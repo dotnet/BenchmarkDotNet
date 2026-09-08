@@ -21,4 +21,4 @@ name: Benchmark Parameterization
 
 [!include[IntroArrayParam](../samples/IntroArrayParam.md)]
 
-[!include[IntroArguments](../samples/IntroArgumentsPriority.md)]
+[!include[IntroArgumentsPriority](../samples/IntroArgumentsPriority.md)]

@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Analysers;
+﻿using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
@@ -35,7 +35,15 @@ public abstract class BaseMockInProcessDiagnoser(RunMode runMode) : IInProcessDi
 
     public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
-    public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => AsyncEnumerable.Empty<ValidationError>();
+    // Iterated here rather than through BenchmarkDotNet's AsyncEnumerable polyfill: that one is internal to
+    // BenchmarkDotNet and compiled out of its .NET 10 asset, while this assembly is netstandard2.0 and would
+    // bind the netstandard asset's copy - which a .NET 10 host then cannot load.
+#pragma warning disable CS1998 // async method lacks await operators
+    public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+    {
+        yield break;
+    }
+#pragma warning restore CS1998
 
     InProcessDiagnoserHandlerData IInProcessDiagnoser.GetHandlerData(BenchmarkCase benchmarkCase)
         => RunMode == RunMode.None

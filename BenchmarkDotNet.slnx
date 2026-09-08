@@ -2,6 +2,7 @@
   <Folder Name="/build/">
     <File Path="build/common.props" />
     <File Path="build/common.targets" />
+    <File Path="build/roslynBands.props" />
   </Folder>
   <Folder Name="/samples/">
     <File Path="samples/Directory.Build.props" />

@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
@@ -168,6 +168,41 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Empty(disassemblyResult.Errors);
             Assert.Contains(disassemblyResult.Methods, method => method.Maps.Any(map => map.SourceCodes.OfType<Asm>().All(asm => asm.ToString()!.Contains("ret"))));
+        }
+
+        // The benchmark declares the names the generator gives its disassembly entry point and JIT-trick method, so both
+        // are renamed on the runnable. The disassembler resolves its entry point by name and has to follow the rename.
+        public class WithGeneratedMemberNames
+        {
+            [Benchmark]
+            public void Benchmark() => Called();
+
+            [MethodImpl(MethodImplOptions.NoInlining)] public void Called() { }
+
+            // Deliberately a different signature from the generated method, which is what would otherwise make the
+            // by-name reflection lookup of the JIT-trick method ambiguous.
+            [MethodImpl(MethodImplOptions.NoInlining)] protected void TrickTheJIT(int notEleven) { }
+
+            // Virtual on purpose: an inherited virtual method occupies a slot in the runnable's method table, which is the
+            // case most likely to show up as a second match when the disassembler looks its entry point up by name.
+            [MethodImpl(MethodImplOptions.NoInlining)] public virtual void ForDisassemblyDiagnoser() { }
+        }
+
+        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
+        [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
+        public void CanDisassembleWhenBenchmarkDeclaresGeneratedMemberNames(Jit jit, Platform platform, IToolchain toolchain)
+        {
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+
+            CanExecute<WithGeneratedMemberNames>(CreateConfig(jit, platform, toolchain, disassemblyDiagnoser, RunStrategy.ColdStart));
+
+            DisassemblyResult result = disassemblyDiagnoser.Results.Single().Value;
+
+            Assert.Empty(result.Errors);
+            AssertDisassemblyResult(result, $"{nameof(WithGeneratedMemberNames.Benchmark)}()");
+            AssertDisassemblyResult(result, $"{nameof(WithGeneratedMemberNames.Called)}()");
         }
 
         private IConfig CreateConfig(Jit jit, Platform platform, IToolchain toolchain, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)

@@ -131,6 +131,8 @@ internal sealed class CsProjNativeAotGenerator : CsProjGenerator
         <EnsureNETCoreAppRuntime>false</EnsureNETCoreAppRuntime> <!-- workaround for 'This runtime may not be supported by.NET Core.' error -->
         <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles> <!-- workaround for 'Found multiple publish output files with the same relative path.' error -->
         <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+        <!-- Shorten obj path to work around https://github.com/dotnet/runtime/issues/103625. -->
+        <IntermediateOutputPath>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'o'))</IntermediateOutputPath>
         {GetInstructionSetSettings(buildPartition)}
       </PropertyGroup>
       {GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)}
@@ -147,7 +149,7 @@ internal sealed class CsProjNativeAotGenerator : CsProjGenerator
       {GetCustomProperties(buildPartition, logger)}
       <!-- Set LangVersion after copied settings so it overrides any LangVersion copied from the benchmarks project -->
       <PropertyGroup>
-        <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '8.0')">latest</LangVersion>
+        <LangVersion Condition="'$(LangVersion)' == '' Or ($([System.Char]::IsDigit('$(LangVersion)', 0)) And '$(LangVersion)' &lt; '9.0')">latest</LangVersion>
       </PropertyGroup>
     </Project>
     """;

@@ -111,11 +111,16 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(typeof(RunnableStructCaseBenchmark), false)]
         [InlineData(typeof(RunnableClassCaseBenchmark), false)]
         [InlineData(typeof(RunnableManyArgsCaseBenchmark), false)]
+        [InlineData(typeof(RunnableRefArgsFromSourceBenchmark), false)] // ref parameters fed from [ArgumentsSource]
         [InlineData(typeof(RunnableTaskCaseBenchmark), false)]
         [InlineData(typeof(RunnableTaskCaseBenchmark), true)]
         [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableBenchmarks), false)]
         [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableCallerOverride), false)]
         [InlineData(typeof(AsyncEnumerableBenchmarksTests.CustomAsyncEnumerableBenchmarks), false)]
+        [InlineData(typeof(AsyncEnumerableParamsSourceTests.StaticParamsSource), false)] // async IAsyncEnumerable [ParamsSource]
+        // A void, parameterless workload with an ASYNC setup/cleanup: the only case that runs the sync core
+        // emitter's setup state machines. RunnableTaskCaseBenchmark covers the Task-returning emitter's.
+        [InlineData(typeof(GlobalSetupCleanupTask), false)]
         public void InProcessBenchmarkEmitsSameIL(Type benchmarkType, bool consumeTasksSynchronously)
         {
             var logger = new OutputLogger(Output);

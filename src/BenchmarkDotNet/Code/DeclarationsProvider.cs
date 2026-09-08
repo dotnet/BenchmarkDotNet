@@ -8,6 +8,7 @@ using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using static BenchmarkDotNet.Code.RunnableConstants;
 
 namespace BenchmarkDotNet.Code
 {
@@ -99,7 +100,7 @@ namespace BenchmarkDotNet.Code
                     .Select((parameter, index) =>
                     {
                         var refModifier = parameter.ParameterType.IsByRef ? "ref" : string.Empty;
-                        return $"{refModifier} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {refModifier} this.__fieldsContainer.argField{index};";
+                        return $"{refModifier} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {refModifier} this.{FieldsContainerName}.{ArgFieldPrefix}{index};";
                     })
             );
 
@@ -110,7 +111,7 @@ namespace BenchmarkDotNet.Code
                     .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} arg{index}")
             );
 
-        // Renders the benchmark method's parameter types as a Type[] for __ResolveWorkloadMethods to match overloads
+        // Renders the benchmark method's parameter types as a Type[] for Run's workload-method resolution to match overloads
         // exactly. Each is a typeof(...) of the element type, re-wrapping by-ref/pointer via reflection (typeof can't
         // express `T&`), so resolution never has to name the method's (possibly unspellable) return type.
         private string GetWorkloadMethodParameterTypes()
@@ -134,7 +135,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} this.__fieldsContainer.argField{index}")
+                    .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} this.{FieldsContainerName}.{ArgFieldPrefix}{index}")
             );
     }
 
@@ -148,7 +149,7 @@ namespace BenchmarkDotNet.Code
             string passArguments = GetPassArguments();
             string workloadMethodCall = GetWorkloadMethodCall(passArguments);
             string coreImpl = $$"""
-            private {{CoreReturnType}} OverheadActionUnroll({{CoreParameters}})
+            private {{CoreReturnType}} {{OverheadActionUnrollMethodName}}({{CoreParameters}})
                     {
                         unsafe
                         {
@@ -156,13 +157,13 @@ namespace BenchmarkDotNet.Code
                             {{StartClockSyncCode}}
                             while (--invokeCount >= 0)
                             {
-                                this.__Overhead({{passArguments}});@Unroll@
+                                this.{{OverheadImplementationMethodName}}({{passArguments}});@Unroll@
                             }
                             {{ReturnSyncCode}}
                         }
                     }
 
-                    private {{CoreReturnType}} OverheadActionNoUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} {{OverheadActionNoUnrollMethodName}}({{CoreParameters}})
                     {
                         unsafe
                         {
@@ -170,13 +171,13 @@ namespace BenchmarkDotNet.Code
                             {{StartClockSyncCode}}
                             while (--invokeCount >= 0)
                             {
-                                this.__Overhead({{passArguments}});
+                                this.{{OverheadImplementationMethodName}}({{passArguments}});
                             }
                             {{ReturnSyncCode}}
                         }
                     }
 
-                    private {{CoreReturnType}} WorkloadActionUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} {{WorkloadActionUnrollMethodName}}({{CoreParameters}})
                     {
                         unsafe
                         {
@@ -190,7 +191,7 @@ namespace BenchmarkDotNet.Code
                         }
                     }
 
-                    private {{CoreReturnType}} WorkloadActionNoUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} {{WorkloadActionNoUnrollMethodName}}({{CoreParameters}})
                     {
                         unsafe
                         {
@@ -223,29 +224,29 @@ namespace BenchmarkDotNet.Code
             string passArguments = GetPassArguments();
             string workloadMethodCall = $"global::{typeof(AwaitHelper).FullName}.{nameof(AwaitHelper.GetResult)}({GetWorkloadMethodCall(passArguments).TrimEnd(';')});";
             string coreImpl = $$"""
-            private {{CoreReturnType}} OverheadActionUnroll({{CoreParameters}})
+            private {{CoreReturnType}} {{OverheadActionUnrollMethodName}}({{CoreParameters}})
                     {
                         {{loadArguments}}
                         {{StartClockSyncCode}}
                         while (--invokeCount >= 0)
                         {
-                            this.__Overhead({{passArguments}});@Unroll@
+                            this.{{OverheadImplementationMethodName}}({{passArguments}});@Unroll@
                         }
                         {{ReturnSyncCode}}
                     }
 
-                    private {{CoreReturnType}} OverheadActionNoUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} {{OverheadActionNoUnrollMethodName}}({{CoreParameters}})
                     {
                         {{loadArguments}}
                         {{StartClockSyncCode}}
                         while (--invokeCount >= 0)
                         {
-                            this.__Overhead({{passArguments}});
+                            this.{{OverheadImplementationMethodName}}({{passArguments}});
                         }
                         {{ReturnSyncCode}}
                     }
 
-                    private {{CoreReturnType}} WorkloadActionUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} {{WorkloadActionUnrollMethodName}}({{CoreParameters}})
                     {
                         {{loadArguments}}
                         {{StartClockSyncCode}}
@@ -256,7 +257,7 @@ namespace BenchmarkDotNet.Code
                         {{ReturnSyncCode}}
                     }
 
-                    private {{CoreReturnType}} WorkloadActionNoUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} {{WorkloadActionNoUnrollMethodName}}({{CoreParameters}})
                     {
                         {{loadArguments}}
                         {{StartClockSyncCode}}
@@ -282,19 +283,19 @@ namespace BenchmarkDotNet.Code
 
         public override string[] GetExtraFields() =>
         [
-            $"public {typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()} workloadValueTaskSource;",
-            $"public {typeof(IClock).GetCorrectCSharpTypeName()} clock;",
-            "public long invokeCount;"
+            $"public {typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()} {WorkloadValueTaskSourceFieldName};",
+            $"public {typeof(IClock).GetCorrectCSharpTypeName()} {ClockFieldName};",
+            $"public long {InvokeCountFieldName};"
         ];
 
         protected override string GetExtraGlobalSetupImpl()
             => $$"""
-            this.__fieldsContainer.workloadValueTaskSource = new {{typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()}}();
-                        this.__StartWorkload();
+            this.{{FieldsContainerName}}.{{WorkloadValueTaskSourceFieldName}} = new {{typeof(WorkloadValueTaskSource).GetCorrectCSharpTypeName()}}();
+                        this.{{StartWorkloadMethodName}}();
             """;
 
         protected override string GetExtraGlobalCleanupImpl()
-            => "this.__fieldsContainer.workloadValueTaskSource.Complete();";
+            => $"this.{FieldsContainerName}.{WorkloadValueTaskSourceFieldName}.Complete();";
 
         protected bool TryGetAsyncMethodBuilderAttribute(out string asyncMethodBuilderAttribute)
         {
@@ -355,57 +356,57 @@ namespace BenchmarkDotNet.Code
             Type workloadCoreReturnType = GetWorkloadCoreReturnType(hasAsyncMethodBuilderAttribute, WorkloadAwaitableReturnType);
             string finalReturn = GetFinalReturn(workloadCoreReturnType);
             string coreImpl = $$"""
-            private {{CoreReturnType}} OverheadActionUnroll({{CoreParameters}})
+            private {{CoreReturnType}} {{OverheadActionUnrollMethodName}}({{CoreParameters}})
                     {
-                        return this.OverheadActionNoUnroll(invokeCount * {{unrollFactor}}, clock);
+                        return this.{{OverheadActionNoUnrollMethodName}}(invokeCount * {{unrollFactor}}, clock);
                     }
 
-                    private {{CoreReturnType}} OverheadActionNoUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} {{OverheadActionNoUnrollMethodName}}({{CoreParameters}})
                     {
                         {{StartClockSyncCode}}
                         while (--invokeCount >= 0)
                         {
-                            this.__Overhead({{passArguments}});
+                            this.{{OverheadImplementationMethodName}}({{passArguments}});
                         }
                         {{ReturnSyncCode}}
                     }
 
-                    private {{CoreReturnType}} WorkloadActionUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} {{WorkloadActionUnrollMethodName}}({{CoreParameters}})
                     {
-                        return this.WorkloadActionNoUnroll(invokeCount * {{unrollFactor}}, clock);
+                        return this.{{WorkloadActionNoUnrollMethodName}}(invokeCount * {{unrollFactor}}, clock);
                     }
 
-                    private {{CoreReturnType}} WorkloadActionNoUnroll({{CoreParameters}})
+                    private {{CoreReturnType}} {{WorkloadActionNoUnrollMethodName}}({{CoreParameters}})
                     {
-                        this.__fieldsContainer.invokeCount = invokeCount;
-                        this.__fieldsContainer.clock = clock;
-                        // The source is allocated and the workload loop started in __GlobalSetup,
+                        this.{{FieldsContainerName}}.{{InvokeCountFieldName}} = invokeCount;
+                        this.{{FieldsContainerName}}.{{ClockFieldName}} = clock;
+                        // The source is allocated and the workload loop started in GlobalSetup,
                         // so this hot path is branchless and allocation-free.
-                        return this.__fieldsContainer.workloadValueTaskSource.Continue();
+                        return this.{{FieldsContainerName}}.{{WorkloadValueTaskSourceFieldName}}.Continue();
                     }
 
-                    private async void __StartWorkload()
+                    private async void {{StartWorkloadMethodName}}()
                     {
-                        await __WorkloadCore();
+                        await {{WorkloadCoreMethodName}}();
                     }
-            
+
                     {{asyncMethodBuilderAttribute}}
-                    private async {{workloadCoreReturnType.GetCorrectCSharpTypeName()}} __WorkloadCore()
+                    private async {{workloadCoreReturnType.GetCorrectCSharpTypeName()}} {{WorkloadCoreMethodName}}()
                     {
                         try
                         {
-                            if (await this.__fieldsContainer.workloadValueTaskSource.GetIsComplete())
+                            if (await this.{{FieldsContainerName}}.{{WorkloadValueTaskSourceFieldName}}.GetIsComplete())
                             {
                                 {{finalReturn}}
                             }
                             while (true)
                             {
-                                {{typeof(StartedClock).GetCorrectCSharpTypeName()}} startedClock = {{typeof(ClockExtensions).GetCorrectCSharpTypeName()}}.Start(this.__fieldsContainer.clock);
-                                while (--this.__fieldsContainer.invokeCount >= 0)
+                                {{typeof(StartedClock).GetCorrectCSharpTypeName()}} startedClock = {{typeof(ClockExtensions).GetCorrectCSharpTypeName()}}.Start(this.{{FieldsContainerName}}.{{ClockFieldName}});
+                                while (--this.{{FieldsContainerName}}.{{InvokeCountFieldName}} >= 0)
                                 {
                                     {{GetCallAndConsumeImpl(workloadMethodCall)}}
                                 }
-                                if (await this.__fieldsContainer.workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
+                                if (await this.{{FieldsContainerName}}.{{WorkloadValueTaskSourceFieldName}}.SetResultAndGetIsComplete(startedClock.GetElapsed()))
                                 {
                                     {{finalReturn}}
                                 }
@@ -413,7 +414,7 @@ namespace BenchmarkDotNet.Code
                         }
                         catch (global::System.Exception e)
                         {
-                            __fieldsContainer.workloadValueTaskSource.SetException(e);
+                            {{FieldsContainerName}}.{{WorkloadValueTaskSourceFieldName}}.SetException(e);
                             {{finalReturn}}
                         }
                     }

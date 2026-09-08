@@ -124,12 +124,14 @@ public class BuildRunner
     public void BuildAnalyzers()
     {
         context.Information("BuildSystemProvider: " + context.BuildSystem().Provider);
-        string[] mccVersions = ["2.8", "3.8", "4.8"];
+        // Each band must restore as well as build: the PackageReference is chosen by MccVersion, so reusing the
+        // default band's project.assets.json silently compiles every band against the default's Roslyn.
+        string[] mccVersions = ["2.8", "3.0", "3.8", "4.4", "4.8", "4.12"];
         foreach (string version in mccVersions)
         {
             context.DotNetBuild(context.AnalyzersProjectFile.FullPath, new DotNetBuildSettings
             {
-                NoRestore = true,
+                NoRestore = false,
                 DiagnosticOutput = true,
                 MSBuildSettings = context.MsBuildSettingsBuild,
                 Configuration = context.BuildConfiguration,
@@ -139,7 +141,7 @@ public class BuildRunner
 
             context.DotNetBuild(context.CodeFixersProjectFile.FullPath, new DotNetBuildSettings
             {
-                NoRestore = true,
+                NoRestore = false,
                 DiagnosticOutput = true,
                 MSBuildSettings = context.MsBuildSettingsBuild,
                 Configuration = context.BuildConfiguration,

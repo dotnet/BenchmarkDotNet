@@ -49,6 +49,12 @@ namespace BenchmarkDotNet.Jobs
 
             foreach (var characteristic in x.GetAllCharacteristics())
             {
+                // Categories say which jobs the user wants to select, they are not a part of what a job *is*.
+                // Comparing them would let two jobs that differ only by category survive the deduplication done by
+                // ImmutableConfigBuilder, which would run the same job twice under two identical names.
+                if (characteristic == MetaMode.CategoriesCharacteristic)
+                    continue;
+
                 if (!x.HasValue(characteristic))
                 {
                     if (y.HasValue(characteristic))
@@ -89,6 +95,12 @@ namespace BenchmarkDotNet.Jobs
             {
                 // Child-bearing characteristics (the job modes) are already covered by their leaf characteristics.
                 if (characteristic.HasChildCharacteristics)
+                    continue;
+
+                // Categories are skipped for the same reason as in Compare: they say which jobs the user wants to
+                // select, not what a job *is*. This is the overload that GroupBy and Distinct use, so comparing them
+                // here is what would actually let two jobs differing only by category run twice under one name.
+                if (characteristic == MetaMode.CategoriesCharacteristic)
                     continue;
 
                 bool xHasValue = x.HasValue(characteristic);

@@ -210,6 +210,36 @@ public class BenchmarkClassAnalyzerTests
             await RunAsync();
         }
 
+        // A derived attribute's own arguments are not the type arguments - it hands those to base(...), out of sight
+        // here - so counting them reports a class the runtime builds fine.
+        [Theory, CombinatorialData]
+        public async Task Generic_class_annotated_with_a_derived_generictypearguments_attribute_should_not_trigger_diagnostic(
+            [CombinatorialMemberData(nameof(BenchmarkAttributeUsagesEnumerableLocal))] string benchmarkAttributeUsage)
+        {
+            var testCode = /* lang=c#-test */ $$"""
+                using BenchmarkDotNet.Attributes;
+
+                public class TwoTypeArgumentsAttribute : GenericTypeArgumentsAttribute
+                {
+                    public TwoTypeArgumentsAttribute(string label) : base(typeof(int), typeof(string)) { }
+                }
+
+                [TwoTypeArguments("label")]
+                public class BenchmarkClass<T1, T2>
+                {
+                    {{benchmarkAttributeUsage}}
+                    public void BenchmarkMethod()
+                    {
+
+                    }
+                }
+                """;
+
+            TestCode = testCode;
+
+            await RunAsync();
+        }
+
         public static IEnumerable<ValueTupleDouble<string, int>> TypeArgumentsData =>
         [
             ("typeof(int), typeof(string)", 2),
@@ -421,6 +451,32 @@ public class BenchmarkClassAnalyzerTests
     {
         public SingleNullArgumentToBenchmarkCategoryAttributeNotAllowed() : base(BenchmarkClassAnalyzer.SingleNullArgumentToBenchmarkCategoryAttributeNotAllowedRule)
         {
+        }
+
+        [Fact]
+        public async Task A_null_argument_to_a_derived_category_attribute_does_not_report_error()
+        {
+            // The rule is about a null *category*. A derived attribute's single argument is whatever its own
+            // constructor takes, and the category it forwards to base(...) is not null at all.
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class LabelledCategoryAttribute : BenchmarkCategoryAttribute
+                {
+                    public LabelledCategoryAttribute(string label) : base("fixed") { }
+                }
+
+                public class BenchmarkClass
+                {
+                    [Benchmark]
+                    [LabelledCategory(null)]
+                    public void Run() { }
+                }
+                """;
+
+            TestCode = testCode;
+            DisableCompilerDiagnostics();
+            await RunAsync();
         }
 
         [Theory, CombinatorialData]
@@ -1153,6 +1209,74 @@ public class BenchmarkClassAnalyzerTests
     public class OnlyOneMethodCanBeBaselinePerCategory : AnalyzerTestFixture<BenchmarkClassAnalyzer>
     {
         public OnlyOneMethodCanBeBaselinePerCategory() : base(BenchmarkClassAnalyzer.OnlyOneMethodCanBeBaselinePerCategoryRule) { }
+
+        [Fact]
+        public async Task Derived_category_attributes_sharing_an_argument_do_not_report_error()
+        {
+            // Harvesting a derived attribute's own arguments as the categories reports the wrong set rather than an
+            // unknown one: these two share a label but forward different categories, so neither baseline collides.
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class ACategoryAttribute : BenchmarkCategoryAttribute
+                {
+                    public ACategoryAttribute(string label) : base("A") { }
+                }
+
+                public class BCategoryAttribute : BenchmarkCategoryAttribute
+                {
+                    public BCategoryAttribute(string label) : base("B") { }
+                }
+
+                public class BenchmarkClass
+                {
+                    [Benchmark(Baseline = true)]
+                    [ACategory("same")]
+                    public void First() { }
+
+                    [Benchmark(Baseline = true)]
+                    [BCategory("same")]
+                    public void Second() { }
+                }
+                """;
+
+            TestCode = testCode;
+            DisableCompilerDiagnostics();
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task A_derived_category_attribute_with_its_own_constructor_shape_does_not_crash_the_analyzer()
+        {
+            // A scalar constructor argument is not the base's string[] of categories; reading it as one throws,
+            // which surfaces as AD0001 and takes every rule in this analyzer down with it. The categories are only
+            // read while walking the base type chain, and only when the derived class declares a baseline, so the
+            // annotated method has to live on a base class for this to reach the code at all.
+            var testCode = /* lang=c#-test */ """
+                using BenchmarkDotNet.Attributes;
+
+                public class TieredCategoryAttribute : BenchmarkCategoryAttribute
+                {
+                    public TieredCategoryAttribute(int tier) : base("tier" + tier) { }
+                }
+
+                public class BenchmarkBase
+                {
+                    [Benchmark]
+                    [TieredCategory(1)]
+                    public void FromBase() { }
+                }
+
+                public class BenchmarkClass : BenchmarkBase
+                {
+                    [Benchmark(Baseline = true)]
+                    public void Run() { }
+                }
+                """;
+
+            TestCode = testCode;
+            await RunAsync();
+        }
 
         [Theory, CombinatorialData]
         public async Task Class_with_only_one_benchmark_method_marked_as_baseline_should_not_trigger_diagnostic(

@@ -79,6 +79,8 @@ namespace BenchmarkDotNet.Configs
             yield return DeferredExecutionValidator.FailOnError;
             yield return ParamsAllValuesValidator.FailOnError;
             yield return ParamsValidator.FailOnError;
+            yield return RequiredMemberValidator.FailOnError;
+            yield return SourceReturnTypeValidator.FailOnError;
             yield return BenchmarkCancellationValidator.FailOnError;
         }
 

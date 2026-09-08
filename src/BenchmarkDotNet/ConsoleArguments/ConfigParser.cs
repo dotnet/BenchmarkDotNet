@@ -616,6 +616,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 yield return new AllCategoriesFilter(options.AllCategories.ToArray());
             if (options.AnyCategories.Any())
                 yield return new AnyCategoriesFilter(options.AnyCategories.ToArray());
+            if (options.AnyJobCategories.Any())
+                yield return new JobCategoryFilter(options.AnyJobCategories.ToArray());
             if (options.AttributeNames.Any())
                 yield return new AttributesFilter(options.AttributeNames.ToArray());
         }
