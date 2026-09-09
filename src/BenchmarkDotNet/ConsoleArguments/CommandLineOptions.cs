@@ -2,11 +2,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.ConsoleArguments.ListBenchmarks;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Helpers;
-using CommandLine;
-using CommandLine.Text;
-using JetBrains.Annotations;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using Perfolizer.Mathematics.OutlierDetection;
 using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
@@ -112,8 +107,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "DontRemove/RemoveUpper/RemoveLower/RemoveAll",
         };
 
-        public int? Affinity { get; set; }
-        public static readonly Option<int?> AffinityOption = new("--affinity")
+        public ulong? Affinity { get; set; }
+        public static readonly Option<ulong?> AffinityOption = new("--affinity")
         {
             Description = "Affinity mask to set for the benchmark process",
         };
@@ -136,6 +131,13 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             AllowMultipleArgumentsPerToken = true,
             Description = "Any Categories to run",
+        };
+
+        public IEnumerable<string> AnyJobCategories { get; set; } = [];
+        public static readonly Option<string[]> AnyJobCategoriesOption = new("--anyJobCategories")
+        {
+            AllowMultipleArgumentsPerToken = true,
+            Description = "Job categories to run. Only the benchmarks which belong to a job that has any of them are going to be executed",
         };
 
         public IEnumerable<string> AttributeNames { get; set; } = [];
@@ -199,12 +201,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         public static readonly Option<FileInfo> MonoPathOption = new("--monoPath")
         {
             Description = "Optional path to Mono which should be used for running benchmarks.",
-        };
-
-        public string ClrVersion { get; set; } = "";
-        public static readonly Option<string> ClrVersionOption = new("--clrVersion")
-        {
-            Description = "Optional version of private CLR build used as the value of COMPLUS_Version env var.",
         };
 
         public string ILCompilerVersion { get; set; } = "";
@@ -424,30 +420,16 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "Path to main.mjs template.",
         };
 
-        public string? CustomRuntimePack { get; set; }
-        public static readonly Option<string> CustomRuntimePackOption = new("--customRuntimePack")
+        public DirectoryInfo? CustomRuntimePack { get; set; }
+        public static readonly Option<DirectoryInfo> CustomRuntimePackOption = new("--customRuntimePack")
         {
-            Description = "Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.",
+            Description = "Path to a custom runtime pack. Only used for ReadyToRun (R2R) currently.",
         };
 
         public FileInfo? AOTCompilerPath { get; set; }
         public static readonly Option<FileInfo> AOTCompilerPathOption = new("--AOTCompilerPath")
         {
-            Description = "Path to Mono AOT compiler, used for MonoAotLLVM.",
-        };
-
-        public MonoAotCompilerMode AOTCompilerMode { get; set; }
-        public static readonly Option<MonoAotCompilerMode> AOTCompilerModeOption = new("--AOTCompilerMode")
-        {
-            DefaultValueFactory = _ => MonoAotCompilerMode.mini,
-            Description = "Mono AOT compiler mode, either 'mini' or 'llvm'",
-        };
-
-        public RuntimeFlavor WasmRuntimeFlavor { get; set; }
-        public static readonly Option<RuntimeFlavor> WasmRuntimeFlavorOption = new("--wasmRuntimeFlavor")
-        {
-            DefaultValueFactory = _ => RuntimeFlavor.Mono,
-            Description = "Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.",
+            Description = "Path to the crossgen2 compiler, used for ReadyToRun (R2R) benchmarks.",
         };
 
         public int WasmProcessTimeoutMinutes { get; set; }
@@ -487,7 +469,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             => Filters.Any()
             || AttributeNames.Any()
             || AllCategories.Any()
-            || AnyCategories.Any();
+            || AnyCategories.Any()
+            || AnyJobCategories.Any();
 
         static CommandLineOptions()
         {
@@ -497,6 +480,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             AddUnrecognizedValidator(FiltersOption);
             AddUnrecognizedValidator(AllCategoriesOption);
             AddUnrecognizedValidator(AnyCategoriesOption);
+            AddUnrecognizedValidator(AnyJobCategoriesOption);
             AddUnrecognizedValidator(AttributeNamesOption);
             AddUnrecognizedValidator(HiddenColumnsOption);
             AddUnrecognizedValidator(HardwareCountersOption);
