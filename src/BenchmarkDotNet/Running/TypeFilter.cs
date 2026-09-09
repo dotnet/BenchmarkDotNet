@@ -13,8 +13,16 @@ namespace BenchmarkDotNet.Running
         {
             var validRunnableTypes = new List<Type>();
 
+            // Built once: the guard below and the list at the end both need it.
+            var assemblyTypes = assemblies
+                .SelectMany(assembly => GenericBenchmarksBuilder.BuildRunnableBenchmarks(assembly.GetRunnableBenchmarks()))
+                .ToArray();
+
             bool hasRunnableTypeBenchmarks = types.Any(type => type.ContainsRunnableBenchmarks());
-            bool hasRunnableAssemblyBenchmarks = assemblies.Any(assembly => GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks()).Length > 0);
+
+            // A type whose attributes cannot be read counts as declaring benchmarks here - it does, and telling the
+            // user that no [Benchmark] was found would be wrong. It is reported below, in place of being run.
+            bool hasRunnableAssemblyBenchmarks = assemblyTypes.Any(built => built.IsSuccess || built.IsUnreadable);
 
             if (!hasRunnableTypeBenchmarks && !hasRunnableAssemblyBenchmarks)
             {
@@ -41,10 +49,11 @@ namespace BenchmarkDotNet.Running
 
             // A type whose attributes cannot be read at all - [Config(typeof(SomeAbstractConfig))], say, where the
             // attribute throws while reflection constructs it - is dropped rather than allowed to abort the run, but
-            // that has to be said out loud: GenericBenchmarksValidator never gets to report it, because it only runs
-            // once at least one benchmark of the assembly survived, and "No benchmarks were found" on its own sends
-            // the user looking in the wrong place. A type that failed on its [GenericTypeArguments] is left to the
-            // validator, which is where that has always been reported.
+            // that has to be said out loud. GenericBenchmarksValidator says so too, and on the paths that never come
+            // through here it is the only one that can, but it only runs once at least one benchmark survived: when
+            // the unreadable type was the only one, this is the one place left to say why nothing was found. Saying
+            // it twice on the way to a run is the lesser problem. A type that failed on its [GenericTypeArguments]
+            // is left to the validator alone, which is where that has always been reported.
             void AddRunnable(IEnumerable<GenericBenchmarkType> built)
             {
                 foreach (var candidate in built)
@@ -70,10 +79,7 @@ namespace BenchmarkDotNet.Running
                 }
             }
 
-            foreach (var assembly in assemblies)
-            {
-                AddRunnable(GenericBenchmarksBuilder.BuildRunnableBenchmarks(assembly.GetRunnableBenchmarks()));
-            }
+            AddRunnable(assemblyTypes);
 
             return (true, validRunnableTypes);
         }
