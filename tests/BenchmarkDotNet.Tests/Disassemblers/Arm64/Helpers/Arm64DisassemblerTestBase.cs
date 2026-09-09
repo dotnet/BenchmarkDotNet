@@ -10,9 +10,9 @@ public abstract class Arm64DisassemblerTestBase
     internal const ulong DummyBaseAddress = 0x0000_F000_0000_0000UL;
 
     internal static readonly Version DummyTargetFrameworkVersion = new Version(10, 0);
-    internal static readonly MockClrMethod DummyMethodNotUsed = default!;
-    internal static readonly MockClrMethod DummyCurrentMethod = new("DummyCurrentMethod", 0x10000, "DummyCurrentMethodSignature", new MockClrType("DummyCurrentMethodType"));
-    internal static readonly MockClrMethod DummyTargetMethod = new("DummyTargetMethod", 0x20000, "DummyTargetMethodSignature", new MockClrType("DummyTargetMethodType"));
+    internal static readonly MockClrMethod DummyMethodNotUsed = new(null, 0, null, null);
+    internal static readonly MockClrMethod DummyCurrentMethod = new("DummyCurrentMethod", DummyBaseAddress + 0x10000, "DummyCurrentMethodSignature", new MockClrType("DummyCurrentMethodType"));
+    internal static readonly MockClrMethod DummyTargetMethod = new("DummyTargetMethod", DummyBaseAddress + 0x20000, "DummyTargetMethodSignature", new MockClrType("DummyTargetMethodType"));
 
     protected static readonly IClrRuntime DummyClrRuntime = CreateMockClrRuntime(0);
     protected readonly ITestOutputHelper Output;
