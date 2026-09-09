@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
 using Microsoft.Diagnostics.Runtime.Interfaces;
+using System.Diagnostics;
 
 #if NET8_0_OR_GREATER
 using Microsoft.Diagnostics.Runtime;
@@ -10,11 +11,11 @@ using Arm64Instruction = Gee.External.Capstone.Arm64.Arm64Instruction;
 
 using Arm64Disassembler = BenchmarkDotNet.Disassemblers.Arm64Disassembler;
 
-
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
 internal class Arm64DisassemblerHelper : Arm64Disassembler
 {
+    [DebuggerHidden]
     public new Arm64Asm[] Decode(
         byte[] code,
         ulong startAddress,
@@ -27,11 +28,13 @@ internal class Arm64DisassemblerHelper : Arm64Disassembler
         return results.Cast<Arm64Asm>().ToArray();
     }
 
+    [DebuggerHidden]
     public new void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, int depth, IClrMethod currentMethod)
     {
         base.TryTranslateAddressToName(address, isAddressPrecodeMD, state, depth, currentMethod);
     }
 
+    [DebuggerHidden]
     public new bool TryFollowJumpTrampoline(State state, ulong address, out ulong target)
     {
         return base.TryFollowJumpTrampoline(state, address, out target);
@@ -39,24 +42,29 @@ internal class Arm64DisassemblerHelper : Arm64Disassembler
 
     // Following methods require UnsafeAccessor to invoke private methods.
 #if NET8_0_OR_GREATER
+
+    [DebuggerHidden]
     public static bool TryResolvePrecode(IDataReader reader, ref ulong address, out bool isPrestubMD)
     {
         var disassembler = new Arm64Disassembler();
         return TryResolvePrecode(disassembler, reader, ref address, out isPrestubMD);
     }
 
+    [DebuggerHidden]
     public static bool TryReadStubHead(IDataReader reader, ulong address, out ulong parseBase, out uint instr0, out uint instr1, out uint instr2)
     {
         var disassembler = new Arm64Disassembler();
         return TryReadStubHead(disassembler, reader, address, out parseBase, out instr0, out instr1, out instr2);
     }
 
+    [DebuggerHidden]
     public static bool IsLdrLiteral64(uint instr, out int rt, out int offsetBytes)
     {
         var disassembler = new Arm64Disassembler();
         return IsLdrLiteral64(disassembler, instr, out rt, out offsetBytes);
     }
 
+    [DebuggerHidden]
     public static bool TryGetReferencedAddress(Arm64Instruction instruction, Arm64RegisterValueAccumulator accumulator, uint pointerSize, out ulong referencedAddress, out bool isReferencedAddressIndirect)
     {
         var disassembler = new Arm64Disassembler();
