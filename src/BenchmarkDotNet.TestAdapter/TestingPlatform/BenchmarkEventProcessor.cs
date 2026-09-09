@@ -30,11 +30,27 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         // first benchmark runs, and the benchmarks themselves run one after another.
         private readonly object buildCompleteGate = new();
 
+        // Written on BenchmarkDotNet's thread, read on the request's once the run is over.
+        private volatile bool parameterValuesDisposed;
+
         public BenchmarkEventProcessor(IReadOnlyDictionary<string, BenchmarkTestNode> nodes, Action<TestNode> publish)
         {
             this.nodes = nodes;
             this.publish = publish;
         }
+
+        /// <summary>
+        /// Gets whether BenchmarkDotNet disposed the parameter values of the benchmarks it was handed.
+        /// </summary>
+        /// <remarks>
+        /// BenchmarkRunnerClean.Run disposes them in the finally of its run stage, which is where OnEndRunStage is
+        /// raised from - after the disposal, and whether the run completed, threw or was cancelled. It never gets
+        /// there when a critical validation error makes it return before the run stage, and nothing disposes the
+        /// values then, so whoever handed them over has to.
+        /// </remarks>
+        public bool ParameterValuesDisposed => parameterValuesDisposed;
+
+        public override void OnEndRunStage() => parameterValuesDisposed = true;
 
         public override void OnValidationError(ValidationError validationError)
         {

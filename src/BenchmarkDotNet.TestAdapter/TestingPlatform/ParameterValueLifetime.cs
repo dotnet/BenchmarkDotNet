@@ -6,17 +6,29 @@ using Microsoft.Testing.Platform.Extensions.TestHost;
 namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 {
     /// <summary>
-    /// Holds the parameter values that the requests of a test application enumerated but never ran, and disposes them
-    /// once the application is done.
+    /// Owns the parameter values that the requests of a test application enumerate and do not run, and disposes them
+    /// once no request can hand them back again.
     /// </summary>
     /// <remarks>
-    /// Disposing them at the end of the request that enumerated them is wrong under server mode, which is how Visual
-    /// Studio and the VS Code Test Explorer drive the platform: a discovery request and the run requests that follow
-    /// it are served by the same process, every request enumerates the assembly again, and a [ParamsSource] backed by
-    /// a cached collection - a static field, or a property over a readonly array - hands back the very same objects.
-    /// Discovery would then dispose the values the run is about to execute against. The platform builds a
-    /// <see cref="BenchmarkTestFramework"/> per request but this extension only once, so it is what can hold the
-    /// values until nothing can ask for them again.
+    /// <para>
+    /// Disposing a value at the end of the request that enumerated it is wrong under server mode, which is how Visual
+    /// Studio and the VS Code Test Explorer drive the platform: one process serves a discovery request and the run
+    /// requests that follow it, every request enumerates the assembly again, and a [ParamsSource] backed by a cached
+    /// collection - a static field, a property over a readonly array - hands back the very same objects. Discovery
+    /// would dispose the values the run is about to execute against.
+    /// </para>
+    /// <para>
+    /// Holding every value until the application ends is wrong the other way round: a source that constructs per
+    /// read - <c>yield return new FileStream(...)</c>, the common shape - produces fresh objects on every request,
+    /// none of which a later request can reuse, and a long session would pile them up. The two are told apart by
+    /// what the next request enumerates: a value that comes back is cached and stays, a value that does not is gone
+    /// for good and is disposed then. The same rule bounds what is remembered about the values BenchmarkDotNet
+    /// disposed itself.
+    /// </para>
+    /// <para>
+    /// The platform builds a <see cref="BenchmarkTestFramework"/> per request but this extension only once, which is
+    /// why the values live here.
+    /// </para>
     /// </remarks>
     internal sealed class ParameterValueLifetime : ITestHostApplicationLifetime
     {
@@ -26,12 +38,14 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         // leak or double dispose rather than fail visibly.
         private readonly object gate = new();
 
-        // Everything the requests enumerated, keyed by the value so that a ParameterInstance which BenchmarkConverter
-        // handed to several jobs is only disposed once, and everything that was handed to BenchmarkDotNet, which
-        // disposes what it was given itself. Retention is remembered for the whole application: a value that one
-        // request ran is disposed by BenchmarkDotNet, however many later requests enumerate it again.
-        private readonly Dictionary<object, ParameterInstance> enumerated = new(ParameterValueDisposer.ByReference);
-        private readonly HashSet<object> retained = new(ParameterValueDisposer.ByReference);
+        // Keyed by the value rather than by the ParameterInstance, because BenchmarkConverter hands the same value
+        // to every job and every argument set of a benchmark, and it is to be disposed once.
+        //
+        // What the request in flight has enumerated so far; what the last completed request enumerated, and which
+        // of those BenchmarkDotNet has disposed itself because it ran them.
+        private Dictionary<object, ParameterInstance> inFlight = new(ParameterValueDisposer.ByReference);
+        private Dictionary<object, ParameterInstance> held = new(ParameterValueDisposer.ByReference);
+        private readonly HashSet<object> disposedByBenchmarkDotNet = new(ParameterValueDisposer.ByReference);
 
         /// <inheritdoc />
         public string Uid => extension.Uid + ".ParameterValueLifetime";
@@ -49,20 +63,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         public Task<bool> IsEnabledAsync() => extension.IsEnabledAsync();
 
         /// <summary>
-        /// Records what a request enumerated and what of it was handed to BenchmarkDotNet, without disposing
-        /// anything yet.
+        /// Records the values the request in flight enumerated. Nothing is disposed until the request completes.
         /// </summary>
-        /// <param name="enumeratedCases">Everything the request enumerated.</param>
-        /// <param name="retainedCases">The benchmarks that were handed to BenchmarkDotNet, if any.</param>
-        public void Track(IEnumerable<BenchmarkCase> enumeratedCases, IEnumerable<BenchmarkCase> retainedCases)
+        /// <param name="enumeratedCases">The benchmarks the request enumerated.</param>
+        public void Track(IEnumerable<BenchmarkCase> enumeratedCases)
         {
             lock (gate)
             {
                 foreach (var parameter in ParameterValueDisposer.GetDisposableParameters(enumeratedCases))
-                    enumerated[parameter.Value!] = parameter;
-
-                foreach (var parameter in ParameterValueDisposer.GetDisposableParameters(retainedCases))
-                    retained.Add(parameter.Value!);
+                    inFlight[parameter.Value!] = parameter;
             }
         }
 
@@ -70,8 +79,8 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// Records the values of the benchmarks that the enumeration hid, which no request will ever be handed.
         /// </summary>
         /// <remarks>
-        /// Being kept by the enumeration is not the same as being handed to BenchmarkDotNet, so the kept values are
-        /// only excluded from what is collected here: whether they are ever run is for <see cref="Track"/> to say.
+        /// Being kept by the enumeration is not the same as being run, so the kept values are only excluded from what
+        /// is collected here: they are recorded through <see cref="Track"/> once the enumeration has returned.
         /// </remarks>
         /// <param name="enumeratedCases">Everything the assembly declares.</param>
         /// <param name="keptCases">The benchmarks the enumeration returned.</param>
@@ -86,9 +95,46 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 foreach (var parameter in ParameterValueDisposer.GetDisposableParameters(enumeratedCases))
                 {
                     if (!kept.Contains(parameter.Value!))
-                        enumerated[parameter.Value!] = parameter;
+                        inFlight[parameter.Value!] = parameter;
                 }
             }
+        }
+
+        /// <summary>
+        /// Completes the request in flight: disposes the values of the previous request that this one did not
+        /// enumerate again, and keeps the rest for the next one.
+        /// </summary>
+        /// <param name="ranCases">
+        /// The benchmarks whose values BenchmarkDotNet disposed itself, which it does once its run stage began - and
+        /// not at all when it bailed out before that, on a critical validation error.
+        /// </param>
+        public async ValueTask CompleteRequestAsync(IEnumerable<BenchmarkCase> ranCases)
+        {
+            List<ParameterInstance> gone;
+
+            lock (gate)
+            {
+                var current = inFlight;
+                inFlight = new Dictionary<object, ParameterInstance>(ParameterValueDisposer.ByReference);
+
+                // A value the previous request enumerated and this one did not comes from a source that constructs
+                // per read: no request can hand it back again, so it goes now rather than at exit. A value that came
+                // back is cached, and stays until nothing can ask for it.
+                gone = held
+                    .Where(pair => !current.ContainsKey(pair.Key) && !disposedByBenchmarkDotNet.Contains(pair.Key))
+                    .Select(pair => pair.Value)
+                    .ToList();
+
+                // Only the values that keep coming back need remembering as already disposed; a fresh one that was
+                // run is gone with its request.
+                disposedByBenchmarkDotNet.RemoveWhere(value => !current.ContainsKey(value));
+                foreach (var parameter in ParameterValueDisposer.GetDisposableParameters(ranCases))
+                    disposedByBenchmarkDotNet.Add(parameter.Value!);
+
+                held = current;
+            }
+
+            await gone.DisposeAllAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -101,9 +147,17 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
             lock (gate)
             {
-                unused = enumerated.Where(pair => !retained.Contains(pair.Key)).Select(pair => pair.Value).ToList();
-                enumerated.Clear();
-                retained.Clear();
+                // Every request completes through CompleteRequestAsync, so nothing should be in flight here, but a
+                // value that somehow is would otherwise be leaked for good.
+                unused = held.Concat(inFlight)
+                    .Where(pair => !disposedByBenchmarkDotNet.Contains(pair.Key))
+                    .GroupBy(pair => pair.Key, ParameterValueDisposer.ByReference)
+                    .Select(group => group.First().Value)
+                    .ToList();
+
+                held.Clear();
+                inFlight.Clear();
+                disposedByBenchmarkDotNet.Clear();
             }
 
             await unused.DisposeAllAsync().ConfigureAwait(false);

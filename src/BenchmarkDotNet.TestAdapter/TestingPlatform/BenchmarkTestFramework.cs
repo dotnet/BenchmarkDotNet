@@ -5,6 +5,7 @@ using Microsoft.Testing.Platform.Capabilities.TestFramework;
 using Microsoft.Testing.Platform.Extensions.Messages;
 using Microsoft.Testing.Platform.Extensions.OutputDevice;
 using Microsoft.Testing.Platform.Extensions.TestFramework;
+using Microsoft.Testing.Platform.OutputDevice;
 using Microsoft.Testing.Platform.Requests;
 using Microsoft.Testing.Platform.Services;
 using Microsoft.Testing.Platform.TestHost;
@@ -90,10 +91,13 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
         private async Task DiscoverAsync(DiscoverTestExecutionRequest request, ExecuteRequestContext context)
         {
-            var enumeration = GetMatchingBenchmarks(request.Filter);
-
+            // The enumeration sits inside the try: it records the values it creates as it goes, and completing the
+            // request is what hands them over, so nothing that throws between the two can lose them.
             try
             {
+                var enumeration = GetMatchingBenchmarks(request.Filter);
+                await WarnAboutUnrecognisedFilterAsync(enumeration, context.CancellationToken).ConfigureAwait(false);
+
                 foreach (var benchmarks in enumeration.Matches)
                 {
                     context.CancellationToken.ThrowIfCancellationRequested();
@@ -109,10 +113,9 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             }
             finally
             {
-                // Discovery runs nothing, so every value the enumeration created is unused - but not necessarily for
-                // good: under server mode a run request follows in this same process, so the disposal waits until the
-                // application is done rather than happening here.
-                parameterValues.Track(enumeration.All.SelectMany(runInfo => runInfo.BenchmarksCases), []);
+                // Discovery runs nothing, so BenchmarkDotNet disposed nothing. The values are not disposed here
+                // either: under server mode a run request follows in this very process, see ParameterValueLifetime.
+                await parameterValues.CompleteRequestAsync([]).ConfigureAwait(false);
             }
         }
 
@@ -121,48 +124,76 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             var sessionUid = request.Session.SessionUid;
             var cancellationToken = context.CancellationToken;
 
+            // Declared ahead of the try, because the finally needs both to say what BenchmarkDotNet disposed - and the
+            // event processor is created out here too, so that a run which threw after BenchmarkDotNet had already
+            // disposed the values, as one does when publishing fails, still has that on record.
             var runnable = new List<Match>();
-            var enumeration = GetMatchingBenchmarks(request.Filter);
-            foreach (var benchmarks in enumeration.Matches)
-            {
-                if (benchmarks.Count == 1)
-                    runnable.Add(benchmarks[0]);
-                else
-                    await PublishCollisionAsync(context, sessionUid, benchmarks).ConfigureAwait(false);
-            }
-
-            // A benchmark that was filtered out or that collided is never handed to BenchmarkDotNet, so nothing else
-            // would dispose the values the enumeration created for it. As in DiscoverAsync, a later request of the
-            // same application may still enumerate and run them, so the disposal waits for the end of the run.
-            parameterValues.Track(
-                enumeration.All.SelectMany(runInfo => runInfo.BenchmarksCases),
-                runnable.Select(match => match.Node.BenchmarkCase));
-
-            if (runnable.Count == 0)
-                return;
-
-            var nodes = runnable.ToDictionary(match => match.Node.Uid, match => match.Node);
+            BenchmarkEventProcessor? eventProcessor = null;
 
             // BenchmarkDotNet reports its progress through synchronous callbacks (EventProcessor and ILogger) while
             // the message bus and the output device are asynchronous. Blocking on those from inside a callback risks
             // deadlocking against the synchronization context BenchmarkDotNet installs while it runs, so the callbacks
-            // write to this channel and the drain below does the awaiting. Synchronous continuations are left off, so
-            // that a write can never end up publishing on BenchmarkDotNet's own thread.
+            // write to this channel and the drain in RunAsync does the awaiting. Synchronous continuations are left
+            // off, so that a write can never end up publishing on BenchmarkDotNet's own thread.
             var workQueue = Channel.CreateUnbounded<Func<Task>>(new UnboundedChannelOptions
             {
                 SingleReader = true,
                 AllowSynchronousContinuations = false
             });
 
+            try
+            {
+                var enumeration = GetMatchingBenchmarks(request.Filter);
+                await WarnAboutUnrecognisedFilterAsync(enumeration, cancellationToken).ConfigureAwait(false);
+
+                foreach (var benchmarks in enumeration.Matches)
+                {
+                    if (benchmarks.Count == 1)
+                        runnable.Add(benchmarks[0]);
+                    else
+                        await PublishCollisionAsync(context, sessionUid, benchmarks).ConfigureAwait(false);
+                }
+
+                if (runnable.Count == 0)
+                    return;
+
+                eventProcessor = new BenchmarkEventProcessor(
+                    runnable.ToDictionary(match => match.Node.Uid, match => match.Node),
+                    testNode =>
+                    {
+                        var message = new TestNodeUpdateMessage(sessionUid, testNode);
+                        workQueue.Writer.TryWrite(() => context.MessageBus.PublishAsync(this, message));
+                    });
+
+                await RunAsync(context, runnable, eventProcessor, workQueue, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                // A benchmark that was filtered out or that collided was never handed to BenchmarkDotNet, so nothing
+                // else disposes its values; and the ones that were handed over are only disposed by BenchmarkDotNet
+                // once its run stage began, not when it bailed out on a critical validation error. As in
+                // DiscoverAsync, nothing is disposed here that a later request could still run.
+                var ranCases = eventProcessor is { ParameterValuesDisposed: true }
+                    ? runnable.Select(match => match.Node.BenchmarkCase)
+                    : [];
+
+                await parameterValues.CompleteRequestAsync(ranCases).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// Runs the given benchmarks through BenchmarkDotNet, publishing their results as they are produced.
+        /// </summary>
+        private async Task RunAsync(
+            ExecuteRequestContext context,
+            List<Match> runnable,
+            BenchmarkEventProcessor eventProcessor,
+            Channel<Func<Task>> workQueue,
+            CancellationToken cancellationToken)
+        {
             // A failure while publishing has to stop the benchmarks as well, otherwise the run would carry on with
             // nobody listening to it.
             using var runCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            var eventProcessor = new BenchmarkEventProcessor(nodes, testNode =>
-            {
-                var message = new TestNodeUpdateMessage(sessionUid, testNode);
-                workQueue.Writer.TryWrite(() => context.MessageBus.PublishAsync(this, message));
-            });
 
             // BenchmarkDotNet's own console output is replaced so that everything goes through the output device,
             // which keeps it in the right place when the platform runs in server mode or inside an IDE.
@@ -247,6 +278,23 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         }
 
         /// <summary>
+        /// Tells the user that the request's filter is one this adapter does not know, and is being treated as
+        /// matching everything.
+        /// </summary>
+        private Task WarnAboutUnrecognisedFilterAsync(Enumeration enumeration, CancellationToken cancellationToken)
+        {
+            if (enumeration.UnrecognisedFilter is not { } filterType)
+                return Task.CompletedTask;
+
+            var warning = new WarningMessageOutputDeviceData(
+                $"BenchmarkDotNet.TestAdapter does not recognise the '{filterType.FullName}' test execution filter " +
+                "and is treating it as matching every benchmark. Please report this at " +
+                "https://github.com/dotnet/BenchmarkDotNet/issues.");
+
+            return serviceProvider.GetOutputDevice().DisplayAsync(this, warning, cancellationToken);
+        }
+
+        /// <summary>
         /// Runs the queued work items in order, until the queue is completed and empty.
         /// </summary>
         /// <param name="reader">The reader of the work queue.</param>
@@ -301,9 +349,14 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// </returns>
         private Enumeration GetMatchingBenchmarks(ITestExecutionFilter filter)
         {
-            var matches = new List<List<Match>>();
+            var (matches, unrecognisedFilter) = CreateMatcher(filter);
+            var matchingGroups = new List<List<Match>>();
             var matchesByUid = new Dictionary<string, List<Match>>(StringComparer.Ordinal);
             var runInfos = BenchmarkEnumerator.GetBenchmarksFromAssembly(assembly, parameterValues.TrackHidden);
+
+            // Recorded before anything else is done with them, so that whatever throws from here on - a node that
+            // cannot be built, a message that cannot be published - cannot lose them.
+            parameterValues.Track(runInfos.SelectMany(runInfo => runInfo.BenchmarksCases));
 
             foreach (var runInfo in runInfos)
             {
@@ -314,37 +367,35 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 foreach (var benchmarkCase in runInfo.BenchmarksCases)
                 {
                     var node = BenchmarkTestNode.Create(benchmarkCase, includeJobInName);
-                    if (!Matches(filter, node))
+                    if (!matches(node))
                         continue;
 
                     if (!matchesByUid.TryGetValue(node.Uid, out var sameUid))
                     {
                         sameUid = new List<Match>();
                         matchesByUid.Add(node.Uid, sameUid);
-                        matches.Add(sameUid);
+                        matchingGroups.Add(sameUid);
                     }
 
                     sameUid.Add(new Match(runInfo, node));
                 }
             }
 
-            return new Enumeration(matches, runInfos);
+            return new Enumeration(matchingGroups, runInfos, unrecognisedFilter);
         }
 
 #pragma warning disable TPEXP // The tree node filter is still marked as experimental by the platform.
-        private static bool Matches(ITestExecutionFilter filter, BenchmarkTestNode node) => filter switch
+        private static (Func<BenchmarkTestNode, bool> Matches, Type? UnrecognisedFilter) CreateMatcher(ITestExecutionFilter filter) => filter switch
         {
-            TestNodeUidListFilter uidListFilter => uidListFilter.TestNodeUids.Any(uid => uid.Value == node.Uid),
-            TreeNodeFilter treeNodeFilter => treeNodeFilter.MatchesFilter(node.Path, node.GetFilterableProperties()),
-            NopFilter => true,
+            TestNodeUidListFilter uidListFilter => (node => uidListFilter.TestNodeUids.Any(uid => uid.Value == node.Uid), null),
+            TreeNodeFilter treeNodeFilter => (node => treeNodeFilter.MatchesFilter(node.Path, node.GetFilterableProperties()), null),
+            NopFilter => (_ => true, null),
 
-            // A filter the platform adds later has to be implemented here before it can be honoured. Falling back to
-            // "everything" would run the whole assembly instead of the subset that was asked for, which is a wrong
-            // answer rather than a visible failure.
-            _ => throw new NotSupportedException(
-                $"BenchmarkDotNet.TestAdapter does not support the '{filter.GetType().FullName}' test execution " +
-                "filter, and will not run every benchmark in its place. Please report this at " +
-                "https://github.com/dotnet/BenchmarkDotNet/issues.")
+            // ITestExecutionFilter is a public extension point, and a consumer can resolve a newer platform than this
+            // was built against, so a filter this does not know is bound to turn up one day. Failing the request
+            // over it would report zero tests - and discovery runs nothing, so nothing is protected by that. It is
+            // treated as matching everything instead, and said so, which keeps the wrong subset visible.
+            _ => (_ => true, filter.GetType())
         };
 #pragma warning restore TPEXP
 
@@ -353,11 +404,18 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// </summary>
         private sealed class Enumeration
         {
-            public Enumeration(List<List<Match>> matches, BenchmarkRunInfo[] all)
+            public Enumeration(List<List<Match>> matches, BenchmarkRunInfo[] all, Type? unrecognisedFilter)
             {
                 Matches = matches;
                 All = all;
+                UnrecognisedFilter = unrecognisedFilter;
             }
+
+            /// <summary>
+            /// Gets the type of the request's filter when it is one this adapter does not know, and was therefore
+            /// taken to match every benchmark.
+            /// </summary>
+            public Type? UnrecognisedFilter { get; }
 
             /// <summary>
             /// Gets the benchmarks the request asked for, grouped by uid.
