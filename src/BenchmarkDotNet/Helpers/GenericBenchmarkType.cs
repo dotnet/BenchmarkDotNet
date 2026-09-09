@@ -25,8 +25,9 @@ namespace BenchmarkDotNet.Helpers
 
         /// <summary>
         /// Gets whether the type was rejected before any of its benchmarks could be read, rather than because one set
-        /// of [GenericTypeArguments] did not fit it. Nothing downstream reports such a type - GenericBenchmarksValidator
-        /// only runs once at least one benchmark of the assembly survived - so whoever drops it has to say so.
+        /// of [GenericTypeArguments] did not fit it. Such a type still declares benchmarks, which is what "no
+        /// benchmarks were found" must not be said about, and whoever drops it when nothing else survives is the
+        /// only one left to say why.
         /// </summary>
         internal bool IsUnreadable { get; }
 
