@@ -26,7 +26,6 @@ using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Wasm;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.Framework;
 using Perfolizer.Horology;
@@ -965,8 +964,9 @@ namespace BenchmarkDotNet.Tests
             var jobs = parsedConfiguration.config.GetJobs();
             foreach (var job in parsedConfiguration.config.GetJobs())
             {
-                var wasmRuntime = Assert.IsType<WasmRuntime>(job.Environment.Runtime);
-                wasmRuntime.JavaScriptEngineArguments.Should().Be("--expose_wasm --module");
+                var wasmToolchain = job.GetToolchain().Should().BeAssignableTo<CsProjWasmToolchain>().Subject;
+                var setting = wasmToolchain.Settings.Should().BeOfType<WasmSettings>().Subject;
+                setting.JavaScriptEngineArguments.Should().Be("--expose_wasm --module");
             }
         }
 
@@ -982,8 +982,9 @@ namespace BenchmarkDotNet.Tests
             var jobs = parsedConfiguration.config.GetJobs();
             foreach (var job in parsedConfiguration.config.GetJobs())
             {
-                var wasmRuntime = job.Environment.Runtime.Should().BeOfType<WasmRuntime>().Subject;
-                wasmRuntime.JavaScriptEngineArguments.Should().Be("--expose_wasm --module");
+                var wasmToolchain = job.GetToolchain().Should().BeAssignableTo<CsProjWasmToolchain>().Subject;
+                var setting = wasmToolchain.Settings.Should().BeOfType<WasmSettings>().Subject;
+                setting.JavaScriptEngineArguments.Should().Be("--expose_wasm --module");
             }
         }
 
@@ -1006,10 +1007,9 @@ namespace BenchmarkDotNet.Tests
             var jobs = parsedConfiguration.config.GetJobs();
             foreach (var job in parsedConfiguration.config.GetJobs())
             {
-                var wasmToolchain = Assert.IsAssignableFrom<CsProjWasmToolchain>(job.GetToolchain());
-                // We may need change assertion to just "--expose_wasm --module"
-                // if https://github.com/commandlineparser/commandline/pull/892 lands
-                Assert.Equal(" --expose_wasm --module", ((WasmSettings)wasmToolchain.Settings).JavaScriptEngineArguments);
+                var wasmToolchain = job.GetToolchain().Should().BeAssignableTo<CsProjWasmToolchain>().Subject;
+                var setting = wasmToolchain.Settings.Should().BeOfType<WasmSettings>().Subject;
+                setting.JavaScriptEngineArguments.Should().Be("--expose_wasm --module");
             }
         }
 
@@ -1086,7 +1086,6 @@ namespace BenchmarkDotNet.Tests
             var config = result.config!;
             var options = result.options!;
 
-
             // Assert
 
             // Verify options that has default value.
@@ -1098,8 +1097,6 @@ namespace BenchmarkDotNet.Tests
                 options.DisassemblerRecursiveDepth.Should().Be(1);
                 options.WasmJavaScriptEngine.Should().Be("v8");
                 options.WasmJavaScriptEngineArguments.Should().Be("--expose_wasm");
-                options.AOTCompilerMode.Should().Be(MonoAotCompilerMode.mini);
-                options.WasmRuntimeFlavor.Should().Be(RuntimeFlavor.Mono);
                 options.WasmProcessTimeoutMinutes.Should().Be(10);
             }
 
@@ -1121,6 +1118,7 @@ namespace BenchmarkDotNet.Tests
                 options.DisplayAllStatistics.Should().BeFalse();
                 options.AllCategories.Should().BeEmpty();
                 options.AnyCategories.Should().BeEmpty();
+                options.AnyJobCategories.Should().BeEmpty();
                 options.AttributeNames.Should().BeEmpty();
                 options.Join.Should().BeFalse();
                 options.Title.Should().BeEmpty();
@@ -1131,7 +1129,6 @@ namespace BenchmarkDotNet.Tests
                 options.RestorePath.Should().BeNull();
                 options.CoreRunPaths.Should().BeEmpty();
                 options.MonoPath.Should().BeNull();
-                options.ClrVersion.Should().BeEmpty();
                 options.ILCompilerVersion.Should().BeEmpty();
                 options.IlcPackages.Should().BeNull();
                 options.LaunchCount.Should().BeNull();
@@ -1161,7 +1158,7 @@ namespace BenchmarkDotNet.Tests
                 options.EnvironmentVariables.Should().BeEmpty();
                 options.MemoryRandomization.Should().BeFalse();
                 options.WasmMainJsTemplate.Should().BeNull();
-                options.CustomRuntimePack.Should().BeEmpty();
+                options.CustomRuntimePack.Should().BeNull();
                 options.AOTCompilerPath.Should().BeNull();
                 options.NoForcedGCs.Should().BeFalse();
                 options.EvaluateOverhead.Should().BeFalse();
@@ -1199,7 +1196,9 @@ namespace BenchmarkDotNet.Tests
 
                 Options:
                   -j, --job <job>                                                                     Dry/Short/Medium/Long or Default [default: Default]
-                  -r, --runtimes <runtimes>                                                           Full target framework moniker for .NET Core and .NET. For Mono just 'Mono'. For NativeAOT please append target runtime version (example: 'nativeaot7.0'). First one will be marked as baseline!
+                  -r, --runtimes <runtimes>                                                           Full target framework moniker for (Core)CLR (e.g. 'net481', 'net8.0', 'net10.0-windows'). For legacy Mono just 'Mono' or 'MonoAot'.
+                                                                                                      Other supported runtimes: 'monoX.0' (.NET on MonoVM), 'nativeaotX.0', 'r2rX.0', 'monowasmX.0', 'monowasmaotX.0', 'corewasmX.0'.
+                                                                                                      First one will be marked as baseline!
                   -e, --exporters <exporters>                                                         GitHub/StackOverflow/RPlot/CSV/JSON/HTML/XML/CSVMeasurements/Markdown/Atlassian/Plain/BriefJSON/FullJSON/Asciidoc/BriefXML/FullXML/OpenMetrics. A custom IExporter can also be selected by its assembly-qualified type name, e.g. "My.Namespace.MyExporter, MyAssembly".
                   -m, --memory                                                                        Prints memory statistics
                   -t, --threading                                                                     Prints threading statistics
@@ -1215,6 +1214,7 @@ namespace BenchmarkDotNet.Tests
                   --allStats                                                                          Displays all statistics (min, max & more)
                   --allCategories <allCategories>                                                     Categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed
                   --anyCategories <anyCategories>                                                     Any Categories to run
+                  --anyJobCategories <anyJobCategories>                                               Job categories to run. Only the benchmarks which belong to a job that has any of them are going to be executed
                   --attribute <attribute>                                                             Run all methods with given attribute (applied to class or method)
                   --join                                                                              Prints single table with results for all benchmarks
                   --title <title>                                                                     Custom title for the produced summaries and the base name of the result files exported for them
@@ -1225,7 +1225,6 @@ namespace BenchmarkDotNet.Tests
                   --packages <packages>                                                               The directory to restore packages to (optional).
                   --coreRun <coreRun>                                                                 Path(s) to CoreRun (optional).
                   --monoPath <monoPath>                                                               Optional path to Mono which should be used for running benchmarks.
-                  --clrVersion <clrVersion>                                                           Optional version of private CLR build used as the value of COMPLUS_Version env var.
                   --ilCompilerVersion <ilCompilerVersion>                                             Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: "7.0.0-preview.3.22123.2"
                   --ilcPackages <ilcPackages>                                                         Optional path to shipping packages produced by local dotnet/runtime build.
                   --launchCount <launchCount>                                                         How many times we should launch process with target benchmark. The default is 1.
@@ -1261,10 +1260,8 @@ namespace BenchmarkDotNet.Tests
                   --wasmEngine <wasmEngine>                                                           Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain. [default: v8]
                   --wasmArgs <wasmArgs>                                                               Arguments for the javascript engine used by Wasm toolchain. [default: --expose_wasm]
                   --wasmMainJsTemplate <wasmMainJsTemplate>                                           Path to main.mjs template.
-                  --customRuntimePack <customRuntimePack>                                             Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.
-                  --AOTCompilerPath <AOTCompilerPath>                                                 Path to Mono AOT compiler, used for MonoAotLLVM.
-                  --AOTCompilerMode <llvm|mini|wasm>                                                  Mono AOT compiler mode, either 'mini' or 'llvm' [default: mini]
-                  --wasmRuntimeFlavor <CoreCLR|Mono>                                                  Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack. [default: Mono]
+                  --customRuntimePack <customRuntimePack>                                             Path to a custom runtime pack. Only used for ReadyToRun (R2R) currently.
+                  --AOTCompilerPath <AOTCompilerPath>                                                 Path to the crossgen2 compiler, used for ReadyToRun (R2R) benchmarks.
                   --wasmProcessTimeout <wasmProcessTimeout>                                           Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it. [default: 10]
                   --noForcedGCs                                                                       Specifying would not forcefully induce any GCs.
                   --evaluateOverhead                                                                  Specifies whether to run and evaluate overhead iterations.

@@ -100,6 +100,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.DisplayAllStatisticsOption,
                     CommandLineOptions.AllCategoriesOption,
                     CommandLineOptions.AnyCategoriesOption,
+                    CommandLineOptions.AnyJobCategoriesOption,
                     CommandLineOptions.AttributeNamesOption,
                     CommandLineOptions.JoinOption,
                     CommandLineOptions.TitleOption,
@@ -110,7 +111,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.RestorePathOption,
                     CommandLineOptions.CoreRunPathsOption,
                     CommandLineOptions.MonoPathOption,
-                    CommandLineOptions.ClrVersionOption,
                     CommandLineOptions.ILCompilerVersionOption,
                     CommandLineOptions.IlcPackagesOption,
                     CommandLineOptions.LaunchCountOption,
@@ -148,8 +148,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.WasmMainJsTemplateOption,
                     CommandLineOptions.CustomRuntimePackOption,
                     CommandLineOptions.AOTCompilerPathOption,
-                    CommandLineOptions.AOTCompilerModeOption,
-                    CommandLineOptions.WasmRuntimeFlavorOption,
                     CommandLineOptions.WasmProcessTimeoutMinutesOption,
                     CommandLineOptions.NoForcedGCsOption,
                     CommandLineOptions.EvaluateOverheadOption,
@@ -588,6 +586,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 DisplayAllStatistics = parseResult.GetValue(CommandLineOptions.DisplayAllStatisticsOption),
                 AllCategories = parseResult.GetValue(CommandLineOptions.AllCategoriesOption) ?? [],
                 AnyCategories = parseResult.GetValue(CommandLineOptions.AnyCategoriesOption) ?? [],
+                AnyJobCategories = parseResult.GetValue(CommandLineOptions.AnyJobCategoriesOption) ?? [],
                 AttributeNames = parseResult.GetValue(CommandLineOptions.AttributeNamesOption) ?? [],
                 Join = parseResult.GetValue(CommandLineOptions.JoinOption),
                 Title = parseResult.GetValue(CommandLineOptions.TitleOption) ?? "",
@@ -600,7 +599,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                     : null,
                 CoreRunPaths = parseResult.GetValue(CommandLineOptions.CoreRunPathsOption) ?? [],
                 MonoPath = parseResult.GetValue(CommandLineOptions.MonoPathOption),
-                ClrVersion = parseResult.GetValue(CommandLineOptions.ClrVersionOption) ?? "",
                 ILCompilerVersion = parseResult.GetValue(CommandLineOptions.ILCompilerVersionOption) ?? "",
                 IlcPackages = parseResult.GetValue(CommandLineOptions.IlcPackagesOption),
                 LaunchCount = parseResult.GetValue(CommandLineOptions.LaunchCountOption),
@@ -636,10 +634,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 WasmJavaScriptEngine = parseResult.GetValue(CommandLineOptions.WasmJavascriptEngineOption) ?? "",
                 WasmJavaScriptEngineArguments = parseResult.GetValue(CommandLineOptions.WasmJavaScriptEngineArgumentsOption) ?? "",
                 WasmMainJsTemplate = parseResult.GetValue(CommandLineOptions.WasmMainJsTemplateOption),
-                CustomRuntimePack = parseResult.GetValue(CommandLineOptions.CustomRuntimePackOption) ?? "",
+                CustomRuntimePack = parseResult.GetValue(CommandLineOptions.CustomRuntimePackOption),
                 AOTCompilerPath = parseResult.GetValue(CommandLineOptions.AOTCompilerPathOption),
-                AOTCompilerMode = parseResult.GetValue(CommandLineOptions.AOTCompilerModeOption),
-                WasmRuntimeFlavor = parseResult.GetValue(CommandLineOptions.WasmRuntimeFlavorOption),
                 WasmProcessTimeoutMinutes = parseResult.GetValue(CommandLineOptions.WasmProcessTimeoutMinutesOption),
                 NoForcedGCs = parseResult.GetValue(CommandLineOptions.NoForcedGCsOption),
                 EvaluateOverhead = parseResult.GetValue(CommandLineOptions.EvaluateOverheadOption),
@@ -704,17 +700,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.Title.IsNotBlank())
                 result.AddRange(["--title", options.Title]);
 
-            if (options.ClrVersion.IsNotBlank())
-                result.AddRange(["--clrVersion", options.ClrVersion]);
-
             if (options.StatisticalTestThreshold.IsNotBlank())
                 result.AddRange(["--statisticalTest", options.StatisticalTestThreshold]);
 
             if (options.ILCompilerVersion.IsNotBlank())
                 result.AddRange(["--ilCompilerVersion", options.ILCompilerVersion]);
-
-            if (options.CustomRuntimePack.IsNotBlank())
-                result.AddRange(["--customRuntimePack", options.CustomRuntimePack]);
 
             // Add multiple values
             if (options.Exporters.Any())
@@ -739,6 +729,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 result.Add("--anyCategories");
                 result.AddRange(options.AnyCategories);
+            }
+
+            if (options.AnyJobCategories.Any())
+            {
+                result.Add("--anyJobCategories");
+                result.AddRange(options.AnyJobCategories);
             }
 
             if (options.AttributeNames.Any())
@@ -826,9 +822,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.ListBenchmarkCaseMode != ListBenchmarkCaseMode.Disabled)
             { result.Add("--list"); result.Add(options.ListBenchmarkCaseMode.ToString()); }
 
-            if (options.AOTCompilerMode != MonoAotCompilerMode.mini)
-            { result.Add("--AOTCompilerMode"); result.Add(options.AOTCompilerMode.ToString()); }
-
             if (options.ArtifactsDirectory != null)
             { result.Add("--artifacts"); result.Add(options.ArtifactsDirectory.FullName); }
 
@@ -853,11 +846,14 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.WasmJavaScriptEngineArguments.IsNotBlank() && options.WasmJavaScriptEngineArguments != "--expose_wasm")
             { result.Add("--wasmArgs"); result.Add(options.WasmJavaScriptEngineArguments); }
 
+            if (options.WasmMainJsTemplate != null)
+            { result.Add("--wasmMainJsTemplate"); result.Add(options.WasmMainJsTemplate.FullName); }
+
+            if (options.CustomRuntimePack != null)
+            { result.Add("--customRuntimePack"); result.Add(options.CustomRuntimePack.FullName); }
+
             if (options.AOTCompilerPath != null)
             { result.Add("--AOTCompilerPath"); result.Add(options.AOTCompilerPath.FullName); }
-
-            if (options.WasmRuntimeFlavor != RuntimeFlavor.Mono)
-            { result.Add("--wasmRuntimeFlavor"); result.Add(options.WasmRuntimeFlavor.ToString()); }
 
             if (options.WasmProcessTimeoutMinutes != 10)
             { result.Add("--wasmProcessTimeout"); result.Add(options.WasmProcessTimeoutMinutes.ToString()); }
@@ -1199,94 +1195,6 @@ namespace BenchmarkDotNet.ConsoleArguments
                     ? baseJob.WithRuntime(clr)
                     : baseJob.WithToolchain(CsProjFrameworkToolchain.From(clr, settings));
             }
-        }
-
-        private static Job CreateAotJob(Job baseJob, CommandLineOptions options, RuntimeMoniker runtimeMoniker, string ilCompilerVersion, string nuGetFeedUrl = "")
-        {
-            var builder = NativeAotToolchain.CreateBuilder();
-
-            if (options.CliPath != null)
-                builder.DotNetCli(options.CliPath.FullName);
-            if (options.RestorePath != null)
-                builder.PackagesRestorePath(options.RestorePath.FullName);
-
-            if (options.IlcPackages != null)
-                builder.UseLocalBuild(options.IlcPackages);
-            else if (options.ILCompilerVersion.IsNotBlank())
-                builder.UseNuGet(options.ILCompilerVersion, nuGetFeedUrl);
-            else
-                builder.UseNuGet(ilCompilerVersion, nuGetFeedUrl);
-
-            var runtime = runtimeMoniker.GetRuntime();
-            builder.TargetFrameworkMoniker(runtime.MsBuildMoniker);
-
-            return baseJob.WithRuntime(runtime).WithToolchain(builder.ToToolchain()).WithId(runtime.Name);
-        }
-
-        private static Job MakeMonoJob(Job baseJob, CommandLineOptions options, MonoRuntime runtime)
-        {
-            return baseJob
-                .WithRuntime(runtime)
-                .WithToolchain(MonoToolchain.From(
-                    new NetCoreAppSettings(
-                        targetFrameworkMoniker: runtime.MsBuildMoniker,
-                        runtimeFrameworkVersion: "",
-                        name: runtime.Name,
-                        options: options)));
-        }
-
-        private static Job MakeMonoAOTLLVMJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
-        {
-            var monoAotLLVMRuntime = new MonoAotLLVMRuntime(
-                aotCompilerPath: options.AOTCompilerPath,
-                aotCompilerMode: options.AOTCompilerMode,
-                msBuildMoniker: msBuildMoniker,
-                moniker: moniker);
-
-            var toolChain = MonoAotLLVMToolChain.From(
-                new NetCoreAppSettings(
-                    targetFrameworkMoniker: monoAotLLVMRuntime.MsBuildMoniker,
-                    runtimeFrameworkVersion: "",
-                    name: monoAotLLVMRuntime.Name,
-                    options: options));
-
-            return baseJob.WithRuntime(monoAotLLVMRuntime).WithToolchain(toolChain).WithId(monoAotLLVMRuntime.Name);
-        }
-
-        private static Job CreateR2RJob(Job baseJob, CommandLineOptions options, Runtime runtime)
-        {
-            var toolChain = R2RToolchain.From(
-                new NetCoreAppSettings(
-                    targetFrameworkMoniker: runtime.MsBuildMoniker,
-                    runtimeFrameworkVersion: "",
-                    name: runtime.Name,
-                    options: options));
-
-            return baseJob.WithRuntime(runtime).WithToolchain(toolChain).WithId(runtime.Name);
-        }
-
-        private static Job MakeWasmJob(Job baseJob, CommandLineOptions options, string msBuildMoniker, RuntimeMoniker moniker)
-        {
-            bool wasmAot = options.AOTCompilerMode == MonoAotCompilerMode.wasm;
-
-            var wasmRuntime = new WasmRuntime(
-                msBuildMoniker: msBuildMoniker,
-                moniker: moniker,
-                displayName: "Wasm",
-                javaScriptEngine: options.WasmJavaScriptEngine,
-                javaScriptEngineArguments: options.WasmJavaScriptEngineArguments,
-                aot: wasmAot,
-                runtimeFlavor: options.WasmRuntimeFlavor,
-                mainJsTemplate: options.WasmMainJsTemplate,
-                processTimeoutMinutes: options.WasmProcessTimeoutMinutes);
-
-            var toolChain = WasmToolchain.From(new NetCoreAppSettings(
-                targetFrameworkMoniker: wasmRuntime.MsBuildMoniker,
-                runtimeFrameworkVersion: "",
-                name: wasmRuntime.Name,
-                options: options));
-
-            return baseJob.WithRuntime(wasmRuntime).WithToolchain(toolChain).WithId(wasmRuntime.Name);
         }
 
         private static IEnumerable<IFilter> GetFilters(CommandLineOptions options)
