@@ -50,6 +50,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 "DisposableProbe.Identity(Value: tracked-2)",
                 "DisposableProbe.Identity(Value: tracked-3)",
 
+                "FreshValueProbe.Identity(Value: fresh-1)",
+                "FreshValueProbe.Identity(Value: fresh-2)",
+
                 // A generic benchmark is named after the type arguments it was closed over.
                 "GenericProbe<System.Char>.Create",
                 "GenericProbe<System.Collections.Generic.List<System.String>>.Create",
@@ -207,6 +210,57 @@ namespace BenchmarkDotNet.IntegrationTests
                     Timeout));
 
             Assert.Equal("created=2 disposed=2", report);
+        }
+
+        [Fact]
+        public void ParameterValuesOfASourceThatConstructsPerReadAreDisposedAsRequestsGoBy()
+        {
+            // FreshValueProbe's source hands back new values on every read, so nothing one request enumerated can
+            // ever be reused by the next. Holding them for the whole session would turn a long Test Explorer session
+            // into the handle leak the disposal exists to prevent: they have to go as soon as the following request
+            // shows they did not come back. The probe reports what had been disposed by the time each read happened.
+            var report = ReadDisposalReport(
+                PassingProbes,
+                "fresh-value-probe.txt",
+                () => TestingPlatformServerModeSession.DiscoverThenRun(
+                    GetProbeApplication(PassingProbes),
+                    "DisposableProbe.Identity(Value: tracked",
+                    Timeout,
+                    discoverAgain: true));
+
+            Assert.Equal(
+                [
+                    "read=1 created=2 disposed=0",
+
+                    // The values of the first request are only known to be unreusable once this read did not hand
+                    // them back, which is after it.
+                    "read=2 created=4 disposed=0",
+
+                    // By the third request they are gone, and so on: the session holds one request's worth.
+                    "read=3 created=6 disposed=2",
+                    "exit created=6 disposed=6",
+                ],
+                report.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries));
+        }
+
+        [Fact]
+        public void ParameterValuesAreDisposedWhenBenchmarkDotNetBailsOutOnValidation()
+        {
+            // The unoptimized probe application fails JitOptimizationsValidator, which is critical: BenchmarkRunnerClean
+            // returns before the try whose finally disposes the values it was handed, so nothing disposes them. The
+            // adapter must not take "handed to BenchmarkDotNet" for "disposed by BenchmarkDotNet" - that assumption
+            // would leave exactly these values, of a run that never started, to the finalizer for good.
+            IReadOnlyList<DiscoveredTest> discovered = [];
+            TestRunSummary? summary = null;
+
+            var report = ReadDisposalReport(
+                UnoptimizedProbes,
+                "unoptimized-probe.txt",
+                () => summary = RunAndSummarize(UnoptimizedProbes, "--treenode-filter", "/*/*/SharedValueProbe/*"));
+
+            Assert.Equal(2, summary!.Total);
+            Assert.Equal(2, summary.Failed);
+            Assert.Equal("created=4 disposed=4", report);
         }
 
         [Fact]

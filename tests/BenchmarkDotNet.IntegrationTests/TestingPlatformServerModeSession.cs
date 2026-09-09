@@ -45,11 +45,13 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="application">The probe application to drive.</param>
         /// <param name="runFilter">The text the display name of a benchmark has to contain to be run.</param>
         /// <param name="timeout">How long any one step may take.</param>
+        /// <param name="discoverAgain">Whether to discover a second time once the run is over, as an IDE refreshing does.</param>
         /// <returns>The nodes the discovery reported, and the last state each ran node was reported in.</returns>
         public static (IReadOnlyList<ServerNode> Discovered, IReadOnlyList<ServerNode> Ran) DiscoverThenRun(
             string application,
             string runFilter,
-            TimeSpan timeout)
+            TimeSpan timeout,
+            bool discoverAgain = false)
         {
             var listener = new TcpListener(IPAddress.Loopback, 0);
             listener.Start();
@@ -77,7 +79,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 using var client = listener.AcceptTcpClient();
                 using var session = new TestingPlatformServerModeSession(process, client, timeout);
 
-                return session.Run(runFilter);
+                return session.Run(runFilter, discoverAgain);
             }
             finally
             {
@@ -85,7 +87,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private (IReadOnlyList<ServerNode>, IReadOnlyList<ServerNode>) Run(string runFilter)
+        private (IReadOnlyList<ServerNode>, IReadOnlyList<ServerNode>) Run(string runFilter, bool discoverAgain)
         {
             SendRequest("initialize", new
             {
@@ -111,6 +113,9 @@ namespace BenchmarkDotNet.IntegrationTests
                     .Select(node => new Dictionary<string, object> { ["uid"] = node.Uid, ["display-name"] = node.DisplayName })
                     .ToArray()
             });
+
+            if (discoverAgain)
+                Exchange("testing/discoverTests", runId => new { runId });
 
             Send(new { jsonrpc = "2.0", method = "exit", @params = new { } });
 
