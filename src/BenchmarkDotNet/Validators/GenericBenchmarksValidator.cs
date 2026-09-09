@@ -16,8 +16,9 @@ namespace BenchmarkDotNet.Validators
                 .Distinct()
                 .SelectMany(assembly => assembly.GetRunnableBenchmarks())
                 .SelectMany(GenericBenchmarksBuilder.BuildGenericsIfNeeded)
-                // An unreadable type is reported by TypeFilter, which sees it even when nothing else survives.
-                .Where(built => !built.IsSuccess && !built.IsUnreadable)
+                // An unreadable type is reported here as well as by TypeFilter: BenchmarkRunner.Run<T>() and both
+                // test adapters never go through TypeFilter, so for them this is the only report there is.
+                .Where(built => !built.IsSuccess)
                 .Select(built => new ValidationError(false, built.Error!))
                 .ToAsyncEnumerable();
     }
