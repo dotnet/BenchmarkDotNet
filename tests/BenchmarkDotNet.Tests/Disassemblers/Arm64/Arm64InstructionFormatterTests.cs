@@ -118,7 +118,7 @@ public partial class Arm64InstructionFormatterTests : Arm64DisassemblerTestBase
 
     private static Arm64Asm[] GetArm64Asms(uint[] rawInstructions, ulong baseAddress, Dictionary<ulong, string> symbols)
     {
-        var clrRuntime = CreateMockClrRuntime(0);
+        using var clrRuntime = CreateMockClrRuntime(0);
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         foreach (var symbol in symbols)
         {

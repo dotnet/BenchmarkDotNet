@@ -33,7 +33,7 @@ public partial class Arm64DisassemblerTests
 
         byte[] bytes = rawInstructions.ToLittleEndianBytes();
 
-        var clrRuntime = CreateMockClrRuntime(
+        using var clrRuntime = CreateMockClrRuntime(
             [
                 Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
                 Arm64InstructionFactory.LDR(X10, 0x10000), // ldr x10, #0x10000
