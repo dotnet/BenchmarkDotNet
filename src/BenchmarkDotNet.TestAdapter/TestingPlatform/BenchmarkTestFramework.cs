@@ -93,9 +93,14 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         {
             // The enumeration sits inside the try: it records the values it creates as it goes, and completing the
             // request is what hands them over, so nothing that throws between the two can lose them.
+            var parameterValueScope = parameterValues.BeginRequest();
+
             try
             {
-                var enumeration = GetMatchingBenchmarks(request.Filter);
+                var enumeration = GetMatchingBenchmarks(request.Filter, parameterValueScope);
+
+                // Discovery runs nothing, so a filter this adapter does not know costs nothing but a wrong list, and
+                // reporting every benchmark beats reporting none. The run path refuses it instead.
                 await WarnAboutUnrecognisedFilterAsync(enumeration, context.CancellationToken).ConfigureAwait(false);
 
                 foreach (var benchmarks in enumeration.Matches)
@@ -115,7 +120,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             {
                 // Discovery runs nothing, so BenchmarkDotNet disposed nothing. The values are not disposed here
                 // either: under server mode a run request follows in this very process, see ParameterValueLifetime.
-                await parameterValues.CompleteRequestAsync([]).ConfigureAwait(false);
+                await parameterValueScope.CompleteAsync([]).ConfigureAwait(false);
             }
         }
 
@@ -129,6 +134,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             // disposed the values, as one does when publishing fails, still has that on record.
             var runnable = new List<Match>();
             BenchmarkEventProcessor? eventProcessor = null;
+            var parameterValueScope = parameterValues.BeginRequest();
 
             // BenchmarkDotNet reports its progress through synchronous callbacks (EventProcessor and ILogger) while
             // the message bus and the output device are asynchronous. Blocking on those from inside a callback risks
@@ -143,8 +149,19 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
             try
             {
-                var enumeration = GetMatchingBenchmarks(request.Filter);
-                await WarnAboutUnrecognisedFilterAsync(enumeration, cancellationToken).ConfigureAwait(false);
+                var enumeration = GetMatchingBenchmarks(request.Filter, parameterValueScope);
+
+                // Unlike discovery, a run cannot treat a filter it does not know as matching everything: that would
+                // spend the machine's next hour benchmarking the whole assembly instead of the subset that was asked
+                // for, and a warning on the output device is not something an IDE is bound to surface. Refusing the
+                // request keeps the filter visible and costs nothing but a re-run once it is supported.
+                if (enumeration.UnrecognisedFilter is { } unrecognisedFilter)
+                {
+                    throw new NotSupportedException(
+                        $"BenchmarkDotNet.TestAdapter does not support the '{unrecognisedFilter.FullName}' test " +
+                        "execution filter, and will not run every benchmark of the assembly in its place. Please " +
+                        "report this at https://github.com/dotnet/BenchmarkDotNet/issues.");
+                }
 
                 foreach (var benchmarks in enumeration.Matches)
                 {
@@ -177,7 +194,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                     ? runnable.Select(match => match.Node.BenchmarkCase)
                     : [];
 
-                await parameterValues.CompleteRequestAsync(ranCases).ConfigureAwait(false);
+                await parameterValueScope.CompleteAsync(ranCases).ConfigureAwait(false);
             }
         }
 
@@ -343,20 +360,21 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// Enumerates the benchmarks of the assembly and keeps the ones the request asked for.
         /// </summary>
         /// <param name="filter">The filter of the request.</param>
+        /// <param name="parameterValueScope">The scope the values this creates are recorded in.</param>
         /// <returns>
-        /// The matching benchmarks in enumeration order and grouped by uid, together with everything the assembly
-        /// declares. A group holding more than one benchmark is a uid collision.
+        /// The matching benchmarks in enumeration order and grouped by uid. A group holding more than one benchmark
+        /// is a uid collision.
         /// </returns>
-        private Enumeration GetMatchingBenchmarks(ITestExecutionFilter filter)
+        private Enumeration GetMatchingBenchmarks(ITestExecutionFilter filter, ParameterValueLifetime.RequestScope parameterValueScope)
         {
             var (matches, unrecognisedFilter) = CreateMatcher(filter);
             var matchingGroups = new List<List<Match>>();
             var matchesByUid = new Dictionary<string, List<Match>>(StringComparer.Ordinal);
-            var runInfos = BenchmarkEnumerator.GetBenchmarksFromAssembly(assembly, parameterValues.TrackHidden);
+            var runInfos = BenchmarkEnumerator.GetBenchmarksFromAssembly(assembly, parameterValueScope.TrackHidden);
 
             // Recorded before anything else is done with them, so that whatever throws from here on - a node that
             // cannot be built, a message that cannot be published - cannot lose them.
-            parameterValues.Track(runInfos.SelectMany(runInfo => runInfo.BenchmarksCases));
+            parameterValueScope.Track(runInfos.SelectMany(runInfo => runInfo.BenchmarksCases));
 
             foreach (var runInfo in runInfos)
             {
@@ -381,7 +399,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 }
             }
 
-            return new Enumeration(matchingGroups, runInfos, unrecognisedFilter);
+            return new Enumeration(matchingGroups, unrecognisedFilter);
         }
 
 #pragma warning disable TPEXP // The tree node filter is still marked as experimental by the platform.
@@ -391,10 +409,10 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             TreeNodeFilter treeNodeFilter => (node => treeNodeFilter.MatchesFilter(node.Path, node.GetFilterableProperties()), null),
             NopFilter => (_ => true, null),
 
-            // ITestExecutionFilter is a public extension point, and a consumer can resolve a newer platform than this
-            // was built against, so a filter this does not know is bound to turn up one day. Failing the request
-            // over it would report zero tests - and discovery runs nothing, so nothing is protected by that. It is
-            // treated as matching everything instead, and said so, which keeps the wrong subset visible.
+            // ITestExecutionFilter is a public extension point, and a consumer can resolve a newer platform than
+            // this was built against, so a filter this does not know is bound to turn up one day. It matches
+            // everything and is reported as unrecognised; what that costs differs between the two requests, so what
+            // to do about it is left to each of them - discovery lists the lot and says so, a run refuses.
             _ => (_ => true, filter.GetType())
         };
 #pragma warning restore TPEXP
@@ -404,10 +422,9 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// </summary>
         private sealed class Enumeration
         {
-            public Enumeration(List<List<Match>> matches, BenchmarkRunInfo[] all, Type? unrecognisedFilter)
+            public Enumeration(List<List<Match>> matches, Type? unrecognisedFilter)
             {
                 Matches = matches;
-                All = all;
                 UnrecognisedFilter = unrecognisedFilter;
             }
 
@@ -421,11 +438,6 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             /// Gets the benchmarks the request asked for, grouped by uid.
             /// </summary>
             public List<List<Match>> Matches { get; }
-
-            /// <summary>
-            /// Gets every benchmark the assembly declares, matching or not.
-            /// </summary>
-            public BenchmarkRunInfo[] All { get; }
         }
 
         /// <summary>

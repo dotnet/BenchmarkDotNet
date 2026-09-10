@@ -43,10 +43,10 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// Gets whether BenchmarkDotNet disposed the parameter values of the benchmarks it was handed.
         /// </summary>
         /// <remarks>
-        /// BenchmarkRunnerClean.Run disposes them in the finally of its run stage, which is where OnEndRunStage is
-        /// raised from - after the disposal, and whether the run completed, threw or was cancelled. It never gets
-        /// there when a critical validation error makes it return before the run stage, and nothing disposes the
-        /// values then, so whoever handed them over has to.
+        /// BenchmarkRunnerClean disposes them in the finally of its run stage, which is where OnEndRunStage is
+        /// raised from - after the disposal has been through every value, whether the run completed, threw, was
+        /// cancelled, or the disposal itself threw. It never gets there when a critical validation error makes it
+        /// return before the run stage, and nothing disposes the values then, so whoever handed them over has to.
         /// </remarks>
         public bool ParameterValuesDisposed => parameterValuesDisposed;
 
