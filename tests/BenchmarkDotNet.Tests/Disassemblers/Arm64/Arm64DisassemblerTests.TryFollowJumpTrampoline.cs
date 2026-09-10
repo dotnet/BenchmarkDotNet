@@ -185,7 +185,8 @@ public partial class Arm64DisassemblerTests
     }
 
     // TODO: Need to confirm .NET JIT specification later.
-    // TryFollowJumpTrampoline seems not support FixupPrecode with pre-backpatch form.
+    // Currently TryFollowJumpTrampoline is not support FixupPrecode with pre-backpatch form.
+    // See: https://github.com/dotnet/BenchmarkDotNet/pull/3245#discussion_r3961711836
     [Fact]
     public void TryFollowJumpTrampoline_FixupPrecodeCode_Fixup_ShouldReturnFalse()
     {
