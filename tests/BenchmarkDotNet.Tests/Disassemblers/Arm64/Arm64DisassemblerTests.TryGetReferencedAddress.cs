@@ -33,7 +33,7 @@ public partial class Arm64DisassemblerTests
         var result = Arm64DisassemblerHelper.TryGetReferencedAddress(
           rawInstruction.ToCapstoneArm64Instruction(),
            valueAccumulator,
-           pointerSize: 0, // Thiss parameter is not used.
+           pointerSize: 0, // This parameter is not used.
            out ulong referencedAddress,
            out bool isReferencedAddressIndirect);
 
@@ -54,7 +54,7 @@ public partial class Arm64DisassemblerTests
         var result = Arm64DisassemblerHelper.TryGetReferencedAddress(
            rawInstruction.ToCapstoneArm64Instruction(),
            valueAccumulator,
-           pointerSize: 0, // Thiss parameter is not used.
+           pointerSize: 0, // This parameter is not used.
            out ulong referencedAddress,
            out bool isReferencedAddressIndirect);
 
@@ -75,7 +75,7 @@ public partial class Arm64DisassemblerTests
         var result = Arm64DisassemblerHelper.TryGetReferencedAddress(
            rawInstruction.ToCapstoneArm64Instruction(),
            valueAccumulator,
-           pointerSize: 0, // Thiss parameter is not used.
+           pointerSize: 0, // This parameter is not used.
            out ulong referencedAddress,
            out bool isReferencedAddressIndirect);
 
@@ -96,7 +96,7 @@ public partial class Arm64DisassemblerTests
         var result = Arm64DisassemblerHelper.TryGetReferencedAddress(
            rawInstruction.ToCapstoneArm64Instruction(),
            valueAccumulator,
-           pointerSize: 0, // Thiss parameter is not used.
+           pointerSize: 0, // This parameter is not used.
            out ulong referencedAddress,
            out bool isReferencedAddressIndirect);
 
