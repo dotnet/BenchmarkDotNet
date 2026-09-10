@@ -9,26 +9,17 @@ public delegate bool TryReadPointerDelegate(ulong address, out ulong value);
 
 internal class MockDataReader : IDataReader
 {
-    private readonly ReadBytesDelegate _read = (_, _) => throw new InvalidOperationException($"{nameof(_read)} field is not set.");
-    private readonly TryReadPointerDelegate _tryReadPointer = (_, out _) => throw new InvalidOperationException($"{nameof(_tryReadPointer)} field is not set.");
+    private readonly ReadBytesDelegate _read;
+    private readonly TryReadPointerDelegate _tryReadPointer;
 
     public MockDataReader(ulong dummyValue = 0)
     {
+        _read = (_, _) => 0;
         _tryReadPointer = (ulong address, out ulong value) =>
         {
             value = dummyValue;
             return true;
         };
-    }
-
-    public MockDataReader(TryReadPointerDelegate tryReadPointer)
-    {
-        _tryReadPointer = tryReadPointer;
-    }
-
-    public MockDataReader(ReadBytesDelegate read)
-    {
-        _read = read;
     }
 
     public MockDataReader(ReadBytesDelegate read, TryReadPointerDelegate tryReadPointer)
