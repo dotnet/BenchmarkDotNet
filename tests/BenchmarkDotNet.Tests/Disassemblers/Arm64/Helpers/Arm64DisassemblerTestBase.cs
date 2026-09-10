@@ -40,7 +40,7 @@ public abstract class Arm64DisassemblerTestBase
 
     /// <summary>
     /// Create MockClrRuntime with MockDataReader that returns following data.
-    ///   Read: Throw InvalidOperationException.
+    ///   Read: Return 0 length as written bytes.
     ///   ReadPointer: Return address 0 data to skip TryResolvePrecode/TryFollowJumpTrampoline.
     /// </summary>
     protected static MockClrRuntime CreateMockClrRuntime()
