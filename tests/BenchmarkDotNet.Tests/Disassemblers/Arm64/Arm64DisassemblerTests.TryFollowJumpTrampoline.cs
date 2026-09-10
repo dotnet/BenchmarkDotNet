@@ -64,9 +64,9 @@ public partial class Arm64DisassemblerTests
         var rawInstructions = new[]
         {
             Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
-            Arm64InstructionFactory.LDR(X10, 0x10000), // ldr x11, #0x10000
+            Arm64InstructionFactory.LDR(X10, 0x10000), // ldr x10, #0x10000
             Arm64InstructionFactory.LDR(X12, 0x20000), // ldr x12, #0x20000
-            Arm64InstructionFactory.BR(X10),           // br x11
+            Arm64InstructionFactory.BR(X10),           // br x10
         };
         PrintInstructions(rawInstructions);
 
@@ -122,7 +122,7 @@ public partial class Arm64DisassemblerTests
         var rawInstructions = new uint[]
         {
             Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD),          // dmb ishld
-            Arm64InstructionFactory.LDR(X9, 0x10000),                                   // ldr x11, #0x10000
+            Arm64InstructionFactory.LDR(X9, 0x10000),                                   // ldr x9, #0x10000
             Arm64InstructionFactory.LDRH(W10, new Arm64ImmediateMemoryAccessor(X9, 0)), // ldrh w10, [x9]
             Arm64InstructionFactory.SUBS(W10, W10, 1),                                  // subs w10, w10, #1
         };
