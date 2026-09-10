@@ -22,7 +22,6 @@ using BenchmarkDotNet.Validators;
 using Perfolizer.Horology;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
-using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 using RunMode = BenchmarkDotNet.Jobs.RunMode;
 
@@ -200,27 +199,21 @@ namespace BenchmarkDotNet.Running
                 // see https://github.com/dotnet/BenchmarkDotNet/issues/1383 and https://github.com/dotnet/runtime/issues/314 for more
                 //
                 // DisposeAllAsync goes through every value before it reports a failure, so one that threw leaves
-                // nothing else undisposed - and must not skip the teardown below either. Whoever is listening is told
-                // that the run stage ended whatever the disposal did, and the failure is raised after them.
-                ExceptionDispatchInfo? disposeFailure = null;
-
+                // nothing else undisposed - and must not take the teardown down with it either: whoever is listening
+                // is told that the run stage ended whatever the disposal did.
                 try
                 {
                     await benchmarkRunInfos.DisposeAllAsync().ConfigureAwait();
                 }
-                catch (Exception exception)
+                finally
                 {
-                    disposeFailure = ExceptionDispatchInfo.Capture(exception);
+                    compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
+                    Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
+                    compositeLogger.WriteLineInfo("Artifacts cleanup is finished.");
+                    compositeLogger.Flush();
+
+                    eventProcessor.OnEndRunStage();
                 }
-
-                compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
-                Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
-                compositeLogger.WriteLineInfo("Artifacts cleanup is finished.");
-                compositeLogger.Flush();
-
-                eventProcessor.OnEndRunStage();
-
-                disposeFailure?.Throw();
             }
         }
 
