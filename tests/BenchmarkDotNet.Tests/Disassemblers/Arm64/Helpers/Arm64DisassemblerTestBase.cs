@@ -49,31 +49,3 @@ public abstract class Arm64DisassemblerTestBase
         return new MockClrRuntime(new MockDataTarget(dataReader));
     }
 }
-
-file static class ExtensionMethods
-{
-    public static ReadBytesDelegate ToGetReadBytesDelegate(this uint[] rawInstructions)
-    {
-        return (address, buffer) =>
-        {
-            var instructionCountToWrite = Math.Min(rawInstructions.Length, buffer.Length / 4);
-
-            for (int i = 0; i < instructionCountToWrite; i++)
-            {
-                uint rawInstruction = rawInstructions[i];
-                BinaryPrimitives.WriteUInt32LittleEndian(buffer.Slice(i * 4), rawInstruction);
-            }
-
-            return instructionCountToWrite * 4;
-        };
-    }
-
-    public static TryReadPointerDelegate ToTryReadPointerDelegate(this Func<ulong, ulong> getPointer)
-    {
-        return (ulong address, out ulong value) =>
-        {
-            value = getPointer(address);
-            return true;
-        };
-    }
-}
