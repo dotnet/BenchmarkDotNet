@@ -1,10 +1,10 @@
-#if !NET8_0_OR_GREATER
+#if !NET7_0_OR_GREATER
 namespace System.Diagnostics;
 
 /// <summary>
 /// Exception thrown when the program executes an instruction that was thought to be unreachable.
 /// </summary>
-public sealed class UnreachableException : Exception
+internal sealed class UnreachableException : Exception
 {
     private const string DefaultMessage = "The program executed an instruction that was thought to be unreachable.";
 
