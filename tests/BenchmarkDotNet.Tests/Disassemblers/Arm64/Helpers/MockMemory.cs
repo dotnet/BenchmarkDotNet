@@ -63,6 +63,13 @@ internal sealed class MockMemory
         return AddBytes(address, bytes);
     }
 
+    public MockMemory AddFalsePointer(ulong address)
+    {
+        // Register dummy buffer to return `false` when TryReadPointer is called.
+        var bytes = new byte[1];
+        return AddBytes(address, bytes);
+    }
+
     public MockMemory AddJitHelperFunctionName(ulong address, string? value)
     {
         JitHelperFunctionNames.Add(address, value);
@@ -107,7 +114,6 @@ internal sealed class MockMemory
 
         return clrRuntime;
     }
-
 
     private int Read(ulong address, Span<byte> buffer)
     {

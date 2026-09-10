@@ -83,5 +83,21 @@ public partial class Arm64RegisterValueAccumulatorTests
         // Assert
         accumulator.HasValue.Should().BeFalse();
     }
+
+    [Fact]
+    public void MovzThenMovk_DifferentRegister_ShouldHaveValue()
+    {
+        // Arrange
+        var accumulator = CreateValueAccumulator();
+
+        // Act
+        accumulator.Feed(Arm64TestInstructions.Movz(X0, 0x1234));     // movz x0, #0x1234
+        accumulator.Feed(Arm64TestInstructions.Movk(X1, 0x5678, 16)); // movk x1, #0x5678, lsl #16
+
+        // Assert
+        accumulator.HasValue.Should().BeTrue();
+        accumulator.Value.Should().Be(0x1234);
+        accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
+    }
 }
 #endif
