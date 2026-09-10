@@ -2,23 +2,24 @@
 using AsmArm64;
 using AwesomeAssertions;
 using BenchmarkDotNet.Disassemblers;
+using Microsoft.Diagnostics.Runtime.Interfaces;
 using static AsmArm64.Arm64RegisterX;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
 public partial class Arm64DisassemblerTests
 {
-    private Arm64RegisterValueAccumulator CreateValueAccumulator(Arm64RegisterX register, ushort initialValue)
+    private Arm64RegisterValueAccumulator CreateValueAccumulator(Arm64RegisterX register, ushort initialValue, IClrRuntime clrRuntime)
     {
-        using var clrRuntime = CreateMockClrRuntime();
         var valueAccumulator = new Arm64RegisterValueAccumulator();
         valueAccumulator.Init(clrRuntime);
 
-        // Set initial state
+        // Set initial state by processing Movz instruction.
         valueAccumulator.Feed(Arm64TestInstructions.Movz(register, initialValue));
 
         valueAccumulator.HasValue.Should().BeTrue();
         valueAccumulator.Value.Should().Be(initialValue);
+        // TODO: Add Register validation after migrated to AsmArm64
 
         return valueAccumulator;
     }
@@ -27,7 +28,8 @@ public partial class Arm64DisassemblerTests
     public void TryGetReferencedAddress_With_BR()
     {
         // Arrange
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100);
+        using var clrRuntime = CreateMockClrRuntime();
+        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
         var rawInstruction = Arm64InstructionFactory.BR(X0);
 
         // Act
@@ -48,7 +50,8 @@ public partial class Arm64DisassemblerTests
     public void TryGetReferencedAddress_With_BLR()
     {
         // Arrange
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100);
+        using var clrRuntime = CreateMockClrRuntime();
+        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
         var rawInstruction = Arm64InstructionFactory.BLR(X0);
 
         // Act
@@ -69,7 +72,8 @@ public partial class Arm64DisassemblerTests
     public void TryGetReferencedAddress_With_BranchRelative()
     {
         // Arrange
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100);
+        using var clrRuntime = CreateMockClrRuntime();
+        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
         var rawInstruction = Arm64InstructionFactory.B(0x200);
 
         // Act
@@ -90,7 +94,8 @@ public partial class Arm64DisassemblerTests
     public void TryGetReferencedAddress_DontMatchCondition_ShouldReturnFalse()
     {
         // Arrange
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100);
+        using var clrRuntime = CreateMockClrRuntime();
+        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
         var rawInstruction = Arm64InstructionFactory.RET(); // `ret` instruction is not BranchRelative group
 
         // Act
@@ -109,7 +114,8 @@ public partial class Arm64DisassemblerTests
     public void TryGetReferencedAddress_With_BR_DifferentRegister_ShouldReturnFalse()
     {
         // Arrange
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100);
+        using var clrRuntime = CreateMockClrRuntime();
+        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
         var rawInstruction = Arm64InstructionFactory.BR(X1);
 
         // Act
