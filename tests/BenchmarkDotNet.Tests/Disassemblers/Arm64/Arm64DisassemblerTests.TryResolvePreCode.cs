@@ -1,8 +1,9 @@
 #if NET8_0_OR_GREATER
+using Argon;
 using AsmArm64;
 using AwesomeAssertions;
-using static AsmArm64.Arm64RegisterX;
 using static AsmArm64.Arm64RegisterW;
+using static AsmArm64.Arm64RegisterX;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
@@ -17,26 +18,22 @@ public partial class Arm64DisassemblerTests
         var rawInstructions = new[]
         {
             Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
-            Arm64InstructionFactory.LDR(X10, JumpAddress), // ldr x11, #0x10000
+            Arm64InstructionFactory.LDR(X10, JumpAddress), // ldr x10, #0x10000
             Arm64InstructionFactory.LDR(X12, MdOffset),    // ldr x12, #0x20000
-            Arm64InstructionFactory.BR(X10),               // br x11
+            Arm64InstructionFactory.BR(X10),               // br x10
         };
         PrintInstructions(rawInstructions);
 
-        var dataReader = CreateMockDataReader(rawInstructions, getPointer: (ulong address) =>
-        {
-            // Validate address value
-            var parseBase = DummyBaseAddress + 4; // Skip `dmb ishld` instruction
-            ulong mdSlot = parseBase + 4 + (ulong)MdOffset;
-            address.Should().Be(mdSlot);
-
-            // Return resolved address
-            return ExpectedResultAddress;
-        });
-
-        ulong address = DummyBaseAddress;
+        const ulong BaseAddress = DummyBaseAddress;
+        const ulong MdSlotAddress = DummyBaseAddress + DmbIshldOffset + 4 + MdOffset;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .AddPointer(MdSlotAddress, ExpectedResultAddress)
+           .ToMockClrRuntime();
+        var dataReader = clrRuntime.DataTarget.DataReader;
 
         // Act
+        ulong address = DummyBaseAddress;
         var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
@@ -48,26 +45,29 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryResolvePrecode_FixupPrecode()
     {
+        const int JumpAddress = 0x10000; // This value is not used.
+        const int MdOffset = 0x20000;
+
         // Arrange
         var rawInstructions = new uint[]
         {
             Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
-            Arm64InstructionFactory.LDR(X11, 0x10000), // ldr x11, #0x10000
-            Arm64InstructionFactory.BR(X11),           // br x11
-            Arm64InstructionFactory.LDR(X12, 0x20000), // ldr x12, #0x20000
+            Arm64InstructionFactory.LDR(X11, JumpAddress), // ldr x11, #0x10000
+            Arm64InstructionFactory.BR(X11),               // br x11
+            Arm64InstructionFactory.LDR(X12, MdOffset),    // ldr x12, #0x20000
         };
         PrintInstructions(rawInstructions);
 
-        var dataReader = CreateMockDataReader(rawInstructions, getPointer: (ulong address) =>
-        {
-            const int mdLdrOffset = 12;
-            address.Should().Be(DummyBaseAddress + mdLdrOffset + 0x20000);
-            return ExpectedResultAddress;
-        });
-
-        ulong address = DummyBaseAddress;
+        const ulong BaseAddress = DummyBaseAddress;
+        const ulong MdSlotAddress = DummyBaseAddress + DmbIshldOffset + 8 + MdOffset;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .AddPointer(MdSlotAddress, ExpectedResultAddress)
+           .ToMockClrRuntime();
+        var dataReader = clrRuntime.DataTarget.DataReader;
 
         // Act
+        ulong address = BaseAddress;
         var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
@@ -92,19 +92,16 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var dataReader = CreateMockDataReader(rawInstructions, getPointer: (ulong address) =>
-        {
-            // Validate address value
-            ulong parseBase = DummyBaseAddress + 4; // Skip `dmb ishld` instruction
-            ulong mdAddress = unchecked(parseBase + MdOffset);
-            address.Should().Be(mdAddress);
-
-            // Return resolved address
-            return ExpectedResultAddress;
-        });
+        const ulong BaseAddress = DummyBaseAddress;
+        const ulong MdSlotAddress = DummyBaseAddress + DmbIshldOffset + 0x10000;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .AddPointer(MdSlotAddress, ExpectedResultAddress)
+           .ToMockClrRuntime();
+        var dataReader = clrRuntime.DataTarget.DataReader;
 
         // Act
-        ulong address = DummyBaseAddress;
+        ulong address = BaseAddress;
         var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
@@ -127,16 +124,13 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var dataReader = CreateMockDataReader(rawInstructions, getPointer: (ulong address) =>
-        {
-            // Validate address value
-            ulong parseBase = DummyBaseAddress + 4; // Skip `dmb ishld` instruction
-            ulong countSlot = unchecked(parseBase + RemainingCallCount);
-            address.Should().Be(countSlot + 8);
-
-            // Return resolved address
-            return ExpectedResultAddress;
-        });
+        const ulong BaseAddress = DummyBaseAddress;
+        const ulong CountSlotAddress = DummyBaseAddress + DmbIshldOffset + RemainingCallCount + 8;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .AddPointer(CountSlotAddress, ExpectedResultAddress)
+           .ToMockClrRuntime();
+        var dataReader = clrRuntime.DataTarget.DataReader;
 
         // Act
         ulong address = DummyBaseAddress;

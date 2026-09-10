@@ -1,11 +1,17 @@
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interfaces;
 using System.Collections.Immutable;
+using System.Net;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
 public class MockClrRuntime : IClrRuntime
 {
+    internal Dictionary<ulong, string?> JitHelperFunctionNames = new();
+    internal Dictionary<ulong, IClrMethod?> MethodByHandle = new();
+    internal Dictionary<ulong, IClrMethod?> MethodByInstructionPointer = new();
+    internal Dictionary<ulong, IClrType?> TypeByMethodTable = new();
+
     public MockClrRuntime(IDataTarget dataTarget)
     {
         DataTarget = dataTarget;
@@ -21,32 +27,33 @@ public class MockClrRuntime : IClrRuntime
     }
 
     #region APIs that are used by TryTranslateAddressToName
-
-    internal Func<ulong, string?> GetJitHelperFunctionNameFunc =
-        _ => throw new InvalidOperationException("GetJitHelperFunctionNameFunc is not set.");
-
-    internal Func<ulong, IClrMethod?> GetMethodByHandleFunc =
-        _ => throw new InvalidOperationException("GetMethodByHandleFunc is not set.");
-
-
-    internal Func<ulong, IClrMethod?> GetMethodByInstructionPointerFunc =
-        _ => throw new InvalidOperationException("GetMethodByInstructionPointerFunc is not set.");
-
-
-    internal Func<ulong, IClrType?> GetTypeByMethodTableFunc =
-        _ => throw new InvalidOperationException("GetTypeByMethodTableFunc is not set.");
-
     public string? GetJitHelperFunctionName(ulong address)
-        => GetJitHelperFunctionNameFunc(address);
+    {
+        if (JitHelperFunctionNames.TryGetValue(address, out var value))
+            return value;
+        throw new ArgumentException($"Specified address(0x{address:X}) is not registered.");
+    }
 
     public IClrMethod? GetMethodByHandle(ulong methodHandle)
-        => GetMethodByHandleFunc(methodHandle);
+    {
+        if (MethodByHandle.TryGetValue(methodHandle, out var value))
+            return value;
+        throw new ArgumentException($"Specified methodHandle(0x{methodHandle:X}) is not registered.");
+    }
 
     public IClrMethod? GetMethodByInstructionPointer(ulong ip)
-        => GetMethodByInstructionPointerFunc(ip);
+    {
+        if (MethodByInstructionPointer.TryGetValue(ip, out var value))
+            return value;
+        throw new ArgumentException($"Specified InstructionPointer(0x{ip:X}) is not registered.");
+    }
 
     public IClrType? GetTypeByMethodTable(ulong methodTable)
-        => GetTypeByMethodTableFunc(methodTable);
+    {
+        if (TypeByMethodTable.TryGetValue(methodTable, out var value))
+            return value;
+        throw new ArgumentException($"Specified methodTable(0x{methodTable:X}) is not registered.");
+    }
     #endregion
 
     #region Methods/Properties that is not used

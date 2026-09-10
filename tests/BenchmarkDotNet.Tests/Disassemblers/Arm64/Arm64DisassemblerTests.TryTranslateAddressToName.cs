@@ -14,21 +14,12 @@ public partial class Arm64DisassemblerTests
     public void TryTranslateAddressToName_GetJitHelperFunctionName_ReturnsNonEmptyValue()
     {
         using var clrRuntime = CreateMockClrRuntime();
-        clrRuntime.GetJitHelperFunctionNameFunc = address =>
-        {
-            return address switch
-            {
-                Address1 => DummyTargetMethod.Name,
-                _ => throw new ArgumentOutOfRangeException($"Unexpected address specified: 0x{address:X2}"),
-            };
-        };
-
-        const ulong address = Address1;
+        clrRuntime.JitHelperFunctionNames.Add(Address1, DummyTargetMethod.Name);
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act
         var helper = new Arm64DisassemblerHelper();
-        helper.TryTranslateAddressToName(address, isAddressPrecodeMD: false, state, depth: 0, DummyMethodNotUsed);
+        helper.TryTranslateAddressToName(Address1, isAddressPrecodeMD: false, state, depth: 0, DummyMethodNotUsed);
 
         // Assert
         state.AddressToNameMapping.Should().BeEquivalentTo(new Dictionary<ulong, string>
@@ -48,31 +39,17 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_ResolveIndirectAddress()
     {
-        using var clrRuntime = CreateMockClrRuntime([], address =>
-        {
-            return address switch
-            {
-                Address1 => Address2,
-                _ => throw new ArgumentOutOfRangeException($"Unexpected address specified: 0x{address:X2}"),
-            };
-        });
-        clrRuntime.GetJitHelperFunctionNameFunc = address => null;
-        clrRuntime.GetMethodByInstructionPointerFunc = address =>
-        {
-            return address switch
-            {
-                Address1 => null,
-                Address2 => DummyTargetMethod,
-                _ => throw new ArgumentOutOfRangeException($"Unexpected address specified: 0x{address:X2}"),
-            };
-        };
-
-        const ulong address = Address1;
+        using var clrRuntime = new MockMemory()
+           .AddJitHelperFunctionName(Address1, null)
+           .AddMethodByInstructionPointer(Address1, null)
+           .AddPointer(Address1, Address2)
+           .AddMethodByInstructionPointer(Address2, DummyTargetMethod)
+           .ToMockClrRuntime();
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act
         var helper = new Arm64DisassemblerHelper();
-        helper.TryTranslateAddressToName(address, isAddressPrecodeMD: false, state, depth: 0, DummyCurrentMethod);
+        helper.TryTranslateAddressToName(Address1, isAddressPrecodeMD: false, state, depth: 0, DummyCurrentMethod);
 
         // Assert
         state.AddressToNameMapping.Should().BeEquivalentTo(new Dictionary<ulong, string>
@@ -95,19 +72,14 @@ public partial class Arm64DisassemblerTests
     public void TryTranslateAddressToName_NoAlignedAddress()
     {
         const ulong NonAlignedAddress = Address1 + 4;
-        using var clrRuntime = CreateMockClrRuntime();
-        clrRuntime.GetJitHelperFunctionNameFunc = address => null;
-        clrRuntime.GetMethodByInstructionPointerFunc = address =>
-        {
-            return address switch
-            {
-                NonAlignedAddress => null,
-                _ => throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}"),
-            };
-        };
-        clrRuntime.GetMethodByHandleFunc = handle => null;
-        clrRuntime.GetTypeByMethodTableFunc = address => null;
 
+        using var clrRuntime = new MockMemory()
+          .AddJitHelperFunctionName(NonAlignedAddress, null)
+          .AddMethodByInstructionPointer(NonAlignedAddress, null)
+          .AddPointer(NonAlignedAddress, 0) // Skip TryFollowJumpTrampoline
+          .AddMethodByHandle(NonAlignedAddress, null)
+          .AddTypeByMethodTable(NonAlignedAddress, null)
+          .ToMockClrRuntime();
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act
@@ -127,17 +99,10 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetMethodByInstructionPointer_ReturnsSameMethod()
     {
-        using var clrRuntime = CreateMockClrRuntime([]);
-        clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
-        clrRuntime.GetMethodByInstructionPointerFunc = address =>
-        {
-            return address switch
-            {
-                Address1 => DummyCurrentMethod, // Return same method.
-                _ => throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}"),
-            };
-        };
-
+        using var clrRuntime = new MockMemory()
+         .AddJitHelperFunctionName(Address1, null)
+         .AddMethodByInstructionPointer(Address1, DummyCurrentMethod) // Return same method.
+         .ToMockClrRuntime();
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act
@@ -158,16 +123,10 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetMethodByInstructionPointer_ReturnsDifferentMethod()
     {
-        using var clrRuntime = CreateMockClrRuntime();
-        clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
-        clrRuntime.GetMethodByInstructionPointerFunc = address =>
-        {
-            return address switch
-            {
-                Address1 => DummyTargetMethod,
-                _ => throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}"),
-            };
-        };
+        using var clrRuntime = new MockMemory()
+            .AddJitHelperFunctionName(Address1, null)
+            .AddMethodByInstructionPointer(Address1, DummyTargetMethod) // Return different method.
+            .ToMockClrRuntime();
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act
@@ -193,26 +152,15 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_TryFollowJumpTrampoline_B()
     {
-        using var clrRuntime = CreateMockClrRuntime(
-        [
-            Arm64InstructionFactory.B(0x10000), // b 0x10000
-        ],
-        address =>
-        {
-            return Address1;
-        });
-
-        clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
-        clrRuntime.GetMethodByInstructionPointerFunc = address =>
-        {
-            return address switch
-            {
-                Address1 => null,
-                Address1 + 0x10000 => DummyTargetMethod,
-                _ => throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}")
-            };
-        };
-
+        using var clrRuntime = new MockMemory()
+            .AddInstructions(Address1,
+            [
+                Arm64InstructionFactory.B(0x10000), // b 0x10000
+            ])
+            .AddJitHelperFunctionName(Address1, null)
+            .AddMethodByInstructionPointer(Address1, null)
+            .AddMethodByInstructionPointer(Address1 + 0x10000, DummyTargetMethod)
+            .ToMockClrRuntime();
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act
@@ -238,41 +186,28 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_TryFollowJumpTrampoline_MultiHop()
     {
-        using var clrRuntime = CreateMockClrRuntime(
-        [
-            Arm64InstructionFactory.B(0x1000), // b 0x1000
-        ],
-        address =>
-        {
-            return Address2;
-        });
+        var rawInstructions = new uint[] { Arm64InstructionFactory.B(0x1000) };
 
-        clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
-        clrRuntime.GetMethodByInstructionPointerFunc = address =>
-        {
-            switch (address)
-            {
-                case Address1:
-                case Address2:
-                    return null; // Return null to test JumpTrampoline
-
-                case Address1 + 0x1000:
-                case Address1 + 0x2000:
-                case Address1 + 0x3000:
-                case Address1 + 0x4000:
-                case Address1 + 0x5000:
-                case Address1 + 0x6000:
-                case Address1 + 0x7000:
-                    return null;
-
-                case Address1 + 0x8000:
-                    return DummyTargetMethod; // Return method when Hop:8
-
-                default:
-                    throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}");
-            }
-        };
-
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(Address1, rawInstructions)
+           .AddInstructions(Address1 + 0x1000, rawInstructions)
+           .AddInstructions(Address1 + 0x2000, rawInstructions)
+           .AddInstructions(Address1 + 0x3000, rawInstructions)
+           .AddInstructions(Address1 + 0x4000, rawInstructions)
+           .AddInstructions(Address1 + 0x5000, rawInstructions)
+           .AddInstructions(Address1 + 0x6000, rawInstructions)
+           .AddInstructions(Address1 + 0x7000, rawInstructions)
+           .AddJitHelperFunctionName(Address1, null)
+           .AddMethodByInstructionPointer(Address1, null)
+           .AddMethodByInstructionPointer(Address1 + 0x1000, null)
+           .AddMethodByInstructionPointer(Address1 + 0x2000, null)
+           .AddMethodByInstructionPointer(Address1 + 0x3000, null)
+           .AddMethodByInstructionPointer(Address1 + 0x4000, null)
+           .AddMethodByInstructionPointer(Address1 + 0x5000, null)
+           .AddMethodByInstructionPointer(Address1 + 0x6000, null)
+           .AddMethodByInstructionPointer(Address1 + 0x7000, null)
+           .AddMethodByInstructionPointer(Address1 + 0x8000, DummyTargetMethod)
+           .ToMockClrRuntime();
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act
@@ -298,21 +233,12 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetMethodByHandle_WithPreCode()
     {
-        using var clrRuntime = CreateMockClrRuntime([], _ => 0);
-        clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
-        clrRuntime.GetMethodByInstructionPointerFunc = address =>
-        {
-            return address switch
-            {
-                Address1 => null, // Return null to test GetMethodByHandle;
-                _ => throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}"),
-            };
-        };
-        clrRuntime.GetMethodByHandleFunc = handle =>
-        {
-            return DummyTargetMethod;
-        };
-
+        using var clrRuntime = new MockMemory()
+           .AddJitHelperFunctionName(Address1, null)
+           .AddPointer(Address1, 0)                       // Return 0 to skip GetMethodByInstructionPointer 
+           .AddMethodByInstructionPointer(Address1, null) // Return null to test GetMethodByHandle;
+           .AddMethodByHandle(Address1, DummyTargetMethod)
+           .ToMockClrRuntime();
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act
@@ -338,24 +264,12 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetMethodByHandle_WithoutPreCode()
     {
-        using var clrRuntime = CreateMockClrRuntime([], _ => 0);
-        clrRuntime.GetJitHelperFunctionNameFunc = _ => "";
-        clrRuntime.GetMethodByInstructionPointerFunc = address =>
-        {
-            return address switch
-            {
-                Address1 => null, // Return null to test GetMethodByHandle;
-                _ => throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}"),
-            };
-        };
-        clrRuntime.GetMethodByHandleFunc = address =>
-        {
-            return address switch
-            {
-                Address1 => DummyTargetMethod,
-                _ => throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}"),
-            };
-        };
+        using var clrRuntime = new MockMemory()
+          .AddJitHelperFunctionName(Address1, null)
+          .AddPointer(Address1, 0)                       // Return 0 to skip GetMethodByInstructionPointer
+          .AddMethodByInstructionPointer(Address1, null) // Return null to test GetMethodByHandle;
+          .AddMethodByHandle(Address1, DummyTargetMethod)
+          .ToMockClrRuntime();
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act
@@ -378,18 +292,13 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetTypeByMethodTable()
     {
-        using var clrRuntime = CreateMockClrRuntime([], _ => 0);
-        clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
-        clrRuntime.GetMethodByInstructionPointerFunc = address =>
-        {
-            return address switch
-            {
-                Address1 => null,
-                _ => throw new ArgumentOutOfRangeException($"Address: 0x{address:X2}"),
-            };
-        };
-        clrRuntime.GetMethodByHandleFunc = handle => null; // Returns null to test GetTypeByMethodTable
-        clrRuntime.GetTypeByMethodTableFunc = address => new MockClrType("DummyType");
+        using var clrRuntime = new MockMemory()
+         .AddJitHelperFunctionName(Address1, null)
+         .AddMethodByInstructionPointer(Address1, null) // Return null to test GetMethodByHandle;
+         .AddPointer(Address1, 0)                       // Return 0 to skip TryFollowJumpTrampoline
+         .AddMethodByHandle(Address1, null)             // Returns null to test GetTypeByMethodTable
+         .AddTypeByMethodTable(Address1, new MockClrType("DummyType"))
+         .ToMockClrRuntime();
         State state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         // Act

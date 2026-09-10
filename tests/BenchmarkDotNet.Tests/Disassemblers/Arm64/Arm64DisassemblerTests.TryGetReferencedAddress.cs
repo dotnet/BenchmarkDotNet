@@ -10,8 +10,9 @@ public partial class Arm64DisassemblerTests
 {
     private Arm64RegisterValueAccumulator CreateValueAccumulator(ushort initialValue)
     {
+        using var clrRuntime = CreateMockClrRuntime();
         var valueAccumulator = new Arm64RegisterValueAccumulator();
-        valueAccumulator.Init(DummyClrRuntime);
+        valueAccumulator.Init(clrRuntime);
 
         valueAccumulator.Feed(Arm64TestInstructions.Movz(X0, initialValue));
 

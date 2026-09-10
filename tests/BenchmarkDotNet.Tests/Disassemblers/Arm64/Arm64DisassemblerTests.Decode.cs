@@ -33,21 +33,20 @@ public partial class Arm64DisassemblerTests
 
         byte[] bytes = rawInstructions.ToLittleEndianBytes();
 
-        using var clrRuntime = CreateMockClrRuntime(
+        const ulong MdSlotAddress = 0x56781234 + 8 + 0x20000;
+
+        using var clrRuntime = new MockMemory()
+            .AddInstructions(0x5678_1234,
             [
                 Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
                 Arm64InstructionFactory.LDR(X10, 0x10000), // ldr x10, #0x10000
                 Arm64InstructionFactory.LDR(X12, 0x20000), // ldr x12, #0x20000
                 Arm64InstructionFactory.BR(X10),           // br x10
-            ],
-            address =>
-            {
-                return Address2; // Called by TryResolvePrecode
-            }
-        );
-        clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
-        clrRuntime.GetMethodByInstructionPointerFunc = _ => DummyTargetMethod;
-
+            ])
+            .AddPointer(MdSlotAddress, ExpectedResultAddress) // Called by TryResolvePrecode
+            .AddJitHelperFunctionName(ExpectedResultAddress, "")
+            .AddMethodByInstructionPointer(ExpectedResultAddress, DummyTargetMethod)
+            .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
 
         ulong baseAddress = DummyBaseAddress;
@@ -89,7 +88,7 @@ public partial class Arm64DisassemblerTests
             Instruction = rawInstructions[2].ToCapstoneArm64Instruction(baseAddress, 2),
             InstructionLength = 4,
             DisassembleSyntax = DisassembleSyntax.Masm,
-            ReferencedAddress = Address2,
+            ReferencedAddress = ExpectedResultAddress,
             IsReferencedAddressIndirect = true,
         }, ConfigureCustomEquivalency);
 
@@ -97,7 +96,7 @@ public partial class Arm64DisassemblerTests
 
         state.AddressToNameMapping.Should().BeEquivalentTo(new Dictionary<ulong, string>()
         {
-            [Address2] = DummyTargetMethod.MethodName,
+            [ExpectedResultAddress] = DummyTargetMethod.MethodName,
         });
     }
 }
