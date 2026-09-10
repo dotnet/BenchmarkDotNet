@@ -20,7 +20,7 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var clrRuntime = CreateMockClrRuntime(rawInstructions);
+        using var clrRuntime = CreateMockClrRuntime(rawInstructions);
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         ulong baseAddress = DummyBaseAddress;
 
@@ -44,7 +44,7 @@ public partial class Arm64DisassemblerTests
 
         PrintInstructions(rawInstructions);
 
-        var clrRuntime = CreateMockClrRuntime(rawInstructions);
+        using var clrRuntime = CreateMockClrRuntime(rawInstructions);
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         ulong baseAddress = DummyBaseAddress;
 
@@ -70,7 +70,7 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
+        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
             return ExpectedResultAddress;
         });
@@ -99,7 +99,7 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
+        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
             return ExpectedResultAddress;
         });
@@ -128,7 +128,7 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
+        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
             return ExpectedResultAddress;
         });
@@ -158,7 +158,7 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
+        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
             return ExpectedResultAddress;
         });
@@ -185,7 +185,7 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
+        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
         {
             return ExpectedResultAddress;
         });

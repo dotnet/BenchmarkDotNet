@@ -13,7 +13,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetJitHelperFunctionName_ReturnsNonEmptyValue()
     {
-        var clrRuntime = CreateMockClrRuntime();
+        using var clrRuntime = CreateMockClrRuntime();
         clrRuntime.GetJitHelperFunctionNameFunc = address =>
         {
             return address switch
@@ -48,7 +48,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_ResolveIndirectAddress()
     {
-        var clrRuntime = CreateMockClrRuntime([], address =>
+        using var clrRuntime = CreateMockClrRuntime([], address =>
         {
             return address switch
             {
@@ -95,7 +95,7 @@ public partial class Arm64DisassemblerTests
     public void TryTranslateAddressToName_NoAlignedAddress()
     {
         const ulong NonAlignedAddress = Address1 + 4;
-        var clrRuntime = CreateMockClrRuntime();
+        using var clrRuntime = CreateMockClrRuntime();
         clrRuntime.GetJitHelperFunctionNameFunc = address => null;
         clrRuntime.GetMethodByInstructionPointerFunc = address =>
         {
@@ -127,7 +127,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetMethodByInstructionPointer_ReturnsSameMethod()
     {
-        var clrRuntime = CreateMockClrRuntime([]);
+        using var clrRuntime = CreateMockClrRuntime([]);
         clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
         clrRuntime.GetMethodByInstructionPointerFunc = address =>
         {
@@ -158,7 +158,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetMethodByInstructionPointer_ReturnsDifferentMethod()
     {
-        var clrRuntime = CreateMockClrRuntime();
+        using var clrRuntime = CreateMockClrRuntime();
         clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
         clrRuntime.GetMethodByInstructionPointerFunc = address =>
         {
@@ -193,7 +193,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_TryFollowJumpTrampoline_B()
     {
-        var clrRuntime = CreateMockClrRuntime(
+        using var clrRuntime = CreateMockClrRuntime(
         [
             Arm64InstructionFactory.B(0x10000), // b 0x10000
         ],
@@ -238,7 +238,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_TryFollowJumpTrampoline_MultiHop()
     {
-        var clrRuntime = CreateMockClrRuntime(
+        using var clrRuntime = CreateMockClrRuntime(
         [
             Arm64InstructionFactory.B(0x1000), // b 0x1000
         ],
@@ -298,7 +298,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetMethodByHandle_WithPreCode()
     {
-        var clrRuntime = CreateMockClrRuntime([], _ => 0);
+        using var clrRuntime = CreateMockClrRuntime([], _ => 0);
         clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
         clrRuntime.GetMethodByInstructionPointerFunc = address =>
         {
@@ -338,7 +338,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetMethodByHandle_WithoutPreCode()
     {
-        var clrRuntime = CreateMockClrRuntime([], _ => 0);
+        using var clrRuntime = CreateMockClrRuntime([], _ => 0);
         clrRuntime.GetJitHelperFunctionNameFunc = _ => "";
         clrRuntime.GetMethodByInstructionPointerFunc = address =>
         {
@@ -378,7 +378,7 @@ public partial class Arm64DisassemblerTests
     [Fact]
     public void TryTranslateAddressToName_GetTypeByMethodTable()
     {
-        var clrRuntime = CreateMockClrRuntime([], _ => 0);
+        using var clrRuntime = CreateMockClrRuntime([], _ => 0);
         clrRuntime.GetJitHelperFunctionNameFunc = _ => null;
         clrRuntime.GetMethodByInstructionPointerFunc = address =>
         {
