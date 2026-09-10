@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Extensions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Helpers;
@@ -12,32 +13,45 @@ internal static class DynamicAwaitHelper
         return (awaitableInfo.ResultType != typeof(void), result);
     }
 
-    internal static ValueTask DrainAsyncEnumerableAsync(object asyncEnumerable, AsyncEnumerableInfo enumerableInfo)
-        => EnumerateCoreAsync(asyncEnumerable, enumerableInfo, items: null);
+    internal static IAsyncEnumerable<object?> EnumerateSourceAsync(object asyncEnumerable, Type elementType)
+        // Sources are always read through IAsyncEnumerable<T>, pattern-based await foreach types are not supported.
+        // A reference-type element needs no reflection at all: IAsyncEnumerable<out T> is covariant.
+        => !elementType.IsValueType
+            ? (IAsyncEnumerable<object?>) asyncEnumerable
+            : EnumerateSourceAsyncCore(asyncEnumerable, ReflectionExtensions.GetAsyncEnumerableInterfaceInfo(elementType));
 
-    internal static async ValueTask<List<object?>> ToListAsync(object asyncEnumerable, AsyncEnumerableInfo enumerableInfo)
+    private static async IAsyncEnumerable<object?> EnumerateSourceAsyncCore(object asyncEnumerable, AsyncEnumerableInfo asyncEnumerableInfo, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        List<object?> items = [];
-        await EnumerateCoreAsync(asyncEnumerable, enumerableInfo, items).ConfigureAwait(false);
-        return items;
+        var enumerator = Unwrapped(() => asyncEnumerableInfo.GetAsyncEnumeratorMethod.Invoke(asyncEnumerable, [cancellationToken]))!;
+        var moveNextAsyncArgs = GetDefaultArgs(asyncEnumerableInfo.MoveNextAsyncMethod);
+
+        try
+        {
+            while (await ((ValueTask<bool>) Unwrapped(() => asyncEnumerableInfo.MoveNextAsyncMethod.Invoke(enumerator, moveNextAsyncArgs))!).ConfigureAwait(false))
+            {
+                yield return Unwrapped(() => asyncEnumerableInfo.CurrentProperty.GetValue(enumerator));
+            }
+        }
+        finally
+        {
+            await ((IAsyncDisposable) enumerator).DisposeAsync().ConfigureAwait(false);
+        }
     }
 
-    private static async ValueTask EnumerateCoreAsync(object asyncEnumerable, AsyncEnumerableInfo enumerableInfo, List<object?>? items)
+    internal static async IAsyncEnumerable<object?> EnumerateBenchmarkAsync(object asyncEnumerable, AsyncEnumerableInfo asyncEnumerableInfo)
     {
-        var getAsyncEnumeratorArgs = GetDefaultArgs(enumerableInfo.GetAsyncEnumeratorMethod);
-        var enumerator = enumerableInfo.GetAsyncEnumeratorMethod.Invoke(asyncEnumerable, getAsyncEnumeratorArgs)!;
+        var enumerator = Unwrapped(() => asyncEnumerableInfo.GetAsyncEnumeratorMethod.Invoke(asyncEnumerable, GetDefaultArgs(asyncEnumerableInfo.GetAsyncEnumeratorMethod)))!;
 
-        var moveNextAsyncArgs = GetDefaultArgs(enumerableInfo.MoveNextAsyncMethod);
-        var currentProperty = enumerableInfo.CurrentProperty;
-        var moveNextAwaitable = enumerableInfo.MoveNextAwaitable;
+        var moveNextAsyncArgs = GetDefaultArgs(asyncEnumerableInfo.MoveNextAsyncMethod);
+        var currentProperty = asyncEnumerableInfo.CurrentProperty;
+        var moveNextAwaitable = asyncEnumerableInfo.MoveNextAwaitable;
 
-        // DisposeAsync is optional for the await-foreach pattern. Roslyn matches a public instance
-        // method named DisposeAsync whose parameters are all optional and whose return type satisfies
-        // the awaitable pattern with a void GetResult; otherwise it falls back to the IAsyncDisposable
-        // interface dispatch.
+        // DisposeAsync is optional in the await-foreach pattern: Roslyn matches a public instance DisposeAsync
+        // whose parameters are all optional and whose return type is awaitable with a void GetResult, else the
+        // IAsyncDisposable interface.
         MethodInfo? disposeAsyncMethod = null;
         AwaitableInfo? disposeAwaitableInfo = null;
-        foreach (var candidate in enumerableInfo.EnumeratorType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+        foreach (var candidate in asyncEnumerableInfo.EnumeratorType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
         {
             if (candidate.Name == nameof(IAsyncDisposable.DisposeAsync)
                 && candidate.GetParameters().All(p => p.IsOptional)
@@ -49,7 +63,7 @@ internal static class DynamicAwaitHelper
                 break;
             }
         }
-        if (disposeAsyncMethod is null && typeof(IAsyncDisposable).IsAssignableFrom(enumerableInfo.EnumeratorType))
+        if (disposeAsyncMethod is null && typeof(IAsyncDisposable).IsAssignableFrom(asyncEnumerableInfo.EnumeratorType))
         {
             disposeAsyncMethod = typeof(IAsyncDisposable).GetMethod(nameof(IAsyncDisposable.DisposeAsync))!;
             disposeAsyncMethod.ReturnType.IsAwaitable(out disposeAwaitableInfo);
@@ -60,20 +74,20 @@ internal static class DynamicAwaitHelper
         {
             while (true)
             {
-                var moveNextResult = enumerableInfo.MoveNextAsyncMethod.Invoke(enumerator, moveNextAsyncArgs);
+                var moveNextResult = Unwrapped(() => asyncEnumerableInfo.MoveNextAsyncMethod.Invoke(enumerator, moveNextAsyncArgs));
                 bool hasMore = (bool)(await new DynamicAwaitable(moveNextAwaitable, moveNextResult!))!;
                 if (!hasMore)
                 {
                     break;
                 }
-                items?.Add(currentProperty.GetValue(enumerator));
+                yield return Unwrapped(() => currentProperty.GetValue(enumerator));
             }
         }
         finally
         {
             if (disposeAsyncMethod != null)
             {
-                var disposeResult = disposeAsyncMethod.Invoke(enumerator, disposeAsyncArgs);
+                var disposeResult = Unwrapped(() => disposeAsyncMethod.Invoke(enumerator, disposeAsyncArgs));
                 if (disposeResult != null)
                 {
                     await new DynamicAwaitable(disposeAwaitableInfo!, disposeResult);
@@ -92,7 +106,7 @@ internal static class DynamicAwaitHelper
         var args = new object?[parameters.Length];
         for (int i = 0; i < parameters.Length; i++)
         {
-            args[i] = parameters[i].HasDefaultValue ? parameters[i].DefaultValue : null;
+            args[i] = parameters[i].GetDefaultArgumentValue();
         }
         return args;
     }
@@ -100,16 +114,51 @@ internal static class DynamicAwaitHelper
     private readonly struct DynamicAwaitable(AwaitableInfo awaitableInfo, object awaitable)
     {
         public DynamicAwaiter GetAwaiter()
-            => new(awaitableInfo, awaitableInfo.GetAwaiterMethod.Invoke(awaitable, null));
+        {
+            // Read into locals: a lambda in a struct's instance member cannot capture a primary constructor parameter.
+            var info = awaitableInfo;
+            object target = awaitable;
+
+            return new(info, Unwrapped(() => info.GetAwaiterMethod.Invoke(target, null)));
+        }
+    }
+
+    // Reflection wraps exceptions in TargetInvocationException, while the covariance path lets it through as thrown.
+    // Here we unwrap it and rethrow while preserving its stacktrace so both paths exceptions behave consistently.
+    private static object? Unwrapped(Func<object?> invoke)
+    {
+        try
+        {
+            return invoke();
+        }
+        catch (TargetInvocationException exception) when (exception.InnerException is { } inner)
+        {
+            ExceptionDispatchInfo.Capture(inner).Throw();
+            throw; // Not reached: Throw() always throws.
+        }
     }
 
     private readonly struct DynamicAwaiter(AwaitableInfo awaitableInfo, object? awaiter) : ICriticalNotifyCompletion
     {
         public bool IsCompleted
-            => awaitableInfo.IsCompletedProperty.GetMethod!.Invoke(awaiter, null) is true;
+        {
+            get
+            {
+                var isCompleted = awaitableInfo.IsCompletedProperty.GetMethod!;
+                object? target = awaiter;
+
+                return Unwrapped(() => isCompleted.Invoke(target, null)) is true;
+            }
+        }
 
         public object? GetResult()
-            => awaitableInfo.GetResultMethod.Invoke(awaiter, null);
+        {
+            // Read into locals: a lambda in a struct's instance member cannot capture a primary constructor parameter.
+            var getResult = awaitableInfo.GetResultMethod;
+            object? target = awaiter;
+
+            return Unwrapped(() => getResult.Invoke(target, null));
+        }
 
         public void OnCompleted(Action continuation)
             => OnCompletedCore(typeof(INotifyCompletion), nameof(INotifyCompletion.OnCompleted), continuation);
@@ -119,14 +168,41 @@ internal static class DynamicAwaitHelper
 
         private void OnCompletedCore(Type interfaceType, string methodName, Action continuation)
         {
-            var onCompletedMethod = interfaceType.GetMethod(methodName);
+            // ICriticalNotifyCompletion is optional in the awaiter pattern, but DynamicAwaiter declares it, so a
+            // state machine awaiting one always takes UnsafeOnCompleted. Asking GetInterfaceMap for an interface the
+            // user's awaiter does not implement throws, so hand those to OnCompleted - which flows the execution
+            // context that UnsafeOnCompleted exists to skip, the safe direction.
+            if (interfaceType == typeof(ICriticalNotifyCompletion)
+                && !typeof(ICriticalNotifyCompletion).IsAssignableFrom(awaitableInfo.AwaiterType))
+            {
+                OnCompletedCore(typeof(INotifyCompletion), nameof(INotifyCompletion.OnCompleted), continuation);
+                return;
+            }
+
+            var onCompletedMethod = interfaceType.GetMethod(methodName)!;
+
+            // The awaiter pattern binds on the awaiter's declared type, which may itself be an interface -
+            // GetInterfaceMap refuses one ("'this' type cannot be an interface itself"), and the throw lands on
+            // AwaitUnsafeOnCompleted, where it is rethrown onto the thread pool and takes the process down. No map
+            // is needed here anyway: invoking the interface method dispatches to whatever implements it, an
+            // explicit implementation included.
+            if (awaitableInfo.AwaiterType.IsInterface)
+            {
+                object? interfaceTarget = awaiter;
+                Unwrapped(() => onCompletedMethod.Invoke(interfaceTarget, [continuation]));
+                return;
+            }
+
             var map = awaitableInfo.AwaiterType.GetInterfaceMap(interfaceType);
 
             for (int i = 0; i < map.InterfaceMethods.Length; i++)
             {
                 if (map.InterfaceMethods[i] == onCompletedMethod)
                 {
-                    map.TargetMethods[i].Invoke(awaiter, [continuation]);
+                    var onCompleted = map.TargetMethods[i];
+                    object? target = awaiter;
+
+                    Unwrapped(() => onCompleted.Invoke(target, [continuation]));
                     return;
                 }
             }

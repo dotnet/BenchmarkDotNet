@@ -1,9 +1,9 @@
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -19,7 +19,8 @@ namespace BenchmarkDotNet.Jobs
         // Env
         public static Job WithJit(this Job job, Jit jit) => job.WithCore(j => j.Environment.Jit = jit);
 
-        public static Job WithRuntime(this Job job, Runtime runtime) => job.WithCore(j => j.Environment.Runtime = runtime);
+        // Runtime and toolchain are coupled; the coupling is enforced by the InfrastructureMode property setters.
+        public static Job WithRuntime(this Job job, Runtime runtime) => job.WithCore(j => j.Infrastructure.Runtime = runtime);
 
         /// <summary>
         /// ProcessorAffinity for the benchmark process.
@@ -203,6 +204,7 @@ namespace BenchmarkDotNet.Jobs
         public static Job WithJitTieringMode(this Job job, JitTieringMode mode) => job.WithCore(j => j.Run.JitTieringMode = mode);
 
         // Infrastructure
+        // Runtime and toolchain are coupled; the coupling is enforced by the InfrastructureMode property setters.
         public static Job WithToolchain(this Job job, IToolchain toolchain) => job.WithCore(j => j.Infrastructure.Toolchain = toolchain);
 
         [PublicAPI] public static Job WithClock(this Job job, IClock clock) => job.WithCore(j => j.Infrastructure.Clock = clock);
@@ -324,6 +326,34 @@ namespace BenchmarkDotNet.Jobs
         /// </summary>
         public static Job AsDefault(this Job job, bool value = true) => job.WithCore(j => j.Meta.IsDefault = value);
 
+        /// <summary>
+        /// Creates a new job based on the given job with the given category added to <see cref="MetaMode.Categories"/>.
+        /// <remarks>categories are metadata used to select which jobs are executed, they don't affect how the job is executed</remarks>
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <param name="category">The category which should be added to the new job</param>
+        /// <returns>The new job with the additional category</returns>
+        public static Job WithCategory(this Job job, string category)
+        {
+            // validated here so that the exception names this method's parameter rather than the one of the
+            // MetaMode member it delegates to
+            ArgumentNullException.ThrowIfNull(category);
+
+            return job.WithCore(j => j.Meta.AddCategories([category]));
+        }
+
+        /// <summary>
+        /// Creates a new job based on the given job with the given categories.
+        /// <remarks>the categories of the original job are not preserved, use <see cref="WithCategory"/> if you want to add to them</remarks>
+        /// </summary>
+        /// <param name="job">The original job</param>
+        /// <param name="categories">The categories of the new job</param>
+        /// <returns>The new job with overriden categories</returns>
+        // the name of this method's parameter is handed over, so that a bad argument is not reported as the `value`
+        // of the MetaMode property this delegates to
+        public static Job WithCategories(this Job job, params string[] categories)
+            => job.WithCore(j => j.Meta.SetCategories(categories, nameof(categories)));
+
         internal static Job MakeSettingsUserFriendly(this Job job, Descriptor descriptor)
         {
             // users expect that if IterationSetup is configured, it should be run before every benchmark invocation https://github.com/dotnet/BenchmarkDotNet/issues/730
@@ -337,10 +367,14 @@ namespace BenchmarkDotNet.Jobs
             return job;
         }
 
+        // The runtime is kept in sync with the toolchain by the InfrastructureMode setters, so we can read it directly.
+        internal static Runtime GetRuntime(this Job job)
+            => job.Infrastructure.HasValue(InfrastructureMode.RuntimeCharacteristic)
+                ? job.Infrastructure.Runtime!
+                : RuntimeInformation.GetCurrentRuntime();
+
         internal static bool IsNativeAOT(this Job job)
-            => job.Environment.GetRuntime() is NativeAotRuntime
-            // given job can have NativeAOT toolchain set, but Runtime == default
-            || (job.Infrastructure.TryGetToolchain(out var toolchain) && toolchain is NativeAotToolchain);
+            => job.GetRuntime() is NativeAotRuntime;
 
         private static Job WithCore(this Job job, Action<Job> updateCallback)
         {

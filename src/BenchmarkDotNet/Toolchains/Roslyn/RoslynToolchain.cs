@@ -1,26 +1,15 @@
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
-    /// <summary>
-    /// Build a benchmark program with the Roslyn compiler.
-    /// </summary>
-    [PublicAPI]
-    public class RoslynToolchain : Toolchain
+    public abstract class RoslynToolchain(string name, Runtime runtime, IBuilder builder, IExecutor executor)
+        : Toolchain(name, runtime, RoslynGenerator.Instance, builder, executor)
     {
-        public static readonly IToolchain Instance = new RoslynToolchain();
-
-        [PublicAPI]
-        public RoslynToolchain() : base("Roslyn", new Generator(), Roslyn.Builder.Instance, new Executor())
-        {
-        }
-
-        [PublicAPI]
         public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {
             await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver).ConfigureAwait(false))
@@ -31,14 +20,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             if (!(RuntimeInformation.IsFullFramework || RuntimeInformation.IsOldMono))
             {
                 yield return new ValidationError(true,
-                    "The Roslyn toolchain is only supported on .NET Framework and legacy Mono",
-                    benchmarkCase);
-            }
-
-            if (benchmarkCase.Job.ResolveValue(GcMode.RetainVmCharacteristic, resolver))
-            {
-                yield return new ValidationError(true,
-                    $"Currently App.config does not support RetainVM option, benchmark '{benchmarkCase.DisplayInfo}' will not be executed",
+                    $"{GetType().Name} is only supported on .NET Framework and legacy Mono",
                     benchmarkCase);
             }
 
@@ -46,9 +28,16 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 && benchmarkCase.Job.ResolveValue(InfrastructureMode.BuildConfigurationCharacteristic, resolver) != InfrastructureMode.ReleaseConfigurationName)
             {
                 yield return new ValidationError(true,
-                    "The Roslyn toolchain does not allow to rebuild source project, so defining custom build configuration makes no sense",
+                    $"{GetType().Name} does not allow to rebuild source project, so defining custom build configuration makes no sense",
                     benchmarkCase);
             }
         }
+
+        public override bool Equals(object? obj)
+            => obj is RoslynToolchain other
+            && other.GetType() == GetType()
+            && Runtime.Equals(other.Runtime);
+
+        public override int GetHashCode() => HashCode.Combine(GetType(), Runtime);
     }
 }

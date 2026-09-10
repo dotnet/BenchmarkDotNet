@@ -1,7 +1,6 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Engines;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
@@ -108,12 +107,6 @@ namespace BenchmarkDotNet.Extensions
 
         internal static void SetEnvironmentVariables(this ProcessStartInfo start, BenchmarkCase benchmarkCase, IResolver resolver)
         {
-            if (benchmarkCase.Job.Environment.Runtime is ClrRuntime clrRuntime && clrRuntime.Version.IsNotBlank())
-                SetClrEnvironmentVariables(start, "Version", clrRuntime.Version);
-
-            if (benchmarkCase.Job.Environment.Runtime is MonoRuntime monoRuntime && monoRuntime.MonoBclPath.IsNotBlank())
-                start.Environment["MONO_PATH"] = monoRuntime.MonoBclPath;
-
             if (benchmarkCase.Config.HasPerfCollectProfiler())
             {
                 // enable tracing configuration inside of CoreCLR (https://github.com/dotnet/coreclr/blob/master/Documentation/project-docs/linux-performance-tracing.md#collecting-a-trace)
@@ -128,7 +121,7 @@ namespace BenchmarkDotNet.Extensions
             // corerun does not understand runtimeconfig.json files;
             // we have to set "COMPlus_GC*" environment variables as documented in
             // https://docs.microsoft.com/en-us/dotnet/core/run-time-config/garbage-collector
-            if (benchmarkCase.Job.Infrastructure.Toolchain is CoreRunToolchain _)
+            if (benchmarkCase.Job.Infrastructure.Toolchain is CoreRunToolchain)
                 start.SetCoreRunEnvironmentVariables(benchmarkCase, resolver);
 
             // disable ReSharper's Dynamic Program Analysis (see https://github.com/dotnet/BenchmarkDotNet/issues/1871 for details)
@@ -268,7 +261,7 @@ namespace BenchmarkDotNet.Extensions
                 SetClrEnvironmentVariables(start, "GCHeapCount", gcMode.HeapCount.ToString("X"));
         }
 
-        private static void SetClrEnvironmentVariables(ProcessStartInfo start, string suffix, string value)
+        internal static void SetClrEnvironmentVariables(this ProcessStartInfo start, string suffix, string value)
         {
             start.Environment[$"DOTNET_{suffix}"] = value;
             start.Environment[$"COMPlus_{suffix}"] = value;

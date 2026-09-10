@@ -1,5 +1,5 @@
 using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using JetBrains.Annotations;
@@ -39,7 +39,12 @@ namespace BenchmarkDotNet.Engines
 
         public long? GetBytesAllocatedPerOperation(BenchmarkCase benchmarkCase)
         {
-            bool excludeAllocationQuantumSideEffects = benchmarkCase.GetRuntime().RuntimeMoniker <= RuntimeMoniker.NetCoreApp20; // the issue got fixed for .NET Core 2.0+ https://github.com/dotnet/coreclr/issues/10207
+            // .NET Framework (AppDomain.MonitoringTotalAllocatedMemorySize) and legacy Mono measure allocations at
+            // allocation-quantum granularity, and .NET Core <= 2.0 has the same quantum side effect (fixed in 2.1+,
+            // https://github.com/dotnet/coreclr/issues/10207). Matches the pre-refactor RuntimeMoniker <= NetCoreApp20 check.
+            var runtime = benchmarkCase.GetRuntime();
+            bool excludeAllocationQuantumSideEffects = runtime is ClrRuntime or LegacyMonoRuntime
+                || (runtime is CoreRuntime core && core.Version <= new Version(2, 0));
 
             long? allocatedBytes = GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects);
             return allocatedBytes == null ? null

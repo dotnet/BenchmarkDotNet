@@ -1,34 +1,22 @@
-using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
-using JetBrains.Annotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    [PublicAPI]
-    public abstract class DotNetCliGenerator : GeneratorBase
+    public abstract class DotNetCliGenerator(DotNetCliSettings settings, bool isNetCore) : GeneratorBase
     {
         private static readonly string[] ProjectExtensions = [".csproj", ".fsproj", ".vbroj"];
 
         private static readonly string[] SolutionExtensions = [".sln", ".slnx"];
 
-        [PublicAPI] public string TargetFrameworkMoniker { get; }
+        /// <summary>
+        /// The settings the toolchain built this generator with. The target framework moniker is already resolved
+        /// against the runtime (never blank).
+        /// </summary>
+        public DotNetCliSettings Settings => settings;
 
-        [PublicAPI] public string CliPath { get; }
-
-        [PublicAPI] public string PackagesPath { get; }
-
-        protected bool IsNetCore { get; }
-
-        [PublicAPI]
-        protected DotNetCliGenerator(string targetFrameworkMoniker, string cliPath, string packagesPath, bool isNetCore)
-        {
-            TargetFrameworkMoniker = targetFrameworkMoniker;
-            CliPath = cliPath.IsBlank() ? "dotnet" : cliPath;
-            PackagesPath = packagesPath.EnsureNotNull();
-            IsNetCore = isNetCore;
-        }
+        protected bool IsNetCore => isNetCore;
 
         protected override string GetExecutableExtension() => IsNetCore ? ".dll" : ".exe";
 
@@ -97,13 +85,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => PackagesPath;
+        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => Settings.PackagesPath?.FullName ?? "";
 
         protected override ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
+            string cli = Settings.CliPath?.FullName ?? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value;
             var content = new StringBuilder(300)
-                .AppendLine($"call {CliPath} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)}")
-                .AppendLine($"call {CliPath} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, TargetFrameworkMoniker)}")
+                .AppendLine($"call {cli} {DotNetCliCommand.GetRestoreCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath)}")
+                .AppendLine($"call {cli} {DotNetCliCommand.GetBuildCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, Settings.TargetFrameworkMoniker)}")
                 .ToString();
 
             return new(File.WriteAllTextAsync(artifactsPaths.BuildScriptFilePath, content, cancellationToken));

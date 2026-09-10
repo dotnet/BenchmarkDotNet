@@ -1,39 +1,27 @@
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.Results;
-using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
-    [PublicAPI]
-    public class DotNetCliBuilder : IBuilder
+    // The toolchain resolves the target framework moniker against the runtime before constructing the builder.
+    public class DotNetCliBuilder(DotNetCliSettings settings, bool logOutput = false) : IBuilder
     {
-        private string TargetFrameworkMoniker { get; }
-
-        private string CustomDotNetCliPath { get; }
-        private bool LogOutput { get; }
-
-        [PublicAPI]
-        public DotNetCliBuilder(string targetFrameworkMoniker, string customDotNetCliPath = "", bool logOutput = false)
-        {
-            TargetFrameworkMoniker = targetFrameworkMoniker;
-            CustomDotNetCliPath = customDotNetCliPath;
-            LogOutput = logOutput;
-        }
+        internal FileInfo? CustomDotNetCliPath { get; } = settings.CliPath;
 
         public async ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
         {
             var buildResult = await new DotNetCliCommand(
                 CustomDotNetCliPath,
                 generateResult.ArtifactsPaths.ProjectFilePath,
-                TargetFrameworkMoniker,
+                settings.TargetFrameworkMoniker,
                 string.Empty,
                 generateResult,
                 logger,
                 buildPartition,
                 [],
                 buildPartition.Timeout,
-                logOutput: LogOutput
+                logOutput: logOutput
             )
                 .RestoreThenBuildAsync(cancellationToken)
                 .ConfigureAwait(false);

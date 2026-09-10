@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -22,7 +22,7 @@ public abstract class SnapshotProfilerBase : IProfiler
 
     protected abstract string CreateSnapshotFilePath(DiagnoserActionParameters parameters);
     protected abstract string GetRunnerPath();
-    internal abstract bool IsSupported(RuntimeMoniker runtimeMoniker);
+    internal abstract bool IsSupported(Runtime runtime);
 
     private readonly List<string> snapshotFilePaths = [];
 
@@ -31,7 +31,7 @@ public abstract class SnapshotProfilerBase : IProfiler
     public IEnumerable<IAnalyser> Analysers => [];
 
     public RunMode GetRunMode(BenchmarkCase benchmarkCase) =>
-        IsSupported(benchmarkCase.Job.Environment.GetRuntime().RuntimeMoniker) ? RunMode.ExtraRun : RunMode.None;
+        IsSupported(benchmarkCase.GetRuntime()) ? RunMode.ExtraRun : RunMode.None;
 
 
     public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
@@ -39,10 +39,10 @@ public abstract class SnapshotProfilerBase : IProfiler
         var logger = parameters.Config.GetCompositeLogger();
         var job = parameters.BenchmarkCase.Job;
 
-        var runtimeMoniker = job.Environment.GetRuntime().RuntimeMoniker;
-        if (!IsSupported(runtimeMoniker))
+        var runtime = parameters.BenchmarkCase.GetRuntime();
+        if (!IsSupported(runtime))
         {
-            logger.WriteLineError($"Runtime '{runtimeMoniker}' is not supported by dotMemory");
+            logger.WriteLineError($"Runtime '{runtime}' is not supported by dotMemory");
             return new();
         }
 
@@ -64,10 +64,10 @@ public abstract class SnapshotProfilerBase : IProfiler
 
     public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
     {
-        var runtimeMonikers = validationParameters.Benchmarks.Select(b => b.Job.Environment.GetRuntime().RuntimeMoniker).Distinct();
-        foreach (var runtimeMoniker in runtimeMonikers)
-            if (!IsSupported(runtimeMoniker))
-                yield return new ValidationError(true, $"Runtime '{runtimeMoniker}' is not supported by dotMemory");
+        var runtimes = validationParameters.Benchmarks.Select(b => b.GetRuntime()).Distinct();
+        foreach (var runtime in runtimes)
+            if (!IsSupported(runtime))
+                yield return new ValidationError(true, $"Runtime '{runtime}' is not supported by {ShortName}");
     }
 
     public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];

@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.XUnit;
-using BenchmarkDotNet.Toolchains.Roslyn;
+using BenchmarkDotNet.Toolchains.Framework;
 using System.Globalization;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 CultureInfo.CurrentCulture = overrideCulture;
                 CultureInfo.CurrentUICulture = overrideCulture;
 
-                var miniJob = Job.Dry.WithToolchain(RoslynToolchain.Instance);
+                var miniJob = Job.Dry.WithToolchain(RoslynFrameworkToolchain.Default);
                 var config = CreateSimpleConfig(job: miniJob);
 
                 CanExecute<SimpleBenchmarks>(config);

@@ -74,7 +74,10 @@ namespace BenchmarkDotNet.Disassemblers
 
             var runtime = dataTarget.ClrVersions.Single().CreateRuntime();
 
-            var state = new State(runtime, args.TargetFrameworkMoniker);
+            var state = new State(runtime, args.RuntimeVersion);
+
+            // Null when the caller passed filters: nothing enqueues the entry point then, so there is none to strip below.
+            ClrMethod? entryPoint = null;
 
             if (args.Filters.Length > 0)
             {
@@ -84,19 +87,25 @@ namespace BenchmarkDotNet.Disassemblers
             {
                 var typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).WhereNotNull().First();
 
-                state.Todo.Enqueue(
-                    new MethodInfo(
-                        // the Disassembler Entry Method is always parameterless, so check by name is enough
-                        typeWithBenchmark.Methods.Single(method => method.Attributes.HasFlag(System.Reflection.MethodAttributes.Public) && method.Name == args.MethodName),
-                        0));
+                // The whole signature, because the name alone is not enough: ClrType.Methods also surfaces inherited methods
+                // on the desktop CLR, and ClrMethod.Type reports the type being enumerated rather than the declaring one, so
+                // only the signature distinguishes the generated method from a benchmark member of the same name.
+                // Kept in sync with the disassembler entry method in Templates/BenchmarkType.txt and RunnableEmitter, which
+                // both give it a single Int32 parameter.
+                string entryPointSignature = $"{args.TypeName}.{args.MethodName}(Int32)";
+                entryPoint = typeWithBenchmark.Methods.Single(method => method.Signature == entryPointSignature);
+
+                state.Todo.Enqueue(new MethodInfo(entryPoint, 0));
             }
 
             var disassembledMethods = Disassemble(args, state);
 
-            // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working
+            // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working.
+            // Identified by its native code address rather than its name: a signature does not always carry the declaring
+            // type (see AddressToNameMapping below), so a benchmark method of the same name could match it.
             var filteredMethods = disassembledMethods.Length == 1
                 ? disassembledMethods // if there is only one method we want to return it (most probably benchmark got inlined)
-                : disassembledMethods.Where(method => !method.Name.Contains(DisassemblerConstants.DisassemblerEntryMethodName)).ToArray();
+                : disassembledMethods.Where(method => method.NativeCode != entryPoint?.NativeCode).ToArray();
 
             return new DisassemblyResult
             {

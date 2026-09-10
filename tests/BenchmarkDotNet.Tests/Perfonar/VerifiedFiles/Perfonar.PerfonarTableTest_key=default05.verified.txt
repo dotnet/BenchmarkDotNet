@@ -1,71 +1,50 @@
 ﻿BenchmarkDotNet v0.1729.0-mock, Microsoft Windows NT 10.0.x.mock
 MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 physical cores
 
-Type = Bench, Jit = RyuJit
+Type = Bench, Runtime = net7.0, Jit = RyuJit
 
-@HostProcessAffinity0: Runtime = HostProcess, Affinity = 0
-@Squid:                Runtime = NotRecognized, Affinity = 1
-@MonoAffinity2:        Runtime = Mono, Affinity = 2
-@Net461Affinity3:      Runtime = Net461, Affinity = 3
-@Net462Affinity4:      Runtime = Net462, Affinity = 4
-@Net47Affinity5:       Runtime = Net47, Affinity = 5
-@Net471Affinity6:      Runtime = Net471, Affinity = 6
-@Net472Affinity7:      Runtime = Net472, Affinity = 7
-@Net48Affinity8:       Runtime = Net48, Affinity = 8
-@Net481Affinity9:      Runtime = Net481, Affinity = 9
-@Liger:                Runtime = NetCoreApp20, Affinity = 10
-@Rat:                  Runtime = NetCoreApp21, Affinity = 11
-@Skate:                Runtime = NetCoreApp22, Affinity = 12
-@Perch:                Runtime = NetCoreApp30, Affinity = 13
-@Roach:                Runtime = NetCoreApp31, Affinity = 14
-@Net50Affinity15:      Runtime = Net50, Affinity = 15
-@Net60Affinity16:      Runtime = Net60, Affinity = 16
-@Net70Affinity17:      Runtime = Net70, Affinity = 17
-@Net80Affinity18:      Runtime = Net80, Affinity = 18
-@Net90Affinity19:      Runtime = Net90, Affinity = 19
-
-| Method | Job                  |   Center | Spread |
-|:-------|:---------------------|---------:|-------:|
-| Foo    | HostProcessAffinity0 |   2.00ns | 0.81ns |
-| Bar    | HostProcessAffinity0 |   7.00ns | 0.81ns |
-| Foo    | Squid                |  12.00ns | 0.81ns |
-| Bar    | Squid                |  17.00ns | 0.81ns |
-| Foo    | MonoAffinity2        |  22.00ns | 0.81ns |
-| Bar    | MonoAffinity2        |  27.00ns | 0.81ns |
-| Foo    | Net461Affinity3      |  32.00ns | 0.81ns |
-| Bar    | Net461Affinity3      |  37.00ns | 0.81ns |
-| Foo    | Net462Affinity4      |  42.00ns | 0.81ns |
-| Bar    | Net462Affinity4      |  47.00ns | 0.81ns |
-| Foo    | Net47Affinity5       |  52.00ns | 0.81ns |
-| Bar    | Net47Affinity5       |  57.00ns | 0.81ns |
-| Foo    | Net471Affinity6      |  62.00ns | 0.81ns |
-| Bar    | Net471Affinity6      |  67.00ns | 0.81ns |
-| Foo    | Net472Affinity7      |  72.00ns | 0.81ns |
-| Bar    | Net472Affinity7      |  77.00ns | 0.81ns |
-| Foo    | Net48Affinity8       |  82.00ns | 0.81ns |
-| Bar    | Net48Affinity8       |  87.00ns | 0.81ns |
-| Foo    | Net481Affinity9      |  92.00ns | 0.81ns |
-| Bar    | Net481Affinity9      |  97.00ns | 0.81ns |
-| Foo    | Liger                | 102.00ns | 0.81ns |
-| Bar    | Liger                | 107.00ns | 0.81ns |
-| Foo    | Rat                  | 112.00ns | 0.81ns |
-| Bar    | Rat                  | 117.00ns | 0.81ns |
-| Foo    | Skate                | 122.00ns | 0.81ns |
-| Bar    | Skate                | 127.00ns | 0.81ns |
-| Foo    | Perch                | 132.00ns | 0.81ns |
-| Bar    | Perch                | 137.00ns | 0.81ns |
-| Foo    | Roach                | 142.00ns | 0.81ns |
-| Bar    | Roach                | 147.00ns | 0.81ns |
-| Foo    | Net50Affinity15      | 152.00ns | 0.81ns |
-| Bar    | Net50Affinity15      | 157.00ns | 0.81ns |
-| Foo    | Net60Affinity16      | 162.00ns | 0.81ns |
-| Bar    | Net60Affinity16      | 167.00ns | 0.81ns |
-| Foo    | Net70Affinity17      | 172.00ns | 0.81ns |
-| Bar    | Net70Affinity17      | 177.00ns | 0.81ns |
-| Foo    | Net80Affinity18      | 182.00ns | 0.81ns |
-| Bar    | Net80Affinity18      | 187.00ns | 0.81ns |
-| Foo    | Net90Affinity19      | 192.00ns | 0.81ns |
-| Bar    | Net90Affinity19      | 197.00ns | 0.81ns |
+| Method | Affinity |   Center | Spread |
+|:-------|:---------|---------:|-------:|
+| Foo    | 0        |   2.00ns | 0.81ns |
+| Bar    | 0        |   7.00ns | 0.81ns |
+| Foo    | 1        |  12.00ns | 0.81ns |
+| Bar    | 1        |  17.00ns | 0.81ns |
+| Foo    | 2        |  22.00ns | 0.81ns |
+| Bar    | 2        |  27.00ns | 0.81ns |
+| Foo    | 3        |  32.00ns | 0.81ns |
+| Bar    | 3        |  37.00ns | 0.81ns |
+| Foo    | 4        |  42.00ns | 0.81ns |
+| Bar    | 4        |  47.00ns | 0.81ns |
+| Foo    | 5        |  52.00ns | 0.81ns |
+| Bar    | 5        |  57.00ns | 0.81ns |
+| Foo    | 6        |  62.00ns | 0.81ns |
+| Bar    | 6        |  67.00ns | 0.81ns |
+| Foo    | 7        |  72.00ns | 0.81ns |
+| Bar    | 7        |  77.00ns | 0.81ns |
+| Foo    | 8        |  82.00ns | 0.81ns |
+| Bar    | 8        |  87.00ns | 0.81ns |
+| Foo    | 9        |  92.00ns | 0.81ns |
+| Bar    | 9        |  97.00ns | 0.81ns |
+| Foo    | 10       | 102.00ns | 0.81ns |
+| Bar    | 10       | 107.00ns | 0.81ns |
+| Foo    | 11       | 112.00ns | 0.81ns |
+| Bar    | 11       | 117.00ns | 0.81ns |
+| Foo    | 12       | 122.00ns | 0.81ns |
+| Bar    | 12       | 127.00ns | 0.81ns |
+| Foo    | 13       | 132.00ns | 0.81ns |
+| Bar    | 13       | 137.00ns | 0.81ns |
+| Foo    | 14       | 142.00ns | 0.81ns |
+| Bar    | 14       | 147.00ns | 0.81ns |
+| Foo    | 15       | 152.00ns | 0.81ns |
+| Bar    | 15       | 157.00ns | 0.81ns |
+| Foo    | 16       | 162.00ns | 0.81ns |
+| Bar    | 16       | 167.00ns | 0.81ns |
+| Foo    | 17       | 172.00ns | 0.81ns |
+| Bar    | 17       | 177.00ns | 0.81ns |
+| Foo    | 18       | 182.00ns | 0.81ns |
+| Bar    | 18       | 187.00ns | 0.81ns |
+| Foo    | 19       | 192.00ns | 0.81ns |
+| Bar    | 19       | 197.00ns | 0.81ns |
 
 {
   "engine": {
@@ -95,8 +74,10 @@ Type = Bench, Jit = RyuJit
   "nested": [
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "hostProcess",
           "jit": "ryuJit",
           "affinity": 0
         }
@@ -152,8 +133,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "notRecognized",
           "jit": "ryuJit",
           "affinity": 1
         }
@@ -209,8 +192,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "mono",
           "jit": "ryuJit",
           "affinity": 2
         }
@@ -266,8 +251,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net461",
           "jit": "ryuJit",
           "affinity": 3
         }
@@ -323,8 +310,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net462",
           "jit": "ryuJit",
           "affinity": 4
         }
@@ -380,8 +369,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net47",
           "jit": "ryuJit",
           "affinity": 5
         }
@@ -437,8 +428,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net471",
           "jit": "ryuJit",
           "affinity": 6
         }
@@ -494,8 +487,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net472",
           "jit": "ryuJit",
           "affinity": 7
         }
@@ -551,8 +546,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net48",
           "jit": "ryuJit",
           "affinity": 8
         }
@@ -608,8 +605,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net481",
           "jit": "ryuJit",
           "affinity": 9
         }
@@ -665,8 +664,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "netCoreApp20",
           "jit": "ryuJit",
           "affinity": 10
         }
@@ -722,8 +723,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "netCoreApp21",
           "jit": "ryuJit",
           "affinity": 11
         }
@@ -779,8 +782,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "netCoreApp22",
           "jit": "ryuJit",
           "affinity": 12
         }
@@ -836,8 +841,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "netCoreApp30",
           "jit": "ryuJit",
           "affinity": 13
         }
@@ -893,8 +900,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "netCoreApp31",
           "jit": "ryuJit",
           "affinity": 14
         }
@@ -950,8 +959,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net50",
           "jit": "ryuJit",
           "affinity": 15
         }
@@ -1007,8 +1018,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net60",
           "jit": "ryuJit",
           "affinity": 16
         }
@@ -1064,8 +1077,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net70",
           "jit": "ryuJit",
           "affinity": 17
         }
@@ -1121,8 +1136,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net80",
           "jit": "ryuJit",
           "affinity": 18
         }
@@ -1178,8 +1195,10 @@ Type = Bench, Jit = RyuJit
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net90",
           "jit": "ryuJit",
           "affinity": 19
         }

@@ -5,7 +5,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 
 namespace BenchmarkDotNet.Tests.Helpers;
 
@@ -53,9 +53,9 @@ public class UniqueIdGeneratorTests
         // Assert
         uids.Should().BeEquivalentTo(
         [
-            "1f1ec424-c811-820a-a4ad-4def359fbc26",
-            "1ba530cd-a780-8707-a8f7-d59d1a80ad9d",
-            "1aa03476-a73c-8c01-918f-d80de359b386",
+            "1195d076-7324-88e9-be38-f686096150d6",
+            "1a59b0ad-fe5b-8bc4-b56e-4c4611296d0a",
+            "17102bb5-975f-8d91-a2d3-3c0da3addea2",
 
             "18ba3702-d8a3-8666-9b61-48e7a90e784a",
             "15fa977d-8202-81f3-abf4-c6d0c9d5b18c",

@@ -13,13 +13,13 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliCommand
     {
-        [PublicAPI] public string CliPath { get; }
+        [PublicAPI] public FileInfo? CliPath { get; }
 
         [PublicAPI] public string FilePath { get; }
 
         [PublicAPI] public string TargetFrameworkMoniker { get; }
 
-        [PublicAPI] public string Arguments { get; }
+        [PublicAPI] public string? Arguments { get; }
 
         [PublicAPI] public GenerateResult GenerateResult { get; }
 
@@ -33,10 +33,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public bool LogOutput { get; }
 
-        public DotNetCliCommand(string cliPath, string filePath, string tfm, string arguments, GenerateResult generateResult, ILogger logger,
+        public DotNetCliCommand(FileInfo? cliPath, string filePath, string tfm, string? arguments, GenerateResult generateResult, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout, bool logOutput = false)
         {
-            CliPath = cliPath.IsBlank() ? DotNetCliCommandExecutor.DefaultDotNetCliPath.Value : cliPath;
+            CliPath = cliPath; // null means "use the default dotnet cli"; resolved in DotNetCliCommandExecutor.BuildStartInfo
             Arguments = arguments;
             FilePath = filePath;
             TargetFrameworkMoniker = tfm;
@@ -51,7 +51,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         public DotNetCliCommand WithArguments(string arguments)
             => new(CliPath, FilePath, TargetFrameworkMoniker, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
-        public DotNetCliCommand WithCliPath(string cliPath)
+        public DotNetCliCommand WithCliPath(FileInfo? cliPath)
             => new(cliPath, FilePath, TargetFrameworkMoniker, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
         private bool UseNoDependencies

@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
             Assert.True(summary.Reports.All(report => report.ExecuteResults.Any()));
-            Assert.Equal(1, summary.Reports.Count(report => report.BenchmarkCase.Job.Environment.Runtime is CoreRuntime));
+            Assert.Equal(1, summary.Reports.Count(report => report.BenchmarkCase.GetRuntime() is CoreRuntime));
 
             Assert.Contains(".NET 10.0", summary.AllRuntimes);
         }
@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
             Assert.True(summary.Reports.All(report => report.ExecuteResults.Any()));
-            Assert.Equal(jobCount, summary.Reports.Count(report => report.BenchmarkCase.Job.Environment.Runtime is ClrRuntime));
+            Assert.Equal(jobCount, summary.Reports.Count(report => report.BenchmarkCase.GetRuntime() is ClrRuntime));
 
             Assert.Contains(".NET Framework", summary.AllRuntimes);
         }

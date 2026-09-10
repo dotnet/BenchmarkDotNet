@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using JetBrains.Profiler.SelfApi;
 using System.Reflection;
 
@@ -70,64 +70,13 @@ public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) 
         return runnerPath;
     }
 
-    internal override bool IsSupported(RuntimeMoniker runtimeMoniker)
+    internal override bool IsSupported(Runtime runtime) => runtime switch
     {
-        switch (runtimeMoniker)
-        {
-            case RuntimeMoniker.HostProcess:
-            case RuntimeMoniker.Net461:
-            case RuntimeMoniker.Net462:
-            case RuntimeMoniker.Net47:
-            case RuntimeMoniker.Net471:
-            case RuntimeMoniker.Net472:
-            case RuntimeMoniker.Net48:
-            case RuntimeMoniker.Net481:
-            case RuntimeMoniker.Net50:
-            case RuntimeMoniker.Net60:
-            case RuntimeMoniker.Net70:
-            case RuntimeMoniker.Net80:
-            case RuntimeMoniker.Net90:
-            case RuntimeMoniker.Net10_0:
-            case RuntimeMoniker.Net11_0:
-            case RuntimeMoniker.R2R80:
-            case RuntimeMoniker.R2R90:
-            case RuntimeMoniker.R2R10_0:
-            case RuntimeMoniker.R2R11_0:
-                return true;
-            case RuntimeMoniker.NotRecognized:
-            case RuntimeMoniker.Mono:
-            case RuntimeMoniker.NativeAot70:
-            case RuntimeMoniker.NativeAot80:
-            case RuntimeMoniker.NativeAot90:
-            case RuntimeMoniker.NativeAot10_0:
-            case RuntimeMoniker.NativeAot11_0:
-            case RuntimeMoniker.WasmNet80:
-            case RuntimeMoniker.WasmNet90:
-            case RuntimeMoniker.WasmNet10_0:
-            case RuntimeMoniker.WasmNet11_0:
-            case RuntimeMoniker.MonoAOTLLVM:
-            case RuntimeMoniker.MonoAOTLLVMNet60:
-            case RuntimeMoniker.MonoAOTLLVMNet70:
-            case RuntimeMoniker.MonoAOTLLVMNet80:
-            case RuntimeMoniker.MonoAOTLLVMNet90:
-            case RuntimeMoniker.MonoAOTLLVMNet10_0:
-            case RuntimeMoniker.MonoAOTLLVMNet11_0:
-            case RuntimeMoniker.Mono60:
-            case RuntimeMoniker.Mono70:
-            case RuntimeMoniker.Mono80:
-            case RuntimeMoniker.Mono90:
-            case RuntimeMoniker.Mono10_0:
-            case RuntimeMoniker.Mono11_0:
-                return false;
-            case RuntimeMoniker.NetCoreApp20:
-            case RuntimeMoniker.NetCoreApp21:
-            case RuntimeMoniker.NetCoreApp22:
-                return OsDetector.IsWindows();
-            case RuntimeMoniker.NetCoreApp30:
-            case RuntimeMoniker.NetCoreApp31:
-                return OsDetector.IsWindows() || OsDetector.IsLinux();
-            default:
-                throw new ArgumentOutOfRangeException(nameof(runtimeMoniker), runtimeMoniker, $"Runtime moniker {runtimeMoniker} is not supported");
-        }
-    }
+        ClrRuntime => true,
+        R2RRuntime => true,
+        CoreRuntime core when core.Version.Major < 3 => OsDetector.IsWindows(),
+        CoreRuntime core when core.Version.Major < 5 => OsDetector.IsWindows() || OsDetector.IsLinux(),
+        CoreRuntime => true,
+        _ => false,
+    };
 }

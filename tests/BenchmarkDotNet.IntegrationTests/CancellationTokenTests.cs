@@ -11,11 +11,11 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
-using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.IntegrationTests;
@@ -30,6 +30,36 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
             .AddLogger(new OutputLogger(Output));
 
         CanExecute<BenchmarkWithCancellationToken>(config);
+    }
+
+    // GetFields hands back a hidden base field alongside the `new` one hiding it, and the token is assigned
+    // through an object initializer, where a repeated name is CS1912 - the generated code failed to build.
+    // (GetProperties collapses the pair, so only fields reach this.)
+    [Fact]
+    public void BenchmarkHidingAnInheritedCancellationTokenField_BuildsAndReceivesToken()
+    {
+        var config = ManualConfig.CreateEmpty()
+            .AddJob(Job.Dry)
+            .AddLogger(new OutputLogger(Output));
+
+        CanExecute<BenchmarkHidingCancellationTokenField>(config);
+    }
+
+    public class BenchmarkHidingCancellationTokenFieldBase
+    {
+        [BenchmarkCancellation] public CancellationToken Token;
+    }
+
+    public class BenchmarkHidingCancellationTokenField : BenchmarkHidingCancellationTokenFieldBase
+    {
+        [BenchmarkCancellation] public new CancellationToken Token;
+
+        [Benchmark]
+        public void CheckToken()
+        {
+            Assert.True(Token.CanBeCanceled);
+            Assert.False(Token.IsCancellationRequested);
+        }
     }
 
     [Fact]
@@ -52,20 +82,40 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         CanExecute<BenchmarkWithCancellationToken>(config);
     }
 
+    [Theory]
+    [MemberData(nameof(CancellationToolchains), DisableDiscoveryEnumeration = true)]
+    public void StaticCancellationTokenOnABaseTypeReceivesToken(IToolchain toolchain)
+    {
+        var config = ManualConfig.CreateEmpty()
+            .AddJob(Job.Dry.WithToolchain(toolchain))
+            .AddLogger(new OutputLogger(Output));
+
+        CanExecute<InheritsStaticCancellationToken>(config);
+    }
+
+    public static IEnumerable<object[]> CancellationToolchains()
+    {
+        yield return [InProcessNoEmitToolchain.Default];
+        yield return [InProcessEmitToolchain.Default];
+
+        if (ContinuousIntegration.IsGitHubDraftPR())
+            yield break;
+
+        yield return [Job.Default.GetToolchain()];
+    }
+
     [TheoryEnvSpecific("JSVU does not support ARM on Windows or Linux", EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR)]
     [InlineData("v8")]
     [InlineData("node")]
     public void BenchmarkWithCancellationTokenProperty_ReceivesToken_Wasm(string javaScriptEngine)
     {
-        var dotnetVersion = "net10.0";
         var logger = new OutputLogger(Output);
-        var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: MonoAotCompilerMode.mini);
+        var wasmSettings = new WasmSettings { JavaScriptEngine = javaScriptEngine };
 
         var config = ManualConfig.CreateEmpty()
             .AddLogger(logger)
             .AddJob(Job.Dry
-                .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet10_0, "wasm", false, javaScriptEngine))
-                .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
+                .WithToolchain(CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net10_0, wasmSettings)))
             .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)
             .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
@@ -123,15 +173,13 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         var cts = new CancellationTokenSource();
         var diagnoser = new CancelAfterFirstIterationDiagnoser(cts);
 
-        var dotnetVersion = "net10.0";
         var logger = new OutputLogger(Output);
-        var netCoreAppSettings = new NetCoreAppSettings(dotnetVersion, runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: MonoAotCompilerMode.mini);
+        var wasmSettings = new WasmSettings { JavaScriptEngine = javaScriptEngine };
 
         var config = ManualConfig.CreateEmpty()
             .AddLogger(logger)
             .AddJob(Job.Dry
-                .WithRuntime(new WasmRuntime(dotnetVersion, RuntimeMoniker.WasmNet10_0, "wasm", false, javaScriptEngine))
-                .WithToolchain(WasmToolchain.From(netCoreAppSettings)))
+                .WithToolchain(CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net10_0, wasmSettings)))
             .AddDiagnoser(diagnoser)
             .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)
@@ -150,6 +198,25 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         {
             Assert.True(CancellationToken.CanBeCanceled);
             Assert.False(CancellationToken.IsCancellationRequested);
+        }
+    }
+
+    // A static [BenchmarkCancellation] member declared on a base type. Reflection withholds a base type's statics
+    // unless FlattenHierarchy is asked for, which BenchmarkCancellationValidator asks for and the assignment sites
+    // did not - so the member validated but was never written, leaving the benchmark a default token.
+    public class StaticCancellationTokenOnABase
+    {
+        [BenchmarkCancellation]
+        public static CancellationToken InheritedToken { get; set; }
+    }
+
+    public class InheritsStaticCancellationToken : StaticCancellationTokenOnABase
+    {
+        [Benchmark]
+        public void CheckToken()
+        {
+            Assert.True(InheritedToken.CanBeCanceled);
+            Assert.False(InheritedToken.IsCancellationRequested);
         }
     }
 

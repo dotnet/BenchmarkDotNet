@@ -1,42 +1,52 @@
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
-    public class CoreRunToolchain : IToolchain
+    public sealed class CoreRunToolchain : IToolchain, IHasSettings
     {
-        /// <summary>
-        /// creates a CoreRunToolchain which is using provided CoreRun to execute .NET Core apps
-        /// </summary>
-        /// <param name="coreRun">the path to CoreRun</param>
-        /// /<param name="createCopy">should a copy of CoreRun be performed? True by default. <remarks>The toolchain replaces old dependencies in CoreRun folder with newer versions if used by the benchmarks.</remarks></param>
-        /// <param name="targetFrameworkMoniker">TFM, net10.0 is the default</param>
-        /// <param name="customDotNetCliPath">path to dotnet cli, if not provided the one from PATH will be used</param>
-        /// <param name="displayName">display name, CoreRun is the default value</param>
-        /// <param name="restorePath">the directory to restore packages to</param>
-        public CoreRunToolchain(FileInfo coreRun, bool createCopy = true,
-            string targetFrameworkMoniker = "net10.0",
-            FileInfo? customDotNetCliPath = null,
-            DirectoryInfo? restorePath = null,
-            string displayName = "CoreRun")
+        private const string DefaultTargetFrameworkMoniker = "net11.0";
+
+        private CoreRunToolchain(CoreRunSettings settings)
         {
-            if (!coreRun.Exists)
+            if (!settings.SourceCoreRun.Exists)
                 throw new FileNotFoundException("Provided CoreRun path does not exist. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.");
 
-            SourceCoreRun = coreRun;
-            CopyCoreRun = createCopy ? GetShadowCopyPath(coreRun) : coreRun;
-            CustomDotNetCliPath = customDotNetCliPath;
-            RestorePath = restorePath;
+            Settings = settings;
+            SourceCoreRun = settings.SourceCoreRun;
+            CopyCoreRun = settings.CreateCopy ? GetShadowCopyPath(settings.SourceCoreRun) : settings.SourceCoreRun;
 
-            Name = displayName;
-            Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, targetFrameworkMoniker, customDotNetCliPath?.FullName ?? "", restorePath?.FullName ?? "");
-            Builder = new CoreRunPublisher(targetFrameworkMoniker, CopyCoreRun, customDotNetCliPath);
-            Executor = new DotNetCliExecutor(customDotNetCliPath: CopyCoreRun.FullName); // instead of executing "dotnet $pathToDll" we do "CoreRun $pathToDll"
+            // The build components receive the resolved settings (target framework moniker filled in); the original
+            // `settings` is stored in Settings for equality and the settings column.
+            var resolvedSettings = Resolve(settings, DefaultTargetFrameworkMoniker);
+            // Parsed rather than picked apart by hand: neither a platform suffix (net10.0-windows) nor a
+            // netcoreappX.Y survives stripping "net" and calling Version.Parse.
+            Runtime = Environments.Runtime.TryParse(resolvedSettings.TargetFrameworkMoniker, out var parsed) && parsed is CoreRuntime coreRuntime
+                ? coreRuntime
+                : throw new NotSupportedException(
+                    $"CoreRun can only run .NET (Core) benchmarks, but '{resolvedSettings.TargetFrameworkMoniker}' does not describe a .NET (Core) target framework.");
+            Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, resolvedSettings);
+            Builder = new CoreRunPublisher(resolvedSettings, CopyCoreRun);
+            Executor = new DotNetCliExecutor(customDotNetCliPath: CopyCoreRun); // instead of executing "dotnet $pathToDll" we do "CoreRun $pathToDll"
         }
 
-        public string Name { get; }
+        /// <summary>Returns a toolchain that uses the provided CoreRun to execute .NET Core apps.</summary>
+        public static CoreRunToolchain From(CoreRunSettings settings) => new(settings);
+
+        // Fills the target framework moniker in with the default only when the user left it unset, avoiding the
+        // settings copy otherwise. CoreRun has no runtime to derive it from - it parses the runtime out of the moniker.
+        private static CoreRunSettings Resolve(CoreRunSettings settings, string fallbackTfm)
+            => settings.TargetFrameworkMoniker.IsNotBlank() ? settings : settings with { TargetFrameworkMoniker = fallbackTfm };
+
+        internal CoreRunSettings Settings { get; }
+
+        ISettings IHasSettings.Settings => Settings;
+
+        public Runtime Runtime { get; }
 
         public IGenerator Generator { get; }
 
@@ -50,11 +60,14 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         public FileInfo CopyCoreRun { get; }
 
-        public FileInfo? CustomDotNetCliPath { get; }
+        public override string ToString() => $"{Settings.DisplayName} {Runtime.Version}";
 
-        public DirectoryInfo? RestorePath { get; }
+        public override bool Equals(object? obj)
+            => obj is CoreRunToolchain other
+            && Runtime.Equals(other.Runtime)
+            && Settings.Equals(other.Settings);
 
-        public override string ToString() => Name;
+        public override int GetHashCode() => HashCode.Combine(Runtime, Settings);
 
         public async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmark, IResolver resolver)
         {
@@ -64,7 +77,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
                     $"Provided CoreRun path does not exist, benchmark '{benchmark.DisplayInfo}' will not be executed. Please remember that BDN expects path to CoreRun.exe (corerun on Unix), not to Core_Root folder.",
                     benchmark);
             }
-            else if (DotNetSdkValidator.IsCliPathInvalid(CustomDotNetCliPath?.FullName, benchmark, out var invalidCliError))
+            else if (DotNetSdkValidator.IsCliPathInvalid(Settings.CliPath, benchmark, out var invalidCliError))
             {
                 yield return invalidCliError;
             }

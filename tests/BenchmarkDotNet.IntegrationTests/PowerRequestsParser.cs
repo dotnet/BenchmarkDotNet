@@ -106,29 +106,36 @@ internal class PowerRequestsParser
         // return an empty string when CR is followed by LF.
         StringReader reader = new StringReader(input);
         string? line;
+        TokenType previousTokenType = TokenType.None;
         while ((line = reader.ReadLine()) != null)
         {
             if (line.Length == 0)
             {
                 yield return new Token(TokenType.EmptyLine, "");
+                previousTokenType = TokenType.EmptyLine;
             }
             else if (line[line.Length - 1] == ':')
             {
                 yield return new Token(TokenType.RequestType, line.Substring(0, line.Length - 1).ToString());
-            }
-            else if (string.Equals(line, "None.", StringComparison.InvariantCulture))
-            {
-                yield return new Token(TokenType.None, line);
+                previousTokenType = TokenType.RequestType;
             }
             else if (line[0] == '[')
             {
                 int pos = line.IndexOf(']');
                 yield return new Token(TokenType.RequesterType, line.Substring(1, pos - 1));
                 yield return new Token(TokenType.RequesterName, line.Substring(pos + 2));
+                previousTokenType = TokenType.RequesterName;
+            }
+            else if (previousTokenType == TokenType.RequestType)
+            {
+                // Any single line directly after a request type header is the localized "None."
+                yield return new Token(TokenType.None, line);
+                previousTokenType = TokenType.None;
             }
             else
             {
                 yield return new Token(TokenType.Reason, line);
+                previousTokenType = TokenType.Reason;
             }
         }
     }

@@ -1,0 +1,26 @@
+<!-- Shared by BenchmarkDotNet.Analyzers and BenchmarkDotNet.CodeFixers, which each build one assembly per Roslyn version into analyzers/dotnet/roslyn$(MccVersion). -->
+<Project>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- Default version used by local builds. This is overridden by the build script. -->
+    <MccVersion>4.12</MccVersion>
+    <OutputPath>bin\$(Configuration)\roslyn$(MccVersion)\cs</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- We multi-target for different compiler versions. https://github.com/dotnet/roslyn/discussions/81256#discussioncomment-14975130, https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md#versioning -->
+    <!-- C# 7.3/Roslyn 2.8 is our baseline (min version we support) -->
+    <!-- ITypeSymbol.IsRefLikeType -->
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MccVersion)', '3.0'))">$(DefineConstants);CODE_ANALYSIS_3_0</DefineConstants>
+    <!-- C# 9 -->
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MccVersion)', '3.8'))">$(DefineConstants);CODE_ANALYSIS_3_8</DefineConstants>
+    <!-- C# 11 -->
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MccVersion)', '4.4'))">$(DefineConstants);CODE_ANALYSIS_4_4</DefineConstants>
+    <!-- C# 12 -->
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MccVersion)', '4.8'))">$(DefineConstants);CODE_ANALYSIS_4_8</DefineConstants>
+    <!-- C# 13 -->
+    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MccVersion)', '4.12'))">$(DefineConstants);CODE_ANALYSIS_4_12</DefineConstants>
+    <MccPackageVersion>$(MccVersion).0</MccPackageVersion>
+  </PropertyGroup>
+</Project>

@@ -11,10 +11,10 @@ public class RunAsyncTests(ITestOutputHelper output) : BenchmarkTestExecutor(out
 {
     public static TheoryData<IToolchain> GetToolchains() =>
     [
-        new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = false }),
-        new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = true }),
-        new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = false }),
-        new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = true }),
+        InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
+        InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
+        InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
+        InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
         Job.Default.GetToolchain()
     ];
 

@@ -62,6 +62,18 @@ namespace BenchmarkDotNet.Tests.Mocks
                 []);
         }
 
+        public static Summary CreateSummary(Type benchmarkType, IConfig config) => new Summary(
+            "MockSummary",
+            BenchmarkConverter.TypeToBenchmarks(benchmarkType, config).BenchmarksCases.Select(CreateSimpleReport).ToImmutableArray(),
+            new HostEnvironmentInfoBuilder().WithoutDotNetSdkVersion().Build(),
+            string.Empty,
+            string.Empty,
+            TimeSpan.FromMinutes(1),
+            config.CultureInfo ?? DefaultCultureInfo.Instance,
+            [],
+            [],
+            config.SummaryStyle);
+
         public static Summary CreateSummary(IConfig config) => new Summary(
             "MockSummary",
             CreateReports(config),

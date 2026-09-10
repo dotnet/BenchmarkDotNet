@@ -64,9 +64,10 @@ namespace BenchmarkDotNet.Reports
                     Parameters = BenchmarkCase.Parameters.PrintInfo,
                     HardwareIntrinsics = this.GetHardwareIntrinsicsInfo()
                 },
-                Job = new JobInfo
+                Job = new BdnJob
                 {
                     Environment = BenchmarkCase.Job.Environment.ToPerfonar(),
+                    Infrastructure = BenchmarkCase.Job.Infrastructure.ToPerfonar(),
                     Execution = BenchmarkCase.Job.Run.ToPerfonar()
                 }
             };

@@ -10,7 +10,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
-using BenchmarkDotNet.Toolchains.Roslyn;
+using BenchmarkDotNet.Toolchains.Framework;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.IntegrationTests
                         .WithConsumeTasksSynchronously(consumeTasksSynchronously))
                 .AddJob(
                     Job.Dry
-                        .WithToolchain(new RoslynToolchain())
+                        .WithToolchain(RoslynFrameworkToolchain.Default)
                         .WithInvocationCount(4)
                         .WithUnrollFactor(4)
                         .WithConsumeTasksSynchronously(consumeTasksSynchronously))
@@ -111,11 +111,16 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(typeof(RunnableStructCaseBenchmark), false)]
         [InlineData(typeof(RunnableClassCaseBenchmark), false)]
         [InlineData(typeof(RunnableManyArgsCaseBenchmark), false)]
+        [InlineData(typeof(RunnableRefArgsFromSourceBenchmark), false)] // ref parameters fed from [ArgumentsSource]
         [InlineData(typeof(RunnableTaskCaseBenchmark), false)]
         [InlineData(typeof(RunnableTaskCaseBenchmark), true)]
         [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableBenchmarks), false)]
         [InlineData(typeof(AsyncEnumerableBenchmarksTests.AsyncEnumerableCallerOverride), false)]
         [InlineData(typeof(AsyncEnumerableBenchmarksTests.CustomAsyncEnumerableBenchmarks), false)]
+        [InlineData(typeof(AsyncEnumerableParamsSourceTests.StaticParamsSource), false)] // async IAsyncEnumerable [ParamsSource]
+        // A void, parameterless workload with an ASYNC setup/cleanup: the only case that runs the sync core
+        // emitter's setup state machines. RunnableTaskCaseBenchmark covers the Task-returning emitter's.
+        [InlineData(typeof(GlobalSetupCleanupTask), false)]
         public void InProcessBenchmarkEmitsSameIL(Type benchmarkType, bool consumeTasksSynchronously)
         {
             var logger = new OutputLogger(Output);
@@ -412,7 +417,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var config = new ManualConfig()
                 .AddJob(Job.Dry
-                    .WithToolchain(new InProcessEmitToolchain(new InProcessEmitSettings { ExecuteOnSeparateThread = false }))
+                    .WithToolchain(InProcessEmitToolchain.From(new InProcessEmitSettings { ExecuteOnSeparateThread = false }))
                     .WithInvocationCount(UnrollFactor)
                     .WithUnrollFactor(UnrollFactor))
                 .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)

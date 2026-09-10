@@ -1,12 +1,13 @@
-using BenchmarkDotNet.Engines;
+﻿using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using System.Reflection;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
-using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
+using static BenchmarkDotNet.Code.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -57,7 +58,11 @@ internal static class InProcessEmitRunner
     {
         var benchmarkCase = parameters.BenchmarkCase;
 
-        var instance = Activator.CreateInstance(runnableType)!;
+        // The constructor hands out the JIT-trick delegate through an out parameter, so nothing here binds a
+        // generated member by name on a type the benchmark also contributes members to.
+        var constructorArguments = new object?[1];
+        var instance = runnableType.GetConstructors().Single().Invoke(constructorArguments);
+        var trickTheJit = (Action) constructorArguments[0]!;
         FillMembers(instance, benchmarkCase, host.CancellationToken);
 
         host.WriteLine();
@@ -116,7 +121,7 @@ internal static class InProcessEmitRunner
             .ConfigureAwait();
         host.ReportResults(results);
 
-        runnableType.GetMethod(TrickTheJitCoreMethodName)!.Invoke(instance, []);
+        trickTheJit();
 
         await compositeInProcessDiagnoserHandler.HandleAsync(BenchmarkSignal.AfterEngine, host.CancellationToken).ConfigureAwait(false);
     }
@@ -141,7 +146,7 @@ internal static class InProcessEmitRunner
         // Inject CancellationToken into properties/fields marked with [BenchmarkCancellation]
         var targetType = benchmarkCase.Descriptor.Type;
 
-        foreach (var property in targetType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+        foreach (var property in targetType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy))
         {
             if (property.PropertyType == typeof(System.Threading.CancellationToken) &&
                 property.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))
@@ -155,7 +160,7 @@ internal static class InProcessEmitRunner
             }
         }
 
-        foreach (var field in targetType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static))
+        foreach (var field in targetType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy))
         {
             if (field.FieldType == typeof(System.Threading.CancellationToken) &&
                 field.IsDefined(typeof(Attributes.BenchmarkCancellationAttribute), inherit: false))

@@ -37,12 +37,12 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(summary.Reports.All(report => report.AllMeasurements.Any()));
 
             Assert.True(summary.Reports
-                .Single(report => report.BenchmarkCase.Job.Environment.Runtime is ClrRuntime)
+                .Single(report => report.BenchmarkCase.GetRuntime() is ClrRuntime)
                 .ExecuteResults
                 .Any());
 
             Assert.True(summary.Reports
-                .Single(report => report.BenchmarkCase.Job.Environment.Runtime is CoreRuntime)
+                .Single(report => report.BenchmarkCase.GetRuntime() is CoreRuntime)
                 .ExecuteResults
                 .Any());
 
@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void B()
         {
-            Console.WriteLine($"// {RuntimeInformation.GetCurrentRuntime().GetToolchain()}");
+            Console.WriteLine($"// {Job.Default.GetToolchain()}");
         }
     }
 }

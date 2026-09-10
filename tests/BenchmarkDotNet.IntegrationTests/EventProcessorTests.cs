@@ -7,6 +7,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
@@ -144,7 +145,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenUsingEventProcessorWithBuildFailures()
         {
-            var toolchain = new Toolchain("Build Failure", new AllFailsGenerator(), null!, null!);
+            var toolchain = new MockToolchain("Build Failure", UnknownRuntime.Instance, new AllFailsGenerator(), null!, null!);
             var events = RunBenchmarksAndRecordEvents([typeof(ClassA)], toolchain: toolchain);
 
             Assert.Equal(9, events.Count);
@@ -213,7 +214,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AllUnsupportedToolchain : Toolchain
         {
-            public AllUnsupportedToolchain() : base("AllUnsupported", null!, null!, null!)
+            public AllUnsupportedToolchain() : base("AllUnsupported", UnknownRuntime.Instance, null!, null!, null!)
             {
             }
 

@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Helpers
     {
         // Cancel key presses are not supported by .NET or do not exist for these platforms.
         internal static readonly bool ConsoleSupportsCancelKeyPress =
-            !(OsDetector.IsAndroid() || OsDetector.IsIOS() || OsDetector.IsTvOS() || Portability.RuntimeInformation.IsWasm);
+            !(OsDetector.IsMobile() || Portability.RuntimeInformation.IsWasm);
 
         private static int cancelKeyPressKeepAliveRegistered;
 

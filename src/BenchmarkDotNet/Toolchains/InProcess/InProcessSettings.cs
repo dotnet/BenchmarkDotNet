@@ -1,6 +1,6 @@
 namespace BenchmarkDotNet.Toolchains.InProcess;
 
-public abstract class InProcessSettings
+public abstract record InProcessSettings
 {
-    public bool ExecuteOnSeparateThread { get; set; } = true;
+    public bool ExecuteOnSeparateThread { get; init; } = true;
 }

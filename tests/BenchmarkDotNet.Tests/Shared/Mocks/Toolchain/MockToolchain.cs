@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -11,7 +12,7 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
 {
     public class MockToolchain(Func<BenchmarkCase, List<Measurement>> measurer) : IToolchain
     {
-        public string Name => nameof(MockToolchain);
+        public Runtime Runtime => UnknownRuntime.Instance;
         public IGenerator Generator => new MockGenerator();
         public IBuilder Builder => new MockBuilder();
         public IExecutor Executor { get; private set; } = new MockExecutor(measurer);

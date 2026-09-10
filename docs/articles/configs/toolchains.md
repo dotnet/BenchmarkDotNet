@@ -104,36 +104,34 @@ The recommended way of running the benchmarks for multiple runtimes is to use th
 
 ## Custom .NET Core Runtime
 
-We can run your benchmarks for custom `<RuntimeFrameworkVersion>` if you want. All you need to do is to create custom toolchain by calling `CsProjCoreToolchain.From` method, which accepts `NetCoreAppSettings`.
+You can build and run your benchmarks against a custom target framework moniker by creating a toolchain from a `NetCoreAppSettings` instance:
 
 ```cs
 public class MyConfig : ManualConfig
 {
     public MyConfig()
     {
-        Add(Job.Default.With(
+        AddJob(Job.Default.WithToolchain(
             CsProjCoreToolchain.From(
-                new NetCoreAppSettings(
-                    targetFrameworkMoniker: "net8.0-windows",
-                    runtimeFrameworkVersion: "8.0.101",
-                    name: ".NET 8.0 Windows"))));
+                CoreRuntime.Core80,
+                new NetCoreAppSettings { TargetFrameworkMoniker = "net8.0-windows" })));
     }
 }
 ```
 
-## Custom .NET Runtime
-
-It's possible to benchmark a private build of .NET Runtime. All you need to do is to define a job with the right version of `ClrRuntime`.
+To pin a specific runtime pack version (the equivalent of setting `<RuntimeFrameworkVersion>` in the project) pass it as an MSBuild argument. It is applied to the restore, build and publish steps and overrides any value coming from the host project:
 
 ```cs
-BenchmarkSwitcher
-    .FromAssembly(typeof(Program).Assembly)
-    .Run(args, 
-        DefaultConfig.Instance.AddJob(
-            Job.ShortRun.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0"))));
+public class MyConfig : ManualConfig
+{
+    public MyConfig()
+    {
+        AddJob(Job.Default
+            .WithRuntime(CoreRuntime.Core80)
+            .WithMsBuildArguments("/p:RuntimeFrameworkVersion=8.0.101"));
+    }
+}
 ```
-
-This sends the provided version as a `COMPLUS_Version` env var to the benchmarked process.
 
 ## Custom dotnet cli path
 
@@ -144,16 +142,20 @@ public class CustomPathsConfig : ManualConfig
 {
     public CustomPathsConfig() 
     {
-        var dotnetCli32bit = NetCoreAppSettings
-            .NetCoreApp31
-            .WithCustomDotNetCliPath(@"C:\Program Files (x86)\dotnet\dotnet.exe", "32 bit cli");
+        var dotnetCli32bit = new NetCoreAppSettings
+        {
+            TargetFrameworkMoniker = "net8.0",
+            CliPath = new FileInfo(@"C:\Program Files (x86)\dotnet\dotnet.exe")
+        };
 
-        var dotnetCli64bit = NetCoreAppSettings
-            .NetCoreApp31
-            .WithCustomDotNetCliPath(@"C:\Program Files\dotnet\dotnet.exe", "64 bit cli");
+        var dotnetCli64bit = new NetCoreAppSettings
+        {
+            TargetFrameworkMoniker = "net8.0",
+            CliPath = new FileInfo(@"C:\Program Files\dotnet\dotnet.exe")
+        };
 
-        AddJob(Job.RyuJitX86.WithToolchain(CsProjCoreToolchain.From(dotnetCli32bit)).WithId("32 bit cli"));
-        AddJob(Job.RyuJitX64.WithToolchain(CsProjCoreToolchain.From(dotnetCli64bit)).WithId("64 bit cli"));
+        AddJob(Job.RyuJitX86.WithToolchain(CsProjCoreToolchain.From(CoreRuntime.Core80, dotnetCli32bit)).WithId("32 bit cli"));
+        AddJob(Job.RyuJitX64.WithToolchain(CsProjCoreToolchain.From(CoreRuntime.Core80, dotnetCli64bit)).WithId("64 bit cli"));
     }
 }
 ```
@@ -197,7 +199,7 @@ This is why you need to:
 - install [pre-requisites](https://docs.microsoft.com/en-us/dotnet/core/deploying/native-aot/#prerequisites) required by NativeAOT compiler
 - target .NET to be able to run NativeAOT benchmarks (example: `<TargetFramework>net7.0</TargetFramework>` in the .csproj file)
 - run the app as a .NET process (example: `dotnet run -c Release -f net7.0`).
-- specify the NativeAOT runtime in an explicit way, either by using console line arguments `--runtimes nativeaot7.0` (the recommended approach), or by using`[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.With(NativeAotRuntime.Net70)`:
+- specify the NativeAOT runtime in an explicit way, either by using console line arguments `--runtimes nativeaot7.0` (the recommended approach), or by using`[SimpleJob]` attribute or by using the fluent Job config API `Job.ShortRun.WithRuntime(NativeAotRuntime.Net70)`:
 
 ```cmd
 dotnet run -c Release -f net7.0 --runtimes nativeaot7.0
@@ -231,30 +233,27 @@ If you want to benchmark some particular version of NativeAOT (or from a differe
 ```cs
 var config = DefaultConfig.Instance
     .AddJob(Job.ShortRun
-        .WithToolchain(NativeAotToolchain.CreateBuilder()
-            .UseNuGet(
-                microsoftDotNetILCompilerVersion: "7.0.0-*", // the version goes here
-                nuGetFeedUrl: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json") // this address might change over time
-            .DisplayName("NativeAOT NuGet")
-            .TargetFrameworkMoniker("net7.0")
-            .ToToolchain()));
+        .WithToolchain(CsProjNativeAotToolchain.From(
+            NativeAotRuntime.Net70, // compiles the benchmarks as net7.0
+            NativeAotSettings.Default.WithNuGet(
+                ilCompilerVersion: "7.0.0-*", // the version goes here
+                nuGetFeedUrl: "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json"))) // this address might change over time
+        .WithId("NativeAOT NuGet"));
 ```
 
-The builder allows to configure more settings:
-- specify packages restore path by using `PackagesRestorePath($path)`
-- rooting all application assemblies by using `RootAllApplicationAssemblies($bool)`. This is disabled by default.
-- generating stack trace metadata by using `IlcGenerateStackTraceData($bool)`. This option is enabled by default.
-- set optimization preference by using `IlcOptimizationPreference($value)`. The default is `Speed`, you can configure it to `Size` or nothing
-- set instruction set for the target OS, architecture and hardware by using `IlcInstructionSet($value)`. By default BDN recognizes most of the instruction sets on your machine and enables them.
+`NativeAotSettings` exposes the equivalent options as `init` properties (use a record initializer, e.g. `NativeAotSettings.Default with { OptimizationPreference = "Size" }`):
+- `PackagesPath` — packages restore path.
+- `GenerateStackTraceData` — generate stack trace metadata. Enabled by default.
+- `OptimizationPreference` — `"Speed"` (default), `"Size"`, or `""` for none.
+- `InstructionSet` — instruction set for the target OS, architecture and hardware. By default BDN recognizes most of the instruction sets on your machine and enables them.
+- `RuntimeIdentifier` — the target runtime identifier (RID).
 
 BenchmarkDotNet supports [rd.xml](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/rd-xml-format.md) files. To get given file respected by BenchmarkDotNet you need to place it in the same folder as the project that defines benchmarks and name it `rd.xml` or in case of multiple files give them `.rd.xml` extension. The alternative to `rd.xml` files is annotating types with [DynamicallyAccessedMembers](https://devblogs.microsoft.com/dotnet/app-trimming-in-net-5/) attribute.
 
-If given benchmark is not supported by NativeAOT, you need to apply `[AotFilter]` attribute for it. Example:
+If a given benchmark is not supported by NativeAOT (e.g. it relies on runtime code generation), exclude it with a filter that checks the runtime. For example, to skip it only for NativeAOT:
 
 ```cs
-[Benchmark]
-[AotFilter("Not supported by design.")]
-public object CreateInstanceNames() => System.Activator.CreateInstance(_assemblyName, _typeName);
+config.AddFilter(new SimpleFilter(benchmark => benchmark.GetRuntime() is not NativeAotRuntime));
 ```
 
 ### Generated files
@@ -284,7 +283,6 @@ cat .\BenchmarkDotNet.Autogenerated.csproj
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <RuntimeFrameworkVersion></RuntimeFrameworkVersion>
     <AssemblyName>Job-KRLVKQ</AssemblyName>
     <AssemblyTitle>Job-KRLVKQ</AssemblyTitle>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -337,11 +335,10 @@ or explicitly in the code:
 ```cs
 var config = DefaultConfig.Instance
     .AddJob(Job.ShortRun
-        .WithToolchain(NativeAotToolchain.CreateBuilder()
-            .UseLocalBuild(@"C:\Projects\runtime\artifacts\packages\Release\Shipping\")
-            .DisplayName("NativeAOT local build")
-            .TargetFrameworkMoniker("net7.0")
-            .ToToolchain()));
+        .WithToolchain(CsProjNativeAotToolchain.From(
+            NativeAotRuntime.Net70, // compiles the benchmarks as net7.0
+            NativeAotSettings.Default.WithLocalBuild(new DirectoryInfo(@"C:\Projects\runtime\artifacts\packages\Release\Shipping\"))))
+        .WithId("NativeAOT local build"));
 ```
 
 BenchmarkDotNet is going to follow [these instructrions](https://github.com/dotnet/runtime/blob/main/docs/workflow/building/coreclr/nativeaot.md#building) to get it working for you.
@@ -426,39 +423,3 @@ And that you have .NET 5 feed added to your `nuget.config` file:
 Now you should be able to run the Wasm benchmarks!
 
 [!include[IntroWasm](../samples/IntroWasm.md)]
-
-## MonoAotLLVM
-
-BenchmarkDotNet supports doing Mono AOT runs with both the Mono-Mini compiler and the Mono-LLVM compiler (which uses llvm on the back end).
-
-Using this tool chain requires the following flags:
-
-```
---runtimes monoaotllvm
---aotcompilerpath <path to mono aot compiler>
---customruntimepack <path to runtime pack>
-```
-
-and optionally (defaults to mini)
-
-```
---aotcompilermode <mini|llvm>  
-```
-
-As of this writing, the mono aot compiler is not available as a seperate download or nuget package. Therefore, it is required to build the compiler in the [dotnet/runtime repository].
-
-The compiler binary (mono-sgen) is built as part of the `mono` subset, so it can be built (along with the runtime pack) like so (in the root of [dotnet/runtime]).
-
-`./build.sh -subset mono+libs -c Release`
-
-The compiler binary should be generated here (modify for your platform):
-
-```
-<runtime root>/artifacts/obj/mono/OSX.x64.Release/mono/mini/mono-sgen
-```
-
-And the runtime pack should be generated here:
-
-```
-<runtimeroot>artifacts/bin/microsoft.netcore.app.runtime.osx-x64/Release/
-```

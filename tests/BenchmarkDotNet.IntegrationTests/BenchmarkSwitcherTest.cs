@@ -355,7 +355,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
             public void PrintNoBenchmarksError(ILogger logger) => PrintNoBenchmarksErrorCalledTimes++;
 
-            public void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters) => PrintWrongFilterInfoCalledTimes++;
+            public ValueTask PrintWrongFilterInfoAsync(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters, CancellationToken cancellationToken)
+            {
+                PrintWrongFilterInfoCalledTimes++;
+                return default;
+            }
 
             public IReadOnlyList<Type> AskUser(IReadOnlyList<Type> allTypes, ILogger logger)
             {

@@ -4,8 +4,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public class CoreRunGenerator : CsProjGenerator
     {
-        public CoreRunGenerator(FileInfo sourceCoreRun, FileInfo copyCoreRun, string targetFrameworkMoniker, string cliPath, string packagesPath)
-            : base(targetFrameworkMoniker, cliPath, packagesPath)
+        public CoreRunGenerator(FileInfo sourceCoreRun, FileInfo copyCoreRun, CoreRunSettings settings)
+            : base(settings)
         {
             SourceCoreRun = sourceCoreRun;
             CopyCoreRun = copyCoreRun;
@@ -17,10 +17,8 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         private bool NeedsCopy => SourceCoreRun != CopyCoreRun;
 
-        protected override string GetPackagesDirectoryPath(string buildArtifactsDirectoryPath) => PackagesPath;
-
         protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, TargetFrameworkMoniker, "publish");
+            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, Settings.TargetFrameworkMoniker, "publish");
 
         protected override void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths)
         {

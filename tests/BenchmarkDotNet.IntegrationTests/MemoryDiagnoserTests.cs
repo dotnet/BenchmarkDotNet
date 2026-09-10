@@ -16,11 +16,9 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Mono;
-using BenchmarkDotNet.Toolchains.MonoAotLLVM;
-using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Validators;
 using System.Reflection;
@@ -62,7 +60,7 @@ namespace BenchmarkDotNet.IntegrationTests
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
 
-            if (toolchain is MonoToolchain)
+            if (toolchain.Runtime is MonoCoreRuntime)
             {
                 objectAllocationOverhead += IntPtr.Size;
             }
@@ -81,7 +79,7 @@ namespace BenchmarkDotNet.IntegrationTests
             if (OsDetector.IsMacOS())
                 return; // currently not supported
 
-            MemoryDiagnoserIsAccurate(NativeAotToolchain.Net10_0);
+            MemoryDiagnoserIsAccurate(CsProjNativeAotToolchain.Net10_0);
         }
 
         [FactEnvSpecific("We don't want to test MonoVM twice (.NET Framework and .NET Core), and it's not supported on Windows+Arm",
@@ -95,7 +93,7 @@ namespace BenchmarkDotNet.IntegrationTests
             long arraySizeOverhead = IntPtr.Size; // array length
             objectAllocationOverhead += IntPtr.Size; // Mono has an extra word
 
-            AssertAllocations(MonoToolchain.Mono80, typeof(MonoBenchmarks.AccurateAllocations), new Dictionary<string, long>
+            AssertAllocations(CsProjMonoCoreToolchain.Mono80, typeof(MonoBenchmarks.AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(MonoBenchmarks.AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
                 { nameof(MonoBenchmarks.AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
@@ -103,30 +101,21 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        [TheoryEnvSpecific("We don't want to test Wasm twice (.NET Framework and .NET Core), and JSVU does not support ARM on Windows or Linux",
-            [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR])]
-        [InlineData(MonoAotCompilerMode.mini)]
-        // BUG: https://github.com/dotnet/BenchmarkDotNet/issues/3036
-        [InlineData(MonoAotCompilerMode.wasm, Skip = "AOT is broken")]
-        public void MemoryDiagnoserSupportsMonoWasm(MonoAotCompilerMode aotCompilerMode)
+        [FactEnvSpecific("We don't want to test Wasm twice (.NET Framework and .NET Core), and JSVU does not support ARM on Windows or Linux",
+            EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR)]
+        public void MemoryDiagnoserSupportsMonoWasm()
         {
             var ptrSize = sizeof(Int32); // We can't rely on IntPtr.Size, since we run on a different platform. Wasm is currently 32bit.
             var objectAllocationOverhead = ptrSize * 2; // pointer to method table + object header word
             var arraySizeOverhead = ptrSize * 2; // bounds + max_length
             var intTaskSize = 40; // We can't use CalculateRequiredSpace for AllocateTask since it calculates the size with IntPtr.Size.
 
-            var netCoreAppSettings = new NetCoreAppSettings("net10.0", runtimeFrameworkVersion: null!, "Wasm", aotCompilerMode: aotCompilerMode);
-
-            var runtime = new WasmRuntime(
-                netCoreAppSettings.TargetFrameworkMoniker, RuntimeMoniker.WasmNet10_0,
-                "Wasm", aotCompilerMode == MonoAotCompilerMode.wasm, "v8");
-
-            AssertAllocations(WasmToolchain.From(netCoreAppSettings), typeof(AccurateAllocations), new Dictionary<string, long>
+            AssertAllocations(CsProjMonoWasmToolchain.Net10_0, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
                 { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },
                 { nameof(AccurateAllocations.AllocateTask), intTaskSize },
-            }, runtime: runtime);
+            });
         }
 
         public class AllocatingGlobalSetupAndCleanup
@@ -365,9 +354,9 @@ namespace BenchmarkDotNet.IntegrationTests
             });
         }
 
-        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators, int iterationCount = 1, Runtime? runtime = null)
+        private void AssertAllocations(IToolchain toolchain, Type benchmarkType, Dictionary<string, long> benchmarksAllocationsValidators, int iterationCount = 1)
         {
-            var config = CreateConfig(toolchain, runtime, iterationCount);
+            var config = CreateConfig(toolchain, iterationCount);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
             var summary = BenchmarkRunner.Run(benchmarks);
@@ -403,7 +392,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private IConfig CreateConfig(IToolchain toolchain, Runtime? runtime,
+        private IConfig CreateConfig(IToolchain toolchain,
             // Single iteration is enough for most of the tests.
             int iterationCount = 1)
         {
@@ -416,11 +405,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 .WithGcConcurrent(false)
                 .WithJitTieringMode(JitTieringMode.Force)
                 .WithToolchain(toolchain);
-
-            if (runtime is not null)
-            {
-                job = job.WithRuntime(runtime);
-            }
 
             return ManualConfig.CreateEmpty()
                 .AddJob(job)

@@ -48,9 +48,9 @@ namespace BenchmarkDotNet.Portability
 #endif
 
 #if NETSTANDARD2_0
-        public static readonly bool IsAot = IsAotMethod() || FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase);
+        public static readonly bool IsAot = GetIsAot();
 
-        private static bool IsAotMethod()
+        private static bool GetIsAot()
         {
             Type runtimeFeature = Type.GetType("System.Runtime.CompilerServices.RuntimeFeature");
             if (runtimeFeature != null)
@@ -63,7 +63,21 @@ namespace BenchmarkDotNet.Portability
                 }
             }
 
-            return false;
+            if (FrameworkDescription.StartsWith(".NET Native", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // Fallback for old runtimes like legacy MonoAot, test if dynamic method works.
+            try
+            {
+                _ = new System.Reflection.Emit.DynamicMethod("test", typeof(void), []);
+                return false;
+            }
+            catch
+            {
+                return true;
+            }
         }
 #else
         public static readonly bool IsAot = !System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
@@ -76,9 +90,9 @@ namespace BenchmarkDotNet.Portability
         public static bool IsNativeAOT
             => Environment.Version.Major >= 5
                && IsAot
-               && !IsWasm && !IsMono; // Wasm and MonoAOTLLVM are also AOT
+               && !IsWasm && !IsMono; // Wasm and Mono AOT are also AOT
 
-        // File-based apps contains specific RuntimeHostConfigurationOptions. 
+        // File-based apps contains specific RuntimeHostConfigurationOptions.
         // https://github.com/dotnet/dotnet/blob/v10.0.302/src/sdk/documentation/general/dotnet-run-file.md
         public static bool IsFileBasedApp => AppContext.GetData("EntryPointFilePath") != null
                                           && AppContext.GetData("EntryPointFileDirectoryPath") != null;
@@ -190,14 +204,13 @@ namespace BenchmarkDotNet.Portability
         internal static Runtime GetCurrentRuntime()
         {
             //do not change the order of conditions because it may cause incorrect determination of runtime
-            if (IsAot && IsMono)
-                return MonoAotLLVMRuntime.Default;
             if (IsWasm)
-                return WasmRuntime.Default;
+                return WasmRuntime.GetCurrentVersion();
             if (IsNewMono)
-                return MonoRuntime.GetCurrentVersion();
+                // New Mono AOT (MonoAotLLVM) has no official workload, it can only be built by custom runtime artifacts, we don't support it.
+                return MonoCoreRuntime.GetCurrentVersion();
             if (IsOldMono)
-                return MonoRuntime.Default;
+                return IsAot ? MonoAotRuntime.Default : MonoRuntime.Default;
             if (IsFullFramework)
                 return ClrRuntime.GetCurrentVersion();
             if (IsNetCore)
@@ -205,7 +218,7 @@ namespace BenchmarkDotNet.Portability
             if (IsNativeAOT)
                 return NativeAotRuntime.GetCurrentVersion();
 
-            throw new NotSupportedException("Unknown .NET Runtime");
+            return UnknownRuntime.Instance;
         }
 
         public static Platform GetCurrentPlatform()
@@ -315,5 +328,15 @@ namespace BenchmarkDotNet.Portability
         [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = "Location property is empty when running with PublishSingleFile/PublishAot")]
         public static string GetCoreLibDllLocation()
             => typeof(object).Assembly.Location;
+
+        // Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier()
+        // returns win10-x64, we want the simpler form win-x64
+        // the values taken from https://docs.microsoft.com/en-us/dotnet/core/rid-catalog#macos-rids
+        internal static string GetPortableRuntimeIdentifier()
+        {
+            string osPart = OsDetector.IsWindows() ? "win" : (OsDetector.IsMacOS() ? "osx" : "linux");
+            string architecture = ProcessArchitecture.ToString().ToLowerInvariant();
+            return $"{osPart}-{architecture}";
+        }
     }
 }

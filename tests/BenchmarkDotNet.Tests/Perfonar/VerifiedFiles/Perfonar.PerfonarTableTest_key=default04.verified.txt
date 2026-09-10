@@ -3,15 +3,15 @@ MockIntel Core i7-6700HQ CPU 2.60GHz (Max: 3.10GHz), 1 CPU, 8 logical and 4 phys
 
 Type = Bench
 
-@Net481LegacyJit: Runtime = Net481, Jit = LegacyJit
-@Net70RyuJit:     Runtime = Net70, Jit = RyuJit
+@Mussel:             Runtime = net481, Jit = LegacyJit
+@Runtimenet70RyuJit: Runtime = net7.0, Jit = RyuJit
 
-| Method | Job             | Center | Spread |
-|:-------|:----------------|-------:|-------:|
-| Foo    | Net481LegacyJit | 11.0ns | 0.81ns |
-| Bar    | Net481LegacyJit | 21.0ns | 0.81ns |
-| Foo    | Net70RyuJit     | 31.0ns | 0.81ns |
-| Bar    | Net70RyuJit     | 41.0ns | 0.81ns |
+| Method | Job                | Center | Spread |
+|:-------|:-------------------|-------:|-------:|
+| Foo    | Mussel             | 11.0ns | 0.81ns |
+| Bar    | Mussel             | 21.0ns | 0.81ns |
+| Foo    | Runtimenet70RyuJit | 31.0ns | 0.81ns |
+| Bar    | Runtimenet70RyuJit | 41.0ns | 0.81ns |
 
 {
   "engine": {
@@ -41,8 +41,10 @@ Type = Bench
   "nested": [
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net481"
+        },
         "environment": {
-          "runtime": "net481",
           "jit": "legacyJit"
         }
       },
@@ -97,8 +99,10 @@ Type = Bench
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net70",
           "jit": "ryuJit"
         }
       },

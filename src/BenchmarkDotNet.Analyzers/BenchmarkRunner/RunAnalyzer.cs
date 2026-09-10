@@ -202,7 +202,7 @@ public class RunAnalyzer : DiagnosticAnalyzer
                         {
                             if (attributeData.AttributeClass != null)
                             {
-                                if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, benchmarkAttributeTypeSymbol))
+                                if (AnalyzerHelper.IsOrDerivesFrom(attributeData.AttributeClass, benchmarkAttributeTypeSymbol))
                                 {
                                     return true;
                                 }

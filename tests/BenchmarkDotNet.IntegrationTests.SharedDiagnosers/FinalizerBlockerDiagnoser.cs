@@ -2,11 +2,11 @@ using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.MonoWasm;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.IntegrationTests.SharedDiagnosers;
@@ -21,14 +21,22 @@ public sealed class FinalizerBlockerDiagnoser : IInProcessDiagnoser
     public IEnumerable<IAnalyser> Analysers => [];
     public void DeserializeResults(BenchmarkCase benchmarkCase, string serializedResults) { }
     public void DisplayResults(ILogger logger) { }
-    public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters) => AsyncEnumerable.Empty<ValidationError>();
+    // Not AsyncEnumerable.Empty: BenchmarkDotNet's polyfill for it is internal and compiled out of that assembly's
+    // .NET 10 asset, so binding it from this netstandard2.0 project resolves against the netstandard asset and then
+    // fails to load under a .NET 10 host.
+#pragma warning disable CS1998
+    public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
+    {
+        yield break;
+    }
+#pragma warning restore CS1998
     public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
     public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken) => new();
     public RunMode GetRunMode(BenchmarkCase benchmarkCase)
-        // Mono Wasm throws PlatformNotSupportedException from Monitor.Wait, and defers finalization to the JS event loop (single-threaded),
+        // Wasm throws PlatformNotSupportedException from Monitor.Wait, and defers finalization to the JS event loop (single-threaded),
         // so it's impossible for us to prevent the finalizer from running. The good thing is that means it cannot run during our synchronous
         // benchmarks, but it also means we should never add any async-yielding benchmark memory tests for Wasm.
-        => benchmarkCase.Job.Infrastructure.Toolchain is WasmToolchain
+        => benchmarkCase.GetRuntime() is WasmRuntime
             ? RunMode.None
             : RunMode.ExtraIteration;
     public InProcessDiagnoserHandlerData GetHandlerData(BenchmarkCase benchmarkCase) => new(typeof(FinalizerBlockerDiagnoserHandler), null);

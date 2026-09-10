@@ -5,10 +5,10 @@ Type = Bench
 
 | Method | Runtime | Center | Spread |
 |:-------|:--------|-------:|-------:|
-| Foo    | Net481  | 11.0ns | 0.81ns |
-| Bar    | Net481  | 21.0ns | 0.81ns |
-| Foo    | Net70   | 31.0ns | 0.81ns |
-| Bar    | Net70   | 41.0ns | 0.81ns |
+| Foo    | net481  | 11.0ns | 0.81ns |
+| Bar    | net481  | 21.0ns | 0.81ns |
+| Foo    | net7.0  | 31.0ns | 0.81ns |
+| Bar    | net7.0  | 41.0ns | 0.81ns |
 
 {
   "engine": {
@@ -38,8 +38,10 @@ Type = Bench
   "nested": [
     {
       "job": {
-        "environment": {
+        "infrastructure": {
           "runtime": "net481"
+        },
+        "environment": {
         }
       },
       "nested": [
@@ -93,8 +95,10 @@ Type = Bench
     },
     {
       "job": {
+        "infrastructure": {
+          "runtime": "net7.0"
+        },
         "environment": {
-          "runtime": "net70"
         }
       },
       "nested": [

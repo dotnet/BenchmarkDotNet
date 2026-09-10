@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Running
     {
         void PrintNoBenchmarksError(ILogger logger);
 
-        void PrintWrongFilterInfo(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters);
+        ValueTask PrintWrongFilterInfoAsync(IReadOnlyList<Type> allTypes, ILogger logger, string[] userFilters, CancellationToken cancellationToken);
 
         IReadOnlyList<Type> AskUser(IReadOnlyList<Type> allTypes, ILogger logger);
     }

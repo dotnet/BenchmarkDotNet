@@ -10,6 +10,7 @@ public enum EnvRequirement
     FullFrameworkOnly,
     NonFullFramework,
     DotNetCoreOnly,
+    Platform64BitOnly,
     NeedsPrivilegedProcess,
     NonGitHubDraftPR,
 }
