@@ -10,6 +10,8 @@ namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
 public partial class Arm64DisassemblerTests
 {
+    private const int DmbIshldOffset = 4;
+
     [Fact]
     public void TryFollowJumpTrampoline_B()
     {
@@ -20,17 +22,19 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        using var clrRuntime = CreateMockClrRuntime(rawInstructions);
+        const ulong BaseAddress = DummyBaseAddress;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
-        ulong baseAddress = DummyBaseAddress;
 
         // Act
         var helper = new Arm64DisassemblerHelper();
-        var result = helper.TryFollowJumpTrampoline(state, baseAddress, out var target);
+        var result = helper.TryFollowJumpTrampoline(state, BaseAddress, out var target);
 
         // Assert
         result.Should().BeTrue();
-        target.Should().Be(baseAddress + 0x10000);
+        target.Should().Be(BaseAddress + 0x10000);
     }
 
     [Fact]
@@ -44,17 +48,19 @@ public partial class Arm64DisassemblerTests
 
         PrintInstructions(rawInstructions);
 
-        using var clrRuntime = CreateMockClrRuntime(rawInstructions);
+        const ulong BaseAddress = DummyBaseAddress;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
-        ulong baseAddress = DummyBaseAddress;
 
         // Act
         var helper = new Arm64DisassemblerHelper();
-        var result = helper.TryFollowJumpTrampoline(state, baseAddress, out var target);
+        var result = helper.TryFollowJumpTrampoline(state, BaseAddress, out var target);
 
         // Assert
         result.Should().BeTrue();
-        target.Should().Be(baseAddress - 0x10000);
+        target.Should().Be(BaseAddress - 0x10000);
     }
 
     [Fact]
@@ -70,16 +76,48 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
-        {
-            return ExpectedResultAddress;
-        });
+        const ulong BaseAddress = DummyBaseAddress;
+        const ulong MdSlotAddress = BaseAddress + DmbIshldOffset + 0x10000;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .AddPointer(MdSlotAddress, ExpectedResultAddress)
+           .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
-        ulong baseAddress = DummyBaseAddress;
 
         // Act
         var helper = new Arm64DisassemblerHelper();
-        var result = helper.TryFollowJumpTrampoline(state, baseAddress, out var target);
+        var result = helper.TryFollowJumpTrampoline(state, BaseAddress, out var target);
+
+        // Assert
+        result.Should().BeTrue();
+        target.Should().Be(ExpectedResultAddress);
+    }
+
+
+    [Fact]
+    public void TryFollowJumpTrampoline_StubPrecode_WithoutDmbIshLd()
+    {
+        // Arrange
+        var rawInstructions = new[]
+        {
+            Arm64InstructionFactory.LDR(X10, 0x10000), // ldr x10, #0x10000
+            Arm64InstructionFactory.LDR(X12, 0x20000), // ldr x12, #0x20000
+            Arm64InstructionFactory.BR(X10),           // br x10
+        };
+
+        PrintInstructions(rawInstructions);
+
+        const ulong BaseAddress = DummyBaseAddress;
+        const ulong MdSlotAddress = BaseAddress + 0x10000;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .AddPointer(MdSlotAddress, ExpectedResultAddress)
+           .ToMockClrRuntime();
+        var state = new State(clrRuntime, DummyTargetFrameworkVersion);
+
+        // Act
+        var helper = new Arm64DisassemblerHelper();
+        var result = helper.TryFollowJumpTrampoline(state, BaseAddress, out var target);
 
         // Assert
         result.Should().BeTrue();
@@ -99,16 +137,17 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
-        {
-            return ExpectedResultAddress;
-        });
+        const ulong BaseAddress = DummyBaseAddress;
+        const ulong MdSlotAddress = BaseAddress + DmbIshldOffset + 0x10000;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .AddPointer(MdSlotAddress, ExpectedResultAddress)
+           .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
-        ulong baseAddress = DummyBaseAddress;
 
         // Act
         var helper = new Arm64DisassemblerHelper();
-        var result = helper.TryFollowJumpTrampoline(state, baseAddress, out var target);
+        var result = helper.TryFollowJumpTrampoline(state, BaseAddress, out var target);
 
         // Assert
         result.Should().BeTrue();
@@ -128,23 +167,25 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
-        {
-            return ExpectedResultAddress;
-        });
+        const ulong BaseAddress = DummyBaseAddress;
+        const ulong CountSlotAddress = BaseAddress + DmbIshldOffset + 0x10000 + 8;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .AddPointer(CountSlotAddress, ExpectedResultAddress)
+           .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
-        ulong baseAddress = DummyBaseAddress;
 
         // Act
         var helper = new Arm64DisassemblerHelper();
-        var result = helper.TryFollowJumpTrampoline(state, baseAddress, out var target);
+        var result = helper.TryFollowJumpTrampoline(state, BaseAddress, out var target);
 
         // Assert
         result.Should().BeTrue();
         target.Should().Be(ExpectedResultAddress);
     }
 
-    // TryFollowJumTrampoline seems not support FixupPrecode with pre-backpatch form.
+    // TODO: Need to confirm .NET JIT specification later.
+    // TryFollowJumpTrampoline seems not support FixupPrecode with pre-backpatch form.
     [Fact]
     public void TryFollowJumpTrampoline_FixupPrecodeCode_Fixup_ShouldReturnFalse()
     {
@@ -158,16 +199,17 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
-        {
-            return ExpectedResultAddress;
-        });
+        const ulong BaseAddress = DummyBaseAddress;
+        const ulong MdSlotAddress = BaseAddress + DmbIshldOffset + 0x10000;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .AddPointer(MdSlotAddress, ExpectedResultAddress)
+           .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
-        ulong baseAddress = DummyBaseAddress;
 
         // Act
         var helper = new Arm64DisassemblerHelper();
-        var result = helper.TryFollowJumpTrampoline(state, baseAddress, out var target);
+        var result = helper.TryFollowJumpTrampoline(state, BaseAddress, out var target);
 
         // Assert
         result.Should().BeFalse();
@@ -180,21 +222,22 @@ public partial class Arm64DisassemblerTests
         // Arrange
         var rawInstructions = new[]
         {
-            // Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD),  // dmb ishld
-            Arm64InstructionFactory.BL(0x10000), // bl 0x10000
+            Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD),  // dmb ishld
+            Arm64InstructionFactory.BL(0x10000), // BL instruction is not handled as StubHead
         };
         PrintInstructions(rawInstructions);
 
-        using var clrRuntime = CreateMockClrRuntime(rawInstructions, address =>
-        {
-            return ExpectedResultAddress;
-        });
+        const ulong BaseAddress = DummyBaseAddress;
+        using var clrRuntime = new MockMemory()
+          .AddInstructions(BaseAddress, rawInstructions)
+          .AddPointer(BaseAddress + 0x10000, ExpectedResultAddress)
+          .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
-        ulong baseAddress = DummyBaseAddress;
+
 
         // Act
         var helper = new Arm64DisassemblerHelper();
-        var result = helper.TryFollowJumpTrampoline(state, baseAddress, out var target);
+        var result = helper.TryFollowJumpTrampoline(state, BaseAddress, out var target);
 
         // Assert
         result.Should().BeFalse();

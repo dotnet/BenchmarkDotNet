@@ -14,7 +14,6 @@ public abstract class Arm64DisassemblerTestBase
     internal static readonly MockClrMethod DummyCurrentMethod = new("DummyCurrentMethod", DummyBaseAddress + 0x10000, "DummyCurrentMethodSignature", new MockClrType("DummyCurrentMethodType"));
     internal static readonly MockClrMethod DummyTargetMethod = new("DummyTargetMethod", DummyBaseAddress + 0x20000, "DummyTargetMethodSignature", new MockClrType("DummyTargetMethodType"));
 
-    protected static readonly IClrRuntime DummyClrRuntime = CreateMockClrRuntime(0);
     protected readonly ITestOutputHelper Output;
 
     public Arm64DisassemblerTestBase(ITestOutputHelper output)
@@ -32,59 +31,49 @@ public abstract class Arm64DisassemblerTestBase
 
     protected void PrintInstructions(uint[] rawInstructions)
     {
-        foreach (var rawinstruction in rawInstructions)
+        foreach (var rawInstruction in rawInstructions)
         {
-            var instruction = rawinstruction.ToCapstoneArm64Instruction();
+            var instruction = rawInstruction.ToCapstoneArm64Instruction();
             Output.WriteLine(instruction.ToString());
         }
     }
 
-    protected static MockClrRuntime CreateMockClrRuntime(ulong dummyValue)
-    {
-        return new MockClrRuntime(new MockDataTarget(new MockDataReader(dummyValue)));
-    }
-
+    /// <summary>
+    /// Create MockClrRuntime with MockDataReader that returns following data.
+    ///   Read: Throw InvalidOperationException.
+    ///   ReadPointer: Return address 0 data to skip TryResolvePrecode/TryFollowJumpTrampoline.
+    /// </summary>
     protected static MockClrRuntime CreateMockClrRuntime()
-        => CreateMockClrRuntime([]);
-
-    protected static MockClrRuntime CreateMockClrRuntime(uint[] rawInstructions)
     {
-        Func<ulong, ulong> dummyFunc = _ => throw new InvalidOperationException("This func is not expected to be called.");
-        return CreateMockClrRuntime(rawInstructions, dummyFunc);
-    }
-
-    protected static MockClrRuntime CreateMockClrRuntime(uint[] rawInstructions, Func<ulong, ulong> getPointer)
-    {
-        var dataReader = CreateMockDataReader(rawInstructions, getPointer);
+        var dataReader = new MockDataReader();
         return new MockClrRuntime(new MockDataTarget(dataReader));
     }
+}
 
-    protected static IDataReader CreateMockDataReader(uint[] rawInstructions)
+file static class ExtensionMethods
+{
+    public static ReadBytesDelegate ToGetReadBytesDelegate(this uint[] rawInstructions)
     {
-        Func<ulong, ulong> dummyFunc = _ => throw new InvalidOperationException("This func is not expected to be called.");
-        return CreateMockDataReader(rawInstructions, dummyFunc);
+        return (address, buffer) =>
+        {
+            var instructionCountToWrite = Math.Min(rawInstructions.Length, buffer.Length / 4);
+
+            for (int i = 0; i < instructionCountToWrite; i++)
+            {
+                uint rawInstruction = rawInstructions[i];
+                BinaryPrimitives.WriteUInt32LittleEndian(buffer.Slice(i * 4), rawInstruction);
+            }
+
+            return instructionCountToWrite * 4;
+        };
     }
 
-    protected static IDataReader CreateMockDataReader(uint[] rawInstructions, Func<ulong, ulong> getPointer)
+    public static TryReadPointerDelegate ToTryReadPointerDelegate(this Func<ulong, ulong> getPointer)
     {
-        return new MockDataReader(
-            read: (address, buffer) =>
-            {
-                var instructionCountToWrite = Math.Min(rawInstructions.Length, buffer.Length / 4);
-
-                for (int i = 0; i < instructionCountToWrite; i++)
-                {
-                    uint rawInstruction = rawInstructions[i];
-                    BinaryPrimitives.WriteUInt32LittleEndian(buffer.Slice(i * 4), rawInstruction);
-                }
-
-                return instructionCountToWrite * 4;
-            },
-            tryReadPointer: new TryReadPointerDelegate((address, out value) =>
-            {
-                value = getPointer(address);
-                return true;
-            })
-        );
+        return (ulong address, out ulong value) =>
+        {
+            value = getPointer(address);
+            return true;
+        };
     }
 }

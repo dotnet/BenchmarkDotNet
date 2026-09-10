@@ -1,4 +1,5 @@
 using Microsoft.Diagnostics.Runtime;
+using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
@@ -10,7 +11,6 @@ internal class MockDataReader : IDataReader
 {
     private readonly ReadBytesDelegate _read = (_, _) => throw new InvalidOperationException($"{nameof(_read)} field is not set.");
     private readonly TryReadPointerDelegate _tryReadPointer = (_, out _) => throw new InvalidOperationException($"{nameof(_tryReadPointer)} field is not set.");
-
 
     public MockDataReader(ulong dummyValue = 0)
     {
@@ -52,11 +52,11 @@ internal class MockDataReader : IDataReader
         return 0;
     }
 
-    // It's used by TryReadStubHead
+    // It's used by TryReadStubHead/TryFollowJumpTrampoline
     public int Read(ulong address, Span<byte> buffer)
         => _read(address, buffer);
 
-    // It's used by TryResolvePrecode
+    // It's used by TryResolvePrecode/TryFollowJumpTrampoline
     public bool ReadPointer(ulong address, out ulong value)
         => _tryReadPointer(address, out value);
 

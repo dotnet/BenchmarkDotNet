@@ -1,8 +1,10 @@
 // TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
 #if NET
+using Argon;
 using AsmArm64;
 using AwesomeAssertions;
 using Gee.External.Capstone.Arm64;
+using System.Net;
 using static AsmArm64.Arm64RegisterX;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
@@ -14,12 +16,13 @@ public partial class Arm64RegisterValueAccumulatorTests
     public void MovzThenLdr_SameRegister_ShouldHaveValue()
     {
         // Arrange
-        var expectedAddress = 0x1234UL;
-        using var clrRuntime = CreateMockClrRuntime(expectedAddress);
+        using var clrRuntime = new MockMemory()
+           .AddPointer(MovzOffset, ExpectedResultAddress)
+           .ToMockClrRuntime();
         var accumulator = CreateValueAccumulator(clrRuntime);
         var instructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x1000),          // movz x0, #0x1000
+            Arm64TestInstructions.Movz(X0, MovzOffset),      // movz x0, #0x1000
             Arm64TestInstructions.Ldr(X0, baseRegister: X0), // ldr x0, [x0]
         };
         PrintInstructions(instructions);
@@ -31,19 +34,20 @@ public partial class Arm64RegisterValueAccumulatorTests
         // Assert
         accumulator.HasValue.Should().BeTrue();
         accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
-        accumulator.Value.Should().Be((long)expectedAddress); // It should be value that is returned by ReadPointer.
+        accumulator.Value.Should().Be(ExpectedResultAddress); // It should be value that is returned by ReadPointer.
     }
 
     [Fact]
     public void MovzThenLdr_DifferentRegister_ShouldHaveValue()
     {
         // Arrange
-        var expectedAddress = 0x1234UL;
-        using var clrRuntime = CreateMockClrRuntime(expectedAddress);
+        using var clrRuntime = new MockMemory()
+           .AddPointer(MovzOffset, ExpectedResultAddress)
+           .ToMockClrRuntime();
         var accumulator = CreateValueAccumulator(clrRuntime);
         var instructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x1000),                          // movz x0, #0x1000
+            Arm64TestInstructions.Movz(X0, MovzOffset),                      // movz x0, #0x1000
             Arm64TestInstructions.Ldr(X1, baseRegister: X0, immediate: 0x0), // ldr x1, [x0]
         };
         PrintInstructions(instructions);
@@ -55,19 +59,20 @@ public partial class Arm64RegisterValueAccumulatorTests
         // Assert
         accumulator.HasValue.Should().BeTrue();
         accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X1); // Value is loaded to X1 register.
-        accumulator.Value.Should().Be((long)expectedAddress); // It should be value that is returned by ReadPointer.
+        accumulator.Value.Should().Be(ExpectedResultAddress); // It should be value that is returned by ReadPointer.
     }
 
     [Fact]
     public void MovzThenLdr_WithDisplacement_ShouldNotHaveValue()
     {
         // Arrange
-        var expectedAddress = 0x1234UL;
-        using var clrRuntime = CreateMockClrRuntime(expectedAddress);
+        using var clrRuntime = new MockMemory()
+           .AddPointer(MovzOffset, ExpectedResultAddress)
+           .ToMockClrRuntime();
         var accumulator = CreateValueAccumulator(clrRuntime);
         var instructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x1000),                            // movz x0, #0x1000
+            Arm64TestInstructions.Movz(X0, MovzOffset),                        // movz x0, #0x1000
             Arm64TestInstructions.Ldr(X0, baseRegister: X0, immediate: 0x100), // ldr x0, [x0, #0x100]
         };
         PrintInstructions(instructions);
@@ -87,12 +92,13 @@ public partial class Arm64RegisterValueAccumulatorTests
     public void MovzThenLdr_WithIndexRegister_ShouldNotHaveValue()
     {
         // Arrange
-        var expectedAddress = 0x1234UL;
-        using var clrRuntime = CreateMockClrRuntime(expectedAddress);
+        using var clrRuntime = new MockMemory()
+           .AddPointer(MovzOffset, ExpectedResultAddress)
+           .ToMockClrRuntime();
         var accumulator = CreateValueAccumulator(clrRuntime);
         var instructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x1000),                             // movz x0, #0x1000
+            Arm64TestInstructions.Movz(X0, MovzOffset),                         // movz x0, #0x1000
             Arm64TestInstructions.Ldr(X0, baseRegister: X0, indexRegister: X1), // ldr x0, [x0, x1]
         };
         PrintInstructions(instructions);
@@ -115,8 +121,8 @@ public partial class Arm64RegisterValueAccumulatorTests
         var accumulator = CreateValueAccumulator();
         var instructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x1000), // movz x0, #0x1000
-            Arm64TestInstructions.Ldr(X0, 0x100),   // ldr x0, #0x100
+            Arm64TestInstructions.Movz(X0, MovzOffset), // movz x0, #0x1000
+            Arm64TestInstructions.Ldr(X0, 0x100),       // ldr x0, #0x100
         };
         PrintInstructions(instructions);
 

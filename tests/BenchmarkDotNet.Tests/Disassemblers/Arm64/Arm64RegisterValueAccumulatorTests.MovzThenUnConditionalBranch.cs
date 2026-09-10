@@ -115,11 +115,11 @@ public partial class Arm64RegisterValueAccumulatorTests
         };
         PrintInstructions(instructions);
 
-        // Act        
+        // Act
         accumulator.Feed(instructions[0]);
         accumulator.Feed(instructions[1]);
 
-        // Assert       
+        // Assert
         accumulator.HasValue.Should().BeFalse();
 
         // TODO: Current implementation don't reset state.
@@ -137,11 +137,11 @@ public partial class Arm64RegisterValueAccumulatorTests
             Arm64TestInstructions.Blr(X0),          // bl x0
         };
 
-        // Act        
+        // Act
         accumulator.Feed(instructions[0]);
         accumulator.Feed(instructions[1]);
 
-        // Assert       
+        // Assert
         accumulator.HasValue.Should().BeFalse();
 
         // TODO: Current implementation don't reset state.

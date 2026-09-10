@@ -118,7 +118,7 @@ public partial class Arm64InstructionFormatterTests : Arm64DisassemblerTestBase
 
     private static Arm64Asm[] GetArm64Asms(uint[] rawInstructions, ulong baseAddress, Dictionary<ulong, string> symbols)
     {
-        using var clrRuntime = CreateMockClrRuntime(0);
+        using var clrRuntime = CreateMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
         foreach (var symbol in symbols)
         {
@@ -141,7 +141,7 @@ public partial class Arm64InstructionFormatterTests : Arm64DisassemblerTestBase
             { Arm64InstructionFactory.MOVZ(X0, 0xFFF),            "movz x0, #0xfff"},
             { Arm64InstructionFactory.MOVZ(X0, 0x100, amount:16), "movz x0, #0x100, lsl #16"},
 
-            // TODO: `Gee.External.Capstone` seems not support negative label offset and wrong text is outputted. 
+            // TODO: `Gee.External.Capstone` seems not support negative label offset and wrong text is outputted.
             // { Arm64InstructionFactory.B(-8),                      "b #-8"}, // Gee.External.Capstone don't support minus label offset.
         };
     }

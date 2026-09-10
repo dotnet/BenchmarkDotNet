@@ -168,6 +168,16 @@ internal static class ExtensionMethods
         return bytes;
     }
 
+    public static int FillBuffer(this uint[] rawInstructions, Span<byte> buffer)
+    {
+        var bytes = rawInstructions.ToLittleEndianBytes();
+        if (bytes.Length > buffer.Length)
+            throw new ArgumentException($"Buffer length must be greater than {bytes.Length}.");
+
+        bytes.CopyTo(buffer);
+        return bytes.Length;
+    }
+
     public static void ValidateMultipleOf4(this Arm64LabelOffset label)
     {
         if (label.Value % 4 != 0)

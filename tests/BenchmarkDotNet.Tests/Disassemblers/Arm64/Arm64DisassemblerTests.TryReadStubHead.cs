@@ -20,14 +20,16 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var dataReader = CreateMockDataReader(rawInstructions);
-
-        ulong address = 0x100000;
+        const ulong BaseAddress = DummyBaseAddress;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .ToMockClrRuntime();
+        var dataReader = clrRuntime.DataTarget.DataReader;
 
         // Act
         var result = Arm64DisassemblerHelper.TryReadStubHead(
             dataReader,
-            address,
+            BaseAddress,
             out ulong parseBase,
             out uint instr0,
             out uint instr1,
@@ -35,7 +37,7 @@ public partial class Arm64DisassemblerTests
 
         // Assert
         result.Should().BeTrue();
-        parseBase.Should().Be(address + 4);     // Skip `dmb ishld` instruction
+        parseBase.Should().Be(BaseAddress + 4); // Skip `dmb ishld` instruction
         instr0.Should().Be(rawInstructions[1]); // ldr x10 0x100
         instr1.Should().Be(rawInstructions[2]); // ldr x12 0x200
         instr2.Should().Be(rawInstructions[3]); // br x10
@@ -53,13 +55,16 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var dataReader = CreateMockDataReader(rawInstructions);
-        ulong address = 0x10000;
+        const ulong BaseAddress = DummyBaseAddress;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .ToMockClrRuntime();
+        var dataReader = clrRuntime.DataTarget.DataReader;
 
         // Act
         var result = Arm64DisassemblerHelper.TryReadStubHead(
             dataReader,
-            address,
+            BaseAddress,
             out ulong parseBase,
             out uint instr0,
             out uint instr1,
@@ -67,7 +72,7 @@ public partial class Arm64DisassemblerTests
 
         // Assert
         result.Should().BeTrue();
-        parseBase.Should().Be(address);
+        parseBase.Should().Be(BaseAddress);
         instr0.Should().Be(rawInstructions[0]); // ldr x10 0x100
         instr1.Should().Be(rawInstructions[1]); // ldr x12 0x200
         instr2.Should().Be(rawInstructions[2]); // br x10
@@ -86,13 +91,16 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var dataReader = CreateMockDataReader(rawInstructions);
-        ulong address = 0;
+        const ulong BaseAddress = DummyBaseAddress;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .ToMockClrRuntime();
+        var dataReader = clrRuntime.DataTarget.DataReader;
 
         // Act
         var result = Arm64DisassemblerHelper.TryReadStubHead(
             dataReader,
-            address,
+            BaseAddress,
             out ulong parseBase,
             out uint instr0,
             out uint instr1,
@@ -114,13 +122,16 @@ public partial class Arm64DisassemblerTests
         };
         PrintInstructions(rawInstructions);
 
-        var dataReader = CreateMockDataReader(rawInstructions);
-        ulong address = 0;
+        const ulong BaseAddress = DummyBaseAddress;
+        using var clrRuntime = new MockMemory()
+           .AddInstructions(BaseAddress, rawInstructions)
+           .ToMockClrRuntime();
+        var dataReader = clrRuntime.DataTarget.DataReader;
 
         // Act
         var result = Arm64DisassemblerHelper.TryReadStubHead(
             dataReader,
-            address,
+            BaseAddress,
             out ulong parseBase,
             out uint instr0,
             out uint instr1,
