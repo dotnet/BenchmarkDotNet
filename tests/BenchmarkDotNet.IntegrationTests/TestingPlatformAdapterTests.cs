@@ -244,13 +244,31 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        public void AnAssemblyWideValidationWarningIsReportedOncePerNode()
+        {
+            // GenericBenchmarksValidator looks at the whole assembly, however BenchmarkDotNet runs the validators once
+            // per benchmark type, so an unreadable type is reported again for every type that runs. An error that
+            // names no benchmark case is put on every node, so without deduplication N types leave N copies of the
+            // same warning on each of the N types' nodes.
+            var (_, ran) = TestingPlatformServerModeSession.DiscoverThenRun(
+                GetProbeApplication(PassingProbes),
+                "Probe.Identity",
+                Timeout);
+
+            Assert.True(ran.Count >= 4, $"Expected several benchmark types to run, but {ran.Count} node(s) did.");
+            Assert.All(ran, node => Assert.Equal("passed", node.ExecutionState));
+            Assert.All(
+                ran,
+                node => Assert.Single(Regex.Matches(node.StandardOutput, "WithAbstractConfig was ignored")));
+        }
+
+        [Fact]
         public void ParameterValuesAreDisposedWhenBenchmarkDotNetBailsOutOnValidation()
         {
             // The unoptimized probe application fails JitOptimizationsValidator, which is critical: BenchmarkRunnerClean
             // returns before the try whose finally disposes the values it was handed, so nothing disposes them. The
             // adapter must not take "handed to BenchmarkDotNet" for "disposed by BenchmarkDotNet" - that assumption
             // would leave exactly these values, of a run that never started, to the finalizer for good.
-            IReadOnlyList<DiscoveredTest> discovered = [];
             TestRunSummary? summary = null;
 
             var report = ReadDisposalReport(

@@ -273,7 +273,8 @@ namespace BenchmarkDotNet.IntegrationTests
                             nodes.Add(new ServerNode(
                                 node.GetProperty("uid").GetString()!,
                                 node.GetProperty("display-name").GetString()!,
-                                node.TryGetProperty("execution-state", out var state) ? state.GetString()! : ""));
+                                node.TryGetProperty("execution-state", out var state) ? state.GetString()! : "",
+                                node.TryGetProperty("standardOutput", out var output) ? output.GetString() ?? "" : ""));
                         }
                     }
                 }
@@ -307,7 +308,7 @@ namespace BenchmarkDotNet.IntegrationTests
             client.Dispose();
         }
 
-        internal sealed record ServerNode(string Uid, string DisplayName, string ExecutionState);
+        internal sealed record ServerNode(string Uid, string DisplayName, string ExecutionState, string StandardOutput);
     }
 }
 #endif
