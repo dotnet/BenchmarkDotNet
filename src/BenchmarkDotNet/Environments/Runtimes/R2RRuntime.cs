@@ -10,6 +10,7 @@ namespace BenchmarkDotNet.Environments
         public static readonly R2RRuntime Net90 = new(new(9, 0));
         public static readonly R2RRuntime Net10_0 = new(new(10, 0));
         public static readonly R2RRuntime Net11_0 = new(new(11, 0));
+        public static readonly R2RRuntime Net12_0 = new(new(12, 0));
 
         private R2RRuntime(Version version) => Version = ToRuntimeVersion(version);
 
@@ -25,6 +26,7 @@ namespace BenchmarkDotNet.Environments
                 9 => Net90,
                 10 => Net10_0,
                 11 => Net11_0,
+                12 => Net12_0,
                 _ => new(version),
             };
 

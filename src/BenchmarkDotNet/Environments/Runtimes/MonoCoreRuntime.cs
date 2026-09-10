@@ -17,6 +17,7 @@ public sealed class MonoCoreRuntime : Runtime
     public static readonly MonoCoreRuntime Net90 = new(new(9, 0));
     public static readonly MonoCoreRuntime Net10_0 = new(new(10, 0));
     public static readonly MonoCoreRuntime Net11_0 = new(new(11, 0));
+    public static readonly MonoCoreRuntime Net12_0 = new(new(12, 0));
 
     private MonoCoreRuntime(Version version) => Version = ToRuntimeVersion(version);
 
@@ -36,6 +37,7 @@ public sealed class MonoCoreRuntime : Runtime
             9 => Net90,
             10 => Net10_0,
             11 => Net11_0,
+            12 => Net12_0,
             _ => new(version),
         };
 

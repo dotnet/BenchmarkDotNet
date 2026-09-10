@@ -1,5 +1,11 @@
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.Mono;
+using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
+using BenchmarkDotNet.Toolchains.R2R;
+using BenchmarkDotNet.Toolchains.Wasm;
 
 namespace BenchmarkDotNet.Tests;
 
@@ -9,6 +15,13 @@ public class RuntimeParseTests
     // dotted / CLI spellings
     [InlineData("net8.0", typeof(CoreRuntime), 8, 0)]
     [InlineData("net10.0", typeof(CoreRuntime), 10, 0)]
+    [InlineData(RuntimeMoniker.Net12_0, typeof(CoreRuntime), 12, 0)]
+    [InlineData(RuntimeMoniker.NativeAot12_0, typeof(NativeAotRuntime), 12, 0)]
+    [InlineData(RuntimeMoniker.Mono12_0, typeof(MonoCoreRuntime), 12, 0)]
+    [InlineData(RuntimeMoniker.MonoWasm12_0, typeof(MonoWasmRuntime), 12, 0)]
+    [InlineData(RuntimeMoniker.MonoWasmAot12_0, typeof(MonoWasmAotRuntime), 12, 0)]
+    [InlineData(RuntimeMoniker.R2R12_0, typeof(R2RRuntime), 12, 0)]
+    [InlineData("corewasm12.0", typeof(CoreWasmRuntime), 12, 0)]
     [InlineData("netcoreapp3.1", typeof(CoreRuntime), 3, 1)]
     [InlineData("net472", typeof(ClrRuntime), 4, 7)]
     [InlineData("net48", typeof(ClrRuntime), 4, 8)]
@@ -21,6 +34,13 @@ public class RuntimeParseTests
     // compact / enum-name spellings
     [InlineData("Net80", typeof(CoreRuntime), 8, 0)]
     [InlineData("Net10_0", typeof(CoreRuntime), 10, 0)]
+    [InlineData("Net12_0", typeof(CoreRuntime), 12, 0)]
+    [InlineData("NativeAot12_0", typeof(NativeAotRuntime), 12, 0)]
+    [InlineData("Mono12_0", typeof(MonoCoreRuntime), 12, 0)]
+    [InlineData("MonoWasm12_0", typeof(MonoWasmRuntime), 12, 0)]
+    [InlineData("MonoWasmAot12_0", typeof(MonoWasmAotRuntime), 12, 0)]
+    [InlineData("R2R12_0", typeof(R2RRuntime), 12, 0)]
+    [InlineData("CoreWasm12_0", typeof(CoreWasmRuntime), 12, 0)]
     [InlineData("NetCoreApp31", typeof(CoreRuntime), 3, 1)]
     [InlineData("NativeAot70", typeof(NativeAotRuntime), 7, 0)]
     [InlineData("Mono60", typeof(MonoCoreRuntime), 6, 0)]
@@ -59,6 +79,7 @@ public class RuntimeParseTests
     [InlineData("net5.0-windows", "net5.0-windows")]
     [InlineData("net8.0-ios", "net8.0-ios")]
     [InlineData("net10.0-windows10.0.19041.0", "net10.0-windows10.0.19041.0")]
+    [InlineData("net12.0-windows", "net12.0-windows")]
     // The platform is never normalized, so the casing survives into the moniker.
     [InlineData("net10.0-WINDOWS", "net10.0-WINDOWS")]
     public void PreservesPlatformSpecificMonikers(string moniker, string expectedTfm)
@@ -237,6 +258,25 @@ public class RuntimeParseTests
         // CoreWasm has no cached static (still experimental), so compare against an allocated instance.
         Assert.Equal(CoreWasmRuntime.From(new Version(11, 0)), Runtime.Parse("CoreWasm11_0"));
         Assert.Equal(NativeAotRuntime.Net80, Runtime.Parse("nativeaot8.0"));
+    }
+
+    [Fact]
+    public void Net12RuntimesAndDefaultToolchainsUseCachedInstances()
+    {
+        Assert.Same(CoreRuntime.Core12_0, Runtime.Parse(RuntimeMoniker.Net12_0));
+        Assert.Same(NativeAotRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.NativeAot12_0));
+        Assert.Same(MonoCoreRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.Mono12_0));
+        Assert.Same(MonoWasmRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.MonoWasm12_0));
+        Assert.Same(MonoWasmAotRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.MonoWasmAot12_0));
+        Assert.Same(R2RRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.R2R12_0));
+        Assert.Same(CoreRuntime.Core12_0, CoreRuntime.Latest);
+
+        Assert.Same(CsProjCoreToolchain.NetCoreApp12_0, CsProjCoreToolchain.From(CoreRuntime.Core12_0, NetCoreAppSettings.Default));
+        Assert.Same(CsProjNativeAotToolchain.Net12_0, CsProjNativeAotToolchain.From(NativeAotRuntime.Net12_0, NativeAotSettings.Default));
+        Assert.Same(CsProjMonoCoreToolchain.Mono12_0, CsProjMonoCoreToolchain.From(MonoCoreRuntime.Net12_0, MonoCoreSettings.Default));
+        Assert.Same(CsProjMonoWasmToolchain.Net12_0, CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net12_0, WasmSettings.Default));
+        Assert.Same(CsProjMonoWasmAotToolchain.Net12_0, CsProjMonoWasmAotToolchain.From(MonoWasmAotRuntime.Net12_0, WasmSettings.Default));
+        Assert.Same(CsProjR2RToolchain.R2R12_0, CsProjR2RToolchain.From(R2RRuntime.Net12_0, R2RSettings.Default));
     }
 
     [Theory]
