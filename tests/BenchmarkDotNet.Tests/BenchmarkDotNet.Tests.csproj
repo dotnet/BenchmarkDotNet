@@ -19,6 +19,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AsmArm64" Version="2.3.0" />
     <PackageReference Include="AwesomeAssertions" Version="9.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageReference Include="Verify.Xunit" Version="31.12.5" />
