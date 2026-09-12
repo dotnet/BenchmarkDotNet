@@ -157,10 +157,8 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 // request keeps the filter visible and costs nothing but a re-run once it is supported.
                 if (enumeration.UnrecognisedFilter is { } unrecognisedFilter)
                 {
-                    throw new NotSupportedException(
-                        $"BenchmarkDotNet.TestAdapter does not support the '{unrecognisedFilter.FullName}' test " +
-                        "execution filter, and will not run every benchmark of the assembly in its place. Please " +
-                        "report this at https://github.com/dotnet/BenchmarkDotNet/issues.");
+                    await RefuseUnrecognisedFilterAsync(context, sessionUid, enumeration, unrecognisedFilter).ConfigureAwait(false);
+                    return;
                 }
 
                 foreach (var benchmarks in enumeration.Matches)
@@ -292,6 +290,43 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             }
 
             drainFailure?.Throw();
+        }
+
+        /// <summary>
+        /// Refuses a run whose filter this adapter does not know, reporting every benchmark it could have selected as
+        /// failed.
+        /// </summary>
+        /// <remarks>
+        /// Throwing instead would leave the platform with nothing per benchmark to show: the request is completed by
+        /// the finally in <see cref="ExecuteRequestAsync"/> before the exception is observed, so an IDE gets a run
+        /// that finished with no feedback on any test. A failed node per benchmark says it where the user is looking.
+        /// </remarks>
+        private async Task RefuseUnrecognisedFilterAsync(
+            ExecuteRequestContext context,
+            SessionUid sessionUid,
+            Enumeration enumeration,
+            Type unrecognisedFilter)
+        {
+            var error =
+                $"BenchmarkDotNet.TestAdapter does not support the '{unrecognisedFilter.FullName}' test execution " +
+                "filter, so it cannot tell which benchmarks this run asked for, and it will not run every benchmark " +
+                "of the assembly in its place. Please report this at " +
+                "https://github.com/dotnet/BenchmarkDotNet/issues.";
+
+            foreach (var benchmarks in enumeration.Matches)
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                var node = benchmarks[0].Node;
+
+                await context.MessageBus.PublishAsync(
+                    this,
+                    new TestNodeUpdateMessage(sessionUid, node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance))).ConfigureAwait(false);
+
+                await context.MessageBus.PublishAsync(
+                    this,
+                    new TestNodeUpdateMessage(sessionUid, node.ToTestNode(new FailedTestNodeStateProperty(error)))).ConfigureAwait(false);
+            }
         }
 
         /// <summary>

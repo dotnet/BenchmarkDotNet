@@ -48,6 +48,11 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         private Dictionary<object, ParameterInstance> held = new(ParameterValueDisposer.ByReference);
         private readonly HashSet<object> disposedByBenchmarkDotNet = new(ParameterValueDisposer.ByReference);
 
+        // The scopes of the requests that have not completed yet. A request hands its values over by completing, so
+        // without this the values of one that never got there - the client sent `exit`, or the IDE cancelled, while
+        // the request was still in flight - would be reachable from nothing by the time the application ends.
+        private readonly HashSet<RequestScope> live = [];
+
         /// <inheritdoc />
         public string Uid => extension.Uid + ".ParameterValueLifetime";
 
@@ -67,7 +72,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// Starts collecting the parameter values of one request.
         /// </summary>
         /// <returns>The scope to record that request's values in, and to complete when it is over.</returns>
-        public RequestScope BeginRequest() => new RequestScope(this);
+        public RequestScope BeginRequest()
+        {
+            var request = new RequestScope(this);
+
+            lock (gate)
+                live.Add(request);
+
+            return request;
+        }
 
         /// <inheritdoc />
         public Task BeforeRunAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -79,12 +92,18 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
             lock (gate)
             {
+                // Nothing can ask for any of these again. That includes the values of a request still in flight: the
+                // application is going away, so its scope will never be completed, and these are the only reference
+                // left to them - a value left to the finalizer instead is the dotnet/BenchmarkDotNet#1383 hang.
                 unused = held
+                    .Concat(live.SelectMany(request => request.Enumerated))
                     .Where(pair => !disposedByBenchmarkDotNet.Contains(pair.Key))
-                    .Select(pair => pair.Value)
+                    .GroupBy(pair => pair.Key, ParameterValueDisposer.ByReference)
+                    .Select(group => group.First().Value)
                     .ToList();
 
                 held.Clear();
+                live.Clear();
                 disposedByBenchmarkDotNet.Clear();
             }
 
@@ -97,6 +116,10 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
             lock (gate)
             {
+                // Handed over, whichever way this goes: what happens to these values is decided here and now, so the
+                // exit-time sweep must not find them a second time.
+                live.Remove(request);
+
                 var enumerated = request.Enumerated;
 
                 if (!request.HasEnumerated)
