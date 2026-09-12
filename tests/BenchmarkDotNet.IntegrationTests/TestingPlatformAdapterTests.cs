@@ -18,6 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private const string PassingProbes = "BenchmarkDotNet.IntegrationTests.TestingPlatform";
         private const string FailingProbes = "BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures";
         private const string UnoptimizedProbes = "BenchmarkDotNet.IntegrationTests.TestingPlatform.Unoptimized";
+        private const string InternalsProbe = "BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals";
 
         // Every probe project is single targeted, see their .csproj files.
         private const string ProbeTargetFramework = "net10.0";
@@ -255,7 +256,14 @@ namespace BenchmarkDotNet.IntegrationTests
                 "Probe.Identity",
                 Timeout);
 
-            Assert.True(ran.Count >= 4, $"Expected several benchmark types to run, but {ran.Count} node(s) did.");
+            // The dedup only does anything when more than one BenchmarkRunInfo is validated, so the benchmarks that
+            // ran have to span several types for this to be exercising it at all - which counting nodes would not say.
+            var types = ran
+                .Select(node => node.DisplayName.Substring(PassingProbes.Length + 1).Split('.')[0])
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+
+            Assert.True(types.Length >= 2, $"Expected several benchmark types to run, but only {string.Join(", ", types)} did.");
             Assert.All(ran, node => Assert.Equal("passed", node.ExecutionState));
             Assert.All(
                 ran,
@@ -363,6 +371,95 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Single(byJob);
             Assert.Equal(byParameter[0].Uid, byJob[0].Uid);
         }
+
+        [Fact]
+        public void ADiscoveryWithAnUnrecognisedFilterListsEveryBenchmarkAndSaysSo()
+        {
+            // Microsoft.Testing.Platform 2.3.3 has no filter the adapter does not handle, and the extension point for
+            // adding one is internal to it, so this branch is unreachable from a real test host - FilterProbe drives
+            // the framework itself to reach it. Discovery runs nothing, so listing too much is the cheap mistake and
+            // reporting nothing is the expensive one; the warning is what makes the wrong list visible.
+            var report = RunInternalsProbe();
+
+            Assert.Contains(
+                report.Discover,
+                line => line.StartsWith("output ", StringComparison.Ordinal)
+                    && line.Contains("does not recognise", StringComparison.Ordinal)
+                    && line.Contains("UnrecognisedFilter", StringComparison.Ordinal));
+
+            // Everything the probe assembly declares, rather than a count that a benchmark added to it would break.
+            Assert.NotEmpty(report.Discovered);
+            Assert.Contains("complete True", report.Discover);
+        }
+
+        [Fact]
+        public void ARunWithAnUnrecognisedFilterIsRefusedWithAFailedNodePerBenchmark()
+        {
+            // The other half of the same branch: a run cannot list too much, because it would spend the machine's next
+            // hour on it. Refusing by throwing would be invisible - the request is completed before the exception is
+            // observed - so every benchmark it could have selected is reported failed instead, which is where an IDE
+            // shows it.
+            var report = RunInternalsProbe();
+
+            var failed = report.Run
+                .Where(line => line.StartsWith("failed(", StringComparison.Ordinal))
+                .ToArray();
+
+            // Every benchmark the same filter listed during discovery is reported, so that none of them is left
+            // looking like it was quietly skipped.
+            Assert.Equal(report.Discovered.Length, failed.Length);
+            Assert.All(failed, line => Assert.Contains("does not support", line, StringComparison.Ordinal));
+            Assert.All(failed, line => Assert.Contains("UnrecognisedFilter", line, StringComparison.Ordinal));
+
+            // Every one of them was reported as started too, and the request finished rather than throwing.
+            Assert.Equal(failed.Length, report.Run.Count(line => line.StartsWith("in-progress ", StringComparison.Ordinal)));
+            Assert.DoesNotContain(report.Run, line => line.StartsWith("threw ", StringComparison.Ordinal));
+            Assert.Contains("complete True", report.Run);
+        }
+
+        [Fact]
+        public void ParameterValuesOfARequestStillInFlightAreDisposedWhenTheApplicationEnds()
+        {
+            // A request hands its values over by completing. One that never gets there - the client sent `exit`, or
+            // the IDE cancelled, while it was still in flight - leaves them reachable from nothing else, and a value
+            // left to the finalizer instead is the dotnet/BenchmarkDotNet#1383 hang this disposal exists to prevent.
+            var report = RunInternalsProbe();
+
+            Assert.Equal("created=2 disposed=2", Assert.Single(report.Abandoned));
+        }
+
+        /// <summary>
+        /// Runs the application that drives the adapter's platform types directly, and splits what it reported into
+        /// its sections.
+        /// </summary>
+        /// <returns>The lines of each section, and the benchmarks the discovery request listed.</returns>
+        private InternalsReport RunInternalsProbe()
+        {
+            var (exitCode, standardOutput) = Execute(InternalsProbe, []);
+
+            Assert.Equal(0, exitCode);
+
+            var lines = standardOutput.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries);
+
+            var abandonedStart = Array.IndexOf(lines, "== abandoned");
+            var discoverStart = Array.IndexOf(lines, "== discover");
+            var runStart = Array.IndexOf(lines, "== run");
+            var end = Array.IndexOf(lines, "== done");
+
+            Assert.True(
+                abandonedStart >= 0 && discoverStart > abandonedStart && runStart > discoverStart && end > runStart,
+                $"The internals probe did not report every section:{Environment.NewLine}{standardOutput}");
+
+            var discover = lines[(discoverStart + 1)..runStart];
+
+            return new InternalsReport(
+                lines[(abandonedStart + 1)..discoverStart],
+                discover,
+                lines[(runStart + 1)..end],
+                discover.Where(line => line.StartsWith("discovered ", StringComparison.Ordinal)).ToArray());
+        }
+
+        private sealed record InternalsReport(string[] Abandoned, string[] Discover, string[] Run, string[] Discovered);
 
         [Fact]
         public void AnOutOfProcessBenchmarkIsBuiltAndRun()
