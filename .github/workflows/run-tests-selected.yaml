@@ -26,6 +26,10 @@ on:
           - tests/BenchmarkDotNet.IntegrationTests
           - tests/BenchmarkDotNet.IntegrationTests.ManualRunning
           - tests/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks
+          # This one is a Microsoft.Testing.Platform application. It carries the `global.json` which routes
+          # `dotnet test` to the platform, and that file is resolved from the working directory, which this
+          # workflow sets to the project.
+          - tests/BenchmarkDotNet.IntegrationTests.TestingPlatform
           - samples/BenchmarkDotNet.Samples
       framework:
         type: choice

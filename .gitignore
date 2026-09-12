@@ -67,6 +67,9 @@ Resource.designer.cs
 # Tests
 TestResults
 
+# The smoke test restores BenchmarkDotNet.TestAdapter into a packages folder of its own, see its .csproj
+build/smoke-tests/packages/
+
 ## Mac OS
 
 # General

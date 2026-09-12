@@ -197,14 +197,23 @@ namespace BenchmarkDotNet.Running
                 // some benchmarks might be using parameters that have locking finalizers
                 // so we need to dispose them after we are done running the benchmarks
                 // see https://github.com/dotnet/BenchmarkDotNet/issues/1383 and https://github.com/dotnet/runtime/issues/314 for more
-                await benchmarkRunInfos.DisposeAllAsync().ConfigureAwait();
+                //
+                // DisposeAllAsync goes through every value before it reports a failure, so one that threw leaves
+                // nothing else undisposed - and must not take the teardown down with it either: whoever is listening
+                // is told that the run stage ended whatever the disposal did.
+                try
+                {
+                    await benchmarkRunInfos.DisposeAllAsync().ConfigureAwait();
+                }
+                finally
+                {
+                    compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
+                    Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
+                    compositeLogger.WriteLineInfo("Artifacts cleanup is finished.");
+                    compositeLogger.Flush();
 
-                compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
-                Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
-                compositeLogger.WriteLineInfo("Artifacts cleanup is finished");
-                compositeLogger.Flush();
-
-                eventProcessor.OnEndRunStage();
+                    eventProcessor.OnEndRunStage();
+                }
             }
         }
 
@@ -404,6 +413,13 @@ namespace BenchmarkDotNet.Running
         {
             var errors = new List<ValidationError>();
 
+            // The validators run once per BenchmarkRunInfo, so one that looks at the whole assembly - as
+            // GenericBenchmarksValidator does - reports the same thing again for every type in it. PrintValidationErrors
+            // has always shown those once, but the event processors are handed every copy, and an error that names no
+            // benchmark case is fanned out by the test adapters to every node: N types then put N copies of the same
+            // warning on each of N nodes. The same error, is one error however many times it is raised.
+            var reported = new HashSet<ValidationError>();
+
             foreach (var benchmark in benchmarks)
             {
                 var validationParameters = new ValidationParameters(benchmark.BenchmarksCases, benchmark.Config);
@@ -411,7 +427,8 @@ namespace BenchmarkDotNet.Running
                 await foreach (var error in benchmark.Config.GetCompositeValidator().ValidateAsync(validationParameters).ConfigureAwait(cancellationToken))
 #pragma warning restore CA2007
                 {
-                    errors.Add(error);
+                    if (reported.Add(error))
+                        errors.Add(error);
                 }
             }
 

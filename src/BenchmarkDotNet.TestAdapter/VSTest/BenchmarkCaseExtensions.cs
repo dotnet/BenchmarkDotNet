@@ -1,0 +1,83 @@
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Running;
+using Microsoft.TestPlatform.AdapterUtilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+namespace BenchmarkDotNet.TestAdapter.VSTest
+{
+    /// <summary>
+    /// A set of extensions for BenchmarkCase to support converting to VSTest TestCase objects.
+    /// </summary>
+    internal static class BenchmarkCaseExtensions
+    {
+        /// <summary>
+        /// Converts a BDN BenchmarkCase to a VSTest TestCase.
+        /// </summary>
+        /// <param name="benchmarkCase">The BenchmarkCase to convert.</param>
+        /// <param name="assemblyPath">The dll or exe of the benchmark project.</param>
+        /// <param name="includeJobInName">Whether or not the display name should include the job name.</param>
+        /// <returns>The VSTest TestCase.</returns>
+        internal static TestCase ToVsTestCase(this BenchmarkCase benchmarkCase, string assemblyPath, bool includeJobInName = false)
+        {
+            var benchmarkMethod = benchmarkCase.Descriptor.WorkloadMethod;
+            var fullClassName = benchmarkCase.Descriptor.Type.GetCorrectCSharpTypeName(prefixWithGlobal: false);
+            var parametrizedMethodName = FullNameProvider.GetMethodName(benchmarkCase);
+
+            var displayJobInfo = benchmarkCase.GetUnrandomizedJobDisplayInfo();
+            var displayMethodName = parametrizedMethodName + (includeJobInName ? $" [{displayJobInfo}]" : "");
+            var displayName = $"{fullClassName}.{displayMethodName}";
+
+            // We use displayName as FQN to workaround the Rider/R# problem with FQNs processing
+            // See: https://github.com/dotnet/BenchmarkDotNet/issues/2494
+            var fullyQualifiedName = displayName;
+
+            // Use benchmark method FQN on Visual Studio environment to avoid TestExplorer hierarchy split
+            // when job display name contains '.' which is interpreted as a namespace separator by VS.
+            // See: https://github.com/dotnet/BenchmarkDotNet/issues/2793
+            if (Environment.GetEnvironmentVariable("VSAPPIDNAME") != null)
+            {
+                var benchmarkMethodName = benchmarkMethod.Name;
+                fullyQualifiedName = $"{fullClassName}.{benchmarkMethodName}";
+            }
+
+            var vsTestCase = new TestCase(fullyQualifiedName, VsTestAdapter.ExecutorUri, assemblyPath)
+            {
+                DisplayName = displayName,
+                Id = GetTestCaseId(benchmarkCase)
+            };
+
+            var benchmarkAttribute = benchmarkMethod.ResolveAttribute<BenchmarkAttribute>();
+            if (benchmarkAttribute != null)
+            {
+                vsTestCase.CodeFilePath = benchmarkAttribute.SourceCodeFile;
+                vsTestCase.LineNumber = benchmarkAttribute.SourceCodeLineNumber;
+            }
+
+            var categories = DefaultCategoryDiscoverer.Instance.GetCategories(benchmarkMethod);
+            foreach (var category in categories)
+                vsTestCase.Traits.Add("Category", category);
+
+            vsTestCase.Traits.Add("", "BenchmarkDotNet");
+
+            return vsTestCase;
+        }
+
+        /// <summary>
+        /// Gets an ID for a given BenchmarkCase that is uniquely identifiable from discovery to execution phase.
+        /// </summary>
+        /// <param name="benchmarkCase">The benchmark case.</param>
+        /// <returns>The test case ID.</returns>
+        internal static Guid GetTestCaseId(this BenchmarkCase benchmarkCase)
+        {
+            var testIdProvider = new TestIdProvider();
+            testIdProvider.AppendString(VsTestAdapter.ExecutorUriString);
+            testIdProvider.AppendString(benchmarkCase.Descriptor.Type.Namespace ?? string.Empty);
+            testIdProvider.AppendString(benchmarkCase.Descriptor.DisplayInfo);
+            testIdProvider.AppendString(benchmarkCase.GetUnrandomizedJobDisplayInfo());
+            testIdProvider.AppendString(benchmarkCase.Parameters.DisplayInfo);
+            return testIdProvider.GetId();
+        }
+    }
+}

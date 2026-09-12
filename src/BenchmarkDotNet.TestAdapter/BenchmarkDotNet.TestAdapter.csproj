@@ -5,8 +5,16 @@
     <AssemblyTitle>BenchmarkDotNet.TestAdapter</AssemblyTitle>
     <AssemblyName>BenchmarkDotNet.TestAdapter</AssemblyName>
     <PackageId>BenchmarkDotNet.TestAdapter</PackageId>
+    <Description>Runs BenchmarkDotNet benchmarks as tests, through Microsoft.Testing.Platform or VSTest</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+
+    <!--
+      Referencing Microsoft.Testing.Platform.MSBuild defaults IsTestingPlatformApplication to true, which would make
+      the SDK treat this library as a test application: it would stop being packable and would get a generated entry
+      point compiled into it. This project implements the adapter, it is not a test application itself.
+    -->
+    <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="/" />
@@ -21,6 +29,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Microsoft.Testing.Platform.MSBuild brings in Microsoft.Testing.Platform, generates the entry point of the
+         benchmark app and provides the `dotnet test` integration. It must flow to the consuming project, so it is
+         deliberately not marked as PrivateAssets. -->
+    <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="2.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
 
@@ -28,7 +43,17 @@
   <ItemGroup>
     <Compile Remove="entrypoints\EntryPoint.*" />
     <None Include="entrypoints\EntryPoint.*" Pack="true" PackagePath="entrypoints\" />
-    <None Include="build\BenchmarkDotNet.TestAdapter.props" Pack="true" PackagePath="build\" />
+    <!--
+      A trailing separator in PackagePath is not portable: on Linux it packs the file as `build//...`, which trips
+      NU5129. The folder is therefore written without one.
+
+      Only `build`, never `buildTransitive`: these files decide whether a project is a Microsoft.Testing.Platform
+      application, which is a choice that belongs to the project that references this package. A `buildTransitive`
+      copy would reach every downstream consumer of a benchmark library and turn it into a testing platform
+      application as well, which fails to compile once it has an entry point of its own.
+    -->
+    <None Include="build\BenchmarkDotNet.TestAdapter.props" Pack="true" PackagePath="build" />
+    <None Include="build\BenchmarkDotNet.TestAdapter.targets" Pack="true" PackagePath="build" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>

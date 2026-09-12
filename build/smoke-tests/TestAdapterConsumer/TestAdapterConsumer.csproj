@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Consumes BenchmarkDotNet.TestAdapter the way a real user does: as a NuGet package. That is the whole point of this
+    project, so it deliberately references nothing from this repository and is not part of BenchmarkDotNet.slnx - the
+    package it needs only exists after `build.cmd pack`, and an in-repo <Import> or ProjectReference would bring the
+    adapter's build files in before Microsoft.Testing.Platform.MSBuild's, which is the reverse of the packaged order.
+
+    Driven by build/smoke-tests/test-adapter-consumer.ps1.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--
+      The nupkg is produced into the repository's artifacts folder by `build.cmd pack`. The script passes this as a
+      global property as well, which wins over this assignment, so that a custom -ArtifactsDirectory is honoured.
+    -->
+    <RestoreAdditionalProjectSources>$(MSBuildThisFileDirectory)..\..\..\artifacts</RestoreAdditionalProjectSources>
+    <!--
+      Restore into a folder of this tree's own rather than into the shared global packages folder. The version never
+      changes between runs - it is `0.16.0-develop`, or `0.16.0-ci` under BDN_CI_BUILD - and NuGet skips extracting a
+      version it has already extracted, however much newer the .nupkg in artifacts is. A fresh CI agent would never
+      notice, but anyone iterating on the props and targets this test exists to guard would be testing the first
+      package they ever packed. Restoring here gives the script a folder it knows the path of, so that it can drop
+      the packages this repository produces before every run instead of guessing where the global folder is.
+
+      It sits next to this project rather than inside it: the SDK globs **\*.cs under the project directory, and the
+      package carries an entrypoints\EntryPoint.cs which would then be compiled into the consumer - its synchronous
+      Main wins over the async one Microsoft.Testing.Platform.MSBuild generates (CS8892), and the application turns
+      back into a plain BenchmarkSwitcher console app.
+    -->
+    <RestorePackagesPath>$(MSBuildThisFileDirectory)..\packages\</RestorePackagesPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The version is passed in by the script, which reads it off the packed file name. -->
+    <PackageReference Include="BenchmarkDotNet.TestAdapter" Version="$(BenchmarkDotNetVersion)" />
+  </ItemGroup>
+
+</Project>

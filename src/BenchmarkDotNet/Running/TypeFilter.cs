@@ -13,8 +13,16 @@ namespace BenchmarkDotNet.Running
         {
             var validRunnableTypes = new List<Type>();
 
+            // Built once: the guard below and the list at the end both need it.
+            var assemblyTypes = assemblies
+                .SelectMany(assembly => GenericBenchmarksBuilder.BuildRunnableBenchmarks(assembly.GetRunnableBenchmarks()))
+                .ToArray();
+
             bool hasRunnableTypeBenchmarks = types.Any(type => type.ContainsRunnableBenchmarks());
-            bool hasRunnableAssemblyBenchmarks = assemblies.Any(assembly => GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks()).Length > 0);
+
+            // A type whose attributes cannot be read counts as declaring benchmarks here - it does, and telling the
+            // user that no [Benchmark] was found would be wrong. It is reported below, in place of being run.
+            bool hasRunnableAssemblyBenchmarks = assemblyTypes.Any(built => built.IsSuccess || built.IsUnreadable);
 
             if (!hasRunnableTypeBenchmarks && !hasRunnableAssemblyBenchmarks)
             {
@@ -39,11 +47,29 @@ namespace BenchmarkDotNet.Running
                 return (false, Array.Empty<Type>());
             }
 
+            // A type whose attributes cannot be read at all - [Config(typeof(SomeAbstractConfig))], say, where the
+            // attribute throws while reflection constructs it - is dropped rather than allowed to abort the run, but
+            // that has to be said out loud. GenericBenchmarksValidator says so too, and on the paths that never come
+            // through here it is the only one that can, but it only runs once at least one benchmark survived: when
+            // the unreadable type was the only one, this is the one place left to say why nothing was found. Saying
+            // it twice on the way to a run is the lesser problem. A type that failed on its [GenericTypeArguments]
+            // is left to the validator alone, which is where that has always been reported.
+            void AddRunnable(IEnumerable<GenericBenchmarkType> built)
+            {
+                foreach (var candidate in built)
+                {
+                    if (candidate.IsSuccess)
+                        validRunnableTypes.Add(candidate.Type);
+                    else if (candidate.IsUnreadable)
+                        logger.WriteLineError(candidate.Error!);
+                }
+            }
+
             foreach (var type in types)
             {
                 if (type.ContainsRunnableBenchmarks())
                 {
-                    validRunnableTypes.AddRange(GenericBenchmarksBuilder.BuildGenericsIfNeeded(type).Where(tuple => tuple.isSuccess).Select(tuple => tuple.result));
+                    AddRunnable(GenericBenchmarksBuilder.BuildGenericsIfNeeded(type));
                 }
                 else
                 {
@@ -53,10 +79,7 @@ namespace BenchmarkDotNet.Running
                 }
             }
 
-            foreach (var assembly in assemblies)
-            {
-                validRunnableTypes.AddRange(GenericBenchmarksBuilder.GetRunnableBenchmarks(assembly.GetRunnableBenchmarks()));
-            }
+            AddRunnable(assemblyTypes);
 
             return (true, validRunnableTypes);
         }

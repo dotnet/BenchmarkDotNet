@@ -35,6 +35,7 @@
     "vsprofiler",
     "vstest",
     "Tailcall",
+    "testadapter",
     "toolchains",
     "unmanaged"
   ],

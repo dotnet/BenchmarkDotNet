@@ -5,6 +5,11 @@ name: Running with VSTest
 
 # Running with VSTest
 
+> [!NOTE]
+> `BenchmarkDotNet.TestAdapter` runs your benchmarks through
+>   [Microsoft.Testing.Platform](xref:docs.testadapter) by default, which is the platform that succeeds VSTest.
+> VSTest is opt-in, as described below.
+
 BenchmarkDotNet supports discovering and executing benchmarks through VSTest.
 This provides an alternative user experience to running benchmarks with the CLI
   and may be preferable for those who like their IDE's VSTest integrations that they may have used when running unit tests.
@@ -54,7 +59,17 @@ In addition, we can still make use of this boolean output to indicate
   You need to install two packages into your benchmark project:
   * `BenchmarkDotNet.TestAdapter`: Implements the VSTest protocol for BenchmarkDotNet
   * `Microsoft.NET.Test.Sdk`: Includes all the pieces needed for the VSTest host to run and load the VSTest adapter.
-* **Step 2.** Make sure that the entry point is configured correctly.  
+* **Step 2.** Ask the adapter for VSTest.  
+  `BenchmarkDotNet.TestAdapter` uses [Microsoft.Testing.Platform](xref:docs.testadapter) unless you set
+    `BenchmarkDotNetUseVSTest` in your project file:
+
+```xml
+<PropertyGroup>
+  <BenchmarkDotNetUseVSTest>true</BenchmarkDotNetUseVSTest>
+</PropertyGroup>
+```
+
+* **Step 3.** Make sure that the entry point is configured correctly.  
   As mentioned in the caveats section, `BenchmarkDotNet.TestAdapter` will generate an entry point for you automatically.
   So, if you have an entry point already,
     you will either need to delete it or set `GenerateProgramFile` to `false` in your project file to continue using your existing one.
@@ -68,6 +83,8 @@ In addition, we can still make use of this boolean output to indicate
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- Run the benchmarks through VSTest rather than Microsoft.Testing.Platform -->
+    <BenchmarkDotNetUseVSTest>true</BenchmarkDotNetUseVSTest>
     <!-- Disable entry point generation as this project has it's own entry point -->
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
@@ -80,7 +97,7 @@ In addition, we can still make use of this boolean output to indicate
 </Project>
 ```
 
-* **Step 3.** Make sure that your IDE supports VSTest integration.  
+* **Step 4.** Make sure that your IDE supports VSTest integration.  
   In Visual Studio, everything works out of the box.
   In Rider/R#, the VSTest integration might need to be activated:
   * Go to the "Unit Testing" settings page.
@@ -88,9 +105,9 @@ In addition, we can still make use of this boolean output to indicate
     * R#: Extensions -> ReSharper -> Options -> Tools -> Unit Testing -> Test Frameworks -> VSTest
   * Make sure that the "Enable VSTest adapter support" checkbox is checked.
   In recent versions of Rider, this may be enabled by default.
-* **Step 4.** Switch to the `Release` configuration.  
+* **Step 5.** Switch to the `Release` configuration.  
   As mentioned above, the TestAdapter is not able to discover and run benchmarks with optimizations disabled (by design).
-* **Step 5.** Build the project.  
+* **Step 6.** Build the project.  
   In order to discover the benchmarks, the VSTest adapter needs to be able to find the assembly.
   Once you build the project, you should observe the discovered benchmarks in your IDE's Unit Test Explorer.
 
