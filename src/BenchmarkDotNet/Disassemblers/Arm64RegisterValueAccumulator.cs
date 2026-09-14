@@ -5,7 +5,7 @@ namespace BenchmarkDotNet.Disassemblers;
 
 internal struct Arm64RegisterValueAccumulator
 {
-    private enum State
+    internal enum State
     {
         LookingForPattern,
         ExpectingMovk,
@@ -21,11 +21,20 @@ internal struct Arm64RegisterValueAccumulator
 
     public void Init(IClrRuntime runtime)
     {
-        _state = State.LookingForPattern;
-        _expectedMovkShift = 0;
-        _value = 0;
-        _registerId = Arm64RegisterId.Invalid;
         _runtime = runtime;
+        Reset();
+    }
+
+    internal void Reset(
+        State state = State.LookingForPattern,
+        int expectedMovkShift = 0,
+        long value = 0,
+        Arm64RegisterId registerId = Arm64RegisterId.Invalid)
+    {
+        _state = state;
+        _expectedMovkShift = expectedMovkShift;
+        _value = value;
+        _registerId = registerId;
     }
 
     public void Feed(Arm64Instruction instruction)
@@ -129,7 +138,7 @@ internal struct Arm64RegisterValueAccumulator
 
     public bool HasValue => _state == State.ExpectingMovk || _state == State.LookingForPossibleLdr;
 
-    public long Value { get { return _value; } }
+    public long Value => _value;
 
-    public Arm64RegisterId RegisterId { get { return _registerId; } }
+    public Arm64RegisterId RegisterId => _registerId;
 }
