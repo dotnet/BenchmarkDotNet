@@ -188,7 +188,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (buildPartition.ForcedNoDependenciesForIntegrationTests)
                 return "";
 
-            // Absolute canonicalized path, because a relative one is resolved against each project's own directory rather than the working directory.
+            // Absolute normalized path, because a relative one is resolved against each project's own directory rather than the working directory.
             // A subdirectory, so that DefaultItemExcludes (which the SDK sets to $(ArtifactsPath)/**) doesn't cover project-level files like wwwroot/.
             var artifactsPath = Path.GetFullPath(Path.Combine(artifactsPaths.BuildArtifactsDirectoryPath, ".artifacts"));
 
