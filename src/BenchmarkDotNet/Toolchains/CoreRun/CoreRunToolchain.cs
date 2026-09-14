@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public sealed class CoreRunToolchain : IToolchain, IHasSettings
     {
-        private const string DefaultTargetFrameworkMoniker = "net11.0";
+        private const string DefaultTargetFrameworkMoniker = "net12.0";
 
         private CoreRunToolchain(CoreRunSettings settings)
         {

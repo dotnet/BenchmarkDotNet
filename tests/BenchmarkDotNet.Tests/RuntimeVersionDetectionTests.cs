@@ -20,6 +20,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(".NETCoreApp,Version=v9.0", 9, 0, "net9.0")]
         [InlineData(".NETCoreApp,Version=v10.0", 10, 0, "net10.0")]
         [InlineData(".NETCoreApp,Version=v11.0", 11, 0, "net11.0")]
+        [InlineData(".NETCoreApp,Version=v12.0", 12, 0, "net12.0")]
         [InlineData(".NETCoreApp,Version=v123.0", 123, 0, "net123.0")]
         public void TryGetVersionFromFrameworkNameHandlesValidInput(string frameworkName, int expectedMajor, int expectedMinor, string expectedTfm)
         {

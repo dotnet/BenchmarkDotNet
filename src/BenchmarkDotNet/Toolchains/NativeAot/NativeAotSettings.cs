@@ -8,7 +8,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot;
 
 public sealed record NativeAotSettings : DotNetCliSettings
 {
-    private const string LocalBuildIlCompilerVersion = "11.0.0-dev";
+    private const string LocalBuildIlCompilerVersion = "12.0.0-dev";
 
     public static readonly NativeAotSettings Default = new();
 

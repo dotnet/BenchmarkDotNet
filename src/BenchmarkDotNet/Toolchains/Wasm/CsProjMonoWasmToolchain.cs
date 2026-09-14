@@ -9,6 +9,7 @@ public sealed class CsProjMonoWasmToolchain : CsProjWasmToolchain
     public static readonly CsProjMonoWasmToolchain Net90 = new(MonoWasmRuntime.Net90, WasmSettings.Default);
     public static readonly CsProjMonoWasmToolchain Net10_0 = new(MonoWasmRuntime.Net10_0, WasmSettings.Default);
     public static readonly CsProjMonoWasmToolchain Net11_0 = new(MonoWasmRuntime.Net11_0, WasmSettings.Default);
+    public static readonly CsProjMonoWasmToolchain Net12_0 = new(MonoWasmRuntime.Net12_0, WasmSettings.Default);
 
     private CsProjMonoWasmToolchain(MonoWasmRuntime runtime, WasmSettings settings)
         : base("MonoWasm", runtime, settings, aot: false, useCoreClrRuntime: false) { }
@@ -25,6 +26,7 @@ public sealed class CsProjMonoWasmToolchain : CsProjWasmToolchain
             9 => Net90,
             10 => Net10_0,
             11 => Net11_0,
+            12 => Net12_0,
             _ => new CsProjMonoWasmToolchain(runtime, settings),
         };
     }

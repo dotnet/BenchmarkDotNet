@@ -29,8 +29,9 @@ namespace BenchmarkDotNet.Environments
         public static readonly CoreRuntime Core90 = new(new(9, 0));
         public static readonly CoreRuntime Core10_0 = new(new(10, 0));
         public static readonly CoreRuntime Core11_0 = new(new(11, 0));
+        public static readonly CoreRuntime Core12_0 = new(new(12, 0));
 
-        public static CoreRuntime Latest => Core11_0; // when dotnet/runtime branches for 12.0, this will need to get updated
+        public static CoreRuntime Latest => Core12_0; // when dotnet/runtime branches for 13.0, this will need to get updated
 
         private readonly string? platform;
 
@@ -125,6 +126,7 @@ namespace BenchmarkDotNet.Environments
                     (9, 0) => Core90,
                     (10, 0) => Core10_0,
                     (11, 0) => Core11_0,
+                    (12, 0) => Core12_0,
                     _ => new CoreRuntime(version),
                 };
 
@@ -314,6 +316,7 @@ namespace BenchmarkDotNet.Environments
                     9 => Core90,
                     10 => Core10_0,
                     11 => Core11_0,
+                    12 => Core12_0,
                     _ => new(version),
                 };
 
