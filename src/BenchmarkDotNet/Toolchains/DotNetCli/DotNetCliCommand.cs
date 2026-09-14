@@ -183,22 +183,17 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         private static string GetArtifactsPathArguments(ArtifactsPaths artifactsPaths, BuildPartition buildPartition)
         {
-            // ArtifactsPath is a global property, so it relocates the referenced benchmark project's
-            // output too. Integration tests build without dependencies and consume the output the test run
-            // already produced, so the reference would resolve to a path nothing ever wrote.
+            // ArtifactsPath is a global property, so it relocates the referenced benchmark project's output too. Integration tests build without
+            // dependencies and consume the output the test run already produced, so the reference would resolve to a path nothing ever wrote.
             if (buildPartition.ForcedNoDependenciesForIntegrationTests)
                 return "";
 
-            // Absolute, because a relative one is resolved against each project's own directory rather than
-            // the working directory: the benchmark project would then keep its intermediate output in its own
-            // source tree, and every partition would share it, which is the sharing this is here to avoid.
-            // A subdirectory, so that DefaultItemExcludes (which the SDK sets to $(ArtifactsPath)/**) doesn't
-            // cover project-level files like wwwroot/.
-            var artifactsPath = $"{artifactsPaths.BuildArtifactsDirectoryPath}{Path.AltDirectorySeparatorChar}.artifacts{Path.AltDirectorySeparatorChar}";
+            // Absolute canonicalized path, because a relative one is resolved against each project's own directory rather than the working directory.
+            // A subdirectory, so that DefaultItemExcludes (which the SDK sets to $(ArtifactsPath)/**) doesn't cover project-level files like wwwroot/.
+            var artifactsPath = Path.GetFullPath(Path.Combine(artifactsPaths.BuildArtifactsDirectoryPath, ".artifacts"));
 
-            // Set as a property rather than --artifacts-path, which is a .NET 8 SDK argument: an older SDK
-            // errors on the argument but simply ignores the property. Those partitions get no isolated
-            // intermediate output, which is why BenchmarkRunnerClean builds them one at a time.
+            // Set as a property rather than --artifacts-path, which is a .NET 8 SDK argument: an older SDK errors on the argument but simply ignores
+            // the property. Those partitions get no isolated intermediate output, which is why BenchmarkRunnerClean builds them one at a time.
             return $"/p:ArtifactsPath={artifactsPath.QuoteIfNeeded()}";
         }
 
