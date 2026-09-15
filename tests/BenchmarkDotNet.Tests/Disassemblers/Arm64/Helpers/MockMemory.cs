@@ -12,19 +12,10 @@ internal sealed class MockMemory
     private Dictionary<ulong, IClrMethod?> MethodByInstructionPointer = new();
     private Dictionary<ulong, IClrType?> TypeByMethodTable = new();
 
-    private readonly ulong BaseAddress;
-
-    public MockMemory(ulong baseAddress = 0)
-    {
-        BaseAddress = baseAddress;
-    }
-
     public MockMemory AddBytes(ulong address, byte[] bytes)
     {
         if (bytes.Length == 0)
             throw new ArgumentException("Memory region cannot be empty.", nameof(bytes));
-
-        address = checked(BaseAddress + address);
 
         foreach (var region in _regions)
         {
