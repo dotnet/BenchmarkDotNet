@@ -95,9 +95,18 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 // Nothing can ask for any of these again. That includes the values of a request still in flight: the
                 // application is going away, so its scope will never be completed, and these are the only reference
                 // left to them - a value left to the finalizer instead is the dotnet/BenchmarkDotNet#1383 hang.
+                //
+                // What such a request has handed to a run BenchmarkDotNet already started is the exception, wherever
+                // else it is found: under server mode the discovery before the run leaves the very same cached values
+                // held, so filtering only the request's own would still dispose them under the running benchmark.
+                var takenOver = new HashSet<object>(
+                    live.SelectMany(request => request.TakenOverByBenchmarkDotNet),
+                    ParameterValueDisposer.ByReference);
+
                 unused = held
-                    .Concat(live.SelectMany(request => request.Enumerated))
                     .Where(pair => !disposedByBenchmarkDotNet.Contains(pair.Key))
+                    .Concat(live.SelectMany(request => request.Enumerated))
+                    .Where(pair => !takenOver.Contains(pair.Key))
                     .GroupBy(pair => pair.Key, ParameterValueDisposer.ByReference)
                     .Select(group => group.First().Value)
                     .ToList();
@@ -162,6 +171,10 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         internal sealed class RequestScope
         {
             private readonly ParameterValueLifetime owner;
+            private readonly HashSet<object> handedOver = new(ParameterValueDisposer.ByReference);
+
+            // Nothing is handed over until HandOver says so, so until then everything here is this request's own.
+            private Func<bool> benchmarkDotNetOwnsHandedOver = () => false;
 
             internal RequestScope(ParameterValueLifetime owner) => this.owner = owner;
 
@@ -176,6 +189,22 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             /// that a source no longer hands a value back and having asked it nothing at all.
             /// </summary>
             internal bool HasEnumerated { get; private set; }
+
+            /// <summary>
+            /// Gets the values this request handed to BenchmarkDotNet, if BenchmarkDotNet has taken over disposing
+            /// them; otherwise nothing.
+            /// </summary>
+            /// <remarks>
+            /// Once BenchmarkDotNet has entered its run stage it disposes the values it was handed in that stage's
+            /// finally, whether the run completes, throws or is cancelled. Disposing them anywhere else as well would
+            /// either be the second disposal of a value it has already released, or - worse, and this is the window
+            /// the application ending is in - the disposal of a value a benchmark is still running against, which
+            /// surfaces to the user as an ObjectDisposedException thrown from inside their own benchmark rather than
+            /// as the cancellation they asked for. Until that stage starts nothing has been disposed and nothing is in
+            /// use, so an abandoned request still owns everything it created.
+            /// </remarks>
+            internal IEnumerable<object> TakenOverByBenchmarkDotNet
+                => benchmarkDotNetOwnsHandedOver() ? handedOver : [];
 
             /// <summary>
             /// Records the values of the benchmarks the enumeration returned, and marks the enumeration as reached.
@@ -215,6 +244,27 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                         if (!kept.Contains(parameter.Value!))
                             Enumerated[parameter.Value!] = parameter;
                     }
+                }
+            }
+
+            /// <summary>
+            /// Records the benchmarks whose values are about to be handed to BenchmarkDotNet, and how to tell whether
+            /// it has taken over disposing them.
+            /// </summary>
+            /// <param name="handedCases">The benchmarks being handed over.</param>
+            /// <param name="ownershipTaken">
+            /// Tells whether BenchmarkDotNet will dispose those values itself, which it undertakes to do from the
+            /// moment its run stage begins. Read while the application is ending, so it is answered from wherever the
+            /// run has got to by then rather than from where it was when this was called.
+            /// </param>
+            public void HandOver(IEnumerable<BenchmarkCase> handedCases, Func<bool> ownershipTaken)
+            {
+                lock (owner.gate)
+                {
+                    foreach (var parameter in ParameterValueDisposer.GetDisposableParameters(handedCases))
+                        handedOver.Add(parameter.Value!);
+
+                    benchmarkDotNetOwnsHandedOver = ownershipTaken;
                 }
             }
 

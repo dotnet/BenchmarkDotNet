@@ -172,7 +172,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 if (runnable.Count == 0)
                     return;
 
-                eventProcessor = new BenchmarkEventProcessor(
+                var processor = new BenchmarkEventProcessor(
                     runnable.ToDictionary(match => match.Node.Uid, match => match.Node),
                     testNode =>
                     {
@@ -180,7 +180,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                         workQueue.Writer.TryWrite(() => context.MessageBus.PublishAsync(this, message));
                     });
 
-                await RunAsync(context, runnable, eventProcessor, workQueue, cancellationToken).ConfigureAwait(false);
+                eventProcessor = processor;
+
+                // From the moment BenchmarkDotNet starts running these, their values are its to dispose rather than
+                // this adapter's, so an application ending underneath the run leaves them to it. See RequestScope.
+                parameterValueScope.HandOver(
+                    runnable.Select(match => match.Node.BenchmarkCase),
+                    () => processor.RunStageStarted);
+
+                await RunAsync(context, runnable, processor, workQueue, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
@@ -326,6 +334,16 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 await context.MessageBus.PublishAsync(
                     this,
                     new TestNodeUpdateMessage(sessionUid, node.ToTestNode(new FailedTestNodeStateProperty(error)))).ConfigureAwait(false);
+            }
+
+            // With no benchmark to carry it, the refusal would be a run that reported nothing and exited successfully.
+            // An assembly can have nothing to report here without anything being wrong with it: an unoptimized one
+            // whose benchmarks all run out of process has every case hidden during the enumeration.
+            if (enumeration.Matches.Count == 0)
+            {
+                await serviceProvider.GetOutputDevice()
+                    .DisplayAsync(this, new ErrorMessageOutputDeviceData(error), context.CancellationToken)
+                    .ConfigureAwait(false);
             }
         }
 
