@@ -376,7 +376,8 @@ namespace BenchmarkDotNet.IntegrationTests
         public void ADiscoveryWithAnUnrecognisedFilterListsEveryBenchmarkAndSaysSo()
         {
             // Microsoft.Testing.Platform 2.3.3 has no filter the adapter does not handle, and the extension point for
-            // adding one is internal to it, so this branch is unreachable from a real test host - FilterProbe drives
+            // adding one is internal to it, so this branch is unreachable from a real test host - the
+            // BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals application, run by RunInternalsProbe, drives
             // the framework itself to reach it. Discovery runs nothing, so listing too much is the cheap mistake and
             // reporting nothing is the expensive one; the warning is what makes the wrong list visible.
             var report = RunInternalsProbe();
@@ -406,7 +407,9 @@ namespace BenchmarkDotNet.IntegrationTests
                 .ToArray();
 
             // Every benchmark the same filter listed during discovery is reported, so that none of them is left
-            // looking like it was quietly skipped.
+            // looking like it was quietly skipped. Asserted to be some of them rather than only to match, which an
+            // enumeration that returned nothing at all would satisfy just as well.
+            Assert.NotEmpty(failed);
             Assert.Equal(report.Discovered.Length, failed.Length);
             Assert.All(failed, line => Assert.Contains("does not support", line, StringComparison.Ordinal));
             Assert.All(failed, line => Assert.Contains("UnrecognisedFilter", line, StringComparison.Ordinal));
@@ -418,6 +421,23 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        public void ARefusedRunSaysSoOnTheOutputDeviceWhenItHasNoBenchmarkToSayItOn()
+        {
+            // Reporting the refusal per benchmark says nothing at all when the enumeration turned up none of them,
+            // and the run would then be a green, zero-test success that never mentions the filter it could not
+            // understand. An assembly can be in that state with nothing wrong with it: an unoptimized one whose
+            // benchmarks all run out of process has every case hidden during the enumeration.
+            var report = RunInternalsProbe();
+
+            Assert.DoesNotContain(report.Empty, line => line.StartsWith("failed(", StringComparison.Ordinal));
+            Assert.Contains(
+                report.Empty,
+                line => line.StartsWith("output ", StringComparison.Ordinal)
+                    && line.Contains("does not support", StringComparison.Ordinal)
+                    && line.Contains("UnrecognisedFilter", StringComparison.Ordinal));
+        }
+
+        [Fact]
         public void ParameterValuesOfARequestStillInFlightAreDisposedWhenTheApplicationEnds()
         {
             // A request hands its values over by completing. One that never gets there - the client sent `exit`, or
@@ -426,6 +446,20 @@ namespace BenchmarkDotNet.IntegrationTests
             var report = RunInternalsProbe();
 
             Assert.Equal("created=2 disposed=2", Assert.Single(report.Abandoned));
+        }
+
+        [Fact]
+        public void ParameterValuesBenchmarkDotNetIsRunningAreNotDisposedWhenTheApplicationEnds()
+        {
+            // The other side of the same sweep. Once a request has handed its benchmarks over and BenchmarkDotNet has
+            // entered the run stage, their values are its to dispose - it does that in the stage's finally, whether
+            // the run completes, throws or is cancelled. Taking them here as well would either dispose them twice or,
+            // in the window this stands for, pull them out from under a benchmark that is still running against them,
+            // which reaches the user as an ObjectDisposedException thrown from inside their own benchmark. The probe
+            // completes a discovery of the same cached values first, as server mode does, so they are held as well.
+            var report = RunInternalsProbe();
+
+            Assert.Equal("created=2 disposed=0", Assert.Single(report.Handed));
         }
 
         /// <summary>
@@ -442,24 +476,35 @@ namespace BenchmarkDotNet.IntegrationTests
             var lines = standardOutput.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries);
 
             var abandonedStart = Array.IndexOf(lines, "== abandoned");
+            var handedStart = Array.IndexOf(lines, "== handed");
             var discoverStart = Array.IndexOf(lines, "== discover");
             var runStart = Array.IndexOf(lines, "== run");
+            var emptyStart = Array.IndexOf(lines, "== empty");
             var end = Array.IndexOf(lines, "== done");
 
             Assert.True(
-                abandonedStart >= 0 && discoverStart > abandonedStart && runStart > discoverStart && end > runStart,
+                abandonedStart >= 0 && handedStart > abandonedStart && discoverStart > handedStart
+                    && runStart > discoverStart && emptyStart > runStart && end > emptyStart,
                 $"The internals probe did not report every section:{Environment.NewLine}{standardOutput}");
 
             var discover = lines[(discoverStart + 1)..runStart];
 
             return new InternalsReport(
-                lines[(abandonedStart + 1)..discoverStart],
+                lines[(abandonedStart + 1)..handedStart],
+                lines[(handedStart + 1)..discoverStart],
                 discover,
-                lines[(runStart + 1)..end],
+                lines[(runStart + 1)..emptyStart],
+                lines[(emptyStart + 1)..end],
                 discover.Where(line => line.StartsWith("discovered ", StringComparison.Ordinal)).ToArray());
         }
 
-        private sealed record InternalsReport(string[] Abandoned, string[] Discover, string[] Run, string[] Discovered);
+        private sealed record InternalsReport(
+            string[] Abandoned,
+            string[] Handed,
+            string[] Discover,
+            string[] Run,
+            string[] Empty,
+            string[] Discovered);
 
         [Fact]
         public void AnOutOfProcessBenchmarkIsBuiltAndRun()
