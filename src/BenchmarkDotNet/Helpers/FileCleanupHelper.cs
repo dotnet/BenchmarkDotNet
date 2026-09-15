@@ -61,7 +61,7 @@ internal static class FileCleanupHelper
         try
         {
             return directory.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
-                            .Where(x => (x.Attributes & FileAttributes.ReparsePoint) != 0);
+                            .Where(x => (x.Attributes & FileAttributes.ReparsePoint) == 0);
         }
         catch
         {
@@ -75,7 +75,7 @@ internal static class FileCleanupHelper
         try
         {
             return directory.EnumerateDirectories()
-                            .Where(x => (x.Attributes & FileAttributes.ReparsePoint) != 0);
+                            .Where(x => (x.Attributes & FileAttributes.ReparsePoint) == 0);
         }
         catch
         {
