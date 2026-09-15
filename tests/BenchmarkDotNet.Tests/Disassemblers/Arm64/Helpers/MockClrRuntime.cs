@@ -1,12 +1,14 @@
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interfaces;
 using System.Collections.Immutable;
-using System.Net;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
 public class MockClrRuntime : IClrRuntime
 {
+    // It is expected that this property will be used for validating registered addresses.
+    private bool ThrowExceptionMode => false;
+
     internal Dictionary<ulong, string?> JitHelperFunctionNames = new();
     internal Dictionary<ulong, IClrMethod?> MethodByHandle = new();
     internal Dictionary<ulong, IClrMethod?> MethodByInstructionPointer = new();
@@ -31,28 +33,36 @@ public class MockClrRuntime : IClrRuntime
     {
         if (JitHelperFunctionNames.TryGetValue(address, out var value))
             return value;
-        throw new ArgumentException($"Specified address(0x{address:X}) is not registered.");
+        if (ThrowExceptionMode)
+            throw new ArgumentException($"Specified address(0x{address:X}) is not registered.");
+        return null;
     }
 
     public IClrMethod? GetMethodByHandle(ulong methodHandle)
     {
         if (MethodByHandle.TryGetValue(methodHandle, out var value))
             return value;
-        throw new ArgumentException($"Specified methodHandle(0x{methodHandle:X}) is not registered.");
+        if (ThrowExceptionMode)
+            throw new ArgumentException($"Specified methodHandle(0x{methodHandle:X}) is not registered.");
+        return null;
     }
 
     public IClrMethod? GetMethodByInstructionPointer(ulong ip)
     {
         if (MethodByInstructionPointer.TryGetValue(ip, out var value))
             return value;
-        throw new ArgumentException($"Specified InstructionPointer(0x{ip:X}) is not registered.");
+        if (ThrowExceptionMode)
+            throw new ArgumentException($"Specified InstructionPointer(0x{ip:X}) is not registered.");
+        return null;
     }
 
     public IClrType? GetTypeByMethodTable(ulong methodTable)
     {
         if (TypeByMethodTable.TryGetValue(methodTable, out var value))
             return value;
-        throw new ArgumentException($"Specified methodTable(0x{methodTable:X}) is not registered.");
+        if (ThrowExceptionMode)
+            throw new ArgumentException($"Specified methodTable(0x{methodTable:X}) is not registered.");
+        return null;
     }
     #endregion
 
