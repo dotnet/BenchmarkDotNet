@@ -16,11 +16,15 @@ The two requests are deliberately treated differently, which is what this pins:
 
 * **discovery** lists every benchmark and warns on the output device — a wrong list costs nothing to correct;
 * **a run** refuses, reporting every benchmark it could have selected as failed — running the whole assembly instead
-  of the subset that was asked for would cost the machine the next hour.
+  of the subset that was asked for would cost the machine the next hour. A run over an assembly that declares no
+  benchmarks has nothing to carry that report, so the refusal goes to the output device instead of the run passing
+  for a green, zero-test success.
 
-It also ends an application while a request is still in flight - the client sending `exit`, or an IDE cancelling -
-which no driven test host can be made to do on cue either. The values that request had enumerated are reachable from
-nothing else, so `ParameterValueLifetime` has to dispose them on its way out; left to the finalizer they are the
-dotnet/BenchmarkDotNet#1383 hang.
+The second thing out of a test host's reach is an application ending while a request is still in flight — the client
+sending `exit`, or an IDE cancelling. This ends one twice over: once with a request that had enumerated values and
+handed them to nobody, which `ParameterValueLifetime` must dispose on its way out, since nothing else can reach them
+and the finalizer is the dotnet/BenchmarkDotNet#1383 hang; and once with a request that had already handed them to
+BenchmarkDotNet, which it must leave alone — those are disposed by the run stage's own `finally`, and taking them
+here would pull them out from under a benchmark still running against them.
 
 `TestingPlatformAdapterTests` in `BenchmarkDotNet.IntegrationTests` runs it and asserts on the report.

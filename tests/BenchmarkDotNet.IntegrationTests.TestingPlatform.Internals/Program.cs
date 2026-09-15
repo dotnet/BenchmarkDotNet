@@ -20,6 +20,9 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
             Console.WriteLine("== abandoned");
             Console.WriteLine(await ReportAbandonedRequestAsync().ConfigureAwait(false));
 
+            Console.WriteLine("== handed");
+            Console.WriteLine(await ReportHandedOverRequestAsync().ConfigureAwait(false));
+
             Console.WriteLine("== discover");
             foreach (var line in await ExecuteAsync(session => new DiscoverTestExecutionRequest(session, new UnrecognisedFilter())).ConfigureAwait(false))
                 Console.WriteLine(line);
@@ -27,6 +30,15 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
             Console.WriteLine("== run");
             foreach (var line in await ExecuteAsync(session => new RunTestExecutionRequest(session, new UnrecognisedFilter())).ConfigureAwait(false))
                 Console.WriteLine(line);
+
+            // An assembly that declares no benchmarks at all, so the refusal below has no node to travel on.
+            Console.WriteLine("== empty");
+            foreach (var line in await ExecuteAsync(
+                session => new RunTestExecutionRequest(session, new UnrecognisedFilter()),
+                typeof(BenchmarkDotNet.Attributes.BenchmarkAttribute).Assembly).ConfigureAwait(false))
+            {
+                Console.WriteLine(line);
+            }
 
             Console.WriteLine("== done");
 
@@ -55,14 +67,48 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
             return $"created={AbandonedBenchmarks.Abandoned.Created} disposed={AbandonedBenchmarks.Abandoned.Disposed}";
         }
 
-        private static async Task<IReadOnlyList<string>> ExecuteAsync(Func<Microsoft.Testing.Platform.TestHost.TestSessionContext, IRequest> createRequest)
+        /// <summary>
+        /// Ends an application the same way, but while the abandoned request had already handed its benchmarks to
+        /// BenchmarkDotNet and BenchmarkDotNet had entered the run stage it disposes them from.
+        /// </summary>
+        /// <remarks>
+        /// They are its to dispose at that point, whether the run completes, throws or is cancelled. Disposing them
+        /// here too would either be a second disposal or - in the window this stands for, an IDE cancelling a run in
+        /// progress - the disposal of a value a benchmark is still using, which reaches the user as an
+        /// ObjectDisposedException thrown from inside their own benchmark.
+        /// </remarks>
+        /// <returns>The counts, as a line.</returns>
+        private static async Task<string> ReportHandedOverRequestAsync()
+        {
+            var lifetime = new ParameterValueLifetime();
+            var cases = BenchmarkConverter.TypeToBenchmarks(typeof(HandedOverBenchmarks)).BenchmarksCases;
+
+            // Under server mode a discovery comes first and completes, leaving these very values held - so they are
+            // reachable from the held set as well as from the request still running them, and neither may take them.
+            var discovery = lifetime.BeginRequest();
+            discovery.Track(cases);
+            await discovery.CompleteAsync([]).ConfigureAwait(false);
+
+            var request = lifetime.BeginRequest();
+            request.Track(cases);
+            request.HandOver(cases, () => true);
+
+            // Deliberately no CompleteAsync, as above: this request is abandoned too.
+            await lifetime.AfterRunAsync(0, CancellationToken.None).ConfigureAwait(false);
+
+            return $"created={HandedOverBenchmarks.HandedOver.Created} disposed={HandedOverBenchmarks.HandedOver.Disposed}";
+        }
+
+        private static async Task<IReadOnlyList<string>> ExecuteAsync(
+            Func<Microsoft.Testing.Platform.TestHost.TestSessionContext, IRequest> createRequest,
+            Assembly? assembly = null)
         {
             var platform = new PlatformStub();
             var lifetime = new ParameterValueLifetime();
             var framework = new BenchmarkTestFramework(
                 new TestFrameworkCapabilities(),
                 PlatformStub.CreateServiceProvider(platform),
-                Assembly.GetExecutingAssembly(),
+                assembly ?? Assembly.GetExecutingAssembly(),
                 lifetime);
 
             var request = createRequest(PlatformStub.CreateSessionContext());
