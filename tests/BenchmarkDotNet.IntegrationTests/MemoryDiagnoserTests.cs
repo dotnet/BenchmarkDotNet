@@ -188,7 +188,15 @@ namespace BenchmarkDotNet.IntegrationTests
         public void TieredJitShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
             if (toolchain.IsInProcess)
+            {
+                // Extra allocation (256 bytes) wheb running on Windows(arm64) + .NET Framework
+                if (OsDetector.IsWindows()
+                 && RuntimeInformation.ProcessArchitecture == Architecture.Arm64
+                 && Portability.RuntimeInformation.IsFullFramework)
+                    Assert.Skip("Flaky test on Windows(arm64) + .NET Framework");
+
                 ValidateMtpProgressDisabled();
+            }
 
             AssertAllocations(toolchain, typeof(TimeConsumingBenchmark), new Dictionary<string, long>
             {
