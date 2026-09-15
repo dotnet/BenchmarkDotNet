@@ -1,4 +1,5 @@
-#if NET8_0_OR_GREATER
+// TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
+#if NET
 using AsmArm64;
 using AwesomeAssertions;
 using Arm64RegisterX = AsmArm64.Arm64RegisterX;

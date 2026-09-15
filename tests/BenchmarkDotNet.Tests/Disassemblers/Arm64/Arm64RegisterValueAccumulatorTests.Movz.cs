@@ -1,3 +1,5 @@
+// TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
+#if NET
 using AwesomeAssertions;
 using Gee.External.Capstone.Arm64;
 using static AsmArm64.Arm64RegisterX;
@@ -31,3 +33,4 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.Value.Should().Be(0x3333_0000_0000);
     }
 }
+#endif
