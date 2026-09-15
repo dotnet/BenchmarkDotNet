@@ -2,6 +2,7 @@
 using AsmArm64;
 using AwesomeAssertions;
 using BenchmarkDotNet.Disassemblers;
+using Gee.External.Capstone.Arm64;
 using Microsoft.Diagnostics.Runtime.Interfaces;
 using static AsmArm64.Arm64RegisterX;
 
@@ -9,17 +10,19 @@ namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
 public partial class Arm64DisassemblerTests
 {
-    private Arm64RegisterValueAccumulator CreateValueAccumulator(Arm64RegisterX register, ushort initialValue, IClrRuntime clrRuntime)
+    private Arm64RegisterValueAccumulator CreateValueAccumulator(
+        IClrRuntime clrRuntime,
+        long initialValue,
+        Arm64RegisterId registerId = Arm64RegisterId.ARM64_REG_X0,
+        Arm64RegisterValueAccumulator.State state = Arm64RegisterValueAccumulator.State.ExpectingMovk)
     {
         var valueAccumulator = new Arm64RegisterValueAccumulator();
         valueAccumulator.Init(clrRuntime);
-
-        // Set initial state by processing Movz instruction.
-        valueAccumulator.Feed(Arm64TestInstructions.Movz(register, initialValue));
+        valueAccumulator.Reset(state: state, registerId: registerId, value: initialValue);
 
         valueAccumulator.HasValue.Should().BeTrue();
         valueAccumulator.Value.Should().Be(initialValue);
-        // TODO: Add Register validation after migrated to AsmArm64
+        valueAccumulator.RegisterId.Should().Be(registerId);
 
         return valueAccumulator;
     }
@@ -29,7 +32,7 @@ public partial class Arm64DisassemblerTests
     {
         // Arrange
         using var clrRuntime = CreateMockClrRuntime();
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
+        var valueAccumulator = CreateValueAccumulator(clrRuntime, initialValue: 0x100);
         var rawInstruction = Arm64InstructionFactory.BR(X0);
 
         // Act
@@ -51,7 +54,7 @@ public partial class Arm64DisassemblerTests
     {
         // Arrange
         using var clrRuntime = CreateMockClrRuntime();
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
+        var valueAccumulator = CreateValueAccumulator(clrRuntime, initialValue: 0x100);
         var rawInstruction = Arm64InstructionFactory.BLR(X0);
 
         // Act
@@ -73,7 +76,7 @@ public partial class Arm64DisassemblerTests
     {
         // Arrange
         using var clrRuntime = CreateMockClrRuntime();
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
+        var valueAccumulator = CreateValueAccumulator(clrRuntime, initialValue: 0x100);
         var rawInstruction = Arm64InstructionFactory.B(0x200);
 
         // Act
@@ -95,7 +98,7 @@ public partial class Arm64DisassemblerTests
     {
         // Arrange
         using var clrRuntime = CreateMockClrRuntime();
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
+        var valueAccumulator = CreateValueAccumulator(clrRuntime, initialValue: 0x100);
         var rawInstruction = Arm64InstructionFactory.RET(); // `ret` instruction is not BranchRelative group
 
         // Act
@@ -115,7 +118,7 @@ public partial class Arm64DisassemblerTests
     {
         // Arrange
         using var clrRuntime = CreateMockClrRuntime();
-        var valueAccumulator = CreateValueAccumulator(X0, 0x100, clrRuntime);
+        var valueAccumulator = CreateValueAccumulator(clrRuntime, initialValue: 0x100);
         var rawInstruction = Arm64InstructionFactory.BR(X1);
 
         // Act
