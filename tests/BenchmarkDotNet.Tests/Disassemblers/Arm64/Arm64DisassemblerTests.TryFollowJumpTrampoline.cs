@@ -225,16 +225,17 @@ public partial class Arm64DisassemblerTests
         {
             Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD),  // dmb ishld
             Arm64InstructionFactory.BL(0x10000), // BL instruction is not handled as StubHead
+            Arm64InstructionFactory.NOP(),
+            Arm64InstructionFactory.NOP(),
+            Arm64InstructionFactory.NOP(),
         };
         PrintInstructions(rawInstructions);
 
         const ulong BaseAddress = DummyBaseAddress;
         using var clrRuntime = new MockMemory()
           .AddInstructions(BaseAddress, rawInstructions)
-          .AddPointer(BaseAddress + 0x10000, ExpectedResultAddress)
           .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
-
 
         // Act
         var helper = new Arm64DisassemblerHelper();
