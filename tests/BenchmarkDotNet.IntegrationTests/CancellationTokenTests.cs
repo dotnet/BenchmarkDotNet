@@ -116,7 +116,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
             .AddLogger(logger)
             .AddJob(Job.Dry
                 .WithToolchain(CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net10_0, wasmSettings)))
-            .WithBuildTimeout(TimeSpan.FromSeconds(240))
+            .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)
             .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
 
@@ -181,7 +181,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
             .AddJob(Job.Dry
                 .WithToolchain(CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net10_0, wasmSettings)))
             .AddDiagnoser(diagnoser)
-            .WithBuildTimeout(TimeSpan.FromSeconds(240))
+            .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)
             .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
 

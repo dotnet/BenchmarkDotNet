@@ -28,7 +28,7 @@ public sealed class CsProjNativeAotToolchain : CsProjNetToolchain
     private CsProjNativeAotToolchain(NativeAotRuntime runtime, NativeAotSettings settings, NativeAotSettings resolved)
         : base("CsProjNativeAot", runtime, settings,
             new CsProjNativeAotGenerator(resolved),
-            new DotNetCliPublisher(resolved, GetExtraArguments(settings.RuntimeIdentifier)),
+            new DotNetCliPublisher(resolved),
             Toolchains.Executor.Instance)
     {
     }
@@ -55,6 +55,4 @@ public sealed class CsProjNativeAotToolchain : CsProjNetToolchain
             _ => new CsProjNativeAotToolchain(runtime, settings),
         };
     }
-
-    public static string GetExtraArguments(string runtimeIdentifier) => $"-r {runtimeIdentifier}";
 }

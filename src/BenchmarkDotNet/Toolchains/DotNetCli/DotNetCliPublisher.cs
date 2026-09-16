@@ -31,5 +31,5 @@ public class DotNetCliPublisher(
             buildPartition.Timeout,
             logOutput: LogOutput
         )
-        .RestoreThenBuildThenPublishAsync(cancellationToken));
+        .PublishAsync(cancellationToken));
 }

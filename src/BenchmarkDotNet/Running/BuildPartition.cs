@@ -116,7 +116,7 @@ namespace BenchmarkDotNet.Running
                 if (!XUnitHelper.IsIntegrationTest.Value || !RuntimeInformation.IsNetCore)
                     return false;
 
-                if (RepresentativeBenchmarkCase.GetToolchain().Builder is not DotNetCliBuilder)
+                if (RepresentativeBenchmarkCase.GetToolchain().Builder is not (DotNetCliBuilder or DotNetCliPublisher))
                     return false;
 
                 return !RepresentativeBenchmarkCase.Job.HasDynamicBuildCharacteristic();

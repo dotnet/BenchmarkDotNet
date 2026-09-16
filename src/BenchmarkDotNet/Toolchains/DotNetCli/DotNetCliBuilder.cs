@@ -23,7 +23,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 buildPartition.Timeout,
                 logOutput: logOutput
             )
-                .RestoreThenBuildAsync(cancellationToken)
+                .BuildAsync(cancellationToken)
                 .ConfigureAwait(false);
             if (buildResult.IsBuildSuccess &&
                 buildPartition.RepresentativeBenchmarkCase.Job.Environment.LargeAddressAware)
