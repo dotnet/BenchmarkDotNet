@@ -96,17 +96,22 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 // application is going away, so its scope will never be completed, and these are the only reference
                 // left to them - a value left to the finalizer instead is the dotnet/BenchmarkDotNet#1383 hang.
                 //
-                // What such a request has handed to a run BenchmarkDotNet already started is the exception, wherever
-                // else it is found: under server mode the discovery before the run leaves the very same cached values
-                // held, so filtering only the request's own would still dispose them under the running benchmark.
+                // What such a request has handed to BenchmarkDotNet is the exception, wherever else it is found: under
+                // server mode the discovery before the run leaves the very same cached values held, so filtering only
+                // the request's own would still dispose them under the running benchmark.
+                //
+                // Both filters are applied to everything the sweep collected rather than to one branch of it. A value
+                // BenchmarkDotNet disposed is held and in disposedByBenchmarkDotNet, and the request that enumerated
+                // it next - a discovery, or a run that bailed out on a critical validation error - has it in its scope
+                // as well, so filtering the held branch alone would let the live one bring it back and dispose it a
+                // second time.
                 var takenOver = new HashSet<object>(
                     live.SelectMany(request => request.TakenOverByBenchmarkDotNet),
                     ParameterValueDisposer.ByReference);
 
                 unused = held
-                    .Where(pair => !disposedByBenchmarkDotNet.Contains(pair.Key))
                     .Concat(live.SelectMany(request => request.Enumerated))
-                    .Where(pair => !takenOver.Contains(pair.Key))
+                    .Where(pair => !disposedByBenchmarkDotNet.Contains(pair.Key) && !takenOver.Contains(pair.Key))
                     .GroupBy(pair => pair.Key, ParameterValueDisposer.ByReference)
                     .Select(group => group.First().Value)
                     .ToList();
@@ -171,10 +176,9 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         internal sealed class RequestScope
         {
             private readonly ParameterValueLifetime owner;
+            // What this request handed to BenchmarkDotNet and has not taken back. Read and written under the owner's
+            // gate, which is also what the exit sweep reads it under.
             private readonly HashSet<object> handedOver = new(ParameterValueDisposer.ByReference);
-
-            // Nothing is handed over until HandOver says so, so until then everything here is this request's own.
-            private Func<bool> benchmarkDotNetOwnsHandedOver = () => false;
 
             internal RequestScope(ParameterValueLifetime owner) => this.owner = owner;
 
@@ -191,20 +195,19 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             internal bool HasEnumerated { get; private set; }
 
             /// <summary>
-            /// Gets the values this request handed to BenchmarkDotNet, if BenchmarkDotNet has taken over disposing
-            /// them; otherwise nothing.
+            /// Gets the values this request has handed to BenchmarkDotNet and not taken back, which are not this
+            /// request's to dispose however the application ends.
             /// </summary>
             /// <remarks>
-            /// Once BenchmarkDotNet has entered its run stage it disposes the values it was handed in that stage's
-            /// finally, whether the run completes, throws or is cancelled. Disposing them anywhere else as well would
-            /// either be the second disposal of a value it has already released, or - worse, and this is the window
-            /// the application ending is in - the disposal of a value a benchmark is still running against, which
-            /// surfaces to the user as an ObjectDisposedException thrown from inside their own benchmark rather than
-            /// as the cancellation they asked for. Until that stage starts nothing has been disposed and nothing is in
-            /// use, so an abandoned request still owns everything it created.
+            /// Ownership runs from the hand-off to the return of the run, rather than from the moment BenchmarkDotNet
+            /// starts its run stage: validation and the whole build stage sit in between, and for an out-of-process
+            /// toolchain that is the slowest part of the run. Disposing a handed value in that window would be the
+            /// disposal of a value the run is about to benchmark against, which surfaces to the user as an
+            /// ObjectDisposedException thrown from inside their own benchmark rather than as the cancellation they
+            /// asked for - and a server-mode client that sends <c>exit</c> rather than cancelling the request gets
+            /// there with the request's own token never cancelled.
             /// </remarks>
-            internal IEnumerable<object> TakenOverByBenchmarkDotNet
-                => benchmarkDotNetOwnsHandedOver() ? handedOver : [];
+            internal IEnumerable<object> TakenOverByBenchmarkDotNet => handedOver;
 
             /// <summary>
             /// Records the values of the benchmarks the enumeration returned, and marks the enumeration as reached.
@@ -248,24 +251,37 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             }
 
             /// <summary>
-            /// Records the benchmarks whose values are about to be handed to BenchmarkDotNet, and how to tell whether
-            /// it has taken over disposing them.
+            /// Hands the values of the given benchmarks to BenchmarkDotNet, which is about to be given the run.
             /// </summary>
+            /// <remarks>
+            /// Called before the run starts, so that the window in which BenchmarkDotNet has the benchmarks but has
+            /// not reached the stage it disposes them from is covered. <see cref="TakeBack"/> ends it.
+            /// </remarks>
             /// <param name="handedCases">The benchmarks being handed over.</param>
-            /// <param name="ownershipTaken">
-            /// Tells whether BenchmarkDotNet will dispose those values itself, which it undertakes to do from the
-            /// moment its run stage begins. Read while the application is ending, so it is answered from wherever the
-            /// run has got to by then rather than from where it was when this was called.
-            /// </param>
-            public void HandOver(IEnumerable<BenchmarkCase> handedCases, Func<bool> ownershipTaken)
+            public void HandOver(IEnumerable<BenchmarkCase> handedCases)
             {
                 lock (owner.gate)
                 {
                     foreach (var parameter in ParameterValueDisposer.GetDisposableParameters(handedCases))
                         handedOver.Add(parameter.Value!);
-
-                    benchmarkDotNetOwnsHandedOver = ownershipTaken;
                 }
+            }
+
+            /// <summary>
+            /// Takes the handed values back, because the run returned without BenchmarkDotNet disposing them.
+            /// </summary>
+            /// <remarks>
+            /// That is what a critical validation error does: BenchmarkDotNet returns before the run stage, so it
+            /// disposes nothing, and these are this request's again - an application ending before the request
+            /// completes has to dispose them, or they are left to the finalizer, which is the
+            /// dotnet/BenchmarkDotNet#1383 hang. Values it did dispose are deliberately not taken back: they stay its
+            /// own until <see cref="CompleteAsync"/> records them as disposed, so that the sweep cannot find them
+            /// in between.
+            /// </remarks>
+            public void TakeBack()
+            {
+                lock (owner.gate)
+                    handedOver.Clear();
             }
 
             /// <summary>

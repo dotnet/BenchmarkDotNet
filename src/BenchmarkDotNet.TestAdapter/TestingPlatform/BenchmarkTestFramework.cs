@@ -182,13 +182,25 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
                 eventProcessor = processor;
 
-                // From the moment BenchmarkDotNet starts running these, their values are its to dispose rather than
-                // this adapter's, so an application ending underneath the run leaves them to it. See RequestScope.
-                parameterValueScope.HandOver(
-                    runnable.Select(match => match.Node.BenchmarkCase),
-                    () => processor.RunStageStarted);
+                // These are BenchmarkDotNet's now rather than this adapter's, so an application ending underneath the
+                // run leaves them to it. From here and not from the start of its run stage: validation and the whole
+                // build stage sit in between, and disposing a value in that window pulls it out from under a run that
+                // is about to benchmark against it. See RequestScope.
+                parameterValueScope.HandOver(runnable.Select(match => match.Node.BenchmarkCase));
 
-                await RunAsync(context, runnable, processor, workQueue, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    await RunAsync(context, runnable, processor, workQueue, cancellationToken).ConfigureAwait(false);
+                }
+                finally
+                {
+                    // The run is over, so nothing of BenchmarkDotNet's is using them anymore. What it disposed stays
+                    // its own until the finally below records it; what it never reached the run stage to dispose - a
+                    // critical validation error - is this request's again, so that an application ending before the
+                    // request completes still disposes it rather than leaving it to the finalizer.
+                    if (!processor.ParameterValuesDisposed)
+                        parameterValueScope.TakeBack();
+                }
             }
             finally
             {
