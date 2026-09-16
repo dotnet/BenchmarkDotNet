@@ -17,7 +17,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-
 namespace BenchmarkDotNet.IntegrationTests
 {
     public class InProcessTest : BenchmarkTestExecutor
@@ -83,7 +82,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddColumnProvider(DefaultColumnProviders.Instance);
 
             var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(BenchmarkAllCases), otherPlatformConfig);
-            var summary = BenchmarkRunner.Run(runInfo);
+            var summary = BenchmarkRunner.Run(runInfo, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotEmpty(summary.ValidationErrors);
         }

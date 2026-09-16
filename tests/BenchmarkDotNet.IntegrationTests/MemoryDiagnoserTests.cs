@@ -1,4 +1,3 @@
-using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -6,12 +5,9 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
@@ -20,7 +16,6 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
-using BenchmarkDotNet.Validators;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -34,10 +29,19 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
-            // xunit v2 allocates every 100ms on a background timer that makes the tests flaky on Mac/Linux (MSTestEnableParentProcessQuery).
-            // TODO: remove the guard when the test framework is updated.
-            if (OsDetector.IsWindows())
+            if (OsDetector.IsWindows() && Portability.RuntimeInformation.IsFullFramework)
+            {
+                // Skip InProcessEmitToolchain tests on Windows +.NET Framework environment.
+                // Because when running tests with xunit v3, memory allocation tests are flaky.
+                // See following issues.
+                // https://github.com/dotnet/BenchmarkDotNet/issues/2779
+                // https://github.com/dotnet/BenchmarkDotNet/pull/3065#issuecomment-5064984074
+                // https://github.com/dotnet/BenchmarkDotNet/issues/3203
+            }
+            else
+            {
                 yield return [InProcessEmitToolchain.Default];
+            }
 
             if (ContinuousIntegration.IsGitHubDraftPR())
                 yield break;
@@ -53,7 +57,8 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public Task<int> AllocateTask() => Task.FromResult<int>(-12345);
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurate(IToolchain toolchain)
         {
@@ -141,7 +146,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserDoesNotIncludeAllocationsFromSetupAndCleanup(IToolchain toolchain)
         {
@@ -156,7 +162,8 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public void EmptyMethod() { }
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void EngineShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
@@ -181,7 +188,8 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         // #1542
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void TieredJitShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
@@ -197,7 +205,8 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public ValueTuple<int> ReturnsValueType() => new ValueTuple<int>(0);
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void EngineShouldNotIntroduceBoxing(IToolchain toolchain)
         {
@@ -218,7 +227,8 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public ValueTask<int> CompletedValueTaskOfT() => new ValueTask<int>(default(int));
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AwaitingTasksShouldNotInterfereAllocationResults(IToolchain toolchain)
         {
@@ -243,7 +253,8 @@ namespace BenchmarkDotNet.IntegrationTests
             private void DoNotInline(object left, object right) { }
         }
 
-        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocatedMemoryShouldBeScaledForOperationsPerInvoke(IToolchain toolchain)
         {
@@ -269,15 +280,11 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("Full Framework cannot measure precisely enough for low invocation counts.", EnvRequirement.DotNetCoreOnly)]
+        [TheoryEnvSpecific("Full Framework cannot measure precisely enough for low invocation counts.", EnvRequirement.DotNetCoreOnly, SkipTestWithoutData = true)]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void AllocationQuantumIsNotAnIssueForNetCore21Plus(IToolchain toolchain)
         {
-            // TODO: Skip test on macos. Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/2779
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
-                return;
-
             long objectAllocationOverhead = IntPtr.Size * 2; // pointer to method table + object header word
             long arraySizeOverhead = IntPtr.Size; // array length
             AssertAllocations(toolchain, typeof(TimeConsuming), new Dictionary<string, long>
@@ -339,7 +346,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("Full Framework cannot measure precisely enough", EnvRequirement.DotNetCoreOnly)]
+        [TheoryEnvSpecific("Full Framework cannot measure precisely enough", EnvRequirement.DotNetCoreOnly, SkipTestWithoutData = true)]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void MemoryDiagnoserIsAccurateForMultiThreadedBenchmarks(IToolchain toolchain)
@@ -359,7 +366,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = CreateConfig(toolchain, iterationCount);
             var benchmarks = BenchmarkConverter.TypeToBenchmarks(benchmarkType, config);
 
-            var summary = BenchmarkRunner.Run(benchmarks);
+            var summary = BenchmarkRunner.Run(benchmarks, cancellationToken: TestContext.Current.CancellationToken);
             try
             {
                 summary.CheckPlatformLinkerIssues();

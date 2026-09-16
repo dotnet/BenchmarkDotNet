@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "Default": {
+      "commandName": "Project",
+      "commandLineArgs": ""
+    },
+    "Run filtered tests": {
+      "commandName": "Project",
+      "commandLineArgs": "--filter AppConfigTests --output Detailed"
+    },
+    "--list-test json": {
+      "commandName": "Project",
+      "commandLineArgs": "--list-test json"
+    },
+    "--info": {
+      "commandName": "Project",
+      "commandLineArgs": "--info"
+    },
+    "--help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    }
+  }
+}
