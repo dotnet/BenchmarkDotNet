@@ -9,6 +9,7 @@
     "Autofac",
     "bitness",
     "corlib",
+    "crossgen",
     "Cygwin",
     "Diagnoser",
     "diagnosers",

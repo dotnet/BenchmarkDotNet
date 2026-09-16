@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace BenchmarkDotNet.Toolchains.CoreRun
 {
-    public class CoreRunPublisher(string tfm, FileInfo coreRun, FileInfo? customDotNetCliPath = null) : DotNetCliPublisher(tfm, customDotNetCliPath?.FullName ?? "")
+    public class CoreRunPublisher(DotNetCliSettings settings, FileInfo coreRun) : DotNetCliPublisher(settings)
     {
         public override async ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
         {

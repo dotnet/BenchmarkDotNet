@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.IntegrationTests.ManualRunning
@@ -18,15 +18,15 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         [InlineData(RuntimeMoniker.Net48)]
         [InlineData(RuntimeMoniker.Net80)]
         [InlineData(RuntimeMoniker.Net10_0)]
-        public void EachFrameworkIsRebuilt(RuntimeMoniker runtime)
+        public void EachFrameworkIsRebuilt(string runtime)
         {
-            var config = ManualConfig.CreateEmpty().AddJob(Job.Dry.WithRuntime(runtime.GetRuntime()).WithEnvironmentVariable(TfmEnvVarName, runtime.ToString()));
+            var config = ManualConfig.CreateEmpty().AddJob(Job.Dry.WithRuntime(Runtime.Parse(runtime)).WithEnvironmentVariable(TfmEnvVarName, runtime));
             CanExecute<ValuePerTfm>(config);
         }
 
         public class ValuePerTfm
         {
-            private const RuntimeMoniker moniker =
+            private const string moniker =
 #if NET462
                 RuntimeMoniker.Net462;
 #elif NET48
@@ -36,13 +36,13 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
 #elif NET10_0
                 RuntimeMoniker.Net10_0;
 #else
-                RuntimeMoniker.NotRecognized;
+                "NotRecognized";
 #endif
 
             [Benchmark]
             public void ThrowWhenWrong()
             {
-                if (Environment.GetEnvironmentVariable(TfmEnvVarName) != moniker.ToString())
+                if (Environment.GetEnvironmentVariable(TfmEnvVarName) != moniker)
                 {
                     throw new InvalidOperationException($"Has not been recompiled, the value was {moniker}, expected {Environment.GetEnvironmentVariable(TfmEnvVarName)}");
                 }

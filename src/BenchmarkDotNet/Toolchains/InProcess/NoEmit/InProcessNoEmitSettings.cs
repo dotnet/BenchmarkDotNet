@@ -1,6 +1,8 @@
 namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
-public class InProcessNoEmitSettings : InProcessSettings
+public record InProcessNoEmitSettings : InProcessSettings
 {
-    public IBenchmarkActionFactory? BenchmarkActionFactory { get; set; }
+    public static readonly InProcessNoEmitSettings Default = new();
+
+    public IBenchmarkActionFactory? BenchmarkActionFactory { get; init; }
 }

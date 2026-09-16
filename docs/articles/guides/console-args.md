@@ -103,6 +103,7 @@ You can also filter the benchmarks by categories:
 
 * `--anyCategories` - runs all benchmarks that belong to **any** of the provided categories
 * `--allCategories`- runs all benchmarks that belong to **all** provided categories
+* `--anyJobCategories` - runs all benchmarks whose job belongs to **any** of the provided job categories. Jobs without categories are excluded
 
 ## Diagnosers
 
@@ -272,6 +273,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--allStats`                (Default: false) Displays all statistics (min, max & more)
 * `--allCategories`           Categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed
 * `--anyCategories`           Any Categories to run
+* `--anyJobCategories`        Job categories to run. Only the benchmarks which belong to a job that has any of them are going to be executed
 * `--attribute`               Run all methods with given attribute (applied to class or method)
 * `--join`                    (Default: false) Prints single table with results for all benchmarks
 * `--title`                   Custom title for the produced summaries and the base name of the result files exported for them
@@ -282,7 +284,6 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--packages`                The directory to restore packages to (optional).
 * `--coreRun`                 Path(s) to CoreRun (optional).
 * `--monoPath`                Optional path to Mono which should be used for running benchmarks.
-* `--clrVersion`              Optional version of private CLR build used as the value of `COMPLUS_Version` env var.
 * `--ilCompilerVersion`       Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: "7.0.0-preview.3.22123.2"
 * `--ilcPackages`             Optional path to shipping packages produced by local dotnet/runtime build. Example: 'D:\projects\runtime\artifacts\packages\Release\Shipping\'
 * `--launchCount`             How many times we should launch process with target benchmark. The default is 1.
@@ -318,10 +319,8 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--jitTieringMode`          (Default: Auto) Controls the behavior of the JIT stage when tiering is enabled. Auto/Force/Skip.
 * `--wasmEngine`              (Default: v8) Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain.
 * `--wasmArgs`                (Default: --expose_wasm) Arguments for the javascript engine used by Wasm toolchain.
-* `--customRuntimePack`       Path to a custom runtime pack. Only used for wasm/MonoAotLLVM currently.
-* `--AOTCompilerPath`         Path to Mono AOT compiler, used for MonoAotLLVM.
-* `--AOTCompilerMode`         (Default: mini) Mono AOT compiler mode, either 'mini' or 'llvm'
-* `--wasmRuntimeFlavor`       (Default: Mono) Runtime flavor for WASM benchmarks: 'Mono' (default) uses the Mono runtime pack, 'CoreCLR' uses the CoreCLR runtime pack.
+* `--customRuntimePack`       Path to a custom runtime pack. Only used for wasm currently.
+* `--AOTCompilerPath`         Path to the crossgen2 compiler, used for ReadyToRun (R2R) benchmarks.
 * `--wasmProcessTimeout`      (Default: 10) Maximum time in minutes to wait for a single WASM benchmark process to finish before force killing it.
 * `--noForcedGCs`             Specifying would not forcefully induce any GCs.
 * `--evaluateOverhead`        Specifies whether to run and evaluate overhead iterations.

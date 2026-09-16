@@ -21,7 +21,7 @@ public class DisassemblerModelSerializationTests
             printSource: true,
             maxDepth: 5,
             syntax: "Syntax",
-            tfm: "Tfm",
+            runtimeVersion: new Version(8, 0),
             filters: ["filter1", "filter2"],
             resultsPath: "/path/to/results"
         );

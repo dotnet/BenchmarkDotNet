@@ -1,8 +1,8 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.Mono;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -28,10 +28,8 @@ namespace BenchmarkDotNet.Samples
         {
             public Config()
             {
-                AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
-                    "Mono x64", @"C:\Program Files\Mono\bin\mono.exe")));
-                AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
-                    "Mono x86", @"C:\Program Files (x86)\Mono\bin\mono.exe")));
+                AddJob(Job.ShortRun.WithToolchain(RoslynMonoToolchain.From(new() { MonoPath = new(@"C:\Program Files\Mono\bin\mono.exe") })));
+                AddJob(Job.ShortRun.WithToolchain(RoslynMonoToolchain.From(new() { MonoPath = new(@"C:\Program Files (x86)\Mono\bin\mono.exe") })));
             }
         }
 
@@ -49,19 +47,23 @@ namespace BenchmarkDotNet.Samples
     {
         private class Config : ManualConfig
         {
-            public void AddMono(string name, string mono_top_dir)
+            public void AddMono(string mono_top_dir)
             {
                 var aot_compile_args = "--aot=llvm";
                 var mono_bcl = $@"{mono_top_dir}\lib\mono\4.5";
                 var mono_bin = $@"{mono_top_dir}\bin\mono.exe";
-                AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
-                    name, mono_bin, aot_compile_args, mono_bcl)));
+                AddJob(Job.ShortRun.WithToolchain(RoslynMonoAotToolchain.From(new()
+                {
+                    MonoPath = new(mono_bin),
+                    MonoBclPath = new(mono_bcl),
+                    AotArgs = aot_compile_args
+                })));
             }
 
             public Config()
             {
-                AddMono("Mono x64", @"C:\Program Files\Mono");
-                AddMono("Mono x86", @"C:\Program Files (x86)\Mono");
+                AddMono(@"C:\Program Files\Mono");
+                AddMono(@"C:\Program Files (x86)\Mono");
             }
         }
 
@@ -80,10 +82,14 @@ namespace BenchmarkDotNet.Samples
         {
             BenchmarkRunner.Run<IntroCustomMonoFluentConfig>(ManualConfig
                 .CreateMinimumViable()
-                .AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
-                    "Mono x64", @"C:\Program Files\Mono\bin\mono.exe")))
-                .AddJob(Job.ShortRun.WithRuntime(new MonoRuntime(
-                    "Mono x86", @"C:\Program Files (x86)\Mono\bin\mono.exe"))));
+                .AddJob(Job.ShortRun.WithToolchain(RoslynMonoToolchain.From(new()
+                {
+                    MonoPath = new(@"C:\Program Files\Mono\bin\mono.exe")
+                })))
+                .AddJob(Job.ShortRun.WithToolchain(RoslynMonoToolchain.From(new()
+                {
+                    MonoPath = new(@"C:\Program Files (x86)\Mono\bin\mono.exe")
+                }))));
         }
 
         [Benchmark]

@@ -15,7 +15,6 @@ namespace BenchmarkDotNet.Environments
         private EnvironmentResolver()
         {
             Register(EnvironmentMode.PlatformCharacteristic, RuntimeInformation.GetCurrentPlatform);
-            Register(EnvironmentMode.RuntimeCharacteristic, RuntimeInformation.GetCurrentRuntime);
             Register(EnvironmentMode.JitCharacteristic, JitInfo.GetCurrentJit);
             Register(EnvironmentMode.AffinityCharacteristic, RuntimeInformation.GetCurrentAffinity);
             Register(EnvironmentMode.EnvironmentVariablesCharacteristic, Array.Empty<EnvironmentVariable>);

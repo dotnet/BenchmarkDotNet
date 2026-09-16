@@ -14,7 +14,7 @@ using System.Diagnostics;
 namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     [PublicAPI]
-    public class DotNetCliExecutor(string customDotNetCliPath) : IExecutor
+    public class DotNetCliExecutor(FileInfo? customDotNetCliPath) : IExecutor
     {
         public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {

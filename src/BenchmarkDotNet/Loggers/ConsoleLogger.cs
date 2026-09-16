@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Loggers
             if (Environment.GetEnvironmentVariable("NO_COLOR").IsNotBlank())
                 return false;
 
-            return !(OsDetector.IsAndroid() || OsDetector.IsIOS() || RuntimeInformation.IsWasm || OsDetector.IsTvOS());
+            return !(OsDetector.IsMobile() || RuntimeInformation.IsWasm);
         });
 
         private readonly bool unicodeSupport;

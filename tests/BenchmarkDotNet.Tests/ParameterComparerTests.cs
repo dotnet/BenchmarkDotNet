@@ -4,7 +4,7 @@ namespace BenchmarkDotNet.Tests
 {
     public class ParameterComparerTests
     {
-        private static readonly ParameterDefinition sharedDefinition = new ParameterDefinition("Testing", isStatic: false, values: [], isArgument: false, parameterType: null!, 0);
+        private static readonly ParameterDefinition sharedDefinition = new ParameterDefinition("Testing", isStatic: false, isArgument: false, parameterType: null!, 0);
 
         [Fact]
         public void BasicComparisionTest()

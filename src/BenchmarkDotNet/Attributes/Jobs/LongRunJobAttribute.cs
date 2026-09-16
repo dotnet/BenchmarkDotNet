@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Attributes
         /// defines a new LongRun Job that targets specified Framework
         /// </summary>
         /// <param name="runtimeMoniker">Target Framework to test.</param>
-        public LongRunJobAttribute(RuntimeMoniker runtimeMoniker)
+        public LongRunJobAttribute(string runtimeMoniker)
             : base(GetJob(Job.LongRun, runtimeMoniker, null, null))
         {
         }
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Attributes
         /// <param name="runtimeMoniker">Target Framework to test.</param>
         /// <param name="jit">Jit to test.</param>
         /// <param name="platform">Platform to test.</param>
-        public LongRunJobAttribute(RuntimeMoniker runtimeMoniker, Jit jit, Platform platform)
+        public LongRunJobAttribute(string runtimeMoniker, Jit jit, Platform platform)
             : base(GetJob(Job.LongRun, runtimeMoniker, jit, platform))
         {
         }

@@ -16,7 +16,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty()
                 .AddLogger(logger)
-                .AddJob(Job.Dry.WithRuntime(MonoRuntime.Mono80))
+                .AddJob(Job.Dry.WithRuntime(MonoCoreRuntime.Net80))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240));
             // MonoBenchmark lives in a separate project that targets net8.0, because Mono packages
             // are no longer published for net9.0+ and this project no longer targets net8.0.

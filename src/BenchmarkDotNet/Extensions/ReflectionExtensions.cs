@@ -7,6 +7,9 @@ namespace BenchmarkDotNet.Extensions
 {
     internal static class ReflectionExtensions
     {
+        // The name the compiler gives an `implicit operator`; there is no reflection API that spells it.
+        internal const string OpImplicitMethodName = "op_Implicit";
+
         internal static T? ResolveAttribute<T>(this Type? type) where T : Attribute =>
             type?.GetTypeInfo().GetCustomAttributes(typeof(T), false).OfType<T>().FirstOrDefault();
 
@@ -16,21 +19,16 @@ namespace BenchmarkDotNet.Extensions
         internal static bool HasAttribute<T>(this MemberInfo? memberInfo) where T : Attribute =>
             memberInfo.ResolveAttribute<T>() != null;
 
+        /// <summary>
+        /// The value to pass for an omitted optional argument. A parameter can be optional without declaring a
+        /// default ([Optional] with no [DefaultParameterValue]); null is right for those, because Invoke converts it
+        /// to default(T) even for a value type. Type.Missing is not: Invoke(object, object[]) does no
+        /// optional-parameter binding and rejects it.
+        /// </summary>
+        internal static object? GetDefaultArgumentValue(this ParameterInfo parameter)
+            => parameter.HasDefaultValue ? parameter.DefaultValue : null;
+
         internal static bool IsNullable(this Type type) => Nullable.GetUnderlyingType(type) != null;
-
-        public static bool IsInitOnly(this PropertyInfo propertyInfo)
-        {
-            var setMethodReturnParameter = propertyInfo.SetMethod?.ReturnParameter;
-            if (setMethodReturnParameter == null)
-                return false;
-
-            var isExternalInitType = typeof(System.Runtime.CompilerServices.Unsafe).Assembly
-                .GetType("System.Runtime.CompilerServices.IsExternalInit");
-            if (isExternalInitType == null)
-                return false;
-
-            return setMethodReturnParameter.GetRequiredCustomModifiers().Contains(isExternalInitType);
-        }
 
         /// <summary>
         /// returns type name which can be used in generated C# code
@@ -210,13 +208,14 @@ namespace BenchmarkDotNet.Extensions
                 .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())
                 .ToArray();
 
-        internal static (string Name, TAttribute Attribute, bool IsStatic, Type ParameterType)[]
+        internal static (string Name, TAttribute Attribute, bool IsStatic, Type ParameterType, MemberInfo Member)[]
             GetTypeMembersWithGivenAttribute<TAttribute>(this Type type, BindingFlags reflectionFlags)
             where TAttribute : Attribute
         {
             var fields = type
                 .GetFields(reflectionFlags)
                 .Select(f => Create(
+                    f,
                     f.Name,
                     f.ResolveAttribute<TAttribute>(),
                     f.IsStatic,
@@ -225,24 +224,50 @@ namespace BenchmarkDotNet.Extensions
             var properties = type
                 .GetProperties(reflectionFlags)
                 .Select(p => Create(
+                    p,
                     p.Name,
                     p.ResolveAttribute<TAttribute>(),
                     p.GetSetMethod()?.IsStatic == true,
                     p.PropertyType));
 
-            return fields.Concat(properties)
-                .WhereNotNull()
-                .Select(x => x!.Value)
+            // One entry per name, keeping the most derived declaration. GetFields hands back a hidden base field
+            // alongside the `new` one hiding it - GetProperties collapses the pair, so only fields arrive twice -
+            // and the name binds to the most derived declaration everywhere it is then used. A second entry
+            // becomes a second parameter of the same name: it multiplies the cases against itself and emits the
+            // name twice in the runnable's object initializer, which is CS1912.
+            var found = new List<(MemberInfo Member, string Name, TAttribute Attribute, bool IsStatic, Type MemberType)>();
+            var indexByName = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            foreach (var candidate in fields.Concat(properties).WhereNotNull().Select(x => x!.Value))
+            {
+                if (!indexByName.TryGetValue(candidate.Name, out int index))
+                {
+                    indexByName.Add(candidate.Name, found.Count);
+                    found.Add(candidate);
+                }
+                else if (found[index].Member.DeclaringType!.IsAssignableFrom(candidate.Member.DeclaringType))
+                {
+                    found[index] = candidate;
+                }
+            }
+
+            return found
+                .Select(x => (x.Name, x.Attribute, x.IsStatic, x.MemberType, x.Member))
                 .ToArray();
 
-            static (string Name, TAttribute Attribute, bool IsStatic, Type MemberType)?
-                Create(string name, TAttribute? attribute, bool isStatic, Type memberType)
+            static (MemberInfo Member, string Name, TAttribute Attribute, bool IsStatic, Type MemberType)?
+                Create(MemberInfo member, string name, TAttribute? attribute, bool isStatic, Type memberType)
             {
                 if (attribute == null)
                     return null;
-                return (name, attribute, isStatic, memberType);
+                return (member, name, attribute, isStatic, memberType);
             }
         }
+
+        // What a parameter takes, ref/in/out set aside: reflection reports those as byref types - `ref T` is `T&`,
+        // which nothing is castable to - though the modifier says how the argument travels, not what it is.
+        internal static Type WithoutRefModifier(this Type parameterType)
+            => parameterType.IsByRef ? parameterType.GetElementType()! : parameterType;
 
         internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, [NotNullWhen(true)] object? argumentInstance)
         {
@@ -254,16 +279,25 @@ namespace BenchmarkDotNet.Extensions
 
             var instanceType = argumentInstance.GetType();
 
-            var implicitCastsDefinedInArgumentInstance = instanceType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
-            if (implicitCastsDefinedInArgumentInstance.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
-                return true;
-
-            var implicitCastsDefinedInArgumentType = argumentType.GetMethods().Where(method => method.Name == "op_Implicit" && method.GetParameters().Any()).ToArray();
-            if (implicitCastsDefinedInArgumentType.Any(implicitCast => implicitCast.ReturnType == argumentType && implicitCast.GetParameters().All(p => p.ParameterType == instanceType)))
-                return true;
-
-            return false;
+            return HasImplicitConversion(argumentType, instanceType);
         }
+
+        private static bool HasImplicitConversion(Type targetType, Type sourceType)
+            => DeclaresConversion(sourceType, targetType, sourceType)
+            || DeclaresConversion(targetType, targetType, sourceType);
+
+        // An `implicit operator` written for exactly these types. Only exactly: a source is admitted by naming
+        // what the parameter takes, so there is no conversion to reason about on the way into the operator - and
+        // reasoning about one is what reflection cannot do, since it answers the CLR's rules rather than C#'s.
+        //
+        // C# gathers operators from both types and their base classes. Reflection withholds a base's statics
+        // without FlattenHierarchy, so without it an operator inherited from a base is invisible.
+        private static bool DeclaresConversion(Type declaringType, Type targetType, Type sourceType)
+            => declaringType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Any(method => method.Name == OpImplicitMethodName
+                    && method.ReturnType == targetType
+                    && method.GetParameters() is { Length: 1 } parameters
+                    && parameters[0].ParameterType == sourceType);
 
         private static bool IsRunnableGenericType(TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
@@ -309,17 +343,12 @@ namespace BenchmarkDotNet.Extensions
 
         internal static bool IsAsyncEnumerable(this Type type, [NotNullWhen(true)] out AsyncEnumerableInfo? info)
         {
-            // 1. Pattern first: a public instance GetAsyncEnumerator with all-optional parameters whose
-            //    return type has a public instance MoveNextAsync awaitable-to-bool (also accepting
-            //    all-optional params) and a public instance Current property. Roslyn's `await foreach`
-            //    binds to this in preference to the interface, so we mirror that order. The element type
-            //    comes from Current so it tracks what the compiler binds to, even if the type also
-            //    implements IAsyncEnumerable<U> for a different U. (Extension GetAsyncEnumerator is not
-            //    handled.)
-            //
-            //    Note: when the type IS exactly IAsyncEnumerable<T>, `GetMethods(Public|Instance)` returns
-            //    the interface's own GetAsyncEnumerator, so this branch also handles that case naturally —
-            //    we just flag it as interface dispatch via the conditional below.
+            // 1. Pattern first, as `await foreach` binds: a public instance GetAsyncEnumerator with all-optional parameters,
+            //    returning a type with a public MoveNextAsync awaitable-to-bool (also accepting all-optional params) and a
+            //    public Current property. The element type comes from Current, so it tracks what the compiler binds to even
+            //    when the type also implements IAsyncEnumerable<U> for another U. Extension GetAsyncEnumerator is not handled.
+            //    IAsyncEnumerable<T> itself lands here too - GetMethods returns the interface's own - and the conditional
+            //    below flags it as interface dispatch.
             var patternGetAsyncEnumerator = type
                 .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .FirstOrDefault(m => m.Name == nameof(IAsyncEnumerable<>.GetAsyncEnumerator)
@@ -357,27 +386,177 @@ namespace BenchmarkDotNet.Extensions
             {
                 if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
                 {
-                    var ifaceItemType = iface.GetGenericArguments()[0];
-                    var ifaceEnumeratorType = typeof(IAsyncEnumerator<>).MakeGenericType(ifaceItemType);
-                    var ifaceMoveNextAsync = ifaceEnumeratorType.GetMethod(nameof(IAsyncEnumerator<>.MoveNextAsync))!;
-                    // `MoveNextAsync` on `IAsyncEnumerator<T>` returns `ValueTask<bool>` which always
-                    // satisfies the awaitable shape; pull the resolved `AwaitableInfo` from IsAwaitable
-                    // rather than constructing it by hand.
-                    ifaceMoveNextAsync.ReturnType.IsAwaitable(out var ifaceMoveNextAwaitable);
-                    info = new AsyncEnumerableInfo(
-                        ifaceItemType,
-                        ifaceEnumeratorType,
-                        iface.GetMethod(nameof(IAsyncEnumerable<>.GetAsyncEnumerator))!,
-                        ifaceMoveNextAsync,
-                        ifaceMoveNextAwaitable!,
-                        ifaceEnumeratorType.GetProperty(nameof(IAsyncEnumerator<>.Current))!,
-                        IsInterfaceDispatch: true);
+                    info = GetAsyncEnumerableInterfaceInfo(iface.GetGenericArguments()[0]);
                     return true;
                 }
             }
             info = null;
             return false;
         }
+
+        // The await-foreach members of IAsyncEnumerable<T> itself, for a caller that has already established the
+        // interface and wants it bound in preference to any pattern method the concrete type may also declare.
+        // Every member is the interface's own, so invoking them dispatches to the implementation whether it is
+        // implicit or explicit.
+        internal static AsyncEnumerableInfo GetAsyncEnumerableInterfaceInfo(Type elementType)
+        {
+            var interfaceType = typeof(IAsyncEnumerable<>).MakeGenericType(elementType);
+            var enumeratorType = typeof(IAsyncEnumerator<>).MakeGenericType(elementType);
+            var moveNextAsync = enumeratorType.GetMethod(nameof(IAsyncEnumerator<>.MoveNextAsync))!;
+            // `MoveNextAsync` on `IAsyncEnumerator<T>` returns `ValueTask<bool>` which always satisfies the
+            // awaitable shape; pull the resolved `AwaitableInfo` from IsAwaitable rather than building it by hand.
+            moveNextAsync.ReturnType.IsAwaitable(out var moveNextAwaitable);
+            return new AsyncEnumerableInfo(
+                elementType,
+                enumeratorType,
+                interfaceType.GetMethod(nameof(IAsyncEnumerable<>.GetAsyncEnumerator))!,
+                moveNextAsync,
+                moveNextAwaitable!,
+                enumeratorType.GetProperty(nameof(IAsyncEnumerator<>.Current))!,
+                IsInterfaceDispatch: true);
+        }
+
+        // Whether the type is, or implements, IAsyncEnumerable<T>. [ParamsSource]/[ArgumentsSource] async sources
+        // must use the interface (not just the await-foreach pattern), so callers reject pattern-only types.
+        internal static bool IsIAsyncEnumerable(this Type type, [NotNullWhen(true)] out Type? elementType)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+            {
+                elementType = type.GetGenericArguments()[0];
+                return true;
+            }
+            foreach (var iface in type.GetInterfaces())
+            {
+                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+                {
+                    elementType = iface.GetGenericArguments()[0];
+                    return true;
+                }
+            }
+            elementType = null;
+            return false;
+        }
+
+        // Mirrors AsyncTypeShapes.CountSourceShapes on the analyzer side. The generated extraction call infers its
+        // element type from the source, and type inference needs a *unique* candidate interface, so a source with
+        // anything other than exactly one instantiation across the two shapes fails to compile (CS0411) - even when
+        // one element type converts to the other, as with IEnumerable<string> plus IEnumerable<object>.
+        internal static int CountSourceShapes(this Type type)
+            => type.CountInstantiations(typeof(IEnumerable<>)) + type.CountInstantiations(typeof(IAsyncEnumerable<>));
+
+        private static int CountInstantiations(this Type type, Type interfaceDefinition)
+        {
+            var found = new HashSet<Type>();
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == interfaceDefinition)
+                found.Add(type);
+            foreach (var iface in type.GetInterfaces())
+            {
+                if (iface.IsGenericType && iface.GetGenericTypeDefinition() == interfaceDefinition)
+                    found.Add(iface);
+            }
+            return found.Count;
+        }
+
+        // The element type a source declares, which is the type the generated extraction call returns and therefore
+        // the type the generated code indexes into. Only an unambiguous shape has one - see CountSourceShapes.
+        internal static bool TryGetSourceElementType(this Type sourceReturnType, [NotNullWhen(true)] out Type? elementType)
+        {
+            if (sourceReturnType.CountSourceShapes() == 1)
+            {
+                foreach (var candidate in sourceReturnType.GetInterfaces().Prepend(sourceReturnType))
+                {
+                    if (candidate.IsGenericType
+                        && (candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                            || candidate.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)))
+                    {
+                        elementType = candidate.GetGenericArguments()[0];
+                        return true;
+                    }
+                }
+            }
+            elementType = null;
+            return false;
+        }
+
+        // The member a [ParamsSource]/[ArgumentsSource] name resolves to: a public method whose parameters are all
+        // optional, else a property with a public getter. The single resolver - discovery reads its values from
+        // whatever this returns and SourceReturnTypeValidator reports on the same member, so the two cannot judge
+        // different members of the same name. A generic method definition is passed over rather than matched, so a
+        // property of that name serves the name instead of an unusable method.
+        internal static MemberInfo? FindSourceMember(this Type sourceType, string sourceName)
+            => (MemberInfo?) sourceType.GetAllMethods()
+                    .FirstOrDefault(method => method.Name == sourceName && method.IsPublic
+                        && !method.IsGenericMethodDefinition
+                        && method.GetParameters().All(parameter => parameter.IsOptional))
+                ?? sourceType.GetAllProperties()
+                    .FirstOrDefault(property => property.Name == sourceName && property.GetMethod?.IsPublic == true);
+
+        /// <summary>
+        /// The members a benchmark's parameters are looked for on. FlattenHierarchy is what reaches a base type's
+        /// statics - without it reflection returns inherited *instance* members only. Discovery and every validator
+        /// reporting on parameter members share this, so none can judge a member another cannot see. Not to be
+        /// confused with <see cref="DeclaredMemberFlags"/>, which is its opposite.
+        /// </summary>
+        internal const BindingFlags ParameterMemberFlags =
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+
+        /// <summary>
+        /// The property or field a parameter is written through, matched on the declared type discovery recorded as
+        /// well as the name. These flags reach a hidden base member beside the one hiding it, and reflection returns
+        /// members in no particular order, so the most derived declaration is chosen here. The choice spans both
+        /// kinds: a field can hide a property, and looking for one kind first would find the base member of that
+        /// kind and never reach the derived member that is the parameter.
+        /// </summary>
+        internal static MemberInfo? GetParameterMember(this Type type, string name, Type parameterType, BindingFlags flags)
+        {
+            MemberInfo? found = null;
+            foreach (var member in type.GetMembers(flags))
+            {
+                var memberType = member switch
+                {
+                    // An indexer takes arguments and is never a parameter member.
+                    PropertyInfo property when property.GetIndexParameters().Length == 0 => property.PropertyType,
+                    FieldInfo field => field.FieldType,
+                    _ => null
+                };
+
+                if (memberType != parameterType || member.Name != name)
+                    continue;
+                if (found is null || found.DeclaringType!.IsAssignableFrom(member.DeclaringType))
+                    found = member;
+            }
+            return found;
+        }
+
+        // DeclaredOnly because the member sought is declared on the type being searched, and a metadata token is
+        // unique only within a module. Inherited members are what ParameterMemberFlags exists to reach.
+        private const BindingFlags DeclaredMemberFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+        // The member as `contextType`'s generic definition names it - on that definition, or on the base in its
+        // hierarchy that declares it. The base is read as the derived type writes it, `Base<T>` carrying the derived
+        // type's own T, so inherited and locally declared members share type parameters. Null when it is elsewhere.
+        internal static MemberInfo? GetDeclaredMemberIn(this MemberInfo member, Type contextType)
+        {
+            if (member.DeclaringType is not { } declaringType)
+                return null;
+
+            var declaringDefinition = declaringType.IsGenericType ? declaringType.GetGenericTypeDefinition() : declaringType;
+
+            for (var candidate = contextType.IsGenericType ? contextType.GetGenericTypeDefinition() : contextType; candidate != null; candidate = candidate.BaseType)
+            {
+                if ((candidate.IsGenericType ? candidate.GetGenericTypeDefinition() : candidate) != declaringDefinition)
+                    continue;
+
+                return candidate.GetMembers(DeclaredMemberFlags)
+                    .FirstOrDefault(inherited => inherited.MetadataToken == member.MetadataToken);
+            }
+
+            return null;
+        }
+
+        // The type a source member hands back, which is what the generated code infers the element type from.
+        internal static Type GetSourceReturnType(this MemberInfo source)
+            => source is PropertyInfo property ? property.GetMethod!.ReturnType : ((MethodInfo) source).ReturnType;
 
         internal static Attribute? GetAsyncMethodBuilderAttribute(this MemberInfo memberInfo)
             // AsyncMethodBuilderAttribute can come from any assembly, so we need to use reflection by name instead of searching for the exact type.

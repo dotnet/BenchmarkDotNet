@@ -18,7 +18,7 @@ public class MonoBenchmark
             throw new Exception("This is not Mono runtime");
         }
 
-        if (RuntimeInformation.GetCurrentRuntime() != MonoRuntime.Mono80)
+        if (RuntimeInformation.GetCurrentRuntime() != MonoCoreRuntime.Net80)
         {
             throw new Exception("Incorrect runtime detection");
         }

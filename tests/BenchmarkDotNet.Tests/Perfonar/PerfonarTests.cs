@@ -76,7 +76,7 @@ public class PerfonarTests(ITestOutputHelper output)
             "default05", new PerfonarTable(
                 Root().Add(
                     Enumerable.Range(0, 20).Select(index =>
-                        Job((RuntimeMoniker)index, Jit.RyuJit, index).Add(
+                        Job(RuntimeMoniker.Net70, Jit.RyuJit, index).Add(
                             Benchmark("Foo", index * 10 + 1 + "ns", index * 10 + 2 + "ns", index * 10 + 3 + "ns"),
                             Benchmark("Bar", index * 10 + 6 + "ns", index * 10 + 7 + "ns", index * 10 + 8 + "ns")
                         )).ToArray()),
@@ -145,11 +145,13 @@ public class PerfonarTests(ITestOutputHelper output)
         ]
     };
 
-    private static EntryInfo Job(RuntimeMoniker? runtime = null, Jit? jit = null, int? affinity = null) => new EntryInfo
+    private static EntryInfo Job(string? runtime = null, Jit? jit = null, long? affinity = null) => new()
     {
-        Job = new JobInfo
+        // The runtime lives under Infrastructure (mirroring Job.Infrastructure), not Environment.
+        Job = new BdnJob
         {
-            Environment = new BdnEnvironment { Runtime = runtime, Jit = jit, Affinity = affinity }
+            Environment = new BdnEnvironment { Jit = jit, Affinity = affinity },
+            Infrastructure = runtime is null ? null : new BdnInfrastructure { Runtime = runtime }
         }
     };
 

@@ -4,7 +4,6 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
@@ -56,11 +55,20 @@ namespace BenchmarkDotNet.Diagnosers
         {
             foreach (var benchmark in validationParameters.Benchmarks)
             {
-                var runtime = benchmark.Job.ResolveValue(EnvironmentMode.RuntimeCharacteristic, EnvironmentResolver.Instance)!;
+                var runtime = benchmark.GetRuntime();
 
-                if (runtime.RuntimeMoniker < RuntimeMoniker.NetCoreApp30)
+                // EventPipeProfiler is out-of-process: it attaches to the benchmark process by PID via the .NET
+                // diagnostics IPC server (DiagnosticsClient), introduced in .NET Core 3.0. WASM is excluded because it
+                // runs inside a JavaScript engine with no attachable diagnostics server.
+                bool supported = runtime switch
                 {
-                    yield return new ValidationError(true, $"{nameof(EventPipeProfiler)} supports only .NET Core 3.0+", benchmark);
+                    CoreRuntime core => core.Version.Major >= 3,
+                    NativeAotRuntime or R2RRuntime or MonoCoreRuntime => true,
+                    _ => false,
+                };
+                if (!supported)
+                {
+                    yield return new ValidationError(true, $"{nameof(EventPipeProfiler)} supports only .NET (Core) 3.0+, but the job targets {runtime}", benchmark);
                 }
             }
         }

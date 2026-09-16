@@ -8,28 +8,28 @@ namespace BenchmarkDotNet.Helpers
     {
         // magic numbers come from https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed
         // should be ordered by release number
-        private static readonly (int minReleaseNumber, string version)[] FrameworkVersions =
+        private static readonly (int minReleaseNumber, Version version)[] FrameworkVersions =
         [
-            (533320, "4.8.1"), // value taken from Windows 11 arm64 insider build
-            (528040, "4.8"),
-            (461808, "4.7.2"),
-            (461308, "4.7.1"),
-            (460798, "4.7"),
-            (394802, "4.6.2"),
-            (394254, "4.6.1")
+            (533320, new(4,8,1)),
+            (528040, new(4,8)),
+            (461808, new(4,7,2)),
+            (461308, new(4,7,1)),
+            (460798, new(4,7)),
+            (394802, new(4,6,2)),
+            (394254, new(4,6,1))
         ];
 
-        internal static string? GetTargetFrameworkVersion(Assembly? assembly)
+        internal static Version? GetTargetFrameworkVersion(Assembly? assembly)
             // Look for a TargetFrameworkAttribute with a supported Framework version.
             => assembly?.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName switch
             {
-                ".NETFramework,Version=v4.6.1" => "4.6.1",
-                ".NETFramework,Version=v4.6.2" => "4.6.2",
-                ".NETFramework,Version=v4.7" => "4.7",
-                ".NETFramework,Version=v4.7.1" => "4.7.1",
-                ".NETFramework,Version=v4.7.2" => "4.7.2",
-                ".NETFramework,Version=v4.8" => "4.8",
-                ".NETFramework,Version=v4.8.1" => "4.8.1",
+                ".NETFramework,Version=v4.6.1" => new(4, 6, 1),
+                ".NETFramework,Version=v4.6.2" => new(4, 6, 2),
+                ".NETFramework,Version=v4.7" => new(4, 7),
+                ".NETFramework,Version=v4.7.1" => new(4, 7, 1),
+                ".NETFramework,Version=v4.7.2" => new(4, 7, 2),
+                ".NETFramework,Version=v4.8" => new(4, 8),
+                ".NETFramework,Version=v4.8.1" => new(4, 8, 1),
                 // Null assembly, or TargetFrameworkAttribute not found, or the assembly targeted a version older than we support,
                 // or the assembly targeted a non-framework tfm (like netstandard2.0).
                 _ => null,
@@ -64,30 +64,30 @@ namespace BenchmarkDotNet.Helpers
             return $".NET Framework {releaseVersion} ({servicingVersion})";
         }
 
-        internal static string GetFrameworkReleaseVersion()
+        internal static Version GetFrameworkReleaseVersion()
         {
             var fullName = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription; // sth like .NET Framework 4.7.3324.0
             var servicingVersion = new string(fullName.SkipWhile(c => !char.IsDigit(c)).ToArray());
             return MapToReleaseVersion(servicingVersion);
         }
 
-        internal static string MapToReleaseVersion(string servicingVersion)
+        internal static Version MapToReleaseVersion(string servicingVersion)
         {
             // the following code assumes that .NET 4.6.1 is the oldest supported version
             if (string.CompareOrdinal(servicingVersion, "4.6.2") < 0)
-                return "4.6.1";
+                return new(4, 6, 1);
             if (string.CompareOrdinal(servicingVersion, "4.7") < 0)
-                return "4.6.2";
+                return new(4, 6, 2);
             if (string.CompareOrdinal(servicingVersion, "4.7.1") < 0)
-                return "4.7";
+                return new(4, 7);
             if (string.CompareOrdinal(servicingVersion, "4.7.2") < 0)
-                return "4.7.1";
+                return new(4, 7, 1);
             if (string.CompareOrdinal(servicingVersion, "4.8") < 0)
-                return "4.7.2";
+                return new(4, 7, 2);
             if (string.CompareOrdinal(servicingVersion, "4.8.9") < 0)
-                return "4.8";
+                return new(4, 8);
 
-            return "4.8.1"; // most probably the last major release of Full .NET Framework
+            return new(4, 8, 1); // most probably the last major release of Full .NET Framework
         }
 
         [SupportedOSPlatform("windows")]
@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Helpers
         }
 
         [SupportedOSPlatform("windows")]
-        internal static string? GetLatestNetDeveloperPackVersion()
+        internal static Version? GetLatestNetDeveloperPackVersion()
         {
             if (GetReleaseNumberFromWindowsRegistry() is not int releaseNumber)
                 return null;
@@ -112,8 +112,8 @@ namespace BenchmarkDotNet.Helpers
         }
 
         // Reference Assemblies exists when Developer Pack is installed
-        private static bool IsDeveloperPackInstalled(string version) => Directory.Exists(Path.Combine(
-            ProgramFilesX86DirectoryPath, @"Reference Assemblies\Microsoft\Framework\.NETFramework", 'v' + version));
+        private static bool IsDeveloperPackInstalled(Version version) => Directory.Exists(Path.Combine(
+            ProgramFilesX86DirectoryPath, @"Reference Assemblies\Microsoft\Framework\.NETFramework", $"v{version}"));
 
         private static readonly string ProgramFilesX86DirectoryPath = Environment.GetFolderPath(
             Environment.Is64BitOperatingSystem

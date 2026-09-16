@@ -1,6 +1,8 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
@@ -13,17 +15,28 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 [PublicAPI]
 public sealed class InProcessNoEmitToolchain : IToolchain
 {
-    /// <summary>A toolchain instance with default settings.</summary>
-    public static readonly IToolchain Default = new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = true });
+    public static readonly InProcessNoEmitToolchain Default = new(RuntimeInformation.GetCurrentRuntime(), InProcessNoEmitSettings.Default);
 
-    /// <summary>Initializes a new instance of the <see cref="InProcessNoEmitToolchain" /> class.</summary>
-    /// <param name="settings">The settings to use for the toolchain.</param>
-    public InProcessNoEmitToolchain(InProcessNoEmitSettings settings)
+    private readonly InProcessNoEmitSettings settings;
+
+    private InProcessNoEmitToolchain(Runtime runtime, InProcessNoEmitSettings settings)
     {
+        this.settings = settings;
+        Runtime = runtime;
         Generator = new InProcessNoEmitGenerator();
         Builder = new InProcessNoEmitBuilder();
         Executor = new InProcessNoEmitExecutor(settings.ExecuteOnSeparateThread, settings.BenchmarkActionFactory);
     }
+
+    /// <summary>Returns an in-process toolchain for the given settings, associated with the current runtime.</summary>
+    public static InProcessNoEmitToolchain From(InProcessNoEmitSettings settings)
+        => From(RuntimeInformation.GetCurrentRuntime(), settings);
+
+    /// <summary>Returns an in-process toolchain for the given runtime and settings.</summary>
+    public static InProcessNoEmitToolchain From(Runtime runtime, InProcessNoEmitSettings settings)
+        => runtime.Equals(Default.Runtime) && settings.Equals(InProcessNoEmitSettings.Default)
+        ? Default
+        : new(runtime, settings);
 
     public async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
     {
@@ -40,25 +53,22 @@ public sealed class InProcessNoEmitToolchain : IToolchain
         }
     }
 
-    /// <summary>Name of the toolchain.</summary>
-    /// <value>The name of the toolchain.</value>
-    public string Name => nameof(InProcessNoEmitToolchain);
+    public Runtime Runtime { get; }
 
-    /// <summary>The generator.</summary>
-    /// <value>The generator.</value>
     public IGenerator Generator { get; }
 
-    /// <summary>The builder.</summary>
-    /// <value>The builder.</value>
     public IBuilder Builder { get; }
 
-    /// <summary>The executor.</summary>
-    /// <value>The executor.</value>
     public IExecutor Executor { get; }
 
     public bool IsInProcess => true;
 
-    /// <summary>Returns a <see cref="string" /> that represents this instance.</summary>
-    /// <returns>A <see cref="string" /> that represents this instance.</returns>
     public override string ToString() => GetType().Name;
+
+    public override bool Equals(object? obj)
+        => obj is InProcessNoEmitToolchain other
+        && Runtime.Equals(other.Runtime)
+        && settings.Equals(other.settings);
+
+    public override int GetHashCode() => HashCode.Combine(Runtime, settings);
 }

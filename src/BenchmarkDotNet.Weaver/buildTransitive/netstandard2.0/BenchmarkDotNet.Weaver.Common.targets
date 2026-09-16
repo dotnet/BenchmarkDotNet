@@ -25,7 +25,7 @@
   <Target Name="BenchmarkDotNetWeaveAssemblies"
       AfterTargets="$(BenchmarkDotNetWeaveAssembliesAfterTargets)"
       BeforeTargets="$(BenchmarkDotNetWeaveAssembliesBeforeTargets)"
-      Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' == 'true'"
+      Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' == 'true' and '$(SkipCompilerExecution)' != 'true'"
       Inputs="$(BenchmarkDotNetWeaveAssemblyPath)"
       Outputs="$(BenchmarkDotNetWeaveAssembliesStampFile)">
 

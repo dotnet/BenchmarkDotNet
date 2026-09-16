@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 using System.Diagnostics.CodeAnalysis;
@@ -31,6 +31,18 @@ namespace BenchmarkDotNet.Tests.Validators
             Assert.Single(validationErrors);
             foreach (string messagePart in messageParts)
                 Assert.Contains(messagePart, validationErrors.Single().Message);
+        }
+
+        private async ValueTask CheckNoErrors<T>()
+        {
+            var typeToBenchmarks = BenchmarkConverter.TypeToBenchmarks(typeof(T));
+            Assert.NotEmpty(typeToBenchmarks.BenchmarksCases);
+
+            var validationErrors = await ParamsValidator.FailOnError.ValidateAsync(typeToBenchmarks).ToArrayAsync();
+            foreach (var error in validationErrors)
+                output.WriteLine("* " + error.Message);
+
+            Assert.Empty(validationErrors);
         }
 
         private const string P = "[Params]";
@@ -319,33 +331,28 @@ namespace BenchmarkDotNet.Tests.Validators
 
 #if NET5_0_OR_GREATER
 
-        [Fact] public async Task InitOnly1Test() => await Check<InitOnly1>(nameof(InitOnly1.Input), "init-only", P);
-        [Fact] public async Task InitOnly2Test() => await Check<InitOnly2>(nameof(InitOnly2.Input), "init-only", Pa);
-        [Fact] public async Task InitOnly3Test() => await Check<InitOnly3>(nameof(InitOnly3.Input), "init-only", Ps);
+        // An init-only setter is assignable from the runnable's object initializer, so it is supported.
+        [Fact] public async Task InitOnly1Test() => await CheckNoErrors<InitOnly1>();
+        [Fact] public async Task InitOnly2Test() => await CheckNoErrors<InitOnly2>();
+        [Fact] public async Task InitOnly3Test() => await CheckNoErrors<InitOnly3>();
 
-#pragma warning disable BDN1206
         public class InitOnly1 : Base
         {
             [Params(false, true)]
             public bool Input { get; init; }
         }
-#pragma warning restore BDN1206
 
-#pragma warning disable BDN1206
         public class InitOnly2 : Base
         {
             [ParamsAllValues]
             public bool Input { get; init; }
         }
-#pragma warning restore BDN1206
 
-#pragma warning disable BDN1206
         public class InitOnly3 : Base
         {
             [ParamsSource(nameof(Source))]
             public bool Input { get; init; }
         }
-#pragma warning restore BDN1206
 
 #endif
     }

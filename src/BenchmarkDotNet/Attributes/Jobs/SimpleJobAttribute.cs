@@ -34,7 +34,7 @@ namespace BenchmarkDotNet.Attributes
 
         [PublicAPI]
         public SimpleJobAttribute(
-            RuntimeMoniker runtimeMoniker,
+            string runtimeMoniker,
             int launchCount = DefaultValue,
             int warmupCount = DefaultValue,
             int iterationCount = DefaultValue,
@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Attributes
         [PublicAPI]
         public SimpleJobAttribute(
             RunStrategy runStrategy,
-            RuntimeMoniker runtimeMoniker,
+            string runtimeMoniker,
             int launchCount = DefaultValue,
             int warmupCount = DefaultValue,
             int iterationCount = DefaultValue,
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Attributes
         ) : base(CreateJob(id, launchCount, warmupCount, iterationCount, invocationCount, runStrategy, baseline, runtimeMoniker)) { }
 
         private static Job CreateJob(string id, int launchCount, int warmupCount, int iterationCount, int invocationCount, RunStrategy? runStrategy,
-            bool baseline, RuntimeMoniker runtimeMoniker = RuntimeMoniker.HostProcess)
+            bool baseline, string? runtimeMoniker = null)
         {
             var job = new Job(id);
             int manualValuesCount = 0;
@@ -100,14 +100,14 @@ namespace BenchmarkDotNet.Attributes
             if (baseline)
                 job.Meta.Baseline = true;
 
-            if (runtimeMoniker != RuntimeMoniker.HostProcess)
+            if (runtimeMoniker.IsNotBlank())
             {
-                job.Environment.Runtime = runtimeMoniker.GetRuntime();
+                job.Infrastructure.Runtime = Runtime.Parse(runtimeMoniker);
                 manualValuesCount++;
             }
 
-            if (id == null && manualValuesCount == 1 && runtimeMoniker != RuntimeMoniker.HostProcess)
-                job = job.WithId(runtimeMoniker.GetRuntime().Name);
+            if (id == null && manualValuesCount == 1 && runtimeMoniker.IsNotBlank())
+                job = job.WithId(Runtime.Parse(runtimeMoniker).ToString());
 
             return job.Freeze();
         }

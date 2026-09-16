@@ -34,8 +34,8 @@ public class InProcessAttribute(
 
         IToolchain toolchain = toolchainType switch
         {
-            InProcessToolchainType.Emit => new InProcessEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }),
-            InProcessToolchainType.NoEmit => new InProcessNoEmitToolchain(new() { ExecuteOnSeparateThread = executeOnSeparateThread }),
+            InProcessToolchainType.Emit => InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = executeOnSeparateThread }),
+            InProcessToolchainType.NoEmit => InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = executeOnSeparateThread }),
             _ => throw new ArgumentOutOfRangeException(nameof(toolchainType))
         };
 

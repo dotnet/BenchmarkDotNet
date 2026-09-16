@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -26,7 +26,7 @@ partial class RunnableEmitter
     {
         /*
             .method private hidebysig
-               instance valuetype [System.Runtime]System.Threading.Tasks.ValueTask __GlobalSetup () cil managed flags(0200)
+               instance valuetype [System.Runtime]System.Threading.Tasks.ValueTask GlobalSetup () cil managed flags(0200)
         */
         var methodBuilder = runnableBuilder
             .DefineNonVirtualInstanceMethod(

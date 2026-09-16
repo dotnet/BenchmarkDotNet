@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmark)
         {
-            return benchmark.Job.Environment.Runtime is ClrRuntime
+            return benchmark.GetRuntime() is ClrRuntime
                 ? CreateFailureReport(benchmark)
                 : CreateSuccessReport(benchmark);
         }

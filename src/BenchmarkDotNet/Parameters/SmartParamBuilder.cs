@@ -1,188 +1,148 @@
-using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Running;
+using JetBrains.Annotations;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Parameters
 {
     internal static class SmartParamBuilder
     {
-        [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
-        internal static object[] CreateForParams(Type parameterType, MemberInfo source, object[] values)
+        internal static IReadOnlyList<ParameterValue> CreateForParams(Type parameterType, MemberInfo source, object?[] values)
         {
-            // IEnumerable<object>
-            if (values.IsEmpty() || values.All(SourceCodeHelper.IsCompilationTimeConstant))
-                return values;
+            // A one-element object[] around a constant is unwrapped to the constant, which is then rendered inline
+            // and needs no index. Only around a constant: a value that has to be read back from the source keeps
+            // the whole array, because the generated code emits no index here to reach inside one with, and
+            // unwrapping only the in-process side would have the two toolchains assign different values.
+            if (values.All(value => value is object[] { Length: 1 } wrapper && SourceCodeHelper.IsCompilationTimeConstant(wrapper[0])))
+                values = values.Select(value => ((object[]) value!)[0]).ToArray();
 
-            // IEnumerable<object[]>
-            if (values.All(value => value is object[] array && array.Length == 1 && SourceCodeHelper.IsCompilationTimeConstant(array[0])))
-                return values.Select(x => ((object[])x)[0]).ToArray();
-
-            return values.Select((value, index) => new SmartParameter(parameterType, source, value, index)).ToArray();
+            return values.Select((value, index) =>
+                SourceCodeHelper.IsCompilationTimeConstant(value)
+                    ? (ParameterValue) new ParameterValue.Constant(value, parameterType)
+                    : new ParameterValue.FromSource(value, new SourceRead(source, index), elementIndex: null, parameterType)).ToArray();
         }
 
-        internal static ParameterInstances CreateForArguments(MethodInfo benchmark, ParameterDefinition[] parameterDefinitions, (MemberInfo source, object[] values) valuesInfo, int sourceIndex, SummaryStyle summaryStyle)
+        internal static ParameterInstances CreateForArguments(
+            MethodInfo benchmark,
+            ParameterDefinition[] parameterDefinitions,
+            (MemberInfo source, object?[] values) valuesInfo,
+            int sourceIndex,
+            SummaryStyle summaryStyle)
         {
             var unwrappedValue = valuesInfo.values[sourceIndex];
 
+            // One read for the whole row: every parameter below takes its value out of this one, so the generated
+            // code enumerates the source once per case rather than once per argument.
+            var read = new SourceRead(valuesInfo.source, sourceIndex);
+
             if (unwrappedValue is object[] array)
             {
-                Type? firstParamType = benchmark.GetParameters().FirstOrDefault()?.ParameterType;
-                // the user provided object[] for a benchmark accepting a single argument
-                if (parameterDefinitions.Length == 1 && array.Length == 1
-                    && (array[0]?.GetType() == firstParamType || (firstParamType != null && firstParamType.IsStackOnlyWithImplicitCast(array[0])))) // the benchmark that accepts an object[] as argument
+                var firstParameterType = parameterDefinitions.FirstOrDefault()?.ParameterType;
+
+                // An object[] for a benchmark taking a single argument: the one that takes the array itself, or a
+                // by-ref-like one built from it.
+                if (parameterDefinitions.Length == 1 && array.Length == 1 && firstParameterType is not null
+                    && (array[0]?.GetType() == firstParameterType || firstParameterType.IsStackOnlyWithImplicitCast(array[0])))
                 {
                     return new ParameterInstances(
-                        [Create(parameterDefinitions, array[0], valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle)]);
+                        [Create(parameterDefinitions, array[0], read, argumentIndex: 0, summaryStyle)]);
                 }
 
                 if (parameterDefinitions.Length > 1)
                 {
                     if (parameterDefinitions.Length != array.Length)
-                        throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]! {array.Length} instead of {parameterDefinitions.Length}.");
+                        throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]!" +
+                            $" {array.Length} instead of {parameterDefinitions.Length}.");
 
                     return new ParameterInstances(
-                        array.Select((value, argumentIndex) => Create(parameterDefinitions, value, valuesInfo.source, sourceIndex, argumentIndex, summaryStyle)).ToArray());
+                        array.Select((value, argumentIndex) => Create(parameterDefinitions, value, read, argumentIndex, summaryStyle))
+                            .ToArray());
                 }
             }
 
             if (parameterDefinitions.Length == 1)
             {
-                return new ParameterInstances([Create(parameterDefinitions, unwrappedValue, valuesInfo.source, sourceIndex, argumentIndex: 0, summaryStyle)]);
+                return new ParameterInstances([Create(parameterDefinitions, unwrappedValue, read, argumentIndex: 0, summaryStyle)]);
             }
 
-            throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]. It should be IEnumerable<object[]> or IEnumerable<object>.");
+            throw new NotSupportedException($"Benchmark {benchmark.Name} has invalid type of arguments provided by [ArgumentsSource({valuesInfo.source.Name})]." +
+                $" It should be IEnumerable<object[]>, IEnumerable<object>, IAsyncEnumerable<object[]> or IAsyncEnumerable<object>.");
         }
 
-        private static ParameterInstance Create(ParameterDefinition[] parameterDefinitions, object value, MemberInfo source, int sourceIndex, int argumentIndex, SummaryStyle summaryStyle)
+        // Whether the generated code indexes the element it extracts, decided by the interface the source is
+        // *written as* and not by which branch above produced this instance: the extraction call is bound against
+        // the declared return type, so the index has to be read from the same place the binding is.
+        private static bool Indexes(MemberInfo source)
         {
+            var returnType = source.GetSourceReturnType();
+
+            return returnType == typeof(IEnumerable<object[]>) || returnType == typeof(IAsyncEnumerable<object[]>);
+        }
+
+        private static ParameterInstance Create(ParameterDefinition[] parameterDefinitions, object? value, SourceRead read, int argumentIndex, SummaryStyle summaryStyle)
+        {
+            var definition = parameterDefinitions[argumentIndex];
+
+            // Asked ahead of the constant path, which renders the value into the source and needs the conversion
+            // just as much. Null is left to it: a ref struct is not written as one, and how that is rendered is
+            // settled there.
+            var takesByRefLike = definition.ParameterType.WithoutRefModifier();
+
+            // InvalidBenchmarkDeclarationException, not InvalidOperationException: BenchmarkRunnerDirty catches this
+            // one and reports it as that benchmark's summary, where anything else escapes Run and takes every other
+            // benchmark in the call down with it.
+            if (value is not null && takesByRefLike.IsByRefLike() && !takesByRefLike.IsStackOnlyWithImplicitCast(value))
+                throw new InvalidBenchmarkDeclarationException($"[ArgumentsSource({read.Source.Name})] provides a {value!.GetType().GetDisplayName()}" +
+                    $" for the {definition.ParameterType.GetDisplayName()} parameter '{definition.Name}', which has no implicit conversion from it." +
+                    $" A by-ref-like parameter only ever takes its value through that conversion, so nothing can be cast to it here." +
+                    $" Please, yield a type it converts from - and where the source's element type is a type parameter," +
+                    $" the [GenericTypeArguments] in play decide this, so it can hold for one and not the next.");
+
             if (SourceCodeHelper.IsCompilationTimeConstant(value))
-                return new ParameterInstance(parameterDefinitions[argumentIndex], value, summaryStyle);
+                return new ParameterInstance(definition, new ParameterValue.Constant(value, definition.ParameterType), summaryStyle);
 
-            return new ParameterInstance(parameterDefinitions[argumentIndex], new SmartArgument(parameterDefinitions, value, source, sourceIndex, argumentIndex), summaryStyle);
+            // A by-ref-like parameter can't be the source's element type, so the value's own type is the one the
+            // generated code casts to, relying on its implicit conversion (#774).
+            // value is non-null here: null is a compilation-time constant, handled above.
+            var targetType = takesByRefLike.IsByRefLike() ? value!.GetType() : definition.ParameterType;
+
+            return new ParameterInstance(
+                definition,
+                new ParameterValue.FromSource(value, read, Indexes(read.Source) ? argumentIndex : null, targetType),
+                summaryStyle);
         }
     }
 
-    internal class SmartArgument : IParam
-    {
-        private readonly ParameterDefinition[] parameterDefinitions;
-        private readonly MemberInfo source;
-        private readonly int sourceIndex;
-        private readonly int argumentIndex;
-
-        public SmartArgument(ParameterDefinition[] parameterDefinitions, object value, MemberInfo source, int sourceIndex, int argumentIndex)
-        {
-            this.parameterDefinitions = parameterDefinitions;
-            Value = value;
-            this.source = source;
-            this.sourceIndex = sourceIndex;
-            this.argumentIndex = argumentIndex;
-        }
-
-        public object Value { get; }
-
-        public string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value?.ToString() ?? ParameterInstance.NullParameterTextRepresentation;
-
-        public string ToSourceCode()
-        {
-            Type paramType = parameterDefinitions[argumentIndex].ParameterType;
-
-            // it's an object so we need to cast it to the right type
-            string cast = paramType.IsByRefLike()
-                ? $"({Value.GetType().GetCorrectCSharpTypeName()})"
-                : $"({paramType.GetCorrectCSharpTypeName()})";
-
-            string callPostfix = source is PropertyInfo ? string.Empty : "()";
-
-            MethodInfo? sourceAsMethodInfo = source as MethodInfo;
-            PropertyInfo? sourceAsPropertyInfo = source as PropertyInfo;
-
-            Type indexableType = typeof(IEnumerable<object[]>);
-
-            string indexPostfix;
-            if (sourceAsMethodInfo?.ReturnType == indexableType ||
-                sourceAsPropertyInfo?.GetMethod?.ReturnType == indexableType)
-            {
-                indexPostfix = $"[{argumentIndex}]";
-            }
-            else
-            {
-                indexPostfix = string.Empty; // IEnumerable<object>
-            }
-
-            string methodCall;
-            if (sourceAsMethodInfo?.IsStatic ?? sourceAsPropertyInfo?.GetMethod?.IsStatic ?? throw new Exception($"{nameof(source)} was not {nameof(MethodInfo)} nor {nameof(PropertyInfo)}"))
-            {
-                // If the source member is static, we need to place the fully qualified type name before it, in case the source member is from another type that this generated type does not inherit from.
-                methodCall = $"{source.DeclaringType!.GetCorrectCSharpTypeName()}.{source.Name}";
-            }
-            else
-            {
-                // If the source member is non-static, we mustn't include the type name, as this would be a compiler error when accessing a non-static source member in the base class of this generated type.
-                methodCall = $"base.{source.Name}";
-            }
-
-            // we do something like enumerable.ElementAt(sourceIndex)[argumentIndex];
-            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({methodCall}{callPostfix}, {sourceIndex}){indexPostfix};";
-        }
-    }
-
-    internal class SmartParameter : IParam
-    {
-        private readonly Type parameterType;
-        private readonly MemberInfo source;
-        private readonly MethodBase method;
-        private readonly int index;
-
-        public SmartParameter(Type parameterType, MemberInfo source, object value, int index)
-        {
-            this.parameterType = parameterType;
-            this.source = source;
-            method = source is PropertyInfo property ? property.GetMethod! : (MethodInfo)source;
-            Value = value;
-            this.index = index;
-        }
-
-        public object Value { get; }
-
-        public string DisplayText => Value is Array array ? ArrayParam.GetDisplayString(array) : Value?.ToString() ?? ParameterInstance.NullParameterTextRepresentation;
-
-        public string ToSourceCode()
-        {
-            string cast = $"({parameterType.GetCorrectCSharpTypeName()})"; // it's an object so we need to cast it to the right type
-
-            string callPrefix = method.IsStatic ? source.DeclaringType!.GetCorrectCSharpTypeName() : "base";
-
-            string callPostfix = source is PropertyInfo ? string.Empty : "()";
-
-            // we so something like enumerable.ElementAt(index);
-            return $"{cast}BenchmarkDotNet.Parameters.ParameterExtractor.GetParameter({callPrefix}.{source.Name}{callPostfix}, {index});";
-        }
-    }
-
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [UsedImplicitly]
     public static class ParameterExtractor
     {
-        [EditorBrowsable(EditorBrowsableState.Never)] // hide from intellisense, it's public so we can call it form the boilerplate code
-        public static T GetParameter<T>(IEnumerable<T> parameters, int index)
+        public static ValueTask<T> GetParameterAsync<T>(IEnumerable<T> parameters, int index, CancellationToken cancellationToken)
+            => GetParameterAsync(parameters.ToAsyncEnumerable(), index, cancellationToken);
+
+        public static async ValueTask<T> GetParameterAsync<T>(IAsyncEnumerable<T> parameters, int index, CancellationToken cancellationToken)
         {
             int count = 0;
 
-            foreach (T parameter in parameters)
+#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
+            await foreach (T parameter in parameters.ConfigureAwait(cancellationToken))
+#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
             {
                 if (count == index)
                 {
                     return parameter;
                 }
 
-                if (parameter is IDisposable disposable)
+                // #1383
+                if (parameter is IAsyncDisposable asyncDisposable)
                 {
-                    // parameters might contain locking finalizers which might cause the benchmarking process to hung at the end
-                    // to avoid that, we dispose the parameters that were created, but won't be used
-                    // (for every test case we have to enumerate the underlying source enumerator and stop when we reach index of given test case)
-                    // See https://github.com/dotnet/BenchmarkDotNet/issues/1383 and https://github.com/dotnet/runtime/issues/314 for more
+                    await asyncDisposable.DisposeAsync().ConfigureAwait();
+                }
+                else if (parameter is IDisposable disposable)
+                {
                     disposable.Dispose();
                 }
 

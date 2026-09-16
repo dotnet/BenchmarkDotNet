@@ -5,7 +5,7 @@ using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using System.Reflection;
 using System.Reflection.Emit;
-using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
+using static BenchmarkDotNet.Code.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
@@ -16,21 +16,6 @@ partial class RunnableEmitter
     // so the iteration loop stays synchronous, matching the pre-async-refactor behavior so historical results stay comparable.
     private sealed class SyncTaskCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark) : RunnableEmitter(buildPartition, moduleBuilder, benchmark)
     {
-        // The workload is consumed synchronously, so the only async state machines are the setup/cleanup
-        // methods. Without arguments there is no fields container declared before them, so their Roslyn
-        // ordinals are two lower than in the async path (which always declares the fields container).
-        // With arguments the fields container shifts them back to the async ordinals.
-        protected override IReadOnlyDictionary<string, int> AsyncMethodToOrdinalMap
-            => argFields.Count > 0
-                ? base.AsyncMethodToOrdinalMap
-                : new Dictionary<string, int>
-                {
-                    { GlobalSetupMethodName, 3 },
-                    { GlobalCleanupMethodName, 4 },
-                    { IterationSetupMethodName, 5 },
-                    { IterationCleanupMethodName, 6 },
-                };
-
         protected override void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }
 
         protected override void EmitCoreImpl()

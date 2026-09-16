@@ -73,7 +73,7 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
 
         var paramsAttributeTypeSymbol = GetParamsAttributeTypeSymbol(context.Compilation);
         var attrs = context.Symbol.GetAttributes();
-        var paramsAttributes = attrs.Where(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, paramsAttributeTypeSymbol)).ToImmutableArray();
+        var paramsAttributes = attrs.Where(attr => AnalyzerHelper.IsOrDerivesFrom(attr.AttributeClass, paramsAttributeTypeSymbol)).ToImmutableArray();
         if (paramsAttributes.Length != 1)
         {
             // Don't analyze zero or multiple [Params] (multiple is not legal and already handled by GeneralParameterAttributesAnalyzer).
@@ -81,6 +81,14 @@ public class ParamsAttributeAnalyzer : DiagnosticAnalyzer
         }
 
         var attr = paramsAttributes[0];
+
+        // Only [Params] itself is guaranteed to carry the values in its own constructor arguments. A derived
+        // attribute declares whatever constructor it likes and may hand values to base(...) - `BoolParams() :
+        // base(true, false)` - where they are invisible here, so its arguments are not the values to inspect.
+        if (!SymbolEqualityComparer.Default.Equals(attr.AttributeClass, paramsAttributeTypeSymbol))
+        {
+            return;
+        }
 
         // [Params]
         if (attr.ConstructorArguments.Length == 0)

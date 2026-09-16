@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
                             new ParameterInstances([
-                                new ParameterInstance(new ParameterDefinition("param1", false, ["Parameter 1"], true, typeof(string), 0 ), "value1", SummaryStyle.Default),
+                                new ParameterInstance(new ParameterDefinition("param1", isStatic: false, isArgument: true, typeof(string), 0), "value1", SummaryStyle.Default),
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
                             new ParameterInstances([
-                                new ParameterInstance(new ParameterDefinition("param1", false, ["Parameter 1"], true, typeof(string), 0 ), "value2", SummaryStyle.Default),
+                                new ParameterInstance(new ParameterDefinition("param1", isStatic: false, isArgument: true, typeof(string), 0), "value2", SummaryStyle.Default),
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
                             new ParameterInstances([
-                                new ParameterInstance(new ParameterDefinition("param1", false, ["Parameter 1"], true, typeof(string), 0 ), "value3", SummaryStyle.Default),
+                                new ParameterInstance(new ParameterDefinition("param1", isStatic: false, isArgument: true, typeof(string), 0), "value3", SummaryStyle.Default),
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
@@ -113,9 +113,9 @@ namespace BenchmarkDotNet.Tests.Exporters
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
                             new ParameterInstances([
-                                new ParameterInstance(new ParameterDefinition("param1", false, ["Parameter 1"], true, typeof(string), 0 ), "value1", SummaryStyle.Default),
-                                new ParameterInstance(new ParameterDefinition("param2", false, ["Parameter 2"], true, typeof(string), 0 ), "value1", SummaryStyle.Default),
-                                new ParameterInstance(new ParameterDefinition("param3", false, ["Parameter 3"], true, typeof(string), 0 ), "value1", SummaryStyle.Default)
+                                new ParameterInstance(new ParameterDefinition("param1", isStatic: false, isArgument: true, typeof(string), 0), "value1", SummaryStyle.Default),
+                                new ParameterInstance(new ParameterDefinition("param2", isStatic: false, isArgument: true, typeof(string), 0), "value1", SummaryStyle.Default),
+                                new ParameterInstance(new ParameterDefinition("param3", isStatic: false, isArgument: true, typeof(string), 0), "value1", SummaryStyle.Default)
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
@@ -134,9 +134,9 @@ namespace BenchmarkDotNet.Tests.Exporters
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
                             new ParameterInstances([
-                                new ParameterInstance(new ParameterDefinition("param1", false, ["Parameter 1"], true, typeof(string), 0 ), "value2", SummaryStyle.Default),
-                                new ParameterInstance(new ParameterDefinition("param2", false, ["Parameter 2"], true, typeof(string), 0 ), "value2", SummaryStyle.Default),
-                                new ParameterInstance(new ParameterDefinition("param3", false, ["Parameter 3"], true, typeof(string), 0 ), "value2", SummaryStyle.Default)                            ]),
+                                new ParameterInstance(new ParameterDefinition("param1", isStatic: false, isArgument: true, typeof(string), 0), "value2", SummaryStyle.Default),
+                                new ParameterInstance(new ParameterDefinition("param2", isStatic: false, isArgument: true, typeof(string), 0), "value2", SummaryStyle.Default),
+                                new ParameterInstance(new ParameterDefinition("param3", isStatic: false, isArgument: true, typeof(string), 0), "value2", SummaryStyle.Default)                            ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
                         null!,
@@ -154,9 +154,9 @@ namespace BenchmarkDotNet.Tests.Exporters
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
                             new ParameterInstances([
-                                new ParameterInstance(new ParameterDefinition("param1", false, ["Parameter 1"], true, typeof(string), 0 ), "value3", SummaryStyle.Default),
-                                new ParameterInstance(new ParameterDefinition("param2", false, ["Parameter 2"], true, typeof(string), 0 ), "value3", SummaryStyle.Default),
-                                new ParameterInstance(new ParameterDefinition("param3", false, ["Parameter 3"], true, typeof(string), 0 ), "value3", SummaryStyle.Default)                            ]),
+                                new ParameterInstance(new ParameterDefinition("param1", isStatic: false, isArgument: true, typeof(string), 0), "value3", SummaryStyle.Default),
+                                new ParameterInstance(new ParameterDefinition("param2", isStatic: false, isArgument: true, typeof(string), 0), "value3", SummaryStyle.Default),
+                                new ParameterInstance(new ParameterDefinition("param3", isStatic: false, isArgument: true, typeof(string), 0), "value3", SummaryStyle.Default)                            ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
                         null!,
@@ -195,7 +195,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                         new BenchmarkCase(
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
-                            new ParameterInstances([]),
+                            ParameterInstances.Empty,
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
                         null!,
@@ -245,7 +245,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                             benchmarkCase: new BenchmarkCase(
                                 new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                                 Job.Dry,
-                                new ParameterInstances([]),
+                                ParameterInstances.Empty,
                                 ImmutableConfigBuilder.Create(new ManualConfig())),
                             null!,
                             null!,
@@ -293,7 +293,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                         benchmarkCase: new BenchmarkCase(
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
-                            new ParameterInstances([]),
+                            ParameterInstances.Empty,
                             ImmutableConfigBuilder.Create(config)),
                         null!,
                         null!,
@@ -337,7 +337,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                         benchmarkCase: new BenchmarkCase(
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
-                            new ParameterInstances([]),
+                            ParameterInstances.Empty,
                             ImmutableConfigBuilder.Create(config)),
                         null!,
                         null!,
@@ -380,7 +380,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                         benchmarkCase: new BenchmarkCase(
                             new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                             Job.Dry,
-                            new ParameterInstances([]),
+                            ParameterInstances.Empty,
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
                         null!,

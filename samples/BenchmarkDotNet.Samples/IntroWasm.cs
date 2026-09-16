@@ -3,8 +3,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.DotNetCli;
-using BenchmarkDotNet.Toolchains.MonoWasm;
+using BenchmarkDotNet.Toolchains.Wasm;
 
 namespace BenchmarkDotNet.Samples
 {
@@ -12,9 +11,9 @@ namespace BenchmarkDotNet.Samples
     public class IntroWasmCmdConfig
     {
         // Example:
-        // --runtimes wasmnet10.0
+        // --runtimes monowasm10.0
         // --cli /path/to/dotnet (optional)
-        // --wasmEngine v8 (optional)
+        // --wasmEngine node (optional)
         // --wasmArgs "--expose_wasm" (optional)
         // --wasmDataDir /path/to/data (optional)
         public static void Run(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(IntroWasmCmdConfig).Assembly).Run(args);
@@ -31,17 +30,10 @@ namespace BenchmarkDotNet.Samples
     {
         public static void Run()
         {
-            // Optional: set this to use a custom `dotnet` (for example, a local dotnet/runtime build).
-            const string cliPath = "";
-
-            WasmRuntime runtime = new WasmRuntime(msBuildMoniker: "net10.0", RuntimeMoniker.WasmNet10_0, "Wasm .net10.0", false, "v8");
-            NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
-                targetFrameworkMoniker: "net10.0", runtimeFrameworkVersion: "", name: "Wasm",
-                customDotNetCliPath: cliPath);
-            var toolChain = WasmToolchain.From(netCoreAppSettings);
+            var toolChain = CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net10_0, WasmSettings.Default with { JavaScriptEngine = "node" });
 
             BenchmarkRunner.Run<IntroWasmFluentConfig>(DefaultConfig.Instance
-                .AddJob(Job.ShortRun.WithRuntime(runtime).WithToolchain(toolChain)));
+                .AddJob(Job.ShortRun.WithToolchain(toolChain)));
         }
 
         [Benchmark]

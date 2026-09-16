@@ -70,6 +70,16 @@ public abstract class CodeFixTestFixture<TAnalyzer, TCodeFix>
         set => _codeFixTest.FixedCode = value;
     }
 
+    /// <summary>Set to <see cref="OutputKind.ConsoleApplication"/> to compile the test code as top-level statements.</summary>
+    protected OutputKind OutputKind
+    {
+        set
+        {
+            _codeFixTest.TestState.OutputKind = value;
+            _codeFixTest.FixedState.OutputKind = value;
+        }
+    }
+
     protected void AddExpectedDiagnostic(int markupKey, params object[] arguments)
     {
         if (_ruleUnderTest == null)

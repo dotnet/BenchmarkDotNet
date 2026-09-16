@@ -57,21 +57,30 @@ internal static class FileCleanupHelper
 
 #if NETSTANDARD2_0
     private static IEnumerable<FileInfo> EnumerateFiles(DirectoryInfo directory)
-        => TryExecute(() => directory.EnumerateFiles("*", SearchOption.TopDirectoryOnly), []);
-
-    private static IEnumerable<DirectoryInfo> EnumerateSubDirectories(DirectoryInfo directory)
-        => TryExecute(() => directory.EnumerateDirectories(), []);
-
-    private static T TryExecute<T>(Func<T> func, T fallback)
     {
         try
         {
-            return func();
+            return directory.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
+                            .Where(x => (x.Attributes & FileAttributes.ReparsePoint) != 0);
         }
         catch
         {
             // Ignore exceptions for access denied, in use, etc.
-            return fallback;
+            return [];
+        }
+    }
+
+    private static IEnumerable<DirectoryInfo> EnumerateSubDirectories(DirectoryInfo directory)
+    {
+        try
+        {
+            return directory.EnumerateDirectories()
+                            .Where(x => (x.Attributes & FileAttributes.ReparsePoint) != 0);
+        }
+        catch
+        {
+            // Ignore exceptions for access denied, in use, etc.
+            return [];
         }
     }
 #else

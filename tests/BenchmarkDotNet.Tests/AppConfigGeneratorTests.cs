@@ -132,29 +132,6 @@ namespace BenchmarkDotNet.Tests
             AssertAreEqualIgnoringWhitespacesAndCase(customSettingsAndJit, destination.ToString());
         }
 
-        [FactEnvSpecific("Full Framework is supported only on Windows", EnvRequirement.WindowsOnly)]
-        public async Task RemovesStartupSettingsForPrivateBuildsOfClr()
-        {
-            const string input =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                "<configuration>" +
-                "<startup><supportedRuntime version=\"v4.0\" sku=\".NETFramework,Version=v4.6.2\" /></startup>" +
-                "</configuration>";
-
-            string withoutStartup =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                "<configuration>" +
-                $"<runtime>{GcSettings}</runtime>" +
-                "</configuration>" + Environment.NewLine;
-
-            using var source = new StringReader(input);
-            using var destination = new Utf8StringWriter();
-
-            await AppConfigGenerator.GenerateAsync(new Job { Environment = { Runtime = ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "4.0") } }.Freeze(), source, destination, Resolver, CancellationToken.None);
-
-            AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
-        }
-
         [Fact]
         public async Task LeavsStartupSettingsIntactForNonPrivateBuildsOfClr()
         {
@@ -174,7 +151,7 @@ namespace BenchmarkDotNet.Tests
             using var source = new StringReader(input);
             using var destination = new Utf8StringWriter();
 
-            await AppConfigGenerator.GenerateAsync(new Job { Environment = { Runtime = ClrRuntime.Net472 } }.Freeze(), source, destination, Resolver, CancellationToken.None);
+            await AppConfigGenerator.GenerateAsync(Job.Default.WithRuntime(ClrRuntime.Net472).Freeze(), source, destination, Resolver, CancellationToken.None);
 
             AssertAreEqualIgnoringWhitespacesAndCase(withoutStartup, destination.ToString());
         }

@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Tests.Columns
             var benchmarkCase = new BenchmarkCase(
                 new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
                 Job.Dry,
-                new ParameterInstances([]),
+                ParameterInstances.Empty,
                 ImmutableConfigBuilder.Create(config));
             var metric = new Metric(LocalMetricDescriptor.TimeInstance, metricValue);
             var benchmarkReport = new BenchmarkReport(true, benchmarkCase, null!, null!, null, [metric]);

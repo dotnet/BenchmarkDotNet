@@ -4,7 +4,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.XUnit;
-using BenchmarkDotNet.Toolchains.CsProj;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 
 namespace BenchmarkDotNet.Tests.Running
 {
@@ -69,45 +69,16 @@ namespace BenchmarkDotNet.Tests.Running
             [Benchmark] public void M2() { }
         }
 
-        [FactEnvSpecific("Full Framework is supported only on Windows", EnvRequirement.WindowsOnly)]
-        public void CustomClrBuildJobsAreGroupedByVersion()
-        {
-            const string version = "abcd";
-
-            var config = ManualConfig.Create(DefaultConfig.Instance)
-                .AddJob(Job.Default.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: version)))
-                .AddJob(Job.Default.WithRuntime(ClrRuntime.CreateForLocalFullNetFrameworkBuild(version: "it's a different version")))
-                .AddJob(Job.Default.WithRuntime(ClrRuntime.GetCurrentVersion()));
-
-            var benchmarks1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), config);
-            var benchmarks2 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), config);
-
-            var grouped = benchmarks1.BenchmarksCases.Union(benchmarks2.BenchmarksCases)
-                .GroupBy(benchmark => benchmark, new BenchmarkPartitioner.BenchmarkRuntimePropertiesComparer())
-                .ToArray();
-
-            Assert.Equal(3, grouped.Length); // Job.Clr + Job.Clr(version) + Job.Clr(different)
-
-            foreach (var grouping in grouped)
-                Assert.Equal(3 * 2, grouping.Count()); // (M1 + M2 + M3) * (Plain1 + Plain2)
-        }
-
         [Fact]
         public void CustomTargetPlatformJobsAreGroupedByTargetFrameworkMoniker()
         {
             var net5Config = ManualConfig.Create(DefaultConfig.Instance)
                 .AddJob(Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp50));
             var net5WindowsConfig1 = ManualConfig.Create(DefaultConfig.Instance)
-                .AddJob(Job.Default.WithToolchain(CsProjCoreToolchain.From(new Toolchains.DotNetCli.NetCoreAppSettings(
-                    targetFrameworkMoniker: "net5.0-windows",
-                    runtimeFrameworkVersion: null!,
-                    name: ".NET 5.0"))));
+                .AddJob(Job.Default.WithToolchain(CsProjCoreToolchain.From(CoreRuntime.Core50, new NetCoreAppSettings { TargetFrameworkMoniker = "net5.0-windows" })));
             // a different INSTANCE of CsProjCoreToolchain that also targets "net5.0-windows"
             var net5WindowsConfig2 = ManualConfig.Create(DefaultConfig.Instance)
-                .AddJob(Job.Default.WithToolchain(CsProjCoreToolchain.From(new Toolchains.DotNetCli.NetCoreAppSettings(
-                    targetFrameworkMoniker: "net5.0-windows",
-                    runtimeFrameworkVersion: null!,
-                    name: ".NET 5.0"))));
+                .AddJob(Job.Default.WithToolchain(CsProjCoreToolchain.From(CoreRuntime.Core50, new NetCoreAppSettings { TargetFrameworkMoniker = "net5.0-windows" })));
 
             var benchmarksNet5 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain1), net5Config);
             var benchmarksNet5Windows1 = BenchmarkConverter.TypeToBenchmarks(typeof(Plain2), net5WindowsConfig1);

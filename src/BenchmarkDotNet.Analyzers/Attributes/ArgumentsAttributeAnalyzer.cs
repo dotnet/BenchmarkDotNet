@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
@@ -43,12 +44,27 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsAttribute_RequiresParameters_Description)));
 
+    internal static readonly DiagnosticDescriptor ArgumentsSourceMustReturnEnumerableRule = new(
+        DiagnosticIds.Attributes_ArgumentsSourceAttribute_MustReturnEnumerable,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustReturnEnumerable_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustReturnEnumerable_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustReturnEnumerable_Description)));
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
         RequiresBenchmarkAttributeRule,
         MustHaveMatchingValueCountRule,
         MustHaveMatchingValueTypeRule,
         RequiresParametersRule,
+        ArgumentsSourceMustReturnEnumerableRule,
+        AnalyzerHelper.SourceMethodMustNotHaveRequiredParametersRule,
+        AnalyzerHelper.SourceMethodMustNotBeGenericRule,
+        AnalyzerHelper.SourceElementMustNotBeByRefLikeRule,
+        AnalyzerHelper.SourceElementMayBeByRefLikeRule,
+        AnalyzerHelper.SourceMustNotBeAmbiguouslyEnumerableRule,
     }.ToImmutableArray();
 
     public override void Initialize(AnalysisContext analysisContext)
@@ -90,15 +106,15 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
         var argumentsSourceAttributes = new List<AttributeData>();
         foreach (var attr in methodSymbol.GetAttributes())
         {
-            if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, benchmarkAttributeTypeSymbol))
+            if (AnalyzerHelper.IsOrDerivesFrom(attr.AttributeClass, benchmarkAttributeTypeSymbol))
             {
                 hasBenchmarkAttribute = true;
             }
-            else if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, argumentsAttributeTypeSymbol))
+            else if (AnalyzerHelper.IsOrDerivesFrom(attr.AttributeClass, argumentsAttributeTypeSymbol))
             {
                 argumentsAttributes.Add(attr);
             }
-            else if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, argumentsSourceAttributeTypeSymbol))
+            else if (AnalyzerHelper.IsOrDerivesFrom(attr.AttributeClass, argumentsSourceAttributeTypeSymbol))
             {
                 argumentsSourceAttributes.Add(attr);
             }
@@ -129,6 +145,14 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
 
         foreach (var attr in argumentsAttributes)
         {
+            // Only [Arguments] itself is guaranteed to carry the values in its own constructor arguments. A derived
+            // attribute declares whatever constructor it likes and may hand values to base(...), where they are
+            // invisible here, so its arguments are not the values to inspect.
+            if (!SymbolEqualityComparer.Default.Equals(attr.AttributeClass, argumentsAttributeTypeSymbol))
+            {
+                continue;
+            }
+
             // [Arguments]
             if (attr.ConstructorArguments.Length == 0)
             {
@@ -171,6 +195,117 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                     methodSymbol.Parameters[i].Type
                 );
             }
+        }
+
+        foreach (var attr in argumentsSourceAttributes)
+        {
+            AnalyzeArgumentsSourceReturnType(attr);
+        }
+
+        void AnalyzeArgumentsSourceReturnType(AttributeData attr)
+        {
+            // These rules need the source's name, which is in this usage's own arguments only when
+            // [ArgumentsSource] itself was applied - a derived attribute may hand it to base(...), out of sight.
+            if (!SymbolEqualityComparer.Default.Equals(attr.AttributeClass, argumentsSourceAttributeTypeSymbol))
+            {
+                return;
+            }
+
+            // [ArgumentsSource(nameof(Source))] or [ArgumentsSource(typeof(Other), nameof(Other.Source))]
+            ITypeSymbol? sourceType;
+            string? sourceName;
+            if (attr.ConstructorArguments.Length == 1)
+            {
+                sourceType = methodSymbol.ContainingType;
+                sourceName = attr.ConstructorArguments[0].Value as string;
+            }
+            else if (attr.ConstructorArguments.Length == 2)
+            {
+                sourceType = attr.ConstructorArguments[0].Value as ITypeSymbol;
+                sourceName = attr.ConstructorArguments[1].Value as string;
+            }
+            else
+            {
+                return;
+            }
+
+            if (sourceType == null || string.IsNullOrEmpty(sourceName))
+            {
+                return;
+            }
+
+            var referencedMember = AnalyzerHelper.FindSourceMember(sourceType, sourceName!);
+
+            if (AnalyzerHelper.SourceResolvesOnlyToGenericMethod(sourceType, sourceName!))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    AnalyzerHelper.SourceMethodMustNotBeGenericRule,
+                    attr.GetSourceNameLocation(),
+                    sourceName));
+                return;
+            }
+
+            if (AnalyzerHelper.SourceResolvesOnlyToRequiredParameterMethod(sourceType, sourceName!))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    AnalyzerHelper.SourceMethodMustNotHaveRequiredParametersRule,
+                    attr.GetSourceNameLocation(),
+                    sourceName));
+                return;
+            }
+
+            ITypeSymbol? returnType = referencedMember switch
+            {
+                IMethodSymbol method => method.ReturnType,
+                IPropertySymbol property => property.Type,
+                _ => null
+            };
+
+            if (returnType == null || returnType.TypeKind == TypeKind.Error)
+            {
+                return;
+            }
+
+            if (AsyncTypeShapes.IsAmbiguouslyEnumerable(context.Compilation, returnType))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    AnalyzerHelper.SourceMustNotBeAmbiguouslyEnumerableRule,
+                    attr.GetSourceNameLocation(),
+                    sourceName,
+                    returnType.ToDisplayString()));
+                return;
+            }
+
+            if (!AsyncTypeShapes.IsSupportedSourceReturnType(context.Compilation, returnType))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    ArgumentsSourceMustReturnEnumerableRule,
+                    attr.GetSourceNameLocation(),
+                    sourceName,
+                    returnType.ToDisplayString()));
+                return;
+            }
+
+            if (!AsyncTypeShapes.TryGetSourceElementType(context.Compilation, returnType, out var elementType))
+            {
+                return;
+            }
+
+            // Discovery reads the values into an object[], which a ref struct cannot enter. Expressible since .NET 10
+            // gave IEnumerable<T> an allows-ref-struct type parameter; a ref struct *parameter* is still supported,
+            // fed from whatever the value is built from. A constraint admitting one is answered the same way, as an
+            // open declaration is judged on what every substitution guarantees.
+            if (AnalyzerHelper.MayBeRefLike(elementType!))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    AnalyzerHelper.ByRefLikeRule(elementType!),
+                    attr.GetSourceNameLocation(),
+                    sourceName,
+                    elementType!.ToDisplayString(),
+                    AnalyzerHelper.ByRefLikeClause(elementType!)));
+                return;
+            }
+
         }
 
         void ReportMustHaveMatchingValueCountDiagnostic(Location diagnosticLocation, int valueCount)

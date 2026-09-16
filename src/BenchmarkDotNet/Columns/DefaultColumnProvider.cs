@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Toolchains;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.Common;
 
@@ -10,11 +11,12 @@ namespace BenchmarkDotNet.Columns
     {
         [PublicAPI] public static readonly IColumnProvider Descriptor = new DescriptorColumnProvider();
         [PublicAPI] public static readonly IColumnProvider Job = new JobColumnProvider();
+        [PublicAPI] public static readonly IColumnProvider Settings = new SettingsColumnProvider();
         [PublicAPI] public static readonly IColumnProvider Statistics = new StatisticsColumnProvider();
         [PublicAPI] public static readonly IColumnProvider Params = new ParamsColumnProvider();
         [PublicAPI] public static readonly IColumnProvider Metrics = new MetricsColumnProvider();
 
-        public static readonly IColumnProvider[] Instance = [Descriptor, Job, Statistics, Params, Metrics];
+        public static readonly IColumnProvider[] Instance = [Descriptor, Job, Settings, Statistics, Params, Metrics];
 
         private class DescriptorColumnProvider : IColumnProvider
         {
@@ -31,6 +33,27 @@ namespace BenchmarkDotNet.Columns
         private class JobColumnProvider : IColumnProvider
         {
             public IEnumerable<IColumn> GetColumns(Summary summary) => JobCharacteristicColumn.AllColumns;
+        }
+
+        private class SettingsColumnProvider : IColumnProvider
+        {
+            // Ask each toolchain's settings which values to surface, then create one column per distinct key.
+            // Settings types that expose the same key share the column, so headers are never duplicated.
+            public IEnumerable<IColumn> GetColumns(Summary summary)
+            {
+                var keys = new HashSet<string>();
+                foreach (var benchmarkCase in summary.BenchmarksCases)
+                {
+                    if ((benchmarkCase.GetToolchain() as IHasSettings)?.Settings is not { } settings)
+                        continue;
+                    var filled = new Dictionary<string, object?>();
+                    settings.FillSettings(filled);
+                    keys.UnionWith(filled.Keys);
+                }
+                return keys
+                    .OrderBy(key => key, StringComparer.Ordinal)
+                    .Select(key => (IColumn)new SettingsColumn(key));
+            }
         }
 
         private class StatisticsColumnProvider : IColumnProvider

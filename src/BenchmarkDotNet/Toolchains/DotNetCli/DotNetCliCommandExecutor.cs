@@ -134,14 +134,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
         }
 
-        internal static ProcessStartInfo BuildStartInfo(string? customDotNetCliPath, string workingDirectory, string arguments,
+        internal static ProcessStartInfo BuildStartInfo(FileInfo? customDotNetCliPath, string workingDirectory, string? arguments,
             IReadOnlyList<EnvironmentVariable>? environmentVariables = null, bool redirectStandardInput = false, bool redirectStandardError = true, bool redirectStandardOutput = true)
         {
             const string dotnetMultiLevelLookupEnvVarName = "DOTNET_MULTILEVEL_LOOKUP";
 
             var startInfo = new ProcessStartInfo
             {
-                FileName = customDotNetCliPath.IsBlank() ? DefaultDotNetCliPath.Value : customDotNetCliPath,
+                FileName = customDotNetCliPath?.FullName ?? DefaultDotNetCliPath.Value,
                 WorkingDirectory = workingDirectory,
                 Arguments = arguments,
                 UseShellExecute = false,
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 foreach (var environmentVariable in environmentVariables)
                     startInfo.Environment[environmentVariable.Key] = environmentVariable.Value;
 
-            if (customDotNetCliPath.IsNotBlank() && (environmentVariables == null || environmentVariables.All(envVar => envVar.Key != dotnetMultiLevelLookupEnvVarName)))
+            if (customDotNetCliPath is not null && (environmentVariables == null || environmentVariables.All(envVar => envVar.Key != dotnetMultiLevelLookupEnvVarName)))
                 startInfo.Environment[dotnetMultiLevelLookupEnvVarName] = "0";
 
             return startInfo;
@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             return "dotnet";
         }
 
-        internal static async Task<string> GetSdkPathAsync(string cliPath, CancellationToken cancellationToken)
+        internal static async Task<string> GetSdkPathAsync(FileInfo? cliPath, CancellationToken cancellationToken)
         {
             DotNetCliCommand cliCommand = new(
                 cliPath: cliPath,

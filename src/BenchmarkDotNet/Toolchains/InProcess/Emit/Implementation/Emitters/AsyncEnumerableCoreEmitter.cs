@@ -6,7 +6,7 @@ using Perfolizer.Horology;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableConstants;
+using static BenchmarkDotNet.Code.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
