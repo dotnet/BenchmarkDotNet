@@ -73,7 +73,7 @@ public partial class Arm64InstructionFormatterTests : Arm64DisassemblerTestBase
             // M00_L01:
             Arm64InstructionFactory.MOV(W0, W1),
             Arm64InstructionFactory.LDP(X29, X30, new Arm64BaseMemoryAccessor(Arm64RegisterSP.SP), 0x10),
-            Arm64InstructionFactory.RET()
+            Arm64InstructionFactory.RET(),
         };
         PrintInstructions(rawInstructions);
 
@@ -112,7 +112,7 @@ public partial class Arm64InstructionFormatterTests : Arm64DisassemblerTestBase
             // M00_L01:
             "FF01097000D0 mov       w0, w1",
             "FF01097000D4 ldp       x29, x30, [sp], #0x10",
-            "FF01097000D8 ret       ",
+            "FF01097000D8 ret",
         ], options => options.WithStrictOrdering());
     }
 
@@ -143,6 +143,8 @@ public partial class Arm64InstructionFormatterTests : Arm64DisassemblerTestBase
 
             // TODO: `Gee.External.Capstone` seems not support negative label offset and wrong text is outputted.
             // { Arm64InstructionFactory.B(-8),                      "b #-8"}, // Gee.External.Capstone don't support minus label offset.
+
+            { Arm64InstructionFactory.NOP(), "nop"},
         };
     }
 }
