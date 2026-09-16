@@ -451,15 +451,39 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ParameterValuesBenchmarkDotNetIsRunningAreNotDisposedWhenTheApplicationEnds()
         {
-            // The other side of the same sweep. Once a request has handed its benchmarks over and BenchmarkDotNet has
-            // entered the run stage, their values are its to dispose - it does that in the stage's finally, whether
-            // the run completes, throws or is cancelled. Taking them here as well would either dispose them twice or,
-            // in the window this stands for, pull them out from under a benchmark that is still running against them,
-            // which reaches the user as an ObjectDisposedException thrown from inside their own benchmark. The probe
-            // completes a discovery of the same cached values first, as server mode does, so they are held as well.
+            // The other side of the same sweep. From the hand-off until the run returns the values are BenchmarkDotNet's
+            // to dispose - it does that in the finally of its run stage, whether the run completes, throws or is
+            // cancelled. Taking them here as well would either dispose them twice or, in the window this stands for,
+            // pull them out from under a run that is using or about to use them, which reaches the user as an
+            // ObjectDisposedException thrown from inside their own benchmark. The probe completes a discovery of the
+            // same cached values first, as server mode does, so they are held as well.
             var report = RunInternalsProbe();
 
             Assert.Equal("created=2 disposed=0", Assert.Single(report.Handed));
+        }
+
+        [Fact]
+        public void ParameterValuesBenchmarkDotNetHandedBackAreDisposedWhenTheApplicationEnds()
+        {
+            // The negative half of the same ownership: a run stopped by a critical validation error returns before the
+            // run stage that disposes parameter values, so the request takes them back and the sweep has to dispose
+            // them. This is the direction that fails quietly - nothing throws, the values simply reach the finalizer,
+            // which is the dotnet/BenchmarkDotNet#1383 hang.
+            var report = RunInternalsProbe();
+
+            Assert.Equal("created=2 disposed=2", Assert.Single(report.TakenBack));
+        }
+
+        [Fact]
+        public void ParameterValuesBenchmarkDotNetAlreadyDisposedAreNotDisposedAgainWhenTheApplicationEnds()
+        {
+            // Server mode's own sequence: a run whose values BenchmarkDotNet disposed, then the discovery or run the
+            // IDE issues next over the same cached values, still in flight when the application ends. The sweep finds
+            // them both in what the completed run left held and in the scope of the request that enumerated them
+            // again, and either way they are spent - disposing one is a user's Dispose() called twice.
+            var report = RunInternalsProbe();
+
+            Assert.Equal("created=2 disposed=0", Assert.Single(report.AlreadyDisposed));
         }
 
         /// <summary>
@@ -477,13 +501,16 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var abandonedStart = Array.IndexOf(lines, "== abandoned");
             var handedStart = Array.IndexOf(lines, "== handed");
+            var takenBackStart = Array.IndexOf(lines, "== taken-back");
+            var alreadyDisposedStart = Array.IndexOf(lines, "== already-disposed");
             var discoverStart = Array.IndexOf(lines, "== discover");
             var runStart = Array.IndexOf(lines, "== run");
             var emptyStart = Array.IndexOf(lines, "== empty");
             var end = Array.IndexOf(lines, "== done");
 
             Assert.True(
-                abandonedStart >= 0 && handedStart > abandonedStart && discoverStart > handedStart
+                abandonedStart >= 0 && handedStart > abandonedStart && takenBackStart > handedStart
+                    && alreadyDisposedStart > takenBackStart && discoverStart > alreadyDisposedStart
                     && runStart > discoverStart && emptyStart > runStart && end > emptyStart,
                 $"The internals probe did not report every section:{Environment.NewLine}{standardOutput}");
 
@@ -491,7 +518,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             return new InternalsReport(
                 lines[(abandonedStart + 1)..handedStart],
-                lines[(handedStart + 1)..discoverStart],
+                lines[(handedStart + 1)..takenBackStart],
+                lines[(takenBackStart + 1)..alreadyDisposedStart],
+                lines[(alreadyDisposedStart + 1)..discoverStart],
                 discover,
                 lines[(runStart + 1)..emptyStart],
                 lines[(emptyStart + 1)..end],
@@ -501,6 +530,8 @@ namespace BenchmarkDotNet.IntegrationTests
         private sealed record InternalsReport(
             string[] Abandoned,
             string[] Handed,
+            string[] TakenBack,
+            string[] AlreadyDisposed,
             string[] Discover,
             string[] Run,
             string[] Empty,
