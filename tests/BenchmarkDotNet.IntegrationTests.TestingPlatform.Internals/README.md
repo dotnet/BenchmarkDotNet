@@ -21,10 +21,16 @@ The two requests are deliberately treated differently, which is what this pins:
   for a green, zero-test success.
 
 The second thing out of a test host's reach is an application ending while a request is still in flight — the client
-sending `exit`, or an IDE cancelling. This ends one twice over: once with a request that had enumerated values and
-handed them to nobody, which `ParameterValueLifetime` must dispose on its way out, since nothing else can reach them
-and the finalizer is the dotnet/BenchmarkDotNet#1383 hang; and once with a request that had already handed them to
-BenchmarkDotNet, which it must leave alone — those are disposed by the run stage's own `finally`, and taking them
-here would pull them out from under a benchmark still running against them.
+sending `exit`, or an IDE cancelling. This ends one three times over, once per state a request's parameter values can
+be in:
+
+* **enumerated and handed to nobody**, which `ParameterValueLifetime` must dispose on its way out, since nothing else
+  can reach them and the finalizer is the dotnet/BenchmarkDotNet#1383 hang;
+* **handed to BenchmarkDotNet**, which it must leave alone — they are disposed by the run stage's own `finally`, and
+  taking them here would pull them out from under a run that is using or about to use them. Ownership runs from the
+  hand-off rather than from the start of the run stage, because validation and the whole build stage sit in between;
+* **handed over and taken back**, which happens when a critical validation error ends the run before the run stage, so
+  BenchmarkDotNet disposed nothing and they are the request's again. Left undisposed they are the same hang as the
+  first case, reached without anything throwing.
 
 `TestingPlatformAdapterTests` in `BenchmarkDotNet.IntegrationTests` runs it and asserts on the report.

@@ -23,6 +23,12 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
             Console.WriteLine("== handed");
             Console.WriteLine(await ReportHandedOverRequestAsync().ConfigureAwait(false));
 
+            Console.WriteLine("== taken-back");
+            Console.WriteLine(await ReportTakenBackRequestAsync().ConfigureAwait(false));
+
+            Console.WriteLine("== already-disposed");
+            Console.WriteLine(await ReportAlreadyDisposedValuesAsync().ConfigureAwait(false));
+
             Console.WriteLine("== discover");
             foreach (var line in await ExecuteAsync(session => new DiscoverTestExecutionRequest(session, new UnrecognisedFilter())).ConfigureAwait(false))
                 Console.WriteLine(line);
@@ -69,13 +75,13 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
 
         /// <summary>
         /// Ends an application the same way, but while the abandoned request had already handed its benchmarks to
-        /// BenchmarkDotNet and BenchmarkDotNet had entered the run stage it disposes them from.
+        /// BenchmarkDotNet - the run in flight that an IDE cancels, or that a server-mode client sending `exit` walks
+        /// away from.
         /// </summary>
         /// <remarks>
-        /// They are its to dispose at that point, whether the run completes, throws or is cancelled. Disposing them
-        /// here too would either be a second disposal or - in the window this stands for, an IDE cancelling a run in
-        /// progress - the disposal of a value a benchmark is still using, which reaches the user as an
-        /// ObjectDisposedException thrown from inside their own benchmark.
+        /// They are BenchmarkDotNet's to dispose from the hand-off until the run returns, so disposing them here too
+        /// would either be a second disposal or the disposal of a value the run is using or about to use, which
+        /// reaches the user as an ObjectDisposedException thrown from inside their own benchmark.
         /// </remarks>
         /// <returns>The counts, as a line.</returns>
         private static async Task<string> ReportHandedOverRequestAsync()
@@ -91,12 +97,72 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
 
             var request = lifetime.BeginRequest();
             request.Track(cases);
-            request.HandOver(cases, () => true);
+            request.HandOver(cases);
 
             // Deliberately no CompleteAsync, as above: this request is abandoned too.
             await lifetime.AfterRunAsync(0, CancellationToken.None).ConfigureAwait(false);
 
             return $"created={HandedOverBenchmarks.HandedOver.Created} disposed={HandedOverBenchmarks.HandedOver.Disposed}";
+        }
+
+        /// <summary>
+        /// Ends an application while a request that handed its benchmarks over has taken them back, which is what a
+        /// run stopped by a critical validation error leaves behind.
+        /// </summary>
+        /// <remarks>
+        /// BenchmarkDotNet returned before the run stage it disposes parameter values from, so it disposed nothing and
+        /// they are the request's again. This is the direction that fails silently rather than loudly: values nobody
+        /// disposes are not an exception anyone sees, they are the finalizer, which is the dotnet/BenchmarkDotNet#1383
+        /// hang.
+        /// </remarks>
+        /// <returns>The counts, as a line.</returns>
+        private static async Task<string> ReportTakenBackRequestAsync()
+        {
+            var lifetime = new ParameterValueLifetime();
+            var cases = BenchmarkConverter.TypeToBenchmarks(typeof(TakenBackBenchmarks)).BenchmarksCases;
+
+            var request = lifetime.BeginRequest();
+            request.Track(cases);
+            request.HandOver(cases);
+            request.TakeBack();
+
+            // Deliberately no CompleteAsync: the request is abandoned while holding them again.
+            await lifetime.AfterRunAsync(0, CancellationToken.None).ConfigureAwait(false);
+
+            return $"created={TakenBackBenchmarks.TakenBack.Created} disposed={TakenBackBenchmarks.TakenBack.Disposed}";
+        }
+
+        /// <summary>
+        /// Ends an application while a request still in flight has enumerated values that BenchmarkDotNet disposed
+        /// when it ran them for the request before, which is the server-mode sequence: a run, then the discovery or
+        /// run the IDE issues next over the same cached values.
+        /// </summary>
+        /// <remarks>
+        /// Disposing them again is a user's Dispose() called twice, which counts wrong, throws, or releases a shared
+        /// handle somebody else is holding. The sweep knows them as disposed however it reaches them - through what is
+        /// held from the completed request, or through the scope of the one that enumerated them again.
+        /// </remarks>
+        /// <returns>The counts, as a line.</returns>
+        private static async Task<string> ReportAlreadyDisposedValuesAsync()
+        {
+            var lifetime = new ParameterValueLifetime();
+            var cases = BenchmarkConverter.TypeToBenchmarks(typeof(AlreadyDisposedBenchmarks)).BenchmarksCases;
+
+            // The run that BenchmarkDotNet disposed these for, which is what completing with them as the ran cases
+            // says. It disposed them itself, so nothing here counts as disposal yet.
+            var ran = lifetime.BeginRequest();
+            ran.Track(cases);
+            await ran.CompleteAsync(cases).ConfigureAwait(false);
+
+            // The request the IDE issued next, enumerating the very same cached values, still in flight when the
+            // application ends.
+            var next = lifetime.BeginRequest();
+            next.Track(cases);
+
+            await lifetime.AfterRunAsync(0, CancellationToken.None).ConfigureAwait(false);
+
+            return $"created={AlreadyDisposedBenchmarks.AlreadyDisposed.Created} "
+                + $"disposed={AlreadyDisposedBenchmarks.AlreadyDisposed.Disposed}";
         }
 
         private static async Task<IReadOnlyList<string>> ExecuteAsync(
