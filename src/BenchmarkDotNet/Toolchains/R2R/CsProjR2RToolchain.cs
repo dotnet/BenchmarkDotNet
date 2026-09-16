@@ -1,7 +1,6 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.R2R;
 
@@ -19,10 +18,7 @@ public sealed class CsProjR2RToolchain : CsProjNetToolchain
     // The build components receive `resolved` (target framework moniker filled in from the runtime); the original
     // `settings` is stored for equality and the settings column so an unset moniker is not surfaced as the runtime's.
     private CsProjR2RToolchain(R2RRuntime runtime, R2RSettings settings, R2RSettings resolved)
-        : base("CsProjR2R", runtime, settings,
-            new R2RGenerator(resolved),
-            new DotNetCliPublisher(resolved),
-            Toolchains.Executor.Instance)
+        : base("CsProjR2R", runtime, settings, new R2RBuilder(resolved), Toolchains.Executor.Instance)
     {
     }
 

@@ -133,7 +133,6 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             return new BenchmarkReport(success: true,
                                        benchmarkCase: benchmarkCase,
-                                       generateResult: null!,
                                        buildResult: null!,
                                        executeResults: null!,
                                        metrics: null!);

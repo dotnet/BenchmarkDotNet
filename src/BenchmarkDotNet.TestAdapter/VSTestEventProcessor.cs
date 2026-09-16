@@ -75,8 +75,8 @@ namespace BenchmarkDotNet.TestAdapter
                     var testCase = cases[benchmarkBuildInfo.BenchmarkCase.GetTestCaseId()];
                     var testResult = GetOrCreateTestResult(testCase);
 
-                    if (buildResult.GenerateException != null)
-                        testResult.ErrorMessage = $"// Generate Exception: {buildResult.GenerateException.Message}";
+                    if (buildResult.Exception != null)
+                        testResult.ErrorMessage = $"// Build Exception: {buildResult.Exception.Message}";
                     else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(buildPartition.GetInProcessDiagnoserHandlerTypes(), out string? reason))
                         testResult.ErrorMessage = $"// Build Error: {reason}";
                     else if (buildResult.ErrorMessage != null)

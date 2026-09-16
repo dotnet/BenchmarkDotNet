@@ -7,7 +7,7 @@ using BenchmarkDotNet.Toolchains.CsProj;
 
 namespace BenchmarkDotNet.Toolchains.Mono
 {
-    internal sealed class CsProjMonoGenerator(MonoCoreSettings settings) : CsProjGenerator(settings)
+    internal sealed class CsProjMonoBuilder(MonoCoreSettings settings) : CsProjBuilder(settings)
     {
         protected override bool PublishesOutput => true;
 

@@ -3,8 +3,6 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains.Framework;
@@ -25,11 +23,7 @@ public sealed class CsProjFrameworkToolchain : Toolchain, IHasSettings
     // The build components receive `resolved` (target framework moniker filled in from the runtime); the original
     // `settings` is stored for equality and the settings column so an unset moniker is not surfaced as the runtime's.
     private CsProjFrameworkToolchain(ClrRuntime runtime, FrameworkSettings settings, FrameworkSettings resolved)
-        : base("CsProjFramework",
-            runtime,
-            new CsProjGenerator(resolved, isNetCore: false),
-            new DotNetCliBuilder(resolved),
-            new Executor())
+        : base("CsProjFramework", runtime, new CsProjFrameworkBuilder(resolved), new Executor())
         => Settings = settings;
 
     // Fills the target framework moniker in from the runtime only when the user left it unset, avoiding both the
@@ -74,7 +68,7 @@ public sealed class CsProjFrameworkToolchain : Toolchain, IHasSettings
                 benchmarkCase);
             yield break;
         }
-        else if (DotNetSdkValidator.IsCliPathInvalid(((DotNetCliBuilder) Builder).CustomDotNetCliPath, benchmarkCase, out var invalidCliError))
+        else if (DotNetSdkValidator.IsCliPathInvalid(Settings.CliPath, benchmarkCase, out var invalidCliError))
         {
             yield return invalidCliError;
         }

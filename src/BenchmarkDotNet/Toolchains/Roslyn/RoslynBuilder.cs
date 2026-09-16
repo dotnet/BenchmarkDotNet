@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
@@ -15,35 +16,83 @@ using OurPlatform = BenchmarkDotNet.Environments.Platform;
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
     [PublicAPI]
-    public class RoslynBuilder : IBuilder
+    public class RoslynBuilder : BuilderBase
     {
         private const string MissingReferenceError = "CS0012";
 
-        public static readonly IBuilder Instance = new RoslynBuilder();
+        public static readonly RoslynBuilder Instance = new();
 
         private static readonly Lazy<AssemblyMetadata[]> FrameworkAssembliesMetadata = new Lazy<AssemblyMetadata[]>(GetFrameworkAssembliesMetadata);
 
-        [PublicAPI]
-        public async ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
+        protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
+            => Path.GetDirectoryName(buildPartition.AssemblyLocation)!;
+
+        protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths) =>
+        [
+            artifactsPaths.ProgramCodePath,
+            artifactsPaths.AppConfigPath,
+            artifactsPaths.BuildScriptFilePath,
+            artifactsPaths.ExecutablePath
+        ];
+
+        protected override async ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
-            logger.WriteLineInfo($"BuildScript: {generateResult.ArtifactsPaths.BuildScriptFilePath}");
+            string prefix = OsDetector.IsWindows() ? "" : "#!/bin/bash\n";
+            var list = new List<string>();
+            if (!OsDetector.IsWindows())
+                list.Add("mono");
+            list.Add("csc");
+            list.Add("/noconfig");
+            list.Add("/target:exe");
+            list.Add("/optimize");
+            list.Add("/unsafe");
+            list.Add("/deterministic");
+            list.Add("/platform:" + buildPartition.Platform.ToConfig());
+            list.Add("/appconfig:" + artifactsPaths.AppConfigPath.EscapeCommandLine());
+            var references = GetAllReferences(buildPartition.Benchmarks[0]).Select(assembly => assembly.Location.EscapeCommandLine());
+            list.Add("/reference:" + string.Join(",", references));
+            list.Add(Path.GetFileName(artifactsPaths.ProgramCodePath));
+
+            await File.WriteAllTextAsync(
+                artifactsPaths.BuildScriptFilePath,
+                prefix + string.Join(" ", list),
+                cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        internal static IEnumerable<Assembly> GetAllReferences(BenchmarkBuildInfo buildInfo)
+            => buildInfo.BenchmarkCase.Descriptor.Type.GetTypeInfo().Assembly
+                .GetReferencedAssemblies()
+                .Select(Assembly.Load)
+                .Append(buildInfo.BenchmarkCase.Descriptor.Type.GetTypeInfo().Assembly) // This assembly does not have to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet)
+                .Concat(BenchmarkDotNetReferences.Assemblies) // BenchmarkDotNet + Perfolizer
+                .Concat(BenchmarkDotNetReferences.Types.Select(type => type.GetTypeInfo().Assembly)) // TaskExtensions (ValueTask)
+                // In-process diagnoser handlers
+                .Concat(buildInfo.CompositeInProcessDiagnoser.GetHandlerData(buildInfo.BenchmarkCase)
+                    .Select(handlerData => handlerData.HandlerType?.GetTypeInfo().Assembly)
+                    .WhereNotNull())
+                .Distinct();
+
+        protected override async ValueTask<BuildResult> BuildAsync(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
+        {
+            logger.WriteLineInfo($"BuildScript: {artifactsPaths.BuildScriptFilePath}");
 
             using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             timeoutCts.CancelAfter(buildPartition.Timeout);
             try
             {
-                return await Build(generateResult, buildPartition, timeoutCts.Token).ConfigureAwait(false);
+                return await Build(artifactsPaths, buildPartition, timeoutCts.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
             {
-                return BuildResult.Failure(generateResult, $"The configured timeout {buildPartition.Timeout} was reached!");
+                return BuildResult.Failure(artifactsPaths, $"The configured timeout {buildPartition.Timeout} was reached!");
             }
         }
 
-        private async ValueTask<BuildResult> Build(GenerateResult generateResult, BuildPartition buildPartition, CancellationToken cancellationToken)
+        private async ValueTask<BuildResult> Build(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, CancellationToken cancellationToken)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(
-                text: await File.ReadAllTextAsync(generateResult.ArtifactsPaths.ProgramCodePath, cancellationToken).ConfigureAwait(false),
+                text: await File.ReadAllTextAsync(artifactsPaths.ProgramCodePath, cancellationToken).ConfigureAwait(false),
                 // this version is used to parse the boilerplate code generated by BDN, so that benchmark themselves can use more recent version
                 options: new CSharpParseOptions(LanguageVersion.CSharp9),
                 cancellationToken: cancellationToken);
@@ -57,35 +106,34 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
             compilationOptions = compilationOptions.WithIgnoreCorLibraryDuplicatedTypes();
 
-            var references = RoslynGenerator
-                .GetAllReferences(buildPartition.Benchmarks[0])
+            var references = GetAllReferences(buildPartition.Benchmarks[0])
                 .Select(assembly => AssemblyMetadata.CreateFromFile(assembly.Location))
                 .Concat(FrameworkAssembliesMetadata.Value)
                 .Distinct()
                 .Select(uniqueMetadata => uniqueMetadata.GetReference())
                 .ToList();
 
-            var (result, missingReferences) = Build(generateResult, buildPartition, syntaxTree, compilationOptions, references, cancellationToken);
+            var (result, missingReferences) = Build(artifactsPaths, buildPartition, syntaxTree, compilationOptions, references, cancellationToken);
 
             if (result.IsBuildSuccess || !missingReferences.Any())
                 return result;
 
             var withMissingReferences = references.Union(missingReferences.Select(assemblyMetadata => assemblyMetadata.GetReference()));
 
-            return Build(generateResult, buildPartition, syntaxTree, compilationOptions, withMissingReferences, cancellationToken).result;
+            return Build(artifactsPaths, buildPartition, syntaxTree, compilationOptions, withMissingReferences, cancellationToken).result;
         }
 
-        private static (BuildResult result, AssemblyMetadata[] missingReference) Build(GenerateResult generateResult, BuildPartition buildPartition, SyntaxTree syntaxTree,
+        private static (BuildResult result, AssemblyMetadata[] missingReference) Build(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, SyntaxTree syntaxTree,
             CSharpCompilationOptions compilationOptions, IEnumerable<PortableExecutableReference> references, CancellationToken cancellationToken)
         {
             var compilation = CSharpCompilation
-                .Create(assemblyName: Path.GetFileName(generateResult.ArtifactsPaths.ExecutablePath))
+                .Create(assemblyName: Path.GetFileName(artifactsPaths.ExecutablePath))
                 .AddSyntaxTrees(syntaxTree)
                 .WithOptions(compilationOptions)
                 .AddReferences(references);
 
             EmitResult emitResult;
-            using (var executable = File.Create(generateResult.ArtifactsPaths.ExecutablePath))
+            using (var executable = File.Create(artifactsPaths.ExecutablePath))
             {
                 emitResult = compilation.Emit(executable, cancellationToken: cancellationToken);
             }
@@ -93,9 +141,9 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             {
                 if (buildPartition.RepresentativeBenchmarkCase.Job.Environment.LargeAddressAware)
                 {
-                    LargeAddressAware.SetLargeAddressAware(generateResult.ArtifactsPaths.ExecutablePath);
+                    LargeAddressAware.SetLargeAddressAware(artifactsPaths.ExecutablePath);
                 }
-                return (BuildResult.Success(generateResult), missingReference: []);
+                return (BuildResult.Success(artifactsPaths), missingReference: []);
             }
 
             var compilationErrors = emitResult.Diagnostics
@@ -108,7 +156,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
             var missingReferences = GetMissingReferences(compilationErrors);
 
-            return (BuildResult.Failure(generateResult, errors.ToString()), missingReferences);
+            return (BuildResult.Failure(artifactsPaths, errors.ToString()), missingReferences);
         }
 
         private Platform GetPlatform(OurPlatform platform)

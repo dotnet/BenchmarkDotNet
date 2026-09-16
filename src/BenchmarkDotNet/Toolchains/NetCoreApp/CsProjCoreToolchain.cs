@@ -27,10 +27,7 @@ public sealed class CsProjCoreToolchain : CsProjNetToolchain
     // The build components receive `resolved` (target framework moniker filled in from the runtime); the original
     // `settings` is stored for equality and the settings column so an unset moniker is not surfaced as the runtime's.
     private CsProjCoreToolchain(Runtime runtime, NetCoreAppSettings settings, NetCoreAppSettings resolved)
-        : base("CsProjCore", runtime, settings,
-            new CsProjGenerator(resolved),
-            new DotNetCliBuilder(resolved),
-            new DotNetCliExecutor(settings.CliPath))
+        : base("CsProjCore", runtime, settings, new CsProjBuilder(resolved), new DotNetCliExecutor(settings.CliPath))
     {
     }
 

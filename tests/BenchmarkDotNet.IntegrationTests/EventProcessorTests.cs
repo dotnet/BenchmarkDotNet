@@ -145,7 +145,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void WhenUsingEventProcessorWithBuildFailures()
         {
-            var toolchain = new MockToolchain("Build Failure", UnknownRuntime.Instance, new AllFailsGenerator(), null!, null!);
+            var toolchain = new MockToolchain("Build Failure", UnknownRuntime.Instance, new AllFailsBuilder(), null!);
             var events = RunBenchmarksAndRecordEvents([typeof(ClassA)], toolchain: toolchain);
 
             Assert.Equal(9, events.Count);
@@ -153,7 +153,7 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal(nameof(EventProcessor.OnEndValidationStage), events[1].EventType);
             Assert.Equal(nameof(EventProcessor.OnStartBuildStage), events[2].EventType);
             Assert.Equal(nameof(EventProcessor.OnBuildComplete), events[3].EventType);
-            Assert.False((events[3].Args[1] as BuildResult)!.IsGenerateSuccess);
+            Assert.False((events[3].Args[1] as BuildResult)!.IsBuildSuccess);
             Assert.Equal(nameof(EventProcessor.OnEndBuildStage), events[4].EventType);
             Assert.Equal(nameof(EventProcessor.OnStartRunStage), events[5].EventType);
         }
@@ -214,7 +214,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class AllUnsupportedToolchain : Toolchain
         {
-            public AllUnsupportedToolchain() : base("AllUnsupported", UnknownRuntime.Instance, null!, null!, null!)
+            public AllUnsupportedToolchain() : base("AllUnsupported", UnknownRuntime.Instance, null!, null!)
             {
             }
 
@@ -224,10 +224,15 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        public class AllFailsGenerator : IGenerator
+        public class AllFailsBuilder : IBuilder
         {
-            public ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
-                => new(GenerateResult.Failure(ArtifactsPaths.Empty, [], new Exception("Generation Failed")));
+            public bool GetSupportsConcurrency(BuildPartition buildPartition) => false;
+
+            public ValueTask<BuildResult> BuildAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
+            {
+                var generateException = new Exception("Generation Failed");
+                return new(BuildResult.Failure(ArtifactsPaths.Empty, generateException));
+            }
         }
 
         public class LoggingEventProcessor : EventProcessor

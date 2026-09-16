@@ -8,7 +8,7 @@ using BenchmarkDotNet.Validators;
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
     public abstract class RoslynToolchain(string name, Runtime runtime, IBuilder builder, IExecutor executor)
-        : Toolchain(name, runtime, RoslynGenerator.Instance, builder, executor)
+        : Toolchain(name, runtime, builder, executor)
     {
         public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
         {

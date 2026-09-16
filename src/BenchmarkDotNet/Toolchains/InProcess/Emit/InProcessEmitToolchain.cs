@@ -17,7 +17,6 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
         private InProcessEmitToolchain(Runtime runtime, InProcessEmitSettings settings) : base(
             nameof(InProcessEmitToolchain),
             runtime,
-            new InProcessEmitGenerator(),
             new InProcessEmitBuilder(),
             new InProcessEmitExecutor(settings.ExecuteOnSeparateThread))
         {

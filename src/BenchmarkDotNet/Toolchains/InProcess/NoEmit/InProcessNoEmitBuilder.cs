@@ -6,6 +6,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 internal class InProcessNoEmitBuilder : IBuilder
 {
-    public ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
-        => new(BuildResult.Success(generateResult));
+    // It does nothing, there is no point to run it concurrently.
+    public bool GetSupportsConcurrency(BuildPartition buildPartition) => false;
+
+    public ValueTask<BuildResult> BuildAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
+        => new(BuildResult.Success(ArtifactsPaths.Empty));
 }

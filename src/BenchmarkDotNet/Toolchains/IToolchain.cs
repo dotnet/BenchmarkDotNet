@@ -8,7 +8,6 @@ namespace BenchmarkDotNet.Toolchains;
 public interface IToolchain
 {
     Runtime Runtime { get; }
-    IGenerator Generator { get; }
     IBuilder Builder { get; }
     IExecutor Executor { get; }
     bool IsInProcess { get; }

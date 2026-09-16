@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
@@ -6,7 +6,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.Results;
 using Perfolizer.Horology;
 using System.Diagnostics;
 using System.Reflection;
@@ -57,11 +56,11 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         /// <summary>
         /// Emits assembly with runnables from current build partition.
         /// </summary>
-        public static Assembly EmitPartitionAssembly(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger)
+        public static Assembly EmitPartitionAssembly(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, ILogger logger)
         {
             ArgumentNullException.ThrowIfNull(buildPartition);
 
-            var assemblyResultPath = generateResult.ArtifactsPaths.ExecutablePath;
+            var assemblyResultPath = artifactsPaths.ExecutablePath;
             var assemblyFileName = Path.GetFileName(assemblyResultPath);
             var config = buildPartition.Benchmarks.First().Config;
 

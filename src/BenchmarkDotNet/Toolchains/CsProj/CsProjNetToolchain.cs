@@ -9,8 +9,8 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains.CsProj;
 
-public abstract class CsProjNetToolchain(string name, Runtime runtime, DotNetCliSettings settings, IGenerator generator, IBuilder builder, IExecutor executor)
-    : Toolchain(name, runtime, generator, builder, executor), IHasSettings
+public abstract class CsProjNetToolchain(string name, Runtime runtime, DotNetCliSettings settings, IBuilder builder, IExecutor executor)
+    : Toolchain(name, runtime, builder, executor), IHasSettings
 {
     internal DotNetCliSettings Settings => settings;
     ISettings IHasSettings.Settings => Settings;

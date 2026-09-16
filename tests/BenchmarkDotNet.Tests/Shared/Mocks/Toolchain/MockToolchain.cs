@@ -13,7 +13,6 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
     public class MockToolchain(Func<BenchmarkCase, List<Measurement>> measurer) : IToolchain
     {
         public Runtime Runtime => UnknownRuntime.Instance;
-        public IGenerator Generator => new MockGenerator();
         public IBuilder Builder => new MockBuilder();
         public IExecutor Executor { get; private set; } = new MockExecutor(measurer);
         public bool IsInProcess => false;
@@ -21,16 +20,12 @@ namespace BenchmarkDotNet.Tests.Mocks.Toolchain
 
         public override string ToString() => GetType().Name;
 
-        private class MockGenerator : IGenerator
-        {
-            public ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
-                => new(GenerateResult.Success(ArtifactsPaths.Empty, []));
-        }
-
         private class MockBuilder : IBuilder
         {
-            public ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
-                => new(BuildResult.Success(generateResult));
+            public bool GetSupportsConcurrency(BuildPartition buildPartition) => false;
+
+            public ValueTask<BuildResult> BuildAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
+                => new(BuildResult.Success(ArtifactsPaths.Empty));
         }
 
         private class MockExecutor(Func<BenchmarkCase, List<Measurement>> measurer) : IExecutor

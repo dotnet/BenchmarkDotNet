@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Toolchains.Wasm
 {
-    public class CsProjWasmGenerator : CsProjGenerator
+    public class CsProjWasmBuilder : CsProjBuilder
     {
         private const string LinkDescriptionFileName = "WasmLinkerDescription.xml";
 
@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.Wasm
         private readonly bool aot;
         private readonly bool useCoreClrRuntime;
 
-        public CsProjWasmGenerator(WasmSettings settings, bool aot, bool useCoreClrRuntime) : base(settings)
+        public CsProjWasmBuilder(WasmSettings settings, bool aot, bool useCoreClrRuntime) : base(settings)
         {
             this.settings = settings;
             this.aot = aot;
@@ -144,6 +144,9 @@ namespace BenchmarkDotNet.Toolchains.Wasm
             => GetExecutablePath(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, "");
 
         protected override bool PublishesOutput => true;
+
+        // AOT builds take a long time, so we show the progress.
+        protected override bool LogOutput => aot;
 
         protected override string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, "wwwroot", "main.mjs");
 

@@ -265,7 +265,7 @@ namespace BenchmarkDotNet.Tests
             CoreRunToolchain? toolchain = config.GetJobs().Single().GetToolchain() as CoreRunToolchain;
             Assert.NotNull(toolchain);
             Assert.Equal(((Runtime)RuntimeInformation.GetCurrentRuntime()).GetTfm(),
-                ((DotNetCliGenerator)toolchain.Generator).Settings.TargetFrameworkMoniker); // runtime was not specified so the current was used
+                ((DotNetCliBuilder)toolchain.Builder).Settings.TargetFrameworkMoniker); // runtime was not specified so the current was used
             Assert.Equal(fakeCoreRunPath, toolchain.SourceCoreRun.FullName);
             Assert.Equal(fakeDotnetCliPath, toolchain.Settings.CliPath?.FullName);
             Assert.Equal(fakeRestorePackages, toolchain.Settings.PackagesPath?.FullName);
@@ -281,8 +281,8 @@ namespace BenchmarkDotNet.Tests
             Job coreRunJob = config.GetJobs().Single();
 
             CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
-            DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
-            Assert.Equal("net12.0", generator.Settings.TargetFrameworkMoniker);
+            DotNetCliBuilder builder = (DotNetCliBuilder)coreRunToolchain.Builder;
+            Assert.Equal("net12.0", builder.Settings.TargetFrameworkMoniker);
         }
 
         [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
@@ -303,17 +303,17 @@ namespace BenchmarkDotNet.Tests
             Job runtimeJob = config.GetJobs().Single(job => job.GetToolchain() is CsProjCoreToolchain);
 
             CoreRunToolchain coreRunToolchain = (CoreRunToolchain)coreRunJob.GetToolchain();
-            DotNetCliGenerator generator = (DotNetCliGenerator)coreRunToolchain.Generator;
-            Assert.Equal(((Runtime)RuntimeInformation.GetCurrentRuntime()).GetTfm(), generator.Settings.TargetFrameworkMoniker);
+            DotNetCliBuilder builder = (DotNetCliBuilder)coreRunToolchain.Builder;
+            Assert.Equal(((Runtime)RuntimeInformation.GetCurrentRuntime()).GetTfm(), builder.Settings.TargetFrameworkMoniker);
             Assert.Equal(fakeCoreRunPath, coreRunToolchain.SourceCoreRun.FullName);
             Assert.Equal(fakeDotnetCliPath, coreRunToolchain.Settings.CliPath?.FullName);
             Assert.Equal(fakeRestorePackages, coreRunToolchain.Settings.PackagesPath?.FullName);
 
             CsProjCoreToolchain coreToolchain = (CsProjCoreToolchain)runtimeJob.GetToolchain();
-            generator = (DotNetCliGenerator)coreToolchain.Generator;
-            Assert.Equal(runtime, ((DotNetCliGenerator)coreToolchain.Generator).Settings.TargetFrameworkMoniker);
+            builder = (DotNetCliBuilder)coreToolchain.Builder;
+            Assert.Equal(runtime, ((DotNetCliBuilder)coreToolchain.Builder).Settings.TargetFrameworkMoniker);
             Assert.Equal(fakeDotnetCliPath, coreToolchain.Settings.CliPath?.FullName);
-            Assert.Equal(fakeRestorePackages, generator.Settings.PackagesPath?.FullName);
+            Assert.Equal(fakeRestorePackages, builder.Settings.PackagesPath?.FullName);
         }
 
         [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
@@ -328,7 +328,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(3, config.GetJobs().Count());
             Job baselineJob = config.GetJobs().Single(job => job.Meta.Baseline == true);
             Assert.False(baselineJob.GetToolchain() is CoreRunToolchain);
-            Assert.Equal(runtime1, ((DotNetCliGenerator)baselineJob.GetToolchain().Generator).Settings.TargetFrameworkMoniker);
+            Assert.Equal(runtime1, ((DotNetCliBuilder)baselineJob.GetToolchain().Builder).Settings.TargetFrameworkMoniker);
         }
 
         [FactEnvSpecific("It's impossible to determine TFM for CoreRunToolchain if host process is not .NET (Core) process", EnvRequirement.DotNetCoreOnly)]
@@ -418,8 +418,8 @@ namespace BenchmarkDotNet.Tests
             var toolchain = job.GetToolchain();
             Assert.IsType(expectedToolchain, toolchain);
             Assert.Equal(Runtime.Parse(moniker), job.GetRuntime());
-            var generator = Assert.IsAssignableFrom<DotNetCliGenerator>(toolchain.Generator);
-            Assert.Equal("net12.0", generator.Settings.TargetFrameworkMoniker);
+            var builder = Assert.IsAssignableFrom<DotNetCliBuilder>(toolchain.Builder);
+            Assert.Equal("net12.0", builder.Settings.TargetFrameworkMoniker);
         }
 
         [Fact]
@@ -466,9 +466,9 @@ namespace BenchmarkDotNet.Tests
             else
             {
                 Assert.True(toolchain is CsProjFrameworkToolchain);
-                Assert.Equal(fakeDotnetCliPath, ((DotNetCliBuilder)toolchain.Builder).CustomDotNetCliPath?.FullName);
+                Assert.Equal(fakeDotnetCliPath, ((DotNetCliBuilder)toolchain.Builder).Settings.CliPath?.FullName);
             }
-            Assert.Equal(tfm, ((DotNetCliGenerator)toolchain.Generator).Settings.TargetFrameworkMoniker);
+            Assert.Equal(tfm, ((DotNetCliBuilder)toolchain.Builder).Settings.TargetFrameworkMoniker);
         }
 
         [Theory]
@@ -535,7 +535,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             var toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(fakeRestoreDirectory, ((DotNetCliGenerator)toolchain.Generator).Settings.PackagesPath?.FullName);
+            Assert.Equal(fakeRestoreDirectory, ((DotNetCliBuilder)toolchain.Builder).Settings.PackagesPath?.FullName);
         }
 
         [Fact]
@@ -687,7 +687,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             var toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(expectedTfm, ((DotNetCliGenerator)toolchain.Generator).Settings.TargetFrameworkMoniker);
+            Assert.Equal(expectedTfm, ((DotNetCliBuilder)toolchain.Builder).Settings.TargetFrameworkMoniker);
         }
 
         [Theory]
@@ -701,7 +701,7 @@ namespace BenchmarkDotNet.Tests
             Assert.Single(config.GetJobs());
             var toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
-            Assert.Equal(msBuildMoniker, ((DotNetCliGenerator)toolchain.Generator).Settings.TargetFrameworkMoniker);
+            Assert.Equal(msBuildMoniker, ((DotNetCliBuilder)toolchain.Builder).Settings.TargetFrameworkMoniker);
         }
 
         [Fact]

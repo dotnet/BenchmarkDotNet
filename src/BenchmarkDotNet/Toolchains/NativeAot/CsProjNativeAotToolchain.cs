@@ -1,7 +1,6 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.NativeAot;
 
@@ -26,10 +25,7 @@ public sealed class CsProjNativeAotToolchain : CsProjNetToolchain
     // The build components receive `resolved` (target framework moniker filled in from the runtime); the original
     // `settings` is stored for equality and the settings column so an unset moniker is not surfaced as the runtime's.
     private CsProjNativeAotToolchain(NativeAotRuntime runtime, NativeAotSettings settings, NativeAotSettings resolved)
-        : base("CsProjNativeAot", runtime, settings,
-            new CsProjNativeAotGenerator(resolved),
-            new DotNetCliPublisher(resolved),
-            Toolchains.Executor.Instance)
+        : base("CsProjNativeAot", runtime, settings, new CsProjNativeAotBuilder(resolved), Toolchains.Executor.Instance)
     {
     }
 
