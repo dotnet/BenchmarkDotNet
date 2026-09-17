@@ -74,9 +74,9 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
         }
 
         /// <summary>
-        /// Ends an application the same way, but while the abandoned request had already handed its benchmarks to
-        /// BenchmarkDotNet - the run in flight that an IDE cancels, or that a server-mode client sending `exit` walks
-        /// away from.
+        /// Ends an application the same way, but while the request in flight had already handed its benchmarks to
+        /// BenchmarkDotNet - the run that an IDE cancels, or that a server-mode client sending `exit` walks away from -
+        /// and then lets that run return and complete, and as it does once BenchmarkDotNet is done.
         /// </summary>
         /// <remarks>
         /// They are BenchmarkDotNet's to dispose from the hand-off until the run returns, so disposing them here too
@@ -99,21 +99,26 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
             request.Track(cases);
             request.HandOver(cases);
 
-            // Deliberately no CompleteAsync, as above: this request is abandoned too.
             await lifetime.AfterRunAsync(0, CancellationToken.None).ConfigureAwait(false);
+
+            // The run then returns, BenchmarkDotNet having disposed the values in its run stage - here only claimed,
+            // so that a completion after the sweep that disposed them again would show up in the count.
+            await request.CompleteAsync(cases).ConfigureAwait(false);
 
             return $"created={HandedOverBenchmarks.HandedOver.Created} disposed={HandedOverBenchmarks.HandedOver.Disposed}";
         }
 
         /// <summary>
-        /// Ends an application while a request that handed its benchmarks over has taken them back, which is what a
-        /// run stopped by a critical validation error leaves behind.
+        /// Ends an application while a request that handed its benchmarks over is still validating or building, and
+        /// then lets the run return without BenchmarkDotNet reaching its run stage - which is what an IDE cancelling
+        /// during the build, a client sending `exit`, or a critical validation error leaves behind.
         /// </summary>
         /// <remarks>
-        /// BenchmarkDotNet returned before the run stage it disposes parameter values from, so it disposed nothing and
-        /// they are the request's again. This is the direction that fails silently rather than loudly: values nobody
-        /// disposes are not an exception anyone sees, they are the finalizer, which is the dotnet/BenchmarkDotNet#1383
-        /// hang.
+        /// The order is the one RunAsync produces: the sweep lands while the values are handed over and skips them,
+        /// and only then does the run return, take them back and complete the request. BenchmarkDotNet disposed
+        /// nothing, and the sweep is over, so completing is what has to dispose them. This is the direction that fails
+        /// silently rather than loudly: values nobody disposes are not an exception anyone sees, they are the
+        /// finalizer, which is the dotnet/BenchmarkDotNet#1383 hang.
         /// </remarks>
         /// <returns>The counts, as a line.</returns>
         private static async Task<string> ReportTakenBackRequestAsync()
@@ -124,10 +129,12 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
             var request = lifetime.BeginRequest();
             request.Track(cases);
             request.HandOver(cases);
-            request.TakeBack();
 
-            // Deliberately no CompleteAsync: the request is abandoned while holding them again.
             await lifetime.AfterRunAsync(0, CancellationToken.None).ConfigureAwait(false);
+
+            // The run returns without having reached its run stage, so nothing was disposed by BenchmarkDotNet.
+            request.TakeBack();
+            await request.CompleteAsync([]).ConfigureAwait(false);
 
             return $"created={TakenBackBenchmarks.TakenBack.Created} disposed={TakenBackBenchmarks.TakenBack.Disposed}";
         }
