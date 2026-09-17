@@ -29,8 +29,10 @@ be in:
 * **handed to BenchmarkDotNet**, which it must leave alone — they are disposed by the run stage's own `finally`, and
   taking them here would pull them out from under a run that is using or about to use them. Ownership runs from the
   hand-off rather than from the start of the run stage, because validation and the whole build stage sit in between;
-* **handed over and taken back**, which happens when a critical validation error ends the run before the run stage, so
-  BenchmarkDotNet disposed nothing and they are the request's again. Left undisposed they are the same hang as the
-  first case, reached without anything throwing.
+* **handed over and taken back**, which happens when a critical validation error or a cancellation during the build
+  ends the run before the run stage, so BenchmarkDotNet disposed nothing and they are the request's again. Left
+  undisposed they are the same hang as the first case, reached without anything throwing. The sweep can land before
+  the run takes them back - then the request completing after it disposes them - or between that and the completion,
+  when the sweep disposes them and the completion must not; the probe checks both orders.
 
 `TestingPlatformAdapterTests` in `BenchmarkDotNet.IntegrationTests` runs it and asserts on the report.

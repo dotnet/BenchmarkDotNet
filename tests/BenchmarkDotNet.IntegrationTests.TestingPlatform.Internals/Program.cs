@@ -109,34 +109,62 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
         }
 
         /// <summary>
-        /// Ends an application while a request that handed its benchmarks over is still validating or building, and
-        /// then lets the run return without BenchmarkDotNet reaching its run stage - which is what an IDE cancelling
-        /// during the build, a client sending `exit`, or a critical validation error leaves behind.
+        /// Ends an application around a request whose run returns without BenchmarkDotNet reaching its run stage -
+        /// which is what an IDE cancelling during the build, a client sending `exit`, or a critical validation error
+        /// leaves behind - once for each point at which the sweep can land.
         /// </summary>
         /// <remarks>
-        /// The order is the one RunAsync produces: the sweep lands while the values are handed over and skips them,
-        /// and only then does the run return, take them back and complete the request. BenchmarkDotNet disposed
-        /// nothing, and the sweep is over, so completing is what has to dispose them. This is the direction that fails
-        /// silently rather than loudly: values nobody disposes are not an exception anyone sees, they are the
-        /// finalizer, which is the dotnet/BenchmarkDotNet#1383 hang.
+        /// BenchmarkDotNet disposed nothing, so the values are the request's again, and RunAsync can produce both
+        /// orders:
+        /// <list type="bullet">
+        /// <item>the sweep lands while the values are still handed over and skips them, and the request completing
+        /// after it is what has to dispose them;</item>
+        /// <item>the sweep lands between the two finally blocks, after the values were taken back and before the
+        /// request completes, so the sweep disposes them and the completion must not do so again.</item>
+        /// </list>
+        /// Each gets a lifetime of its own over the same values, and reports how many disposals it caused. This is the
+        /// direction that fails silently rather than loudly: values nobody disposes are not an exception anyone sees,
+        /// they are the finalizer, which is the dotnet/BenchmarkDotNet#1383 hang.
         /// </remarks>
-        /// <returns>The counts, as a line.</returns>
+        /// <returns>The counts, as a line per order.</returns>
         private static async Task<string> ReportTakenBackRequestAsync()
         {
-            var lifetime = new ParameterValueLifetime();
             var cases = BenchmarkConverter.TypeToBenchmarks(typeof(TakenBackBenchmarks)).BenchmarksCases;
 
-            var request = lifetime.BeginRequest();
-            request.Track(cases);
-            request.HandOver(cases);
+            var sweepFirst = await CountDisposalsAsync(async lifetime =>
+            {
+                var request = lifetime.BeginRequest();
+                request.Track(cases);
+                request.HandOver(cases);
 
-            await lifetime.AfterRunAsync(0, CancellationToken.None).ConfigureAwait(false);
+                await lifetime.AfterRunAsync(0, CancellationToken.None).ConfigureAwait(false);
 
-            // The run returns without having reached its run stage, so nothing was disposed by BenchmarkDotNet.
-            request.TakeBack();
-            await request.CompleteAsync([]).ConfigureAwait(false);
+                request.TakeBack();
+                await request.CompleteAsync([]).ConfigureAwait(false);
+            }).ConfigureAwait(false);
 
-            return $"created={TakenBackBenchmarks.TakenBack.Created} disposed={TakenBackBenchmarks.TakenBack.Disposed}";
+            var takenBackFirst = await CountDisposalsAsync(async lifetime =>
+            {
+                var request = lifetime.BeginRequest();
+                request.Track(cases);
+                request.HandOver(cases);
+                request.TakeBack();
+
+                await lifetime.AfterRunAsync(0, CancellationToken.None).ConfigureAwait(false);
+
+                await request.CompleteAsync([]).ConfigureAwait(false);
+            }).ConfigureAwait(false);
+
+            return $"sweep-first created={TakenBackBenchmarks.TakenBack.Created} disposed={sweepFirst}"
+                + Environment.NewLine
+                + $"taken-back-first created={TakenBackBenchmarks.TakenBack.Created} disposed={takenBackFirst}";
+
+            static async Task<int> CountDisposalsAsync(Func<ParameterValueLifetime, Task> drive)
+            {
+                var before = TakenBackBenchmarks.TakenBack.Disposed;
+                await drive(new ParameterValueLifetime()).ConfigureAwait(false);
+                return TakenBackBenchmarks.TakenBack.Disposed - before;
+            }
         }
 
         /// <summary>

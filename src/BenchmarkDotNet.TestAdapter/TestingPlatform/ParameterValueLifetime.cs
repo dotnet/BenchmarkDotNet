@@ -100,8 +100,10 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             lock (gate)
             {
                 // Nothing can ask for any of these again. That includes the values of a request still in flight: the
-                // application is going away, so its scope will never be completed, and these are the only reference
-                // left to them - a value left to the finalizer instead is the dotnet/BenchmarkDotNet#1383 hang.
+                // application is going away, and one that is abandoned rather than run to the end never completes its
+                // scope, so this is the only disposal they get - a value left to the finalizer instead is the
+                // dotnet/BenchmarkDotNet#1383 hang. A request that does complete after this disposes whatever the
+                // sweep left to it, see settled.
                 //
                 // What such a request has handed to BenchmarkDotNet is the exception, wherever else it is found: under
                 // server mode the discovery before the run leaves the very same cached values held, so filtering only
