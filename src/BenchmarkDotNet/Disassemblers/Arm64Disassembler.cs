@@ -151,6 +151,7 @@ namespace BenchmarkDotNet.Disassemblers
             instr0 = instr1 = instr2 = 0;
 
             byte[] buffer = new byte[16];
+            // TODO: IDataReader.Read might return partial data. It need to call multiple times until buffer filled or readLength<=0.
             int read = reader.Read(address, buffer);
             if (read < 12)
                 return false;
