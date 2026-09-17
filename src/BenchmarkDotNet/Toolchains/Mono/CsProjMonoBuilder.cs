@@ -1,5 +1,3 @@
-using BenchmarkDotNet.Characteristics;
-using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using System.Xml.Linq;
@@ -24,18 +22,9 @@ namespace BenchmarkDotNet.Toolchains.Mono
                 new XElement("RuntimeIdentifier", runtimeIdentifier),
                 // RuntimeIdentifiers is set as well because SelfContained requires it.
                 // https://github.com/dotnet/sdk/issues/10566
-                new XElement("RuntimeIdentifiers", runtimeIdentifier)));
-        }
-
-        protected override string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
-        {
-            // NU1102 error occurs when passing /p:UseMonoRuntime=true to the dotnet cli with projects containing .NET 9.0 or higher. #3000
-            return base.GetRuntimeSettings(gcMode, resolver) +
-                """
-                  <PropertyGroup>
-                    <UseMonoRuntime>true</UseMonoRuntime>
-                  </PropertyGroup>
-                """;
+                new XElement("RuntimeIdentifiers", runtimeIdentifier),
+                // As a global property this causes NU1102 for projects targeting .NET 9.0 or higher. #3000
+                new XElement("UseMonoRuntime", "true")));
         }
     }
 }
