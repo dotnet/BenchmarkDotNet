@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Extensions;
 using Microsoft.Diagnostics.Runtime;
+using Microsoft.Diagnostics.Runtime.Interfaces;
 using Microsoft.Diagnostics.Symbols;
 using System.Diagnostics;
 
@@ -17,7 +18,7 @@ namespace BenchmarkDotNet.Disassemblers
             symbolReader.Dispose();
         }
 
-        internal IEnumerable<Sharp> GetSource(ClrMethod method, ILToNativeMap map)
+        internal IEnumerable<Sharp> GetSource(IClrMethod method, ILToNativeMap map)
         {
             var sourceLocation = GetSourceLocation(method, map.ILOffset);
             if (sourceLocation is not { LineNumber: > 0 })
@@ -105,7 +106,7 @@ namespace BenchmarkDotNet.Disassemblers
             return new string(prefix);
         }
 
-        internal SourceLocation? GetSourceLocation(ClrMethod method, int ilOffset)
+        internal SourceLocation? GetSourceLocation(IClrMethod method, int ilOffset)
         {
             var reader = GetReaderForMethod(method);
             if (reader == null)
@@ -114,9 +115,9 @@ namespace BenchmarkDotNet.Disassemblers
             return reader.SourceLocationForManagedCode((uint)method.MetadataToken, ilOffset);
         }
 
-        private ManagedSymbolModule? GetReaderForMethod(ClrMethod? method)
+        private ManagedSymbolModule? GetReaderForMethod(IClrMethod? method)
         {
-            ClrModule? module = method?.Type?.Module;
+            IClrModule? module = method?.Type?.Module;
             PdbInfo? info = module?.Pdb;
 
             ManagedSymbolModule? reader = null;
