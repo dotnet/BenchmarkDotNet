@@ -13,8 +13,8 @@ public partial class Arm64DisassemblerTests
     public void TryResolvePrecode_StubPrecode()
     {
         // Arrange
-        const int JumpAddress = 0x10000;
-        const int MdOffset = 0x20000; // This value is not used for test.
+        const int JumpAddress = 0x10000; // This value is not used for test.
+        const int MdOffset = 0x20000;
         var rawInstructions = new[]
         {
             Arm64InstructionFactory.DMB(Arm64BarrierOperationLimitKind.ISHLD), // dmb ishld
