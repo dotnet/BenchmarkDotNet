@@ -2,6 +2,7 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
@@ -77,10 +78,18 @@ namespace BenchmarkDotNet.Running
 
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
 
-        private static string GetResolvedAssemblyLocation(Assembly assembly) =>
-            // in case of SingleFile, location.Length returns 0, so we use GetName() and
-            // manually construct the path.
-            assembly.Location.Length == 0 ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name!) : assembly.Location;
+        private static string GetResolvedAssemblyLocation(Assembly assembly)
+        {
+            // A shadow copy is run from a cache directory that holds the assembly alone, so everything we
+            // generate next to it would be built and run without any of its dependencies beside it. #558
+            if (ShadowCopyHelper.TryGetOriginalLocation(assembly, out string? originalLocation))
+                return originalLocation;
+
+            // In case of SingleFile, location is empty, so we manually construct the path.
+            return assembly.Location.IsBlank()
+                ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name!)
+                : assembly.Location;
+        }
 
         internal static string GetProgramName(BenchmarkCase representativeBenchmarkCase, int id)
         {
