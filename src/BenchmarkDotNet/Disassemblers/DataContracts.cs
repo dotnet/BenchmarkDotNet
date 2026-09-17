@@ -142,7 +142,7 @@ public sealed class Arm64Asm : Asm
             if (reader.TokenType != JsonTokenType.EndObject)
                 throw new JsonException("Invalid JSON");
 
-            using var disassembler = CapstoneDisassembler.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
+            using var disassembler = CapstoneFactory.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
             disassembler.EnableInstructionDetails = true;
             disassembler.DisassembleSyntax = syntax;
             var instruction = disassembler.Disassemble(instructionBytes, instructionAddress).SingleOrDefault();

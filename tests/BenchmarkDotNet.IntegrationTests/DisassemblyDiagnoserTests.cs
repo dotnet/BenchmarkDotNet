@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
@@ -10,7 +10,6 @@ using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
-using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Framework;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -32,6 +31,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             if (RuntimeInformation.IsFullFramework)
             {
+                if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64)
+                {
+                    // RyuJit for desktop .NET arm64. Supported only on net481, but we have to match the tfm in our test project.
+                    yield return [Jit.RyuJit, Platform.Arm64, CsProjFrameworkToolchain.Net472];
+                }
+                // Framework on arm emulates x86, so these platform targets should work on both.
                 yield return [Jit.LegacyJit, Platform.X86, CsProjFrameworkToolchain.Net472]; // 32bit LegacyJit for desktop .NET
                 yield return [Jit.LegacyJit, Platform.X64, CsProjFrameworkToolchain.Net472]; // 64bit LegacyJit for desktop .NET
                 yield return [Jit.RyuJit, Platform.X64, CsProjFrameworkToolchain.Net472]; // RyuJit for desktop .NET
@@ -87,7 +92,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [MethodImpl(MethodImplOptions.NoInlining)] public void Benchmark(bool justAnOverload) { } // we need to test overloads (#562)
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, IToolchain toolchain)
@@ -107,7 +112,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassemblyResult(result, $"{nameof(WithCalls.Recursive)}()");
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, IToolchain toolchain)
@@ -133,7 +138,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public T Create() => new T();
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, IToolchain toolchain)
@@ -154,7 +159,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public void JustReturn() { }
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, IToolchain toolchain)
@@ -188,7 +193,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [MethodImpl(MethodImplOptions.NoInlining)] public virtual void ForDisassemblyDiagnoser() { }
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleWhenBenchmarkDeclaresGeneratedMemberNames(Jit jit, Platform platform, IToolchain toolchain)
