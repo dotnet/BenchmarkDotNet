@@ -25,7 +25,6 @@ namespace BenchmarkDotNet.Configs
             DiagnosersValidator.Composite,
             CompilationValidator.FailOnError,
             ConfigValidator.DontFailOnError,
-            ShadowCopyValidator.DontFailOnError,
             JitOptimizationsValidator.DontFailOnError,
             DeferredExecutionValidator.DontFailOnError,
             ParamsAllValuesValidator.FailOnError,

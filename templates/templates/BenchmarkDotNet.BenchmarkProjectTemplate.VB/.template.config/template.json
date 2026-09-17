@@ -35,6 +35,10 @@
       "datatype": "choice",
       "choices": [
         {
+          "choice": "net12.0",
+          "description": ".NET 12"
+        },
+        {
           "choice": "net11.0",
           "description": ".NET 11"
         },

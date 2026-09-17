@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Tests
         [AssertionMethod]
         private void Verify(string msbuildError, bool expectedResult, string? expectedReason, params Type[] inProcessDiagnoserHandlerTypes)
         {
-            var sut = BuildResult.Failure(GenerateResult.Success(ArtifactsPaths.Empty, []), msbuildError);
+            var sut = BuildResult.Failure(ArtifactsPaths.Empty, msbuildError);
 
             Assert.Equal(expectedResult, sut.TryToExplainFailureReason(inProcessDiagnoserHandlerTypes, out var reason));
             Assert.Equal(expectedReason, reason);

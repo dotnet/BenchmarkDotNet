@@ -13,6 +13,7 @@ public sealed class CsProjMonoCoreToolchain : CsProjNetToolchain
     public static readonly CsProjMonoCoreToolchain Mono90 = new(MonoCoreRuntime.Net90, MonoCoreSettings.Default);
     public static readonly CsProjMonoCoreToolchain Mono10_0 = new(MonoCoreRuntime.Net10_0, MonoCoreSettings.Default);
     public static readonly CsProjMonoCoreToolchain Mono11_0 = new(MonoCoreRuntime.Net11_0, MonoCoreSettings.Default);
+    public static readonly CsProjMonoCoreToolchain Mono12_0 = new(MonoCoreRuntime.Net12_0, MonoCoreSettings.Default);
 
     private CsProjMonoCoreToolchain(MonoCoreRuntime runtime, MonoCoreSettings settings)
         : this(runtime, settings, Resolve(settings, runtime)) { }
@@ -20,10 +21,7 @@ public sealed class CsProjMonoCoreToolchain : CsProjNetToolchain
     // The build components receive `resolved` (target framework moniker filled in from the runtime); the original
     // `settings` is stored for equality and the settings column so an unset moniker is not surfaced as the runtime's.
     private CsProjMonoCoreToolchain(MonoCoreRuntime runtime, MonoCoreSettings settings, MonoCoreSettings resolved)
-        : base("Mono", runtime, settings,
-            new CsProjMonoGenerator(resolved),
-            new MonoPublisher(resolved),
-            new DotNetCliExecutor(settings.CliPath))
+        : base("Mono", runtime, settings, new CsProjMonoBuilder(resolved), new DotNetCliExecutor(settings.CliPath))
     {
     }
 
@@ -46,6 +44,7 @@ public sealed class CsProjMonoCoreToolchain : CsProjNetToolchain
             9 => Mono90,
             10 => Mono10_0,
             11 => Mono11_0,
+            12 => Mono12_0,
             _ => new CsProjMonoCoreToolchain(runtime, settings),
         };
     }

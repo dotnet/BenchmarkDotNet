@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 {
     public sealed class CoreRunToolchain : IToolchain, IHasSettings
     {
-        private const string DefaultTargetFrameworkMoniker = "net11.0";
+        private const string DefaultTargetFrameworkMoniker = "net12.0";
 
         private CoreRunToolchain(CoreRunSettings settings)
         {
@@ -29,8 +29,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
                 ? coreRuntime
                 : throw new NotSupportedException(
                     $"CoreRun can only run .NET (Core) benchmarks, but '{resolvedSettings.TargetFrameworkMoniker}' does not describe a .NET (Core) target framework.");
-            Generator = new CoreRunGenerator(SourceCoreRun, CopyCoreRun, resolvedSettings);
-            Builder = new CoreRunPublisher(resolvedSettings, CopyCoreRun);
+            Builder = new CoreRunBuilder(SourceCoreRun, CopyCoreRun, resolvedSettings);
             Executor = new DotNetCliExecutor(customDotNetCliPath: CopyCoreRun); // instead of executing "dotnet $pathToDll" we do "CoreRun $pathToDll"
         }
 
@@ -47,8 +46,6 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
         ISettings IHasSettings.Settings => Settings;
 
         public Runtime Runtime { get; }
-
-        public IGenerator Generator { get; }
 
         public IBuilder Builder { get; }
 

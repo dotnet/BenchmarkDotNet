@@ -25,11 +25,22 @@
   <Target Name="BenchmarkDotNetWeaveAssemblies"
       AfterTargets="$(BenchmarkDotNetWeaveAssembliesAfterTargets)"
       BeforeTargets="$(BenchmarkDotNetWeaveAssembliesBeforeTargets)"
-      Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' == 'true'"
+      Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' == 'true' and '$(SkipCompilerExecution)' != 'true'"
       Inputs="$(BenchmarkDotNetWeaveAssemblyPath)"
       Outputs="$(BenchmarkDotNetWeaveAssembliesStampFile)">
 
-    <WeaveAssemblyTask TargetAssembly="$(BenchmarkDotNetWeaveAssemblyPath)" ReferencePaths="@(ReferencePath)" TreatWarningsAsErrors="$(TreatWarningsAsErrors)" />
+    <!--
+      Weaving rewrites the assembly the compiler already signed, so the signing properties are passed along
+      for it to sign the result again with the same key.
+    -->
+    <WeaveAssemblyTask
+        TargetAssembly="$(BenchmarkDotNetWeaveAssemblyPath)"
+        ReferencePaths="@(ReferencePath)"
+        TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
+        SignAssembly="$(SignAssembly)"
+        AssemblyOriginatorKeyFile="$(AssemblyOriginatorKeyFile)"
+        DelaySign="$(DelaySign)"
+        PublicSign="$(PublicSign)" />
 
     <!-- Create stamp file for incrementality -->
     <Touch Files="$(BenchmarkDotNetWeaveAssembliesStampFile)" AlwaysCreate="true" />

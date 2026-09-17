@@ -5,7 +5,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 using System.Collections.Immutable;
 using System.ComponentModel;
@@ -23,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         [PublicAPI]
         public static async Task<DotNetCliCommandResult> ExecuteAsync(DotNetCliCommand parameters, CancellationToken cancellationToken)
         {
-            using var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) };
+            using var process = new Process { StartInfo = BuildStartInfo(parameters.CliPath, parameters.ArtifactsPaths.BuildArtifactsDirectoryPath, parameters.Arguments, parameters.EnvironmentVariables) };
             using var outputReader = new AsyncProcessOutputReader(process,
                 stdOutLogger: parameters.LogOutput ? parameters.Logger : NullLogger.Instance,
                 stdErrLogger: parameters.Logger);
@@ -122,7 +121,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             ProcessStartInfo startInfo = BuildStartInfo(
-                command.CliPath, command.GenerateResult.ArtifactsPaths.BuildArtifactsDirectoryPath, command.Arguments, command.EnvironmentVariables);
+                command.CliPath, command.ArtifactsPaths.BuildArtifactsDirectoryPath, command.Arguments, command.EnvironmentVariables);
 
             if (startInfo.Environment.Keys.Count > 0)
             {
@@ -196,7 +195,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 filePath: string.Empty,
                 tfm: string.Empty,
                 arguments: "--info",
-                generateResult: GenerateResult.Success(ArtifactsPaths.Empty, []),
+                artifactsPaths: ArtifactsPaths.Empty,
                 logger: NullLogger.Instance,
                 buildPartition: BuildPartition.Empty,
                 environmentVariables: [],

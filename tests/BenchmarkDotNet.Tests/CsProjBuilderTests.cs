@@ -13,9 +13,9 @@ using System.Xml;
 
 namespace BenchmarkDotNet.Tests
 {
-    public class CsProjGeneratorTests
+    public class CsProjBuilderTests
     {
-        private FileInfo TestAssemblyFileInfo = new FileInfo(typeof(CsProjGeneratorTests).Assembly.Location);
+        private FileInfo TestAssemblyFileInfo = new FileInfo(typeof(CsProjBuilderTests).Assembly.Location);
         private const string runtimeHostConfigurationOptionChunk = """
 <ItemGroup>
   <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
@@ -23,15 +23,15 @@ namespace BenchmarkDotNet.Tests
 """;
 
         [Theory]
-        [InlineData("net471", false)]
-        [InlineData("netcoreapp3.1", true)]
-        public void ItsPossibleToCustomizeProjectSdkBasedOnProjectSdkFromTheProjectFile(string targetFrameworkMoniker, bool isNetCore)
+        [InlineData("net471")]
+        [InlineData("netcoreapp3.1")]
+        public void ItsPossibleToCustomizeProjectSdkBasedOnProjectSdkFromTheProjectFile(string targetFrameworkMoniker)
         {
             const string withCustomProjectSdk = @"
 <Project Sdk=""CUSTOM"">
 </Project>
 ";
-            AssertParsedSdkName(withCustomProjectSdk, targetFrameworkMoniker, "CUSTOM", isNetCore);
+            AssertParsedSdkName(withCustomProjectSdk, targetFrameworkMoniker, "CUSTOM");
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Tests
   <Import Sdk=""Microsoft.NET.Sdk.WindowsDesktop"" Project=""Sdk.props"" Condition=""'$(TargetFramework)'=='netcoreapp3.1'""/>
 </Project>
 ";
-            AssertParsedSdkName(withCustomProjectImport, "net471", "Microsoft.NET.Sdk", false);
+            AssertParsedSdkName(withCustomProjectImport, "net471", "Microsoft.NET.Sdk");
         }
 
         [Fact]
@@ -53,13 +53,13 @@ namespace BenchmarkDotNet.Tests
   <Import Sdk=""Microsoft.NET.Sdk.WindowsDesktop"" Project=""Sdk.props"" Condition=""'$(TargetFramework)'=='netcoreapp3.1'""/>
 </Project>
 ";
-            AssertParsedSdkName(withCustomProjectImport, "netcoreapp3.1", "Microsoft.NET.Sdk.WindowsDesktop", true);
+            AssertParsedSdkName(withCustomProjectImport, "netcoreapp3.1", "Microsoft.NET.Sdk.WindowsDesktop");
         }
 
         [AssertionMethod]
-        private void AssertParsedSdkName(string csProjContent, string targetFrameworkMoniker, string expectedSdkValue, bool isNetCore)
+        private void AssertParsedSdkName(string csProjContent, string targetFrameworkMoniker, string expectedSdkValue)
         {
-            var sut = new CsProjGenerator(new NetCoreAppSettings { TargetFrameworkMoniker = targetFrameworkMoniker }, isNetCore);
+            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = targetFrameworkMoniker });
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(csProjContent);
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Tests
   </PropertyGroup>
 </Project>
 ";
-            var sut = new CsProjGenerator(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" }, true);
+            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(withUseWpfTrue);
@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Tests
   <Import Project=""{propsFilePath}"" />
 </Project>";
 
-            var sut = new CsProjGenerator(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" }, true);
+            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(importingAbsolutePath);
@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Tests
   <Import Project="".{Path.DirectorySeparatorChar}test.props"" />
 </Project>";
 
-            var sut = new CsProjGenerator(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" }, true);
+            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(importingRelativePath);
@@ -169,7 +169,7 @@ namespace BenchmarkDotNet.Tests
 {runtimeHostConfigurationOptionChunk}
 </Project>";
 
-            var sut = new CsProjGenerator(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" }, true);
+            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(source);
@@ -189,7 +189,7 @@ namespace BenchmarkDotNet.Tests
   </PropertyGroup>
 </Project>
 ";
-            var sut = new CsProjGenerator(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" }, true);
+            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
 
             var xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(withWarningsAsErrors);
@@ -216,8 +216,8 @@ namespace BenchmarkDotNet.Tests
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, config);
 
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999, new([])) };
-            var projectGenerator = new SteamLoadedBuildPartition(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" }, true);
-            string binariesPath = projectGenerator.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
+            var projectBuilder = new SteamLoadedBuildPartition(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
+            string binariesPath = projectBuilder.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
 
             string expectedPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin"), programName);
             Assert.Equal(expectedPath, binariesPath);
@@ -230,9 +230,9 @@ namespace BenchmarkDotNet.Tests
             var target = new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, ManualConfig.CreateEmpty().CreateImmutableConfig());
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0, new([])) };
-            var projectGenerator = new SteamLoadedBuildPartition(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" }, true);
+            var projectBuilder = new SteamLoadedBuildPartition(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
             var buildPartition = new BuildPartition(benchmarks, new Resolver());
-            string binariesPath = projectGenerator.ResolvePathForBinaries(buildPartition, programName);
+            string binariesPath = projectBuilder.ResolvePathForBinaries(buildPartition, programName);
 
             string expectedPath = Path.Combine(Path.GetDirectoryName(buildPartition.AssemblyLocation)!, programName);
             Assert.Equal(expectedPath, binariesPath);
@@ -266,15 +266,15 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
-        private class SteamLoadedBuildPartition : CsProjGenerator
+        private class SteamLoadedBuildPartition : CsProjBuilder
         {
             internal string ResolvePathForBinaries(BuildPartition buildPartition, string programName)
             {
                 return base.GetBuildArtifactsDirectoryPath(buildPartition, programName);
             }
 
-            public SteamLoadedBuildPartition(NetCoreAppSettings settings, bool isNetCore)
-                : base(settings, isNetCore) { }
+            public SteamLoadedBuildPartition(NetCoreAppSettings settings)
+                : base(settings) { }
         }
     }
 }

@@ -19,6 +19,7 @@ public sealed class CsProjCoreToolchain : CsProjNetToolchain
     public static readonly CsProjCoreToolchain NetCoreApp90 = new(CoreRuntime.Core90, NetCoreAppSettings.Default);
     public static readonly CsProjCoreToolchain NetCoreApp10_0 = new(CoreRuntime.Core10_0, NetCoreAppSettings.Default);
     public static readonly CsProjCoreToolchain NetCoreApp11_0 = new(CoreRuntime.Core11_0, NetCoreAppSettings.Default);
+    public static readonly CsProjCoreToolchain NetCoreApp12_0 = new(CoreRuntime.Core12_0, NetCoreAppSettings.Default);
 
     private CsProjCoreToolchain(CoreRuntime runtime, NetCoreAppSettings settings)
         : this(runtime, settings, Resolve(settings, runtime)) { }
@@ -26,10 +27,7 @@ public sealed class CsProjCoreToolchain : CsProjNetToolchain
     // The build components receive `resolved` (target framework moniker filled in from the runtime); the original
     // `settings` is stored for equality and the settings column so an unset moniker is not surfaced as the runtime's.
     private CsProjCoreToolchain(Runtime runtime, NetCoreAppSettings settings, NetCoreAppSettings resolved)
-        : base("CsProjCore", runtime, settings,
-            new CsProjGenerator(resolved),
-            new DotNetCliBuilder(resolved),
-            new DotNetCliExecutor(settings.CliPath))
+        : base("CsProjCore", runtime, settings, new CsProjBuilder(resolved), new DotNetCliExecutor(settings.CliPath))
     {
     }
 
@@ -61,6 +59,7 @@ public sealed class CsProjCoreToolchain : CsProjNetToolchain
             (9, 0) => NetCoreApp90,
             (10, 0) => NetCoreApp10_0,
             (11, 0) => NetCoreApp11_0,
+            (12, 0) => NetCoreApp12_0,
             _ => new CsProjCoreToolchain(runtime, settings),
         };
     }

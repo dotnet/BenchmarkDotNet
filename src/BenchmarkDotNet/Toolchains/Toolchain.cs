@@ -6,11 +6,9 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains
 {
-    public abstract class Toolchain(string name, Runtime runtime, IGenerator generator, IBuilder builder, IExecutor executor) : IToolchain
+    public abstract class Toolchain(string name, Runtime runtime, IBuilder builder, IExecutor executor) : IToolchain
     {
         public Runtime Runtime { get; } = runtime;
-
-        public IGenerator Generator { get; } = generator;
 
         public IBuilder Builder { get; } = builder;
 

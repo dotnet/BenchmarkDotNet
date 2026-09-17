@@ -53,6 +53,8 @@ namespace BenchmarkDotNet.Jobs
         public const string Net10_0 = "net10.0";
         /// <summary>.NET 11.0</summary>
         public const string Net11_0 = "net11.0";
+        /// <summary>.NET 12.0</summary>
+        public const string Net12_0 = "net12.0";
 
         /// <summary>NativeAOT compiled as net7.0</summary>
         public const string NativeAot70 = "nativeaot7.0";
@@ -64,6 +66,8 @@ namespace BenchmarkDotNet.Jobs
         public const string NativeAot10_0 = "nativeaot10.0";
         /// <summary>NativeAOT compiled as net11.0</summary>
         public const string NativeAot11_0 = "nativeaot11.0";
+        /// <summary>NativeAOT compiled as net12.0</summary>
+        public const string NativeAot12_0 = "nativeaot12.0";
 
         /// <summary>.NET 6 using MonoVM (not CLR which is the default)</summary>
         public const string Mono60 = "mono6.0";
@@ -77,6 +81,8 @@ namespace BenchmarkDotNet.Jobs
         public const string Mono10_0 = "mono10.0";
         /// <summary>.NET 11 using MonoVM (not CLR which is the default)</summary>
         public const string Mono11_0 = "mono11.0";
+        /// <summary>.NET 12 using MonoVM (not CLR which is the default)</summary>
+        public const string Mono12_0 = "mono12.0";
 
         /// <summary>.NET 8 CLR with composite ReadyToRun compilation</summary>
         public const string R2R80 = "r2r8.0";
@@ -86,6 +92,8 @@ namespace BenchmarkDotNet.Jobs
         public const string R2R10_0 = "r2r10.0";
         /// <summary>.NET 11 CLR with composite ReadyToRun compilation</summary>
         public const string R2R11_0 = "r2r11.0";
+        /// <summary>.NET 12 CLR with composite ReadyToRun compilation</summary>
+        public const string R2R12_0 = "r2r12.0";
 
         /// <summary>Mono WebAssembly with net8.0</summary>
         public const string MonoWasm80 = "monowasm8.0";
@@ -95,6 +103,8 @@ namespace BenchmarkDotNet.Jobs
         public const string MonoWasm10_0 = "monowasm10.0";
         /// <summary>Mono WebAssembly with net11.0</summary>
         public const string MonoWasm11_0 = "monowasm11.0";
+        /// <summary>Mono WebAssembly with net12.0</summary>
+        public const string MonoWasm12_0 = "monowasm12.0";
 
         /// <summary>Mono WebAssembly AOT with net8.0</summary>
         public const string MonoWasmAot80 = "monowasmaot8.0";
@@ -104,6 +114,8 @@ namespace BenchmarkDotNet.Jobs
         public const string MonoWasmAot10_0 = "monowasmaot10.0";
         /// <summary>Mono WebAssembly AOT with net11.0</summary>
         public const string MonoWasmAot11_0 = "monowasmaot11.0";
+        /// <summary>Mono WebAssembly AOT with net12.0</summary>
+        public const string MonoWasmAot12_0 = "monowasmaot12.0";
 
         // Still experimental
         //public const string CoreWasm11_0 = "corewasm11.0";
