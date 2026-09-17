@@ -1,7 +1,6 @@
 using AwesomeAssertions;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Serialization;
-using BenchmarkDotNet.Tests.XUnit;
 using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Iced.Intel;
@@ -105,7 +104,7 @@ public class DisassemblerModelSerializationTests
         Assert.Equivalent(model, result, strict: true);
     }
 
-    [FactEnvSpecific("ARM64 disassembler is not supported on .NET Framework or Windows+Arm environment", EnvRequirement.NonFullFramework, EnvRequirement.NonWindowsArm)]
+    [Fact]
     public void Arm64AsmSerializationTest()
     {
         // Arrange
@@ -113,7 +112,7 @@ public class DisassemblerModelSerializationTests
         var disassembleSyntax = DisassembleSyntax.Intel;
 
         // Create instruction instance by using disassembler.
-        using var disassembler = CapstoneDisassembler.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
+        using var disassembler = CapstoneFactory.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
         disassembler.EnableInstructionDetails = true;
         disassembler.DisassembleSyntax = disassembleSyntax;
 

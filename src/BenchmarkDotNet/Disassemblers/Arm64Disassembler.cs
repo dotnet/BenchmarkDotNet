@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Disassemblers
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, IClrMethod currentMethod, DisassemblySyntax syntax)
         {
             const Arm64DisassembleMode disassembleMode = Arm64DisassembleMode.Arm;
-            using (CapstoneArm64Disassembler disassembler = CapstoneDisassembler.CreateArm64Disassembler(disassembleMode))
+            using (CapstoneArm64Disassembler disassembler = CapstoneFactory.CreateArm64Disassembler(disassembleMode))
             {
                 // Enables disassemble details, which are disabled by default, to provide more detailed information on
                 // disassembled binary code.

@@ -121,12 +121,6 @@ namespace BenchmarkDotNet.Diagnosers
                 yield break;
             }
 
-            if (currentPlatform == Platform.Arm64 && OsDetector.IsWindows())
-            {
-                yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} does not support Arm on Windows");
-                yield break;
-            }
-
             if (Config.RunInHost && OsDetector.IsMacOS())
             {
                 yield return new ValidationError(true, "Disassembling in the host process is not supported on MacOS");
