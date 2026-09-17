@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 
 namespace BenchmarkDotNet.Loggers
 {
-    internal class CompositeLogger : ILogger
+    internal class CompositeLogger : ILogger, ILinkLogger
     {
         private readonly ImmutableHashSet<ILogger> loggers;
 
