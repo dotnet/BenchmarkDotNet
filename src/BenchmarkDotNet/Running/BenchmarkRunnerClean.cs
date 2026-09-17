@@ -15,7 +15,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Mathematics;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
@@ -104,17 +103,14 @@ namespace BenchmarkDotNet.Running
             eventProcessor.OnStartBuildStage(buildPartitions);
 
             var sequentialBuildPartitions = buildPartitions.Where(partition =>
-                    partition.Benchmarks.Any(x => x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild))
-                    // .Net SDK 8+ supports ArtifactsPath for proper parallel builds.
-                    // Older SDKs may produce builds with incorrect bindings if more than 1 partition is built in parallel.
-                    || (partition.RepresentativeBenchmarkCase.GetToolchain().Generator is DotNetCliGenerator
-                        && partition.RepresentativeBenchmarkCase.GetRuntime().Version?.Major < 8)
+                    !partition.RepresentativeBenchmarkCase.GetToolchain().Builder.GetSupportsConcurrency(partition)
+                    || partition.Benchmarks.Any(x => x.Config.Options.IsSet(ConfigOptions.DisableParallelBuild))
                 )
                 .ToArray();
             var parallelBuildPartitions = buildPartitions.Except(sequentialBuildPartitions).ToArray();
 
             Dictionary<BuildPartition, BuildResult> buildResults = parallelBuildPartitions.Length > 0
-                ? await BuildInParallel(compositeLogger, rootArtifactsFolderPath, parallelBuildPartitions, globalChronometer, eventProcessor, cancellationToken).ConfigureAwait()
+                ? await BuildConcurrently(compositeLogger, rootArtifactsFolderPath, parallelBuildPartitions, globalChronometer, eventProcessor, cancellationToken).ConfigureAwait()
                 : [];
 
             if (sequentialBuildPartitions.Length > 0)
@@ -277,10 +273,10 @@ namespace BenchmarkDotNet.Running
                     }
                     else
                     {
-                        reports.Add(new BenchmarkReport(false, benchmark, buildResult, buildResult, default, default));
+                        reports.Add(new BenchmarkReport(false, benchmark, buildResult, default, default));
 
-                        if (buildResult.GenerateException != null)
-                            logger.WriteLineError($"// Generate Exception: {buildResult.GenerateException}");
+                        if (buildResult.Exception != null)
+                            logger.WriteLineError($"// Build Exception: {buildResult.Exception}");
                         else if (!buildResult.IsBuildSuccess && buildResult.TryToExplainFailureReason(benchmarkRunInfo.CompositeInProcessDiagnoser.GetInProcessDiagnoserHandlerTypes(benchmark), out string? reason))
                             logger.WriteLineError($"// Build Error: {reason}");
                         else if (buildResult.ErrorMessage != null)
@@ -418,7 +414,7 @@ namespace BenchmarkDotNet.Running
             return errors;
         }
 
-        private static async ValueTask<Dictionary<BuildPartition, BuildResult>> BuildInParallel(
+        private static async ValueTask<Dictionary<BuildPartition, BuildResult>> BuildConcurrently(
             ILogger logger,
             string rootArtifactsFolderPath,
             BuildPartition[] buildPartitions,
@@ -432,49 +428,21 @@ namespace BenchmarkDotNet.Running
 
             var beforeParallelBuild = globalChronometer.GetElapsed();
 
-            async Task<(BuildPartition Partition, BuildResult Result)> BuildAsync(BuildPartition buildPartition)
-            {
-                var result = await Task.Run(
-                    async () => await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken).ConfigureAwait(false),
-                    cancellationToken
-                ).ConfigureAwait();
-
-                // If the generation was successful, but the build was not, we will try building sequentially
-                // so don't send the OnBuildComplete event yet.
-                if (buildPartitions.Length <= 1 || !result.IsGenerateSuccess || result.IsBuildSuccess)
-                    eventProcessor.OnBuildComplete(buildPartition, result);
-
-                return (buildPartition, result);
-            }
-
             var buildResults = (await Task.WhenAll(buildPartitions.Select(BuildAsync)).ConfigureAwait())
-                .ToDictionary(build => build.Partition, build => build.Result);
+                .ToDictionary(build => build.partition, build => build.result);
 
             var afterParallelBuild = globalChronometer.GetElapsed();
 
             logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeParallelBuild, afterParallelBuild)}   *****");
 
-            if (buildPartitions.Length <= 1 || !buildResults.Values.Any(result => result.IsGenerateSuccess && !result.IsBuildSuccess))
-                return buildResults;
-
-            logger.WriteLineHeader("// ***** Failed to build in Parallel, switching to sequential build   *****");
-
-            foreach (var buildPartition in buildPartitions)
-            {
-                if (buildResults[buildPartition].IsGenerateSuccess && !buildResults[buildPartition].IsBuildSuccess)
-                {
-                    if (!buildResults[buildPartition].TryToExplainFailureReason(buildPartition.GetInProcessDiagnoserHandlerTypes(), out _))
-                        buildResults[buildPartition] = await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken).ConfigureAwait();
-
-                    eventProcessor.OnBuildComplete(buildPartition, buildResults[buildPartition]);
-                }
-            }
-
-            var afterSequentialBuild = globalChronometer.GetElapsed();
-
-            logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(afterParallelBuild, afterSequentialBuild)}   *****");
-
             return buildResults;
+
+            async Task<(BuildPartition partition, BuildResult result)> BuildAsync(BuildPartition buildPartition)
+            {
+                var result = await Build(buildPartition, rootArtifactsFolderPath, buildLogger, cancellationToken).ConfigureAwait();
+                eventProcessor.OnBuildComplete(buildPartition, result);
+                return (buildPartition, result);
+            }
         }
 
         private static async IAsyncEnumerable<(BuildPartition BuildPartition, BuildResult BuildResult)> BuildSequential(
@@ -506,24 +474,15 @@ namespace BenchmarkDotNet.Running
 
         private static async ValueTask<BuildResult> Build(BuildPartition buildPartition, string rootArtifactsFolderPath, ILogger buildLogger, CancellationToken cancellationToken)
         {
-            var toolchain = buildPartition.RepresentativeBenchmarkCase.GetToolchain(); // it's guaranteed that all the benchmarks in single partition have same toolchain
-
-            var generateResult = await toolchain.Generator.GenerateProjectAsync(buildPartition, buildLogger, rootArtifactsFolderPath, cancellationToken).ConfigureAwait();
-
             try
             {
-                if (!generateResult.IsGenerateSuccess)
-                {
-                    return generateResult.GenerateException != null
-                        ? BuildResult.Failure(generateResult, generateResult.GenerateException)
-                        : BuildResult.Failure(generateResult, errorMessage: "");
-                }
-
-                return await toolchain.Builder.BuildAsync(generateResult, buildPartition, buildLogger, cancellationToken).ConfigureAwait(false);
+                // it's guaranteed that all the benchmarks in single partition have same toolchain
+                return await buildPartition.RepresentativeBenchmarkCase.GetToolchain().Builder
+                    .BuildAsync(buildPartition, buildLogger, rootArtifactsFolderPath, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception e) when (!ExceptionHelper.IsProperCancelation(e, cancellationToken))
             {
-                return BuildResult.Failure(generateResult, e);
+                return BuildResult.Failure(ArtifactsPaths.Empty, e);
             }
         }
 
@@ -537,7 +496,7 @@ namespace BenchmarkDotNet.Running
 
             var (success, executeResults, metrics) = await Execute(logger, benchmarkCase, benchmarkId, toolchain, buildResult, resolver, compositeInProcessDiagnoser, cancellationToken).ConfigureAwait(false);
 
-            return new BenchmarkReport(success, benchmarkCase, buildResult, buildResult, executeResults, metrics);
+            return new BenchmarkReport(success, benchmarkCase, buildResult, executeResults, metrics);
         }
 
         private static async ValueTask<(bool success, List<ExecuteResult> executeResults, List<Metric> metrics)> Execute(

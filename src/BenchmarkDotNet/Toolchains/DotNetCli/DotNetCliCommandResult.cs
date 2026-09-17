@@ -32,9 +32,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             => new DotNetCliCommandResult(false, time, standardOutput, standardError);
 
         [PublicAPI]
-        public BuildResult ToBuildResult(GenerateResult generateResult)
+        public BuildResult ToBuildResult(ArtifactsPaths artifactsPaths)
             => IsSuccess
-                ? BuildResult.Success(generateResult)
-                : BuildResult.Failure(generateResult, AllInformation);
+                ? BuildResult.Success(artifactsPaths)
+                : BuildResult.Failure(artifactsPaths, AllInformation);
     }
 }

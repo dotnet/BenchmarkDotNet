@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Extensions;
-using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
@@ -15,8 +14,7 @@ using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
 {
-    public class CsProjGenerator(DotNetCliSettings settings, bool isNetCore = true)
-        : DotNetCliGenerator(settings, isNetCore)
+    public class CsProjBuilder(DotNetCliSettings settings) : DotNetCliBuilder(settings)
     {
         private const string DefaultSdkName = "Microsoft.NET.Sdk";
         // The reference-gathering pass writes what it resolved beside the project, as a list and then as
@@ -73,11 +71,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         // directory: the toolchains that publish point that at their own publish folder already.
         protected override string GetPublishDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
             => GetBinariesDirectoryPath(buildArtifactsDirectoryPath, configuration);
-
-        /// <summary>
-        /// Whether the toolchain publishes the project after building it, rather than only building it.
-        /// </summary>
-        protected virtual bool PublishesOutput => false;
 
         protected override ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
@@ -339,7 +332,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 artifactsPaths.ProjectFilePath,
                 Settings.TargetFrameworkMoniker,
                 arguments: $"/p:{GatherReferencesProperty}=true",
-                GenerateResult.Success(artifactsPaths, []),
+                artifactsPaths,
                 logger,
                 buildPartition,
                 [],

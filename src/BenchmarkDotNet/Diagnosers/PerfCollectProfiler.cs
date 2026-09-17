@@ -13,7 +13,6 @@ using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.NetCoreApp;
-using BenchmarkDotNet.Toolchains.Results;
 using BenchmarkDotNet.Validators;
 using JetBrains.Annotations;
 using System.Diagnostics;
@@ -240,7 +239,7 @@ namespace BenchmarkDotNet.Diagnosers
                 filePath: string.Empty,
                 tfm: string.Empty,
                 arguments: $"tool install dotnet-symbol --tool-path \"{toolPath}\"",
-                generateResult: GenerateResult.Success(ArtifactsPaths.Empty, []),
+                artifactsPaths: ArtifactsPaths.Empty,
                 logger: logger,
                 buildPartition: BuildPartition.Empty,
                 environmentVariables: [],

@@ -23,7 +23,6 @@ public sealed class InProcessNoEmitToolchain : IToolchain
     {
         this.settings = settings;
         Runtime = runtime;
-        Generator = new InProcessNoEmitGenerator();
         Builder = new InProcessNoEmitBuilder();
         Executor = new InProcessNoEmitExecutor(settings.ExecuteOnSeparateThread, settings.BenchmarkActionFactory);
     }
@@ -54,8 +53,6 @@ public sealed class InProcessNoEmitToolchain : IToolchain
     }
 
     public Runtime Runtime { get; }
-
-    public IGenerator Generator { get; }
 
     public IBuilder Builder { get; }
 

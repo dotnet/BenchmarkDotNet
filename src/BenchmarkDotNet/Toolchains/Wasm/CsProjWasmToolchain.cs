@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.Toolchains.Wasm;
@@ -21,10 +19,7 @@ public abstract class CsProjWasmToolchain : CsProjNetToolchain
     // `settings` is stored for equality and the settings column so an unset moniker is not surfaced as the runtime's.
     // The executor does not use the moniker, so it keeps the original settings.
     private CsProjWasmToolchain(string name, WasmRuntime runtime, WasmSettings settings, WasmSettings resolved, bool aot, bool useCoreClrRuntime)
-        : base(name, runtime, settings,
-            new CsProjWasmGenerator(resolved, aot, useCoreClrRuntime),
-            new DotNetCliPublisher(resolved, logOutput: aot),
-            new WasmExecutor(settings))
+        : base(name, runtime, settings, new CsProjWasmBuilder(resolved, aot, useCoreClrRuntime), new WasmExecutor(settings))
         => this.settings = settings;
 
     // Fills the target framework moniker in from the runtime only when the user left it unset, avoiding both the

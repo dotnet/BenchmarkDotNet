@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Tests.Reports
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int measurementValue, int noise)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, []));
+            var buildResult = BuildResult.Success(ArtifactsPaths.Empty);
             var measurements = new List<Measurement>
             {
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 1, 1, measurementValue),
@@ -107,7 +107,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 5, 1, measurementValue - 3 * noise)
             };
             var executeResult = new ExecuteResult(measurements, default);
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, [executeResult], []);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, [executeResult], []);
         }
 
         private static IEnumerable<BenchmarkCase> CreateBenchmarks(IConfig config) =>

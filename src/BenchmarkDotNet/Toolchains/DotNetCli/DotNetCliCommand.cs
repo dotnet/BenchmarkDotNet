@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public string? Arguments { get; }
 
-        [PublicAPI] public GenerateResult GenerateResult { get; }
+        [PublicAPI] public ArtifactsPaths ArtifactsPaths { get; }
 
         [PublicAPI] public ILogger Logger { get; }
 
@@ -32,14 +32,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
         [PublicAPI] public bool LogOutput { get; }
 
-        public DotNetCliCommand(FileInfo? cliPath, string filePath, string tfm, string? arguments, GenerateResult generateResult, ILogger logger,
+        public DotNetCliCommand(FileInfo? cliPath, string filePath, string tfm, string? arguments, ArtifactsPaths artifactsPaths, ILogger logger,
             BuildPartition buildPartition, IReadOnlyList<EnvironmentVariable> environmentVariables, TimeSpan timeout, bool logOutput = false)
         {
             CliPath = cliPath; // null means "use the default dotnet cli"; resolved in DotNetCliCommandExecutor.BuildStartInfo
             Arguments = arguments;
             FilePath = filePath;
             TargetFrameworkMoniker = tfm;
-            GenerateResult = generateResult;
+            ArtifactsPaths = artifactsPaths;
             Logger = logger;
             BuildPartition = buildPartition;
             EnvironmentVariables = environmentVariables ?? [];
@@ -48,10 +48,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         }
 
         public DotNetCliCommand WithArguments(string arguments)
-            => new(CliPath, FilePath, TargetFrameworkMoniker, arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
+            => new(CliPath, FilePath, TargetFrameworkMoniker, arguments, ArtifactsPaths, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
         public DotNetCliCommand WithCliPath(FileInfo? cliPath)
-            => new(cliPath, FilePath, TargetFrameworkMoniker, Arguments, GenerateResult, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
+            => new(cliPath, FilePath, TargetFrameworkMoniker, Arguments, ArtifactsPaths, Logger, BuildPartition, EnvironmentVariables, Timeout, LogOutput);
 
         [PublicAPI]
         public async Task<BuildResult> RestoreThenBuildAsync(CancellationToken cancellationToken = default)
@@ -71,27 +71,27 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 // On our CI, Integration tests take too much time, because each benchmark run rebuilds BenchmarkDotNet itself.
                 // To reduce the total duration of the CI workflows, we build all the projects without dependencies
                 var restoreNoDependenciesResult = await DotNetCliCommandExecutor.ExecuteAsync(
-                    WithArguments(GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, $"{Arguments} --no-dependencies", "restore-no-deps")),
+                    WithArguments(GetRestoreCommand(ArtifactsPaths, BuildPartition, FilePath, $"{Arguments} --no-dependencies", "restore-no-deps")),
                     cancellationToken).ConfigureAwait(false);
                 if (!restoreNoDependenciesResult.IsSuccess)
-                    return BuildResult.Failure(GenerateResult, restoreNoDependenciesResult.AllInformation);
+                    return BuildResult.Failure(ArtifactsPaths, restoreNoDependenciesResult.AllInformation);
 
                 var buildNoDependenciesResult = await DotNetCliCommandExecutor.ExecuteAsync(
-                    WithArguments(GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps")),
+                    WithArguments(GetBuildCommand(ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore --no-dependencies", "build-no-restore-no-deps")),
                     cancellationToken).ConfigureAwait(false);
-                return buildNoDependenciesResult.ToBuildResult(GenerateResult);
+                return buildNoDependenciesResult.ToBuildResult(ArtifactsPaths);
             }
 
             var restoreResult = await DotNetCliCommandExecutor.ExecuteAsync(
-                WithArguments(GetRestoreCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, Arguments, "restore")),
+                WithArguments(GetRestoreCommand(ArtifactsPaths, BuildPartition, FilePath, Arguments, "restore")),
                 cancellationToken).ConfigureAwait(false);
             if (!restoreResult.IsSuccess)
-                return BuildResult.Failure(GenerateResult, restoreResult.AllInformation);
+                return BuildResult.Failure(ArtifactsPaths, restoreResult.AllInformation);
 
             var buildNoRestoreResult = await DotNetCliCommandExecutor.ExecuteAsync(
-                WithArguments(GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore", "build-no-restore")),
+                WithArguments(GetBuildCommand(ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-restore", "build-no-restore")),
                 cancellationToken).ConfigureAwait(false);
-            return buildNoRestoreResult.ToBuildResult(GenerateResult);
+            return buildNoRestoreResult.ToBuildResult(ArtifactsPaths);
         }
 
         [PublicAPI]
@@ -104,16 +104,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 // On our CI, Integration tests take too much time, because each benchmark run rebuilds BenchmarkDotNet itself.
                 // To reduce the total duration of the CI workflows, we build all the projects without dependencies
                 var result = await DotNetCliCommandExecutor.ExecuteAsync(
-                    WithArguments(GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-dependencies", "build-no-deps")),
+                    WithArguments(GetBuildCommand(ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-dependencies", "build-no-deps")),
                     cancellationToken).ConfigureAwait(false);
-                return result.ToBuildResult(GenerateResult);
+                return result.ToBuildResult(ArtifactsPaths);
             }
             else
             {
                 var result = await DotNetCliCommandExecutor.ExecuteAsync(
-                    WithArguments(GetBuildCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, Arguments, "build")),
+                    WithArguments(GetBuildCommand(ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, Arguments, "build")),
                     cancellationToken).ConfigureAwait(false);
-                return result.ToBuildResult(GenerateResult);
+                return result.ToBuildResult(ArtifactsPaths);
             }
         }
 
@@ -127,16 +127,16 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 // On our CI, Integration tests take too much time, because each benchmark run rebuilds BenchmarkDotNet itself.
                 // To reduce the total duration of the CI workflows, we build all the projects without dependencies
                 var result = await DotNetCliCommandExecutor.ExecuteAsync(
-                    WithArguments(GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-dependencies", "publish-no-deps")),
+                    WithArguments(GetPublishCommand(ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-dependencies", "publish-no-deps")),
                     cancellationToken).ConfigureAwait(false);
-                return result.ToBuildResult(GenerateResult);
+                return result.ToBuildResult(ArtifactsPaths);
             }
             else
             {
                 var result = await DotNetCliCommandExecutor.ExecuteAsync(
-                    WithArguments(GetPublishCommand(GenerateResult.ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, Arguments, "publish")),
+                    WithArguments(GetPublishCommand(ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, Arguments, "publish")),
                     cancellationToken).ConfigureAwait(false);
-                return result.ToBuildResult(GenerateResult);
+                return result.ToBuildResult(ArtifactsPaths);
             }
         }
 

@@ -37,7 +37,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
-                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -56,7 +55,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
-                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -74,7 +72,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 new ParameterInstance(new ParameterDefinition("param1", isStatic: false, isArgument: true, typeof(string), 0), "value3", SummaryStyle.Default),
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null!,
                         null!,
                         [
                             new ExecuteResult([
@@ -119,7 +116,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                             ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
-                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -139,7 +135,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 new ParameterInstance(new ParameterDefinition("param3", isStatic: false, isArgument: true, typeof(string), 0), "value2", SummaryStyle.Default)                            ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
                         null!,
-                        null!,
                         [
                             new ExecuteResult([
                                 new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 10, 1)
@@ -158,7 +153,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 new ParameterInstance(new ParameterDefinition("param2", isStatic: false, isArgument: true, typeof(string), 0), "value3", SummaryStyle.Default),
                                 new ParameterInstance(new ParameterDefinition("param3", isStatic: false, isArgument: true, typeof(string), 0), "value3", SummaryStyle.Default)                            ]),
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null!,
                         null!,
                         [
                             new ExecuteResult([
@@ -197,7 +191,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                             Job.Dry,
                             ParameterInstances.Empty,
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null!,
                         null!,
                         [
                             new ExecuteResult([
@@ -248,7 +241,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                                 ParameterInstances.Empty,
                                 ImmutableConfigBuilder.Create(new ManualConfig())),
                             null!,
-                            null!,
                             [
                                 new ExecuteResult([
                                     new Measurement(0, IterationMode.Workload, IterationStage.Result, 1, 1, 10.5)
@@ -296,7 +288,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                             ParameterInstances.Empty,
                             ImmutableConfigBuilder.Create(config)),
                         null!,
-                        null!,
                         [
                             new ExecuteResult(
                                 [
@@ -340,7 +331,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                             ParameterInstances.Empty,
                             ImmutableConfigBuilder.Create(config)),
                         null!,
-                        null!,
                         [
                             new ExecuteResult(
                                 [
@@ -382,7 +372,6 @@ namespace BenchmarkDotNet.Tests.Exporters
                             Job.Dry,
                             ParameterInstances.Empty,
                             ImmutableConfigBuilder.Create(new ManualConfig())),
-                        null!,
                         null!,
                         [
                             new ExecuteResult([

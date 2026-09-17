@@ -5,16 +5,16 @@ using BenchmarkDotNet.Toolchains.Results;
 
 namespace BenchmarkDotNet.Toolchains.Mono
 {
-    internal sealed class LegacyMonoAotBuilder(MonoAotSettings settings) : IBuilder
+    internal sealed class LegacyMonoAotBuilder(MonoAotSettings settings) : Roslyn.RoslynBuilder
     {
-        public async ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
+        protected override async ValueTask<BuildResult> BuildAsync(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
         {
-            var result = await Roslyn.RoslynBuilder.Instance.BuildAsync(generateResult, buildPartition, logger, cancellationToken).ConfigureAwait(false);
+            var result = await base.BuildAsync(artifactsPaths, buildPartition, logger, cancellationToken).ConfigureAwait(false);
 
             if (!result.IsBuildSuccess)
                 return result;
 
-            var exePath = generateResult.ArtifactsPaths.ExecutablePath;
+            var exePath = artifactsPaths.ExecutablePath;
             var environmentVariables = settings.MonoBclPath is null
                 ? null
                 : new Dictionary<string, string> { { "MONO_PATH", settings.MonoBclPath.FullName } };
@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
             ).ConfigureAwait(false);
 
             return exitCode != 0
-                ? BuildResult.Failure(generateResult, $"Attempt to AOT failed: with exit code: {exitCode}, output: {string.Join(Environment.NewLine, output)}")
+                ? BuildResult.Failure(artifactsPaths, $"Attempt to AOT failed: with exit code: {exitCode}, output: {string.Join(Environment.NewLine, output)}")
                 : result;
         }
     }

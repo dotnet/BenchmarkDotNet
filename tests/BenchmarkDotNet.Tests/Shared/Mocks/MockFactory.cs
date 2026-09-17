@@ -129,17 +129,17 @@ namespace BenchmarkDotNet.Tests.Mocks
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, int n, double nanoseconds)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, []));
+            var buildResult = BuildResult.Success(ArtifactsPaths.Empty);
             var measurements = Enumerable.Range(0, n)
                 .Select(index => new Measurement(1, IterationMode.Workload, IterationStage.Result, index + 1, 1, nanoseconds + index).ToString())
                 .ToList();
             var executeResult = new ExecuteResult(true, 0, default, measurements, [$"// Runtime=extra output line"], [], 1);
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, [executeResult], []);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, [executeResult], []);
         }
 
         private static BenchmarkReport CreateReport(BenchmarkCase benchmarkCase, bool hugeSd, Metric[] metrics)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, []));
+            var buildResult = BuildResult.Success(ArtifactsPaths.Empty);
             bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
             bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
             var measurements = new List<Measurement>
@@ -152,12 +152,12 @@ namespace BenchmarkDotNet.Tests.Mocks
                 new Measurement(1, IterationMode.Workload, IterationStage.Result, 6, 1, 1)
             };
             var executeResult = new ExecuteResult(measurements, default);
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, [executeResult], metrics);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, [executeResult], metrics);
         }
 
         private static BenchmarkReport CreateReportWithBiasedDistribution(BenchmarkCase benchmarkCase, int min, int median, int max, int n, Metric[] metrics)
         {
-            var buildResult = BuildResult.Success(GenerateResult.Success(ArtifactsPaths.Empty, []));
+            var buildResult = BuildResult.Success(ArtifactsPaths.Empty);
             bool isFoo = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Foo";
             bool isBar = benchmarkCase.Descriptor.WorkloadMethodDisplayInfo == "Bar";
             var measurements = from i in Enumerable.Range(0, Math.Max(1, n / 9))
@@ -186,7 +186,7 @@ namespace BenchmarkDotNet.Tests.Mocks
                                }
                                select m;
             var executeResult = new ExecuteResult(measurements.Take(n).ToList(), default);
-            return new BenchmarkReport(true, benchmarkCase, buildResult, buildResult, [executeResult], metrics);
+            return new BenchmarkReport(true, benchmarkCase, buildResult, [executeResult], metrics);
         }
 
         [LongRunJob]

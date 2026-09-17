@@ -6,11 +6,11 @@ using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Toolchains.R2R
 {
-    internal sealed class R2RGenerator : CsProjGenerator
+    internal sealed class R2RBuilder : CsProjBuilder
     {
         private readonly R2RSettings settings;
 
-        public R2RGenerator(R2RSettings settings) : base(settings)
+        public R2RBuilder(R2RSettings settings) : base(settings)
         {
             this.settings = settings;
             BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;

@@ -6,8 +6,6 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.DotNetCli;
-using System.Text;
 using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Toolchains.NativeAot;
@@ -15,7 +13,7 @@ namespace BenchmarkDotNet.Toolchains.NativeAot;
 /// <summary>
 /// Generates new csproj file for self-contained NativeAOT app.
 /// </summary>
-internal sealed class CsProjNativeAotGenerator : CsProjGenerator
+internal sealed class CsProjNativeAotBuilder : CsProjBuilder
 {
     internal const string NativeAotNuGetFeed = "nativeAotNuGetFeed";
     private const string DefaultNuGetFeed = "https://api.nuget.org/v3/index.json";
@@ -24,7 +22,7 @@ internal sealed class CsProjNativeAotGenerator : CsProjGenerator
 
     private readonly NativeAotSettings settings;
 
-    internal CsProjNativeAotGenerator(NativeAotSettings settings)
+    internal CsProjNativeAotBuilder(NativeAotSettings settings)
         : base(settings with { PackagesPath = GetPackagesDirectoryPath(settings.UseTempFolderForRestore, settings.PackagesPath) })
     {
         this.settings = settings;

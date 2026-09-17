@@ -21,10 +21,7 @@ public sealed class CsProjMonoCoreToolchain : CsProjNetToolchain
     // The build components receive `resolved` (target framework moniker filled in from the runtime); the original
     // `settings` is stored for equality and the settings column so an unset moniker is not surfaced as the runtime's.
     private CsProjMonoCoreToolchain(MonoCoreRuntime runtime, MonoCoreSettings settings, MonoCoreSettings resolved)
-        : base("Mono", runtime, settings,
-            new CsProjMonoGenerator(resolved),
-            new DotNetCliPublisher(resolved),
-            new DotNetCliExecutor(settings.CliPath))
+        : base("Mono", runtime, settings, new CsProjMonoBuilder(resolved), new DotNetCliExecutor(settings.CliPath))
     {
     }
 

@@ -38,7 +38,7 @@ namespace BenchmarkDotNet.Tests.Columns
                 ParameterInstances.Empty,
                 ImmutableConfigBuilder.Create(config));
             var metric = new Metric(LocalMetricDescriptor.TimeInstance, metricValue);
-            var benchmarkReport = new BenchmarkReport(true, benchmarkCase, null!, null!, null, [metric]);
+            var benchmarkReport = new BenchmarkReport(true, benchmarkCase, null!, null, [metric]);
 
             return new Summary("", new[] { benchmarkReport }.ToImmutableArray(), HostEnvironmentInfo.GetCurrent(),
                 "", "", TimeSpan.Zero, CultureInfo.InvariantCulture, [], []);
