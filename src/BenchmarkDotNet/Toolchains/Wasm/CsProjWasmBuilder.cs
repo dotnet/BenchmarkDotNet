@@ -40,7 +40,7 @@ namespace BenchmarkDotNet.Toolchains.Wasm
             await base.GenerateProjectAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
-        protected override string GetSdkName(string benchmarkProjectSdkName) => "Microsoft.NET.Sdk.WebAssembly";
+        protected internal override string GetSdkName(XElement benchmarkProject) => "Microsoft.NET.Sdk.WebAssembly";
 
         protected override void AddEarlyProperties(XElement project, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, FileInfo projectFile)
         {
