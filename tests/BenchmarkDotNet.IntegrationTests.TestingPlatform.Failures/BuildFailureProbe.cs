@@ -30,20 +30,16 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Failures
         }
 
         private sealed class FailingBuildToolchain()
-            : Toolchain("FailingBuild", UnknownRuntime.Instance, new NoopGenerator(), new FailingBuilder(), new UnreachableExecutor())
+            : Toolchain("FailingBuild", UnknownRuntime.Instance, new FailingBuilder(), new UnreachableExecutor())
         {
-        }
-
-        private sealed class NoopGenerator : IGenerator
-        {
-            public ValueTask<GenerateResult> GenerateProjectAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
-                => new(GenerateResult.Success(ArtifactsPaths.Empty, []));
         }
 
         private sealed class FailingBuilder : IBuilder
         {
-            public ValueTask<BuildResult> BuildAsync(GenerateResult generateResult, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
-                => new(BuildResult.Failure(generateResult, ErrorMessage));
+            public bool GetSupportsConcurrency(BuildPartition buildPartition) => true;
+
+            public ValueTask<BuildResult> BuildAsync(BuildPartition buildPartition, ILogger logger, string rootArtifactsFolderPath, CancellationToken cancellationToken)
+                => new(BuildResult.Failure(ArtifactsPaths.Empty, ErrorMessage));
         }
 
         private sealed class UnreachableExecutor : IExecutor
