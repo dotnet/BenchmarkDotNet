@@ -88,8 +88,8 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                     var node = nodes[benchmarkBuildInfo.BenchmarkCase.GetUniqueId()];
                     var pending = GetOrCreatePendingResult(node);
 
-                    if (buildResult.GenerateException != null)
-                        pending.ErrorMessages.Add($"// Generate Exception: {buildResult.GenerateException.Message}");
+                    if (buildResult.Exception != null)
+                        pending.ErrorMessages.Add($"// Build Exception: {buildResult.Exception.Message}");
                     else if (buildResult.TryToExplainFailureReason(buildPartition.GetInProcessDiagnoserHandlerTypes(), out string? reason))
                         pending.ErrorMessages.Add($"// Build Error: {reason}");
                     else if (buildResult.ErrorMessage != null)

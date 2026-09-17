@@ -53,6 +53,13 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         // the request was still in flight - would be reachable from nothing by the time the application ends.
         private readonly HashSet<RequestScope> live = [];
 
+        // Null until the application has ended, and from then on every value whose fate is settled: disposed by the
+        // sweep, by a request that completed after it, or by BenchmarkDotNet. A request that handed its values over
+        // is skipped by the sweep and completes after it. BenchmarkDotNet validates and builds before the run stage
+        // it disposes from, and a run that never gets there disposes nothing - so it cannot store what it enumerated
+        // in held, which nothing looks at again. It disposes whatever is not in here instead.
+        private HashSet<object>? settled;
+
         /// <inheritdoc />
         public string Uid => extension.Uid + ".ParameterValueLifetime";
 
@@ -116,8 +123,13 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                     .Select(group => group.First().Value)
                     .ToList();
 
+                // The requests still in flight stay live: the ones that handed values over complete after this, and
+                // whether another of them still has a value handed over is what decides who disposes it.
+                settled = new HashSet<object>(disposedByBenchmarkDotNet, ParameterValueDisposer.ByReference);
+                foreach (var parameter in unused)
+                    settled.Add(parameter.Value!);
+
                 held.Clear();
-                live.Clear();
                 disposedByBenchmarkDotNet.Clear();
             }
 
@@ -136,35 +148,53 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
                 var enumerated = request.Enumerated;
 
-                if (!request.HasEnumerated)
+                if (settled != null)
+                {
+                    // The application has ended, so no request can hand these back again and nothing will look at
+                    // held: what BenchmarkDotNet did not dispose is disposed now. A value another request in flight
+                    // still has handed over is left to that request, which completes after BenchmarkDotNet is done.
+                    foreach (var parameter in ParameterValueDisposer.GetDisposableParameters(ranCases))
+                        settled.Add(parameter.Value!);
+
+                    var stillHandedOver = new HashSet<object>(
+                        live.SelectMany(other => other.TakenOverByBenchmarkDotNet),
+                        ParameterValueDisposer.ByReference);
+
+                    foreach (var pair in enumerated)
+                    {
+                        if (!stillHandedOver.Contains(pair.Key) && settled.Add(pair.Key))
+                            gone.Add(pair.Value);
+                    }
+                }
+                else if (!request.HasEnumerated)
                 {
                     // The request never reached the end of its enumeration - the assembly failed to load, a source
                     // threw partway - so its absences say nothing about what a source would hand back, and what is
                     // held has to stay. Whatever it did manage to create joins it, rather than being lost.
                     foreach (var pair in enumerated)
                         held[pair.Key] = pair.Value;
-
-                    return;
                 }
+                else
+                {
+                    // Recorded before anything is chosen for disposal, so that a value BenchmarkDotNet has just
+                    // disposed can never also be a candidate here.
+                    foreach (var parameter in ParameterValueDisposer.GetDisposableParameters(ranCases))
+                        disposedByBenchmarkDotNet.Add(parameter.Value!);
 
-                // Recorded before anything is chosen for disposal, so that a value BenchmarkDotNet has just disposed
-                // can never also be a candidate here.
-                foreach (var parameter in ParameterValueDisposer.GetDisposableParameters(ranCases))
-                    disposedByBenchmarkDotNet.Add(parameter.Value!);
+                    // A value the last completed request enumerated and this one did not comes from a source that
+                    // constructs per read: no request can hand it back again, so it goes now rather than at exit. A
+                    // value that came back is cached, and stays until nothing can ask for it.
+                    gone = held
+                        .Where(pair => !enumerated.ContainsKey(pair.Key) && !disposedByBenchmarkDotNet.Contains(pair.Key))
+                        .Select(pair => pair.Value)
+                        .ToList();
 
-                // A value the last completed request enumerated and this one did not comes from a source that
-                // constructs per read: no request can hand it back again, so it goes now rather than at exit. A value
-                // that came back is cached, and stays until nothing can ask for it.
-                gone = held
-                    .Where(pair => !enumerated.ContainsKey(pair.Key) && !disposedByBenchmarkDotNet.Contains(pair.Key))
-                    .Select(pair => pair.Value)
-                    .ToList();
+                    // Only the values that keep coming back need remembering as already disposed; a fresh one that
+                    // was run is gone with its request.
+                    disposedByBenchmarkDotNet.RemoveWhere(value => !enumerated.ContainsKey(value));
 
-                // Only the values that keep coming back need remembering as already disposed; a fresh one that was
-                // run is gone with its request.
-                disposedByBenchmarkDotNet.RemoveWhere(value => !enumerated.ContainsKey(value));
-
-                held = enumerated;
+                    held = enumerated;
+                }
             }
 
             await gone.DisposeAllAsync().ConfigureAwait(false);
@@ -276,7 +306,9 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             /// completes has to dispose them, or they are left to the finalizer, which is the
             /// dotnet/BenchmarkDotNet#1383 hang. Values it did dispose are deliberately not taken back: they stay its
             /// own until <see cref="CompleteAsync"/> records them as disposed, so that the sweep cannot find them
-            /// in between.
+            /// in between. Taking back only covers a sweep that lands between this and the completion; one that
+            /// already ran - the application ended while BenchmarkDotNet was still validating or building - is
+            /// covered by <see cref="CompleteAsync"/> disposing them itself.
             /// </remarks>
             public void TakeBack()
             {
