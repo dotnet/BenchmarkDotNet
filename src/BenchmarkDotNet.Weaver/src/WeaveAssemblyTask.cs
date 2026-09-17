@@ -5,6 +5,7 @@
 
 using AsmResolver.DotNet;
 using AsmResolver.PE.DotNet.Metadata.Tables;
+using AsmResolver.PE.DotNet.StrongName;
 using Microsoft.Build.Framework;
 
 namespace BenchmarkDotNet.Weaver;
@@ -30,6 +31,29 @@ public sealed class WeaveAssemblyTask : Microsoft.Build.Utilities.Task
     /// Whether to treat warnings as errors.
     /// </summary>
     public bool TreatWarningsAsErrors { get; set; }
+
+    /// <summary>
+    /// Whether the compiler strong named the assembly.
+    /// </summary>
+    public bool SignAssembly { get; set; }
+
+    /// <summary>
+    /// The key the compiler strong named the assembly with. Weaving invalidates the signature it produced,
+    /// so the assembly has to be signed again with the same key.
+    /// </summary>
+    public string? AssemblyOriginatorKeyFile { get; set; }
+
+    /// <summary>
+    /// Whether only the public key was available to the compiler, leaving the signature to be written after
+    /// the build. There is then no signature for weaving to invalidate.
+    /// </summary>
+    public bool DelaySign { get; set; }
+
+    /// <summary>
+    /// Whether the assembly carries a public key without ever being signed with the matching private one.
+    /// There is then no signature for weaving to invalidate.
+    /// </summary>
+    public bool PublicSign { get; set; }
 
     /// <summary>
     /// Runs the weave assembly task.
@@ -99,12 +123,15 @@ public sealed class WeaveAssemblyTask : Microsoft.Build.Utilities.Task
 
             if (anyAdjustments)
             {
+                var signer = GetStrongNameSigner(module);
+
                 // Write to a memory stream before overwriting the original file in case an exception occurs during the write (like unsupported platform).
                 // https://github.com/Washi1337/AsmResolver/issues/640
                 var memoryStream = new MemoryStream();
                 try
                 {
                     module.Write(memoryStream);
+                    SignStrongName(memoryStream, module, signer);
                     using var fileStream = new FileStream(TargetAssembly, FileMode.Truncate, FileAccess.Write);
                     memoryStream.WriteTo(fileStream);
                 }
@@ -116,6 +143,12 @@ public sealed class WeaveAssemblyTask : Microsoft.Build.Utilities.Task
                     GC.Collect();
                     module.Write(Stream.Null);
                     module.Write(TargetAssembly);
+
+                    if (signer is not null)
+                    {
+                        using var fileStream = new FileStream(TargetAssembly, FileMode.Open, FileAccess.ReadWrite);
+                        SignStrongName(fileStream, module, signer);
+                    }
                 }
                 finally
                 {
@@ -136,6 +169,49 @@ public sealed class WeaveAssemblyTask : Microsoft.Build.Utilities.Task
             }
         }
         return !Log.HasLoggedErrors;
+    }
+
+    /// <summary>
+    /// Rewriting the assembly invalidates the signature the compiler wrote, so it has to be signed again with
+    /// the same key. Returns null when there is no signature to restore, or no key to restore it with.
+    /// </summary>
+    private StrongNameSigner? GetStrongNameSigner(ModuleDefinition module)
+    {
+        // Delay and public signing leave the signature to be written after the build, and an assembly the
+        // compiler did not sign has none in the first place.
+        if (!SignAssembly || DelaySign || PublicSign || module.Assembly?.PublicKey is null)
+            return null;
+
+        if (string.IsNullOrEmpty(AssemblyOriginatorKeyFile) || !File.Exists(AssemblyOriginatorKeyFile))
+        {
+            LogStrongNameWarning("the key it was signed with was not passed to the weaver");
+            return null;
+        }
+
+        try
+        {
+            return new StrongNameSigner(StrongNamePrivateKey.FromFile(AssemblyOriginatorKeyFile!));
+        }
+        catch (Exception e)
+        {
+            // A key container or a public-key-only file cannot sign, and neither can a file we cannot read.
+            LogStrongNameWarning($"the key it was signed with could not be read: {e.Message}");
+            return null;
+        }
+    }
+
+    private void LogStrongNameWarning(string reason)
+        => Log.LogWarning(
+            $"Weaving invalidated the strong name signature of {Path.GetFileName(TargetAssembly)}, because {reason}. " +
+            "The assembly will fail strong name verification. Set BenchmarkDotNetShouldWeaveAssemblies to false to opt out of weaving.");
+
+    private static void SignStrongName(Stream imageStream, ModuleDefinition module, StrongNameSigner? signer)
+    {
+        if (signer is null)
+            return;
+
+        imageStream.Position = 0;
+        signer.SignImage(imageStream, module.Assembly!.HashAlgorithm);
     }
 
     private static bool IsBenchmarkAttribute(CustomAttribute attribute, RuntimeContext runtimeContext)
