@@ -85,10 +85,10 @@ internal sealed class MockMemory
         return this;
     }
 
-    public MockClrRuntime ToMockClrRuntime()
+    public MockClrRuntime ToMockClrRuntime(bool throwExceptionMode = true)
     {
         var dataReader = new MockDataReader(Read, TryReadPointer);
-        var clrRuntime = new MockClrRuntime(new MockDataTarget(dataReader));
+        var clrRuntime = new MockClrRuntime(new MockDataTarget(dataReader)) { ThrowExceptionMode = throwExceptionMode };
 
         // Add additional mappings
         foreach (var item in JitHelperFunctionNames)
@@ -113,7 +113,7 @@ internal sealed class MockMemory
 
         var region = FindRegion(address);
         if (region is null)
-            throw new ArgumentException($"Failed to read address 0x{address:X}. Because address data is not registered.");
+            return 0;
 
         ulong offset = address - region.Address;
         int available = region.Bytes.Length - (int)offset;

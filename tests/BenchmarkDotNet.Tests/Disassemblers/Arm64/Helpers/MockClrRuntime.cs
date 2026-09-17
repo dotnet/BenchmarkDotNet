@@ -7,7 +7,9 @@ namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 public class MockClrRuntime : IClrRuntime
 {
     // It is expected that this property will be used for validating registered addresses.
-    private bool ThrowExceptionMode => false;
+    // Enabled by default so a test that forgets an AddXXX mapping fails loudly;
+    // set to false for tests that intentionally exercise unregistered (null) paths.
+    internal bool ThrowExceptionMode { get; set; } = true;
 
     internal Dictionary<ulong, string?> JitHelperFunctionNames = new();
     internal Dictionary<ulong, IClrMethod?> MethodByHandle = new();

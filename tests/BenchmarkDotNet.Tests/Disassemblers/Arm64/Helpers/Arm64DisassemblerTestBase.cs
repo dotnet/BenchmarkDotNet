@@ -43,9 +43,9 @@ public abstract class Arm64DisassemblerTestBase
     ///   Read: Return 0 length as written bytes.
     ///   ReadPointer: Return address 0 data to skip TryResolvePrecode/TryFollowJumpTrampoline.
     /// </summary>
-    protected static MockClrRuntime CreateMockClrRuntime()
+    protected static MockClrRuntime CreateMockClrRuntime(bool throwExceptionMode = true)
     {
         var dataReader = new MockDataReader();
-        return new MockClrRuntime(new MockDataTarget(dataReader));
+        return new MockClrRuntime(new MockDataTarget(dataReader)) { ThrowExceptionMode = throwExceptionMode };
     }
 }
