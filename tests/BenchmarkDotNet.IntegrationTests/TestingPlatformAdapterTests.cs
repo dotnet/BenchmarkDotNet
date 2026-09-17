@@ -465,10 +465,11 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ParameterValuesBenchmarkDotNetHandedBackAreDisposedWhenTheApplicationEnds()
         {
-            // The negative half of the same ownership: a run stopped by a critical validation error returns before the
-            // run stage that disposes parameter values, so the request takes them back and the sweep has to dispose
-            // them. This is the direction that fails quietly - nothing throws, the values simply reach the finalizer,
-            // which is the dotnet/BenchmarkDotNet#1383 hang.
+            // The negative half of the same ownership: a run that never reaches the run stage - a critical validation
+            // error, or a cancellation during the build - disposes no parameter values. The sweep lands while they are
+            // still handed over and skips them, so the request completing after it has to dispose them rather than
+            // hold them for a sweep that is already over. This is the direction that fails quietly, and nothing throws,
+            // the values simply reach the finalizer, which is the dotnet/BenchmarkDotNet#1383 hang.
             var report = RunInternalsProbe();
 
             Assert.Equal("created=2 disposed=2", Assert.Single(report.TakenBack));
