@@ -19,12 +19,19 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
     {
         private readonly IProperty[] staticProperties;
 
-        private BenchmarkTestNode(BenchmarkCase benchmarkCase, string uid, string displayName, string path, IProperty[] staticProperties)
+        private BenchmarkTestNode(
+            BenchmarkCase benchmarkCase,
+            string uid,
+            string displayName,
+            string path,
+            string groupUid,
+            IProperty[] staticProperties)
         {
             BenchmarkCase = benchmarkCase;
             Uid = uid;
             DisplayName = displayName;
             Path = path;
+            GroupUid = groupUid;
             this.staticProperties = staticProperties;
         }
 
@@ -48,6 +55,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// Gets the '/' separated path used by <see cref="Microsoft.Testing.Platform.Requests.TreeNodeFilter"/>.
         /// </summary>
         public string Path { get; }
+
+        /// <summary>
+        /// Gets the uid of the group node this benchmark is reported under, which is the type declaring it.
+        /// </summary>
+        /// <remarks>
+        /// BenchmarkDotNet produces one summary per type, so the type is also the granularity at which a summary
+        /// table can be attached to the tree. See <see cref="CreateGroupNode"/>.
+        /// </remarks>
+        public string GroupUid { get; }
 
         /// <summary>
         /// Creates the node for a benchmark case.
@@ -116,7 +132,49 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
             var path = BuildPath(type.Assembly, type.Namespace, fullClassName, parametrizedMethodName, jobDisplayInfo);
 
-            return new BenchmarkTestNode(benchmarkCase, uid, displayName, path, properties.ToArray());
+            return new BenchmarkTestNode(benchmarkCase, uid, displayName, path, GetGroupUid(type), properties.ToArray());
+        }
+
+        /// <summary>
+        /// Gets the uid of the group node the benchmarks of a type are reported under.
+        /// </summary>
+        /// <param name="type">The type declaring the benchmarks.</param>
+        /// <returns>The uid of the group node.</returns>
+        /// <remarks>
+        /// A benchmark's own uid is the guid BenchmarkDotNet hashes out of its identity, so a type name can never be
+        /// mistaken for one. A closed generic type carries its type arguments in the name, which is what keeps the
+        /// instantiations of a generic benchmark class apart - BenchmarkDotNet summarises them separately too.
+        /// </remarks>
+        public static string GetGroupUid(Type type) => type.GetCorrectCSharpTypeName(prefixWithGlobal: false);
+
+        /// <summary>
+        /// Creates the node the benchmarks of a type are reported under.
+        /// </summary>
+        /// <param name="type">The type declaring the benchmarks.</param>
+        /// <param name="extraProperties">Any additional properties, such as the summary table.</param>
+        /// <returns>The created test node.</returns>
+        /// <remarks>
+        /// The node deliberately carries no <see cref="TestNodeStateProperty"/>. That is what makes the platform
+        /// serialize it as a `group` rather than as an `action`, which in turn keeps it out of the run's pass, fail
+        /// and skip counts - a summary is not a test, and reporting it as one would inflate every total by the
+        /// number of benchmark types that ran.
+        /// </remarks>
+        public static TestNode CreateGroupNode(Type type, params IProperty[] extraProperties)
+        {
+            var properties = new PropertyBag();
+            foreach (var property in extraProperties)
+                properties.Add(property);
+
+            // The name is also the identity: a type is named the same way wherever the tree is built, so a discovery
+            // and the run that follows it agree on the group without having to carry one across the two processes.
+            var name = GetGroupUid(type);
+
+            return new TestNode
+            {
+                Uid = new TestNodeUid(name),
+                DisplayName = name,
+                Properties = properties
+            };
         }
 
         /// <summary>

@@ -19,6 +19,9 @@ namespace BenchmarkDotNet.IntegrationTests
     /// </remarks>
     internal sealed class TestingPlatformServerModeSession : IDisposable
     {
+        private const string ActionNode = "action";
+        private const string GroupNode = "group";
+
         private readonly Process process;
         private readonly TcpClient client;
         private readonly NetworkStream stream;
@@ -46,8 +49,11 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="runFilter">The text the display name of a benchmark has to contain to be run.</param>
         /// <param name="timeout">How long any one step may take.</param>
         /// <param name="discoverAgain">Whether to discover a second time once the run is over, as an IDE refreshing does.</param>
-        /// <returns>The nodes the discovery reported, and the last state each ran node was reported in.</returns>
-        public static (IReadOnlyList<ServerNode> Discovered, IReadOnlyList<ServerNode> Ran) DiscoverThenRun(
+        /// <returns>
+        /// The nodes the discovery reported, the last state each ran node was reported in, and the group nodes the
+        /// run reported - the ones carrying the summary table of their type.
+        /// </returns>
+        public static (IReadOnlyList<ServerNode> Discovered, IReadOnlyList<ServerNode> Ran, IReadOnlyList<ServerNode> Groups) DiscoverThenRun(
             string application,
             string runFilter,
             TimeSpan timeout,
@@ -87,7 +93,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        private (IReadOnlyList<ServerNode>, IReadOnlyList<ServerNode>) Run(string runFilter, bool discoverAgain)
+        private (IReadOnlyList<ServerNode>, IReadOnlyList<ServerNode>, IReadOnlyList<ServerNode>) Run(string runFilter, bool discoverAgain)
         {
             SendRequest("initialize", new
             {
@@ -97,7 +103,7 @@ namespace BenchmarkDotNet.IntegrationTests
             });
             Send(new { jsonrpc = "2.0", method = "initialized", @params = new { } });
 
-            var discovered = Exchange("testing/discoverTests", runId => new { runId });
+            var discovered = OfType(Exchange("testing/discoverTests", runId => new { runId }), ActionNode);
 
             var selected = discovered
                 .Where(node => node.DisplayName.Contains(runFilter, StringComparison.Ordinal))
@@ -106,7 +112,7 @@ namespace BenchmarkDotNet.IntegrationTests
             if (selected.Length == 0)
                 throw new InvalidOperationException($"No discovered benchmark matched '{runFilter}'.");
 
-            var ran = Exchange("testing/runTests", runId => new
+            var reported = Exchange("testing/runTests", runId => new
             {
                 runId,
                 tests = selected
@@ -128,8 +134,11 @@ namespace BenchmarkDotNet.IntegrationTests
             // Lets the probe write the report file its process exit handler produces.
             process.WaitForExit();
 
-            return (discovered, ran);
+            return (discovered, OfType(reported, ActionNode), OfType(reported, GroupNode));
         }
+
+        private static ServerNode[] OfType(IEnumerable<ServerNode> nodes, string nodeType)
+            => nodes.Where(node => node.NodeType == nodeType).ToArray();
 
         /// <summary>
         /// Sends one request and collects the node updates the platform reports for it.
@@ -268,14 +277,17 @@ namespace BenchmarkDotNet.IntegrationTests
                     foreach (var change in changes.EnumerateArray())
                     {
                         var node = change.GetProperty("node");
-                        if (node.TryGetProperty("node-type", out var nodeType) && nodeType.GetString() == "action")
-                        {
-                            nodes.Add(new ServerNode(
-                                node.GetProperty("uid").GetString()!,
-                                node.GetProperty("display-name").GetString()!,
-                                node.TryGetProperty("execution-state", out var state) ? state.GetString()! : "",
-                                node.TryGetProperty("standardOutput", out var output) ? output.GetString() ?? "" : ""));
-                        }
+
+                        // A node the platform serializes without an execution state is a `group` rather than an
+                        // `action`: the tree node the benchmarks of a type hang from, which is what carries their
+                        // summary table.
+                        nodes.Add(new ServerNode(
+                            node.GetProperty("uid").GetString()!,
+                            node.GetProperty("display-name").GetString()!,
+                            node.TryGetProperty("execution-state", out var state) ? state.GetString()! : "",
+                            node.TryGetProperty("standardOutput", out var output) ? output.GetString() ?? "" : "",
+                            node.TryGetProperty("node-type", out var nodeType) ? nodeType.GetString()! : "",
+                            change.TryGetProperty("parent", out var parent) ? parent.GetString() : null));
                     }
                 }
 
@@ -308,7 +320,13 @@ namespace BenchmarkDotNet.IntegrationTests
             client.Dispose();
         }
 
-        internal sealed record ServerNode(string Uid, string DisplayName, string ExecutionState, string StandardOutput);
+        internal sealed record ServerNode(
+            string Uid,
+            string DisplayName,
+            string ExecutionState,
+            string StandardOutput,
+            string NodeType,
+            string? Parent);
     }
 }
 #endif

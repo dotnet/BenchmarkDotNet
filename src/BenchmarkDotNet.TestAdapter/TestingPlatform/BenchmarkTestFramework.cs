@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Microsoft.Testing.Platform.Capabilities.TestFramework;
@@ -102,6 +103,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 // Discovery runs nothing, so a filter this adapter does not know costs nothing but a wrong list, and
                 // reporting every benchmark beats reporting none. The run path refuses it instead.
                 await WarnAboutUnrecognisedFilterAsync(enumeration, context.CancellationToken).ConfigureAwait(false);
+                await PublishGroupsAsync(context, request.Session.SessionUid, enumeration).ConfigureAwait(false);
 
                 foreach (var benchmarks in enumeration.Matches)
                 {
@@ -109,9 +111,11 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
                     // Exactly one node per uid: publishing a colliding uid twice would leave the platform with two
                     // nodes it cannot tell apart. The collision itself is reported when the benchmarks are run.
+                    var node = benchmarks[0].Node;
                     var message = new TestNodeUpdateMessage(
                         request.Session.SessionUid,
-                        benchmarks[0].Node.ToTestNode(DiscoveredTestNodeStateProperty.CachedInstance));
+                        node.ToTestNode(DiscoveredTestNodeStateProperty.CachedInstance),
+                        new TestNodeUid(node.GroupUid));
 
                     await context.MessageBus.PublishAsync(this, message).ConfigureAwait(false);
                 }
@@ -151,6 +155,10 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             {
                 var enumeration = GetMatchingBenchmarks(request.Filter, parameterValueScope);
 
+                // Before anything reports a benchmark, so that a node never arrives ahead of the group it names as
+                // its parent - including on the refusal path below, which reports every benchmark as failed.
+                await PublishGroupsAsync(context, sessionUid, enumeration).ConfigureAwait(false);
+
                 // Unlike discovery, a run cannot treat a filter it does not know as matching everything: that would
                 // spend the machine's next hour benchmarking the whole assembly instead of the subset that was asked
                 // for, and a warning on the output device is not something an IDE is bound to surface. Refusing the
@@ -174,9 +182,9 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
                 var processor = new BenchmarkEventProcessor(
                     runnable.ToDictionary(match => match.Node.Uid, match => match.Node),
-                    testNode =>
+                    (testNode, groupUid) =>
                     {
-                        var message = new TestNodeUpdateMessage(sessionUid, testNode);
+                        var message = new TestNodeUpdateMessage(sessionUid, testNode, new TestNodeUid(groupUid));
                         workQueue.Writer.TryWrite(() => context.MessageBus.PublishAsync(this, message));
                     });
 
@@ -190,7 +198,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
                 try
                 {
-                    await RunAsync(context, runnable, processor, workQueue, cancellationToken).ConfigureAwait(false);
+                    await RunAsync(context, sessionUid, runnable, processor, workQueue, cancellationToken).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -221,6 +229,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// </summary>
         private async Task RunAsync(
             ExecuteRequestContext context,
+            SessionUid sessionUid,
             List<Match> runnable,
             BenchmarkEventProcessor eventProcessor,
             Channel<Func<Task>> workQueue,
@@ -310,6 +319,64 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             }
 
             drainFailure?.Throw();
+
+            await PublishSummariesAsync(context, sessionUid, eventProcessor, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Publishes the group node of every type the enumeration matched.
+        /// </summary>
+        /// <remarks>
+        /// The group is what carries the summary table of its type once the run is over, and it is published up front
+        /// so that the benchmarks reported under it always name a parent the client has already seen.
+        /// </remarks>
+        private async Task PublishGroupsAsync(ExecuteRequestContext context, SessionUid sessionUid, Enumeration enumeration)
+        {
+            var types = enumeration.Matches
+                .Select(benchmarks => benchmarks[0].Node.BenchmarkCase.Descriptor.Type)
+                .Distinct();
+
+            foreach (var type in types)
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                await context.MessageBus
+                    .PublishAsync(this, new TestNodeUpdateMessage(sessionUid, BenchmarkTestNode.CreateGroupNode(type)))
+                    .ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// Attaches the summary table BenchmarkDotNet produced for a type to that type's group node.
+        /// </summary>
+        /// <remarks>
+        /// The run's own output reaches the output device as it is produced, but a client of the platform's server
+        /// mode - Visual Studio, or `dotnet test` - forwards that as an informational log message and shows the user
+        /// nothing but the warnings and the errors among it, so the summary table has to travel on a test node to be
+        /// seen. It only exists once the benchmarks of a type have all run, which is after their own nodes reached
+        /// their outcome, so the group node is published a second time to carry it.
+        /// </remarks>
+        private async Task PublishSummariesAsync(
+            ExecuteRequestContext context,
+            SessionUid sessionUid,
+            BenchmarkEventProcessor eventProcessor,
+            CancellationToken cancellationToken)
+        {
+            foreach (var (type, summary) in eventProcessor.Summaries)
+            {
+                // The console dialect is the one BenchmarkDotNet prints itself, so what lands on the node is the table
+                // the user would have read in the console, host environment and job legend included.
+                var logger = new AccumulationLogger();
+                await ((MarkdownExporter)MarkdownExporter.Console)
+                    .ExportToLogAsync(summary, logger, cancellationToken)
+                    .ConfigureAwait(false);
+
+                var node = BenchmarkTestNode.CreateGroupNode(type, new StandardOutputProperty(logger.GetLog()));
+
+                await context.MessageBus
+                    .PublishAsync(this, new TestNodeUpdateMessage(sessionUid, node))
+                    .ConfigureAwait(false);
+            }
         }
 
         /// <summary>

@@ -183,7 +183,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var report = ReadDisposalReport(
                 PassingProbes,
                 "disposable-probe.txt",
-                () => (discovered, ran) = TestingPlatformServerModeSession.DiscoverThenRun(
+                () => (discovered, ran, _) = TestingPlatformServerModeSession.DiscoverThenRun(
                     GetProbeApplication(PassingProbes),
                     "DisposableProbe.Identity(Value: tracked",
                     Timeout));
@@ -245,13 +245,42 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        public void TheSummaryTableIsReportedOnTheGroupNodeOfItsType()
+        {
+            // BenchmarkDotNet writes its summary to the ILogger the adapter gives it, but the platform forwards plain
+            // output as an informational log message and a client of its server mode - Visual Studio, or `dotnet
+            // test` - shows the user only the warnings and the errors among that, so the run's own table never
+            // reaches the reader. It travels on the group node of its type instead, which is also what puts it where
+            // an IDE shows a group's summary. See dotnet/BenchmarkDotNet#2502.
+            var (_, ran, groups) = TestingPlatformServerModeSession.DiscoverThenRun(
+                GetProbeApplication(PassingProbes),
+                "DisposableProbe.Identity(Value: tracked",
+                Timeout);
+
+            var group = Assert.Single(groups);
+            Assert.Equal($"{PassingProbes}.DisposableProbe", group.Uid);
+            Assert.Equal($"{PassingProbes}.DisposableProbe", group.DisplayName);
+
+            // The benchmarks hang from it, which is what makes it their group rather than a node of its own.
+            Assert.NotEmpty(ran);
+            Assert.All(ran, node => Assert.Equal(group.Uid, node.Parent));
+
+            // The markdown table BenchmarkDotNet prints to the console, one row per benchmark that ran.
+            Assert.Contains("| Method", group.StandardOutput);
+            Assert.All(ran, node => Assert.Contains(node.DisplayName.Split('(')[0].Split('.')[^1], group.StandardOutput));
+
+            // A summary is not a test: carrying no execution state is what keeps the group out of the run's counts.
+            Assert.Equal(string.Empty, group.ExecutionState);
+        }
+
+        [Fact]
         public void AnAssemblyWideValidationWarningIsReportedOncePerNode()
         {
             // GenericBenchmarksValidator looks at the whole assembly, however BenchmarkDotNet runs the validators once
             // per benchmark type, so an unreadable type is reported again for every type that runs. An error that
             // names no benchmark case is put on every node, so without deduplication N types leave N copies of the
             // same warning on each of the N types' nodes.
-            var (_, ran) = TestingPlatformServerModeSession.DiscoverThenRun(
+            var (_, ran, _) = TestingPlatformServerModeSession.DiscoverThenRun(
                 GetProbeApplication(PassingProbes),
                 "Probe.Identity",
                 Timeout);

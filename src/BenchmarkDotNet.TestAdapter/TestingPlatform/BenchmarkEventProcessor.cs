@@ -20,10 +20,11 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
     internal sealed class BenchmarkEventProcessor : EventProcessor
     {
         private readonly IReadOnlyDictionary<string, BenchmarkTestNode> nodes;
-        private readonly Action<TestNode> publish;
+        private readonly Action<TestNode, string> publish;
         private readonly Stopwatch runTimerStopwatch = new();
         private readonly Dictionary<string, PendingResult> pendingResults = [];
         private readonly HashSet<string> publishedResults = [];
+        private readonly List<(Type Type, Summary Summary)> summaries = [];
 
         // BenchmarkDotNet builds the partitions in parallel and raises OnBuildComplete from each of the build tasks,
         // so that callback can run on several threads at once. The others cannot: every build is awaited before the
@@ -33,7 +34,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         // Written on BenchmarkDotNet's thread, read on the request's once the run is over.
         private volatile bool parameterValuesDisposed;
 
-        public BenchmarkEventProcessor(IReadOnlyDictionary<string, BenchmarkTestNode> nodes, Action<TestNode> publish)
+        public BenchmarkEventProcessor(IReadOnlyDictionary<string, BenchmarkTestNode> nodes, Action<TestNode, string> publish)
         {
             this.nodes = nodes;
             this.publish = publish;
@@ -50,7 +51,19 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// </remarks>
         public bool ParameterValuesDisposed => parameterValuesDisposed;
 
+        /// <summary>
+        /// Gets the summary BenchmarkDotNet produced for each type it ran benchmarks of, in the order it ran them.
+        /// </summary>
+        /// <remarks>
+        /// Rendering a summary is asynchronous, and this is raised from BenchmarkDotNet's own thread while the
+        /// synchronization context it installs is current, so the summaries are only collected here. The request
+        /// renders and publishes them once the run is over, where awaiting is what the calling code already does.
+        /// </remarks>
+        public IReadOnlyList<(Type Type, Summary Summary)> Summaries => summaries;
+
         public override void OnEndRunStage() => parameterValuesDisposed = true;
+
+        public override void OnEndRunBenchmarksInType(Type type, Summary summary) => summaries.Add((type, summary));
 
         public override void OnValidationError(ValidationError validationError)
         {
@@ -96,7 +109,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                         pending.ErrorMessages.Add($"// Build Error: {buildResult.ErrorMessage}");
 
                     // A benchmark that failed to build will never run, so the result can be published immediately.
-                    publish(node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance));
+                    publish(node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance), node.GroupUid);
                     PublishResult(node, pending, new FailedTestNodeStateProperty(pending.GetErrorMessage() ?? "The benchmark failed to build."));
                 }
             }
@@ -108,7 +121,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             var pending = GetOrCreatePendingResult(node);
             pending.StartTime = DateTimeOffset.UtcNow;
 
-            publish(node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance));
+            publish(node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance), node.GroupUid);
             runTimerStopwatch.Restart();
         }
 
@@ -152,7 +165,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                     (null, null) => SkippedTestNodeStateProperty.CachedInstance
                 };
 
-                publish(node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance));
+                publish(node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance), node.GroupUid);
                 PublishResult(node, pending, state);
             }
         }
@@ -170,7 +183,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             if (pending.Output.Length > 0)
                 properties.Add(new StandardOutputProperty(pending.Output.ToString()));
 
-            publish(node.ToTestNode(state, properties.ToArray()));
+            publish(node.ToTestNode(state, properties.ToArray()), node.GroupUid);
             publishedResults.Add(node.Uid);
         }
 
