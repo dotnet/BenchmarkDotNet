@@ -4,6 +4,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -26,7 +27,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         /// <summary>
         /// Maps action args to fields that store arg values.
         /// </summary>
-        private record struct ArgFieldInfo(FieldInfo Field, Type ArgLocalsType, MethodInfo? OpImplicitMethod);
+        private record struct ArgFieldInfo(FieldInfo Field, Type ArgLocalsType, MethodInfo? OpConversionMethod);
 
         private readonly BuildPartition buildPartition;
         private readonly ModuleBuilder moduleBuilder;
@@ -296,13 +297,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                         argFieldType = argLocalsType.GetElementType()
                             ?? throw new InvalidOperationException($"Bug: cannot get field type from {argLocalsType}");
                     }
-                    else if (parameterType.IsByRefLike() && argValue.Value != null)
+                    else if (parameterType.IsByRefLike() && argValue.ParameterValue.SourceType is var passedArgType && passedArgType != parameterType)
                     {
                         argLocalsType = parameterType;
 
-                        // Use conversion on load; store passed value
-                        var passedArgType = argValue.Value.GetType();
-                        opConversion = GetImplicitConversionOpFromTo(passedArgType, argLocalsType)
+                        // Use conversion on load; store the passed value as the type its declaration names, which is
+                        // the one the conversion was found for - the value may be of a type derived from it, or be
+                        // null and name nothing at all.
+                        opConversion = GetConversionOpFromTo(passedArgType, argLocalsType)
                             ?? throw new InvalidOperationException($"Bug: No conversion from {passedArgType} to {argLocalsType}.");
                         argFieldType = passedArgType;
                     }
@@ -412,8 +414,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 else
                     ilBuilder.Emit(OpCodes.Ldfld, argFieldInfo.Field);
 
-                if (argFieldInfo.OpImplicitMethod != null)
-                    ilBuilder.Emit(OpCodes.Call, argFieldInfo.OpImplicitMethod);
+                if (argFieldInfo.OpConversionMethod != null)
+                    ilBuilder.Emit(OpCodes.Call, argFieldInfo.OpConversionMethod);
             }
         }
 

@@ -194,25 +194,26 @@ namespace BenchmarkDotNet.Running
 
         private static async ValueTask<IReadOnlyList<ParameterInstances>> GetParameterInstancesAsync(Type type, SummaryStyle summaryStyle, CancellationToken cancellationToken)
         {
-            IEnumerable<ParameterValues> GetValues<TAttribute>(Func<TAttribute, Type, IReadOnlyList<ParameterValue>> getValidValues) where TAttribute : PriorityAttribute
+            IEnumerable<ParameterValues> GetValues<TAttribute>(Func<TAttribute, ParameterDefinition, IReadOnlyList<ParameterValue>> getValidValues) where TAttribute : PriorityAttribute
                 => type.GetTypeMembersWithGivenAttribute<TAttribute>(ReflectionExtensions.ParameterMemberFlags)
                     .Select(member =>
-                        new ParameterValues(
-                            new(member.Name, member.IsStatic, isArgument: false, member.ParameterType, member.Attribute.Priority),
-                            getValidValues(member.Attribute, member.ParameterType)
-                        )
-                    );
+                    {
+                        var definition = new ParameterDefinition(member.Name, member.IsStatic, isArgument: false, member.ParameterType, member.Attribute.Priority);
 
-            var parameters = GetValues<ParamsAttribute>((attribute, parameterType) => GetValidValues(attribute.Values, parameterType)).ToList();
+                        return new ParameterValues(definition, getValidValues(member.Attribute, definition));
+                    });
+
+            var parameters = GetValues<ParamsAttribute>((attribute, definition) => GetValidValues(attribute.Values, definition, "[Params]")).ToList();
             foreach (var member in type.GetTypeMembersWithGivenAttribute<ParamsSourceAttribute>(ReflectionExtensions.ParameterMemberFlags))
             {
                 var targetType = member.Attribute.Type ?? type;
                 var (source, values) = await GetValidValuesForParamsSourceAsync(targetType, member.Attribute.Name, cancellationToken).ConfigureAwait();
-                parameters.Add(new ParameterValues(
-                    new ParameterDefinition(member.Name, member.IsStatic, isArgument: false, member.ParameterType, member.Attribute.Priority),
-                    SmartParamBuilder.CreateForParams(member.ParameterType, source, values)));
+                var definition = new ParameterDefinition(member.Name, member.IsStatic, isArgument: false, member.ParameterType, member.Attribute.Priority);
+
+                parameters.Add(new ParameterValues(definition, SmartParamBuilder.CreateForParams(definition, source, values)));
             }
-            parameters.AddRange(GetValues<ParamsAllValuesAttribute>((_, parameterType) => GetValidValues(GetAllValidValues(parameterType), parameterType)));
+            parameters.AddRange(GetValues<ParamsAllValuesAttribute>((_, definition) =>
+                GetValidValues(GetAllValidValues(definition.ParameterType), definition, "[ParamsAllValues]")));
 
             // Each member ranges over its values independently, so the cases are their cartesian product: every case so far is re-made once per value
             // of the next parameter. The seed is the single empty case, which is also the answer for a benchmark that has no parameters at all.
@@ -238,6 +239,20 @@ namespace BenchmarkDotNet.Running
             return cases;
         }
 
+        /// <summary>
+        /// One argument written into the benchmark's own attribute, and the type the generated code holds it as.
+        /// That is the parameter's own, except for a by-ref-like one, which no field can hold (#774): it is
+        /// reached through the conversion the value's own type declares, so only the value names what holds it -
+        /// which is also why a null has to be refused before this can ask.
+        /// </summary>
+        private static ParameterInstance Argument(MethodInfo benchmark, ParameterDefinition definition, object? value, SummaryStyle summaryStyle)
+        {
+            SmartParamBuilder.RefuseNull($"[Arguments] on {benchmark.Name}", definition, value);
+
+            var sourceType = definition.ParameterType.WithoutRefModifier().IsByRefLike() ? value!.GetType() : definition.ParameterType;
+            return new ParameterInstance(definition, new ParameterValue.Constant(value, sourceType), summaryStyle);
+        }
+
         private static async ValueTask<IReadOnlyList<ParameterInstances>> GetArgumentsInstancesAsync(MethodInfo benchmark, Type benchmarkType, SummaryStyle summaryStyle, CancellationToken cancellationToken)
         {
             int priority = benchmark.GetCustomAttributes<PriorityAttribute>().Sum(attribute => attribute.Priority);
@@ -259,11 +274,7 @@ namespace BenchmarkDotNet.Running
 
                 result.Add(
                     new(argumentsAttribute.Values
-                        .Select((value, index) =>
-                        {
-                            var definition = parameterDefinitions[index];
-                            return new ParameterInstance(definition, new ParameterValue.Constant(value, definition.ParameterType), summaryStyle);
-                        })
+                        .Select((value, index) => Argument(benchmark, parameterDefinitions[index], value, summaryStyle))
                         .ToArray()
                     )
                 );
@@ -304,8 +315,13 @@ namespace BenchmarkDotNet.Running
                 throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported.");
         }
 
-        private static IReadOnlyList<ParameterValue> GetValidValues(object?[] values, Type parameterType)
-            => [.. values.Select(value => new ParameterValue.Constant(value, parameterType))];
+        private static IReadOnlyList<ParameterValue> GetValidValues(object?[] values, ParameterDefinition definition, string origin)
+            => [.. values.Select(value =>
+            {
+                SmartParamBuilder.RefuseNull(origin, definition, value);
+
+                return new ParameterValue.Constant(value, definition.ParameterType);
+            })];
 
         private static async ValueTask<(MemberInfo source, object?[] values)> GetValidValuesForParamsSourceAsync(Type sourceType, string sourceName, CancellationToken cancellationToken)
         {
