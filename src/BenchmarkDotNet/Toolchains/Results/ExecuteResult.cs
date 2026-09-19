@@ -48,11 +48,16 @@ namespace BenchmarkDotNet.Toolchains.Results
         }
 
         internal ExecuteResult(List<Measurement> measurements, GcStats gcStats)
+            : this(measurements, gcStats, [])
+        {
+        }
+
+        private ExecuteResult(List<Measurement> measurements, GcStats gcStats, IReadOnlyList<string> prefixedLines)
         {
             FoundExecutable = true;
             ExitCode = 0;
             errors = [];
-            PrefixedLines = [];
+            PrefixedLines = prefixedLines;
             this.measurements = measurements;
             GcStats = gcStats;
             StandardOutput = [];
@@ -71,10 +76,10 @@ namespace BenchmarkDotNet.Toolchains.Results
             Results = [];
         }
 
-        internal static ExecuteResult FromRunResults(RunResults runResults, int exitCode)
+        internal static ExecuteResult FromRunResults(RunResults runResults, int exitCode, IReadOnlyList<string> prefixedLines)
             => exitCode != 0
-                ? CreateFailed(exitCode)
-                : new ExecuteResult([.. runResults.GetAllMeasurements()], runResults.GCStats);
+                ? new ExecuteResult(false, exitCode, default, [], prefixedLines, [], 0)
+                : new ExecuteResult([.. runResults.GetAllMeasurements()], runResults.GCStats, prefixedLines);
 
         internal static ExecuteResult CreateFailed(int exitCode = -1)
             => new(false, exitCode, default, [], [], [], 0);

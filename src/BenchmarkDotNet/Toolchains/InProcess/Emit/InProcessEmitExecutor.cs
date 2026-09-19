@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             }
             host.HandleInProcessDiagnoserResults(executeParameters.BenchmarkCase, executeParameters.CompositeInProcessDiagnoser);
 
-            return ExecuteResult.FromRunResults(host.RunResults, exitCode);
+            return ExecuteResult.FromRunResults(host.RunResults, exitCode, host.PrefixedLines);
         }
 
         private async ValueTask<int> ExecuteCore(IHost host, ExecuteParameters parameters)
