@@ -564,9 +564,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public class WithArrayFromArgumentsSourceToSpan
         {
-            public IEnumerable<object[]> GetArray()
+            public IEnumerable<int[]> GetArray()
             {
-                yield return new object[] { new[] { 0, 1, 2 } };
+                yield return new[] { 0, 1, 2 };
             }
 
             [Benchmark]
@@ -611,9 +611,9 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             private const string expectedString = "very nice string";
 
-            public IEnumerable<object[]> GetString()
+            public IEnumerable<string> GetString()
             {
-                yield return new object[] { expectedString };
+                yield return expectedString;
             }
 
             [Benchmark]
@@ -649,14 +649,14 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)] // make sure BDN mimics xunit's MemberData behaviour
-        public void AnIEnumerableOfArrayOfObjectsCanBeUsedAsArgumentForBenchmarkAcceptingSingleArgument(IToolchain toolchain)
-            => CanExecute<WithIEnumerableOfArrayOfObjectsFromArgumentSource>(toolchain);
+        public void AnIEnumerableOfObjectsCanBeUsedAsArgumentForBenchmarkAcceptingSingleArgument(IToolchain toolchain)
+            => CanExecute<WithIEnumerableOfObjectsFromArgumentSource>(toolchain);
 
-        public class WithIEnumerableOfArrayOfObjectsFromArgumentSource
+        public class WithIEnumerableOfObjectsFromArgumentSource
         {
-            public IEnumerable<object[]> GetArguments()
+            public IEnumerable<object> GetArguments()
             {
-                yield return new object[] { true };
+                yield return true;
             }
 
             [Benchmark]
@@ -1088,46 +1088,211 @@ namespace BenchmarkDotNet.IntegrationTests
         public void StaticMethodsAndPropertiesCanBeUsedAsSources_EnumerableOfArrayOfObjects(IToolchain toolchain)
             => CanExecute<WithStaticSources_EnumerableOfArrayOfObjects>(toolchain);
 
+        // object[] remains the argument list for a benchmark taking several arguments, whether the static source
+        // is a method or a property.
         public class WithStaticSources_EnumerableOfArrayOfObjects
         {
-            public static IEnumerable<object[]> StaticMethod() { yield return new object[] { 1 }; }
+            public static IEnumerable<object[]> StaticMethod() { yield return new object[] { 1, "one" }; }
             public static IEnumerable<object[]> StaticProperty
             {
                 get
                 {
-                    yield return new object[] { 2 };
-                    yield return new object[] { 3 };
+                    yield return new object[] { 2, "two" };
+                    yield return new object[] { 3, "three" };
                 }
             }
 
-            [ParamsSource(nameof(StaticMethod))]
-            public int ParamOne { get; set; }
-
-            [ParamsSource(nameof(StaticProperty))]
-            public int ParamTwo { get; set; }
-
             [Benchmark]
             [ArgumentsSource(nameof(StaticMethod))]
-            public void TestMethod(int argument)
+            public void TestMethod(int number, string text)
             {
-                if (argument != 1)
-                    throw new ArgumentException("The argument value is incorrect!");
-                if (ParamOne != 1)
-                    throw new ArgumentException("The ParamOne value is incorrect!");
-                if (ParamTwo != 2 && ParamTwo != 3)
-                    throw new ArgumentException("The ParamTwo value is incorrect!");
+                if (number != 1 || text != "one")
+                    throw new ArgumentException("The argument values are incorrect!");
             }
 
             [Benchmark]
             [ArgumentsSource(nameof(StaticProperty))]
-            public void TestProperty(int argument)
+            public void TestProperty(int number, string text)
             {
-                if (argument != 2 && argument != 3)
-                    throw new ArgumentException("The argument value is incorrect!");
-                if (ParamOne != 1)
-                    throw new ArgumentException("The ParamOne value is incorrect!");
-                if (ParamTwo != 2 && ParamTwo != 3)
-                    throw new ArgumentException("The ParamTwo value is incorrect!");
+                if ((number != 2 || text != "two") && (number != 3 || text != "three"))
+                    throw new ArgumentException("The argument values are incorrect!");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AValueTupleCanBeTheArgumentList(IToolchain toolchain) => CanExecute<WithValueTupleSource>(toolchain);
+
+        public class WithValueTupleSource
+        {
+            // Neither item is a compilation-time constant, so both are rendered as reads into the row rather than
+            // written into the generated source as literals - which is what puts the tuple accessor under test.
+            public IEnumerable<(int[] numbers, int[] more)> Rows()
+            {
+                yield return ([1], [10, 11]);
+                yield return ([2], [20, 21]);
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Rows))]
+            public void TwoArguments(int[] numbers, int[] more)
+            {
+                if (numbers.Length != 1 || more.Length != 2 || more[0] != numbers[0] * 10 || more[1] != numbers[0] * 10 + 1)
+                    throw new ArgumentException("The argument values are incorrect!");
+            }
+        }
+
+        // A tuple item is judged against its parameter like any other value, so one that is null reaches a
+        // by-ref-like parameter the same way a single argument does: the field holds the type the item is
+        // declared as, and the operator turns the null it holds into the empty span. The other item is not a
+        // compilation-time constant, so the row is read rather than written out as literals - a row of constants
+        // would settle nothing about how the items are reached.
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AByRefLikeParameterIsFedANullTupleItem(IToolchain toolchain) => CanExecute<WithTupleNullToByRefLike>(toolchain);
+
+        public class WithTupleNullToByRefLike
+        {
+            public IEnumerable<(byte[]? bytes, int[] numbers)> Values() { yield return (null, [7]); }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Values))]
+            public void TwoArguments(ReadOnlySpan<byte> bytes, int[] numbers)
+            {
+                if (bytes.Length != 0 || numbers.Length != 1 || numbers[0] != 7)
+                    throw new ArgumentException("The argument values are incorrect!");
+            }
+        }
+
+        // And a by-ref-like parameter fed a tuple item that *is* read: the item is taken out of the row through
+        // the tuple accessor as its own type, then converted where the argument is loaded.
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AByRefLikeParameterIsFedATupleItemReadFromTheRow(IToolchain toolchain)
+            => CanExecute<WithTupleReadToByRefLike>(toolchain);
+
+        public class WithTupleReadToByRefLike
+        {
+            public IEnumerable<(byte[] bytes, int[] numbers)> Values() { yield return ([1, 2, 3], [7]); }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Values))]
+            public void TwoArguments(ReadOnlySpan<byte> bytes, int[] numbers)
+            {
+                if (bytes.Length != 3 || bytes[0] != 1 || numbers.Length != 1 || numbers[0] != 7)
+                    throw new ArgumentException("The argument values are incorrect!");
+            }
+        }
+
+        // A null is fed through the operator like any other value, because the field holds the type the source
+        // declares rather than the type the value happens to be - which null is not any of.
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AByRefLikeParameterIsFedANullValue(IToolchain toolchain) => CanExecute<WithNullToByRefLike>(toolchain);
+
+        public class WithNullToByRefLike
+        {
+            public IEnumerable<byte[]?> Values() { yield return null; }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Values))]
+            public void OneArgument(ReadOnlySpan<byte> bytes)
+            {
+                if (bytes.Length != 0)
+                    throw new ArgumentException("The argument values are incorrect!");
+            }
+        }
+
+        // The conversion is looked for on the type the source declares, so a value of a type derived from it is
+        // fed through the operator its base declares - the field holds it as the declared type too, which is what
+        // keeps the cast the generated code writes and the field it writes into agreeing.
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AByRefLikeParameterIsFedAValueOfADerivedType(IToolchain toolchain) => CanExecute<WithDerivedConvertible>(toolchain);
+
+        public class WithDerivedConvertible
+        {
+            public IEnumerable<Convertible> Values() { yield return new DerivedConvertible(); }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Values))]
+            public void OneArgument(ReadOnlySpan<byte> bytes)
+            {
+                if (bytes.Length != 3 || bytes[0] != 1)
+                    throw new ArgumentException("The argument values are incorrect!");
+            }
+
+            public class Convertible
+            {
+                public byte[] Bytes = [1, 2, 3];
+
+                public static implicit operator ReadOnlySpan<byte>(Convertible convertible) => convertible.Bytes;
+            }
+
+            public class DerivedConvertible : Convertible { }
+        }
+
+        // A by-ref-like parameter is reached through a conversion operator, and an explicit one serves as well as
+        // an implicit one because both toolchains write the cast themselves. Every by-ref-like type the BCL offers
+        // converts implicitly, so only a declared operator puts the other half of that rule under test.
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AByRefLikeParameterIsFedThroughAnExplicitConversion(IToolchain toolchain)
+            => CanExecute<InProcess.EmitTests.RunnableExplicitConversionCaseBenchmark>(toolchain);
+
+        // A source names its element type through whatever it returns, not only through the interface itself: a
+        // List<T> or any other implementer reads the same, because the element type is the same. The generated
+        // code declares its local as the source's own return type, so this is the half a unit test cannot reach.
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void ASourceThatMerelyImplementsTheEnumerableIsRead(IToolchain toolchain) => CanExecute<WithListSource>(toolchain);
+
+        public class WithListSource
+        {
+            public List<(int[] numbers, int[] more)> Rows() => [([1], [10, 11]), ([2], [20, 21])];
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Rows))]
+            public void TwoArguments(int[] numbers, int[] more)
+            {
+                if (numbers.Length != 1 || more.Length != 2 || more[0] != numbers[0] * 10 || more[1] != numbers[0] * 10 + 1)
+                    throw new ArgumentException("The argument values are incorrect!");
+            }
+        }
+
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AnArraySourceIsRead(IToolchain toolchain) => CanExecute<WithArraySource>(toolchain);
+
+        public class WithArraySource
+        {
+            public int[][] Rows() => [[1], [2]];
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Rows))]
+            public void OneArgument(int[] numbers)
+            {
+                if (numbers.Length != 1 || (numbers[0] != 1 && numbers[0] != 2))
+                    throw new ArgumentException("The argument values are incorrect!");
+            }
+        }
+
+        // From the eighth item a ValueTuple nests its tail in Rest, so an index past the seventh is reached through
+        // it rather than directly - and the generated code and the in-process toolchains have to walk it the same
+        // way. Fifteen items reach through two of them, which is what tells a walk that loops from one that
+        // stops at the first Rest; SmartParamBuilderTests covers deeper nesting without a benchmark that wide.
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void AValueTupleLongerThanSevenIsReadThroughItsRest(IToolchain toolchain) => CanExecute<WithLongValueTupleSource>(toolchain);
+
+        public class WithLongValueTupleSource
+        {
+            // The eighth and fifteenth items are arrays rather than constants, so those two are the ones the
+            // generated code has to reach - one Rest deep and two Rests deep respectively.
+            public IEnumerable<(int, int, int, int, int, int, int, int[], int, int, int, int, int, int, int[])> Rows()
+            {
+                yield return (1, 2, 3, 4, 5, 6, 7, [8], 9, 10, 11, 12, 13, 14, [15]);
+            }
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Rows))]
+            public void FifteenArguments(int a, int b, int c, int d, int e, int f, int g, int[] h,
+                int i, int j, int k, int l, int m, int n, int[] o)
+            {
+                if (a != 1 || b != 2 || c != 3 || d != 4 || e != 5 || f != 6 || g != 7 || h[0] != 8
+                    || i != 9 || j != 10 || k != 11 || l != 12 || m != 13 || n != 14 || o[0] != 15)
+                    throw new ArgumentException("The argument values are incorrect!");
             }
         }
 

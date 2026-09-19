@@ -9,6 +9,7 @@ namespace BenchmarkDotNet.Extensions
     {
         // The name the compiler gives an `implicit operator`; there is no reflection API that spells it.
         internal const string OpImplicitMethodName = "op_Implicit";
+        internal const string OpExplicitMethodName = "op_Explicit";
 
         internal static T? ResolveAttribute<T>(this Type? type) where T : Attribute =>
             type?.GetTypeInfo().GetCustomAttributes(typeof(T), false).OfType<T>().FirstOrDefault();
@@ -269,32 +270,36 @@ namespace BenchmarkDotNet.Extensions
         internal static Type WithoutRefModifier(this Type parameterType)
             => parameterType.IsByRef ? parameterType.GetElementType()! : parameterType;
 
-        internal static bool IsStackOnlyWithImplicitCast(this Type argumentType, [NotNullWhen(true)] object? argumentInstance)
+        /// <summary>
+        /// Whether null is not one of this type's values. A ref struct answers yes along with every other value
+        /// type, which is why nothing asks about by-ref-likeness here: for a null the two are the same question.
+        /// </summary>
+        internal static bool RefusesNull(this Type parameterType)
         {
-            if (argumentInstance == null)
-                return false;
+            var takes = parameterType.WithoutRefModifier();
 
-            if (!argumentType.IsByRefLike())
-                return false;
-
-            var instanceType = argumentInstance.GetType();
-
-            return HasImplicitConversion(argumentType, instanceType);
+            return takes.IsValueType && Nullable.GetUnderlyingType(takes) == null;
         }
 
-        private static bool HasImplicitConversion(Type targetType, Type sourceType)
-            => DeclaresConversion(sourceType, targetType, sourceType)
-            || DeclaresConversion(targetType, targetType, sourceType);
+        // A by-ref-like parameter is only ever reached through an operator, and the generated code writes the cast
+        // itself - so an explicit one serves as well as an implicit one. C# gathers operators from both types, so
+        // both are asked of each, and all four are matched on exactly these types: naming what the parameter takes
+        // leaves no conversion to reason about on the way into the operator.
+        internal static bool TakesByConversion(this Type targetType, Type sourceType)
+            => DeclaresConversion(sourceType, targetType, sourceType, OpImplicitMethodName)
+            || DeclaresConversion(targetType, targetType, sourceType, OpImplicitMethodName)
+            || DeclaresConversion(sourceType, targetType, sourceType, OpExplicitMethodName)
+            || DeclaresConversion(targetType, targetType, sourceType, OpExplicitMethodName);
 
-        // An `implicit operator` written for exactly these types. Only exactly: a source is admitted by naming
+        // A conversion operator written for exactly these types. Only exactly: a source is admitted by naming
         // what the parameter takes, so there is no conversion to reason about on the way into the operator - and
         // reasoning about one is what reflection cannot do, since it answers the CLR's rules rather than C#'s.
         //
         // C# gathers operators from both types and their base classes. Reflection withholds a base's statics
         // without FlattenHierarchy, so without it an operator inherited from a base is invisible.
-        private static bool DeclaresConversion(Type declaringType, Type targetType, Type sourceType)
+        private static bool DeclaresConversion(Type declaringType, Type targetType, Type sourceType, string operatorName)
             => declaringType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
-                .Any(method => method.Name == OpImplicitMethodName
+                .Any(method => method.Name == operatorName
                     && method.ReturnType == targetType
                     && method.GetParameters() is { Length: 1 } parameters
                     && parameters[0].ParameterType == sourceType);

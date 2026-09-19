@@ -160,9 +160,9 @@ namespace BenchmarkDotNet.Tests
         [ArgumentsSource(nameof(Date))]
         public void Method(DateTime arg) { }
 
-        public IEnumerable<object[]> Date()
+        public IEnumerable<DateTime> Date()
         {
-            yield return new object[] { DateTime.MaxValue };
+            yield return DateTime.MaxValue;
         }
     }
 
@@ -172,9 +172,9 @@ namespace BenchmarkDotNet.Tests
         [ArgumentsSource(nameof(Guid))]
         public void Method(Guid arg) { }
 
-        public IEnumerable<object[]> Guid()
+        public IEnumerable<Guid> Guid()
         {
-            yield return new object[] { System.Guid.Empty };
+            yield return System.Guid.Empty;
         }
     }
 
@@ -221,9 +221,9 @@ namespace BenchmarkDotNet.Tests
         [ArgumentsSource(nameof(Data))]
         public void Method(int[] array) { }
 
-        public IEnumerable<object[]> Data()
+        public IEnumerable<int[]> Data()
         {
-            yield return new object[] { Enumerable.Range(0, 100).ToArray() };
+            yield return Enumerable.Range(0, 100).ToArray();
         }
     }
 

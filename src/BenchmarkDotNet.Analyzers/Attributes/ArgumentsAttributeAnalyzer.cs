@@ -53,6 +53,51 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustReturnEnumerable_Description)));
 
+    internal static readonly DiagnosticDescriptor MustYieldArgumentListRule = new(
+        DiagnosticIds.Attributes_ArgumentsSourceAttribute_MustYieldArgumentList,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_Description)));
+
+    internal static readonly DiagnosticDescriptor MustMatchParametersForEveryTypeArgumentRule = new(
+        DiagnosticIds.Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_Description)));
+
+    internal static readonly DiagnosticDescriptor MustYieldWhatParametersTakeRule = new(
+        DiagnosticIds.Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_Description)));
+
+    internal static readonly DiagnosticDescriptor ShouldYieldValueTupleRule = new(
+        DiagnosticIds.Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_Description)));
+
+    internal static readonly DiagnosticDescriptor ShouldYieldParameterTypeRule = new(
+        DiagnosticIds.Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType,
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_Title)),
+        AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_MessageFormat)),
+        "Usage",
+        DiagnosticSeverity.Info,
+        isEnabledByDefault: true,
+        description: AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_Description)));
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => new DiagnosticDescriptor[]
     {
         RequiresBenchmarkAttributeRule,
@@ -60,6 +105,11 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
         MustHaveMatchingValueTypeRule,
         RequiresParametersRule,
         ArgumentsSourceMustReturnEnumerableRule,
+        MustYieldArgumentListRule,
+        MustMatchParametersForEveryTypeArgumentRule,
+        MustYieldWhatParametersTakeRule,
+        ShouldYieldValueTupleRule,
+        ShouldYieldParameterTypeRule,
         AnalyzerHelper.SourceMethodMustNotHaveRequiredParametersRule,
         AnalyzerHelper.SourceMethodMustNotBeGenericRule,
         AnalyzerHelper.SourceElementMustNotBeByRefLikeRule,
@@ -306,6 +356,95 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                 return;
             }
 
+            AnalyzeElementAgainstParameters(attr, sourceName!, elementType!);
+        }
+
+        // Mirrors SmartParamBuilder.Admits: one parameter is fed the value itself, several are fed an object[] or a
+        // ValueTuple naming each of them, and every item is judged against the parameter in its position by the
+        // same test - the parameter's own type, or object, or a conversion operator where it is by-ref-like.
+        void AnalyzeElementAgainstParameters(AttributeData attr, string sourceName, ITypeSymbol elementType)
+        {
+            var parameters = methodSymbol.Parameters;
+            var location = attr.GetSourceNameLocation();
+
+            if (parameters.Length == 1)
+            {
+                if (IsObject(elementType))
+                {
+                    // object stays valid - it is the way to defer the decision to the value's runtime type - so this
+                    // only suggests naming the parameter's type, and says nothing when that type is object already.
+                    // Nor where the parameter is by-ref-like: no source can yield one, so object is all there is.
+                    if (!IsObject(parameters[0].Type) && !AnalyzerHelper.MayBeRefLike(parameters[0].Type))
+                        context.ReportDiagnostic(Diagnostic.Create(
+                            ShouldYieldParameterTypeRule, location, Replacement(parameters[0].Type.ToDisplayString()),
+                            sourceName, parameters[0].Type.ToDisplayString()));
+                    return;
+                }
+
+                // The refused shape is the one-element array that used to wrap a single argument, and unwrapping
+                // it is mechanical, so the parameter's type is carried for the fixer to retype the source to. Not
+                // where the parameter is by-ref-like: no source can yield one, so there is nothing to name.
+                var unwrapped = IsObjectArray(elementType) && !AnalyzerHelper.MayBeRefLike(parameters[0].Type)
+                    ? Replacement(parameters[0].Type.ToDisplayString())
+                    : null;
+
+                ReportIfNotAdmissible(location, sourceName, elementType, parameters[0], string.Empty, unwrapped);
+                return;
+            }
+
+            if (IsObjectArray(elementType))
+            {
+                // A ValueTuple cannot hold a ref struct, so where any parameter is by-ref-like there is no tuple to
+                // suggest and object[] is the shape that feeds it.
+                if (!parameters.Any(parameter => AnalyzerHelper.MayBeRefLike(parameter.Type)))
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        ShouldYieldValueTupleRule, location, Replacement(TupleOf(parameters)),
+                        sourceName, TupleOf(parameters)));
+                return;
+            }
+
+            if (!TryGetTupleItems(elementType, parameters.Length, out var items))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    MustYieldArgumentListRule, location, sourceName, elementType.ToDisplayString(),
+                    parameters.Length, methodSymbol.Name));
+                return;
+            }
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (ReportIfNotAdmissible(location, sourceName, items[i], parameters[i], $" for argument {i + 1}"))
+                    return;
+            }
+        }
+
+        // True when something was reported, so the caller stops at the first item that does not fit.
+        bool ReportIfNotAdmissible(Location location, string sourceName, ITypeSymbol type, IParameterSymbol parameter, string position,
+            ImmutableDictionary<string, string?>? properties = null)
+        {
+            // An open declaration cannot be settled here: what a type parameter becomes is supplied by the next
+            // [GenericTypeArguments] on the class, which this deliberately does not read. Discovery holds the
+            // substituted types and reports an error on those, so this says only that it cannot be proved.
+            if (ContainsTypeParameter(type) || ContainsTypeParameter(parameter.Type))
+            {
+                if (!SymbolEqualityComparer.Default.Equals(type, parameter.Type))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        MustMatchParametersForEveryTypeArgumentRule, location,
+                        sourceName, type.ToDisplayString(), parameter.Type.ToDisplayString()));
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (Admissible(type, parameter.Type))
+                return false;
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                MustYieldWhatParametersTakeRule, location, properties,
+                sourceName, type.ToDisplayString(), parameter.Type.ToDisplayString(), position));
+            return true;
         }
 
         void ReportMustHaveMatchingValueCountDiagnostic(Location diagnosticLocation, int valueCount)
@@ -335,4 +474,62 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
             }
         }
     }
+
+
+    // The element type the fixer retypes the source to, carried on the diagnostic so the fix does not have to
+    // work it out a second time from a different starting point.
+    internal const string ElementTypeKey = "ElementType";
+
+    private static ImmutableDictionary<string, string?> Replacement(string elementType)
+        => ImmutableDictionary<string, string?>.Empty.Add(ElementTypeKey, elementType);
+
+    private static bool IsObject(ITypeSymbol type) => type.SpecialType == SpecialType.System_Object;
+
+    private static bool IsObjectArray(ITypeSymbol type)
+        => type is IArrayTypeSymbol { Rank: 1 } array && IsObject(array.ElementType);
+
+    private static string TupleOf(ImmutableArray<IParameterSymbol> parameters)
+        => "(" + string.Join(", ", parameters.Select(parameter => parameter.Type.ToDisplayString())) + ")";
+
+    // Roslyn flattens the Rest chain for us, so a tuple of any length reads the same way here as it does in
+    // SmartParamBuilder, which walks one Rest per seven items.
+    private static bool TryGetTupleItems(ITypeSymbol elementType, int arity, out IReadOnlyList<ITypeSymbol> items)
+    {
+        if (elementType is INamedTypeSymbol { IsTupleType: true } tuple && tuple.TupleElements.Length == arity)
+        {
+            items = tuple.TupleElements.Select(element => element.Type).ToArray();
+            return true;
+        }
+
+        items = [];
+        return false;
+    }
+
+    // The static-analysis counterpart of SmartParamBuilder.Admissible.
+    private static bool Admissible(ITypeSymbol type, ITypeSymbol parameterType)
+        => SymbolEqualityComparer.Default.Equals(type, parameterType)
+        || (AnalyzerHelper.MayBeRefLike(parameterType) && DeclaresConversion(parameterType, type));
+
+    // A conversion operator written for exactly these two types, on either of them - the same question
+    // ReflectionExtensions.TakesByConversion asks of the runtime types.
+    private static bool DeclaresConversion(ITypeSymbol targetType, ITypeSymbol sourceType)
+        => Declares(targetType, targetType, sourceType) || Declares(sourceType, targetType, sourceType);
+
+    private static bool Declares(ITypeSymbol declaringType, ITypeSymbol targetType, ITypeSymbol sourceType)
+        => declaringType.GetMembers()
+            .OfType<IMethodSymbol>()
+            .Any(method => method.MethodKind == MethodKind.Conversion
+                && SymbolEqualityComparer.Default.Equals(method.ReturnType, targetType)
+                && method.Parameters.Length == 1
+                && SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, sourceType));
+
+    // Whether anything in the type is still a type parameter, which is what makes the match unprovable here.
+    private static bool ContainsTypeParameter(ITypeSymbol type)
+        => type switch
+        {
+            ITypeParameterSymbol => true,
+            IArrayTypeSymbol array => ContainsTypeParameter(array.ElementType),
+            INamedTypeSymbol named => named.TypeArguments.Any(ContainsTypeParameter),
+            _ => false,
+        };
 }

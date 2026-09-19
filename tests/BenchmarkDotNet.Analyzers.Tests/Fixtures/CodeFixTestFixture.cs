@@ -33,7 +33,10 @@ public abstract class CodeFixTestFixture<TAnalyzer, TCodeFix>
                     "BenchmarkDotNet.dll",
                     "BenchmarkDotNet.Annotations.dll",
 #if !NET6_0_OR_GREATER
-                    "System.Memory.dll"
+                    "System.Memory.dll",
+                    // Polyfills `IAsyncEnumerable<T>` etc. on netstandard2.0 — a retyped source may be an async
+                    // one, and the fix is only offered where that type resolves.
+                    "Microsoft.Bcl.AsyncInterfaces.dll"
 #endif
                 }
             }
