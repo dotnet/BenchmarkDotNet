@@ -8,8 +8,9 @@
   <PropertyGroup>
     <!-- Formatting in AnalyzerReleases.Unshipped.md -->
     <NoWarn>$(NoWarn);RS2007</NoWarn>
-    <!-- Suppress false positives due to a bug in v3.8.0. -->
-    <NoWarn Condition="'$(MccVersion)' == '3.8'">$(NoWarn);RS2002</NoWarn>
+    <!-- A HashSet built with SymbolEqualityComparer.Default is what RS1024 asks for, but the rule as shipped in
+         Microsoft.CodeAnalysis.Analyzers 3.3.2 (bundled with 4.0.0) reports it anyway. -->
+    <NoWarn Condition="'$(MccVersion)' == '4.0'">$(NoWarn);RS1024</NoWarn>
   </PropertyGroup>
   <ItemGroup>
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(MccPackageVersion)" />
