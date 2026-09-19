@@ -16,8 +16,10 @@ namespace BenchmarkDotNet.Validators
                 .Distinct()
                 .SelectMany(assembly => assembly.GetRunnableBenchmarks())
                 .SelectMany(GenericBenchmarksBuilder.BuildGenericsIfNeeded)
-                .Where(result => !result.isSuccess)
-                .Select(result => new ValidationError(false, $"Generic type {result.result.Name} failed to build due to wrong type argument or arguments count, ignoring."))
+                // An unreadable type is reported here as well as by TypeFilter: BenchmarkRunner.Run<T>() and both
+                // test adapters never go through TypeFilter, so for them this is the only report there is.
+                .Where(built => !built.IsSuccess)
+                .Select(built => new ValidationError(false, built.Error!))
                 .ToAsyncEnumerable();
     }
 }
