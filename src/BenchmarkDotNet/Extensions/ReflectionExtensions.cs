@@ -281,12 +281,22 @@ namespace BenchmarkDotNet.Extensions
             return takes.IsValueType && Nullable.GetUnderlyingType(takes) == null;
         }
 
+        /// <summary>
+        /// The method that converts <see cref="string"/> to <c>ReadOnlySpan&lt;char&gt;</c>, or null.
+        /// </summary>
+        internal static MethodInfo? StringAsSpanMethod(Type targetType, Type sourceType)
+            => targetType == typeof(ReadOnlySpan<char>) && sourceType == typeof(string)
+                ? typeof(MemoryExtensions).GetMethod(nameof(MemoryExtensions.AsSpan), [typeof(string)])
+                : null;
+
         // A by-ref-like parameter is only ever reached through an operator, and the generated code writes the cast
         // itself - so an explicit one serves as well as an implicit one. C# gathers operators from both types, so
         // both are asked of each, and all four are matched on exactly these types: naming what the parameter takes
         // leaves no conversion to reason about on the way into the operator.
         internal static bool TakesByConversion(this Type targetType, Type sourceType)
-            => DeclaresConversion(sourceType, targetType, sourceType, OpImplicitMethodName)
+            // Check the string-to-ReadOnlySpan<char> special-case first.
+            => StringAsSpanMethod(targetType, sourceType) != null
+            || DeclaresConversion(sourceType, targetType, sourceType, OpImplicitMethodName)
             || DeclaresConversion(targetType, targetType, sourceType, OpImplicitMethodName)
             || DeclaresConversion(sourceType, targetType, sourceType, OpExplicitMethodName)
             || DeclaresConversion(targetType, targetType, sourceType, OpExplicitMethodName);

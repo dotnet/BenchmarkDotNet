@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -42,7 +42,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         // decides that such an argument is passed at all. C# gathers operators from both types, so both are asked.
         public static MethodInfo? GetConversionOpFromTo(Type from, Type to)
         {
-            return GetConversionOpCore(to, from, to, ReflectionExtensions.OpImplicitMethodName)
+            // Check the string-to-ReadOnlySpan<char> special-case first.
+            return ReflectionExtensions.StringAsSpanMethod(to, from)
+                ?? GetConversionOpCore(to, from, to, ReflectionExtensions.OpImplicitMethodName)
                 ?? GetConversionOpCore(from, from, to, ReflectionExtensions.OpImplicitMethodName)
                 ?? GetConversionOpCore(to, from, to, ReflectionExtensions.OpExplicitMethodName)
                 ?? GetConversionOpCore(from, from, to, ReflectionExtensions.OpExplicitMethodName);

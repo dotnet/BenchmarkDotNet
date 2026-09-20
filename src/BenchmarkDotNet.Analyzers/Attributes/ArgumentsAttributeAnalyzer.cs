@@ -513,7 +513,16 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
     // A conversion operator written for exactly these two types, on either of them - the same question
     // ReflectionExtensions.TakesByConversion asks of the runtime types.
     private static bool DeclaresConversion(ITypeSymbol targetType, ITypeSymbol sourceType)
-        => Declares(targetType, targetType, sourceType) || Declares(sourceType, targetType, sourceType);
+        // Check the string-to-ReadOnlySpan<char> special-case first.
+        => IsStringToReadOnlySpanOfChar(targetType, sourceType)
+        || Declares(targetType, targetType, sourceType)
+        || Declares(sourceType, targetType, sourceType);
+
+    private static bool IsStringToReadOnlySpanOfChar(ITypeSymbol targetType, ITypeSymbol sourceType)
+        => sourceType.SpecialType == SpecialType.System_String
+        && targetType is INamedTypeSymbol { Name: "ReadOnlySpan", Arity: 1 } span
+        && span.ContainingNamespace?.ToDisplayString() == "System"
+        && span.TypeArguments[0].SpecialType == SpecialType.System_Char;
 
     private static bool Declares(ITypeSymbol declaringType, ITypeSymbol targetType, ITypeSymbol sourceType)
         => declaringType.GetMembers()

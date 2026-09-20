@@ -112,9 +112,14 @@ namespace BenchmarkDotNet.Code
             string field = $"this.{FieldsContainerName}.{ArgFieldPrefix}{index}";
             var parameterType = parameter.ParameterType.WithoutRefModifier();
 
-            return parameterType.IsByRefLike()
-                ? $"({parameterType.GetCorrectCSharpTypeName()}) {field}"
-                : field;
+            if (!parameterType.IsByRefLike())
+                return field;
+
+            // Special-case string-to-ReadOnlySpan<char> (C# first-class-span feature).
+            var held = Benchmark.Parameters.GetArgument(parameter.Name!).ParameterValue.SourceType;
+            return ReflectionExtensions.StringAsSpanMethod(parameterType, held) is { } helper
+                ? $"{helper.DeclaringType!.GetCorrectCSharpTypeName()}.{helper.Name}({field})"
+                : $"({parameterType.GetCorrectCSharpTypeName()}) {field}";
         }
 
         protected string GetPassArguments()

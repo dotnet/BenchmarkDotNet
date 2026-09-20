@@ -2017,6 +2017,57 @@ public class ArgumentsAttributeAnalyzerTests
             await RunAsync();
         }
 
+        // No operator declares string -> ReadOnlySpan<char> on every target: the one on string arrived in .NET
+        // Core 2.1, so a benchmark built for .NET Framework has none. Both toolchains reach it through
+        // MemoryExtensions.AsSpan, so the rule admits it wherever the benchmark is being written.
+        [Fact]
+        public async Task AStringForAReadOnlySpanOfCharParameter_ShouldNotReportError()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<string> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(ReadOnlySpan<char> a) { }
+                }
+                """;
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        // Only that pair: a ReadOnlySpan of anything else is not reachable from a string.
+        [Fact]
+        public async Task AStringForAReadOnlySpanOfByteParameter_ShouldReportError()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<string> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(ReadOnlySpan<byte> a) { }
+                }
+                """;
+
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "string", "System.ReadOnlySpan<byte>", "");
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
         // A by-ref-like parameter is reached through a conversion operator, and an explicit one serves as well as
         // an implicit one because the generated code writes the cast itself.
         [Fact]
