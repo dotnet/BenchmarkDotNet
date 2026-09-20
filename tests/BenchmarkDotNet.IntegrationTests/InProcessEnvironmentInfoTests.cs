@@ -22,23 +22,30 @@ public class InProcessEnvironmentInfoTests(ITestOutputHelper output) : Benchmark
     [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
     public void EnvironmentInfoIsIncludedInReport(IToolchain toolchain)
     {
-        var diagnoser = new MockInProcessDiagnoser1(DiagnoserRunMode.NoOverhead);
-        var config = new ManualConfig()
-            .AddJob(Job.Dry.WithToolchain(toolchain))
-            .AddDiagnoser(diagnoser);
-        var summary = CanExecute<EnvironmentInfoBenchmark>(config);
+        try
+        {
+            var diagnoser = new MockInProcessDiagnoser1(DiagnoserRunMode.NoOverhead);
+            var config = new ManualConfig()
+                .AddJob(Job.Dry.WithToolchain(toolchain))
+                .AddDiagnoser(diagnoser);
+            var summary = CanExecute<EnvironmentInfoBenchmark>(config);
 
-        var report = Assert.Single(summary.Reports);
-        Assert.False(string.IsNullOrWhiteSpace(report.GetRuntimeInfo()));
-        Assert.False(string.IsNullOrWhiteSpace(report.GetGcInfo()));
-        Assert.NotNull(report.GetHardwareIntrinsicsInfo());
+            var report = Assert.Single(summary.Reports);
+            Assert.False(string.IsNullOrWhiteSpace(report.GetRuntimeInfo()));
+            Assert.False(string.IsNullOrWhiteSpace(report.GetGcInfo()));
+            Assert.NotNull(report.GetHardwareIntrinsicsInfo());
 
-        var executeResult = Assert.Single(report.ExecuteResults);
-        Assert.Contains(executeResult.PrefixedLines, line => line.StartsWith("// Runtime=", StringComparison.Ordinal));
-        Assert.Contains(executeResult.PrefixedLines, line => line.StartsWith("// GC=", StringComparison.Ordinal));
-        Assert.Contains(executeResult.PrefixedLines, line => line.StartsWith("// HardwareIntrinsics=", StringComparison.Ordinal));
-        Assert.DoesNotContain(executeResult.PrefixedLines, line => line.StartsWith("// InProcessDiagnoser", StringComparison.Ordinal));
-        Assert.Equal(diagnoser.ExpectedResult, diagnoser.Results[report.BenchmarkCase]);
+            var executeResult = Assert.Single(report.ExecuteResults);
+            Assert.Contains(executeResult.PrefixedLines, line => line.StartsWith("// Runtime=", StringComparison.Ordinal));
+            Assert.Contains(executeResult.PrefixedLines, line => line.StartsWith("// GC=", StringComparison.Ordinal));
+            Assert.Contains(executeResult.PrefixedLines, line => line.StartsWith("// HardwareIntrinsics=", StringComparison.Ordinal));
+            Assert.DoesNotContain(executeResult.PrefixedLines, line => line.StartsWith("// InProcessDiagnoser", StringComparison.Ordinal));
+            Assert.Equal(diagnoser.ExpectedResult, diagnoser.Results[report.BenchmarkCase]);
+        }
+        finally
+        {
+            BaseMockInProcessDiagnoser.s_completedResults.Clear();
+        }
     }
 
     public class EnvironmentInfoBenchmark
