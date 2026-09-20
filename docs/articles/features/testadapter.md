@@ -209,16 +209,22 @@ See [Running with VSTest](xref:docs.vstest) for the details, including the IDE s
 
 ## Viewing the results
 
-Each individual benchmark reports its own output, containing a histogram and various statistics for that
-  single benchmark case.
+Under both hosts, each individual benchmark reports its own output, containing a histogram and various statistics for
+  that single benchmark case.
 Depending on your IDE, this is shown when selecting the test after running it.
+
+### With Microsoft.Testing.Platform
 
 The summary table that compares the benchmarks of a type with each other is reported on the group node of that type,
   so it is shown when selecting the type rather than one of its benchmarks.
 
 The full BenchmarkDotNet output, the summary table and the exported reports included, is also written to the test run
   output.
-Note that Microsoft.Testing.Platform forwards that as informational log messages, and a client that drives the
-  platform in its server mode - Visual Studio, or `dotnet test` - may only show you the warnings and the errors among
-  them.
+Note that the platform forwards that as informational log messages, and a client that drives it in its server mode -
+  Visual Studio, or `dotnet test` - may only show you the warnings and the errors among them.
 Running the test application directly (`dotnet run`, or the built executable) prints all of it.
+
+### With VSTest
+
+The full BenchmarkDotNet output, including the summary table, is written to the test run output.
+VSTest has no group nodes, so there is nowhere for the summary table to be reported per type.
