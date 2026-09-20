@@ -108,6 +108,10 @@ namespace BenchmarkDotNet.IntegrationTests
         [InlineData(typeof(SampleBenchmark), false)]
         [InlineData(typeof(RunnableVoidCaseBenchmark), false)]
         [InlineData(typeof(RunnableRefStructCaseBenchmark), false)]
+        // A by-ref-like parameter reached by an EXPLICIT operator. The emitter calls the operator it looks up,
+        // where the generated C# writes a cast the compiler resolves - and every by-ref-like type the BCL offers
+        // declares its conversion implicitly, so no other case here exercises that lookup.
+        [InlineData(typeof(RunnableExplicitConversionCaseBenchmark), false)]
         [InlineData(typeof(RunnableStructCaseBenchmark), false)]
         [InlineData(typeof(RunnableClassCaseBenchmark), false)]
         [InlineData(typeof(RunnableManyArgsCaseBenchmark), false)]

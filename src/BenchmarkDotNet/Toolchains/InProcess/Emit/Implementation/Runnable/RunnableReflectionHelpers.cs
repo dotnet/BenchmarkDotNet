@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -29,25 +29,32 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             if (value != null)
             {
-                var implicitOp = GetImplicitConversionOpFromTo(value.GetType(), targetType);
-                if (implicitOp != null)
-                    return implicitOp.Invoke(null, [value])!;
+                var conversion = GetConversionOpFromTo(value.GetType(), targetType);
+                if (conversion != null)
+                    return conversion.Invoke(null, [value])!;
             }
 
             return value;
         }
 
-        public static MethodInfo? GetImplicitConversionOpFromTo(Type from, Type to)
+        // Both operator kinds, because a by-ref-like parameter is only ever reached through one and the emitted
+        // call is the same either way - the same pair ReflectionExtensions.TakesByConversion admits, which is what
+        // decides that such an argument is passed at all. C# gathers operators from both types, so both are asked.
+        public static MethodInfo? GetConversionOpFromTo(Type from, Type to)
         {
-            return GetImplicitConversionOpCore(to, from, to)
-                ?? GetImplicitConversionOpCore(from, from, to);
+            // Check the string-to-ReadOnlySpan<char> special-case first.
+            return ReflectionExtensions.StringAsSpanMethod(to, from)
+                ?? GetConversionOpCore(to, from, to, ReflectionExtensions.OpImplicitMethodName)
+                ?? GetConversionOpCore(from, from, to, ReflectionExtensions.OpImplicitMethodName)
+                ?? GetConversionOpCore(to, from, to, ReflectionExtensions.OpExplicitMethodName)
+                ?? GetConversionOpCore(from, from, to, ReflectionExtensions.OpExplicitMethodName);
         }
 
-        private static MethodInfo? GetImplicitConversionOpCore(Type owner, Type from, Type to)
+        private static MethodInfo? GetConversionOpCore(Type owner, Type from, Type to, string operatorName)
         {
             return owner.GetMethods(BindingFlagsPublicStatic)
                 .FirstOrDefault(m =>
-                    m.Name == ReflectionExtensions.OpImplicitMethodName
+                    m.Name == operatorName
                     && m.ReturnType == to
                     && m.GetParameters().Single().ParameterType == from);
         }
