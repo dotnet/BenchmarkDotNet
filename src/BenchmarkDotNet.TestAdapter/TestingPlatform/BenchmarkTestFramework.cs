@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
 using Microsoft.Testing.Platform.Capabilities.TestFramework;
@@ -350,11 +351,20 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// Attaches the summary table BenchmarkDotNet produced for a type to that type's group node.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The run's own output reaches the output device as it is produced, but a client of the platform's server
         /// mode - Visual Studio, or `dotnet test` - forwards that as an informational log message and shows the user
         /// nothing but the warnings and the errors among it, so the summary table has to travel on a test node to be
         /// seen. It only exists once the benchmarks of a type have all run, which is after their own nodes reached
         /// their outcome, so the group node is published a second time to carry it.
+        /// </para>
+        /// <para>
+        /// Rendering one is allowed to fail. BenchmarkDotNet prints its own summary from inside its run stage, while
+        /// this happens after it, so the parameter values have been disposed by the time the table is built - and a
+        /// table renders them by calling ToString() on each access rather than on a cached string. A value that
+        /// throws once disposed would otherwise take down a request whose every result had already been published,
+        /// so a summary that cannot be rendered is reported as a warning and the rest are still published.
+        /// </para>
         /// </remarks>
         private async Task PublishSummariesAsync(
             ExecuteRequestContext context,
@@ -364,14 +374,33 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         {
             foreach (var (type, summary) in eventProcessor.Summaries)
             {
-                // The console dialect is the one BenchmarkDotNet prints itself, so what lands on the node is the table
-                // the user would have read in the console, host environment and job legend included.
-                var logger = new AccumulationLogger();
-                await ((MarkdownExporter)MarkdownExporter.Console)
-                    .ExportToLogAsync(summary, logger, cancellationToken)
-                    .ConfigureAwait(false);
+                string report;
 
-                var node = BenchmarkTestNode.CreateGroupNode(type, new StandardOutputProperty(logger.GetLog()));
+                try
+                {
+                    // The console dialect is the one BenchmarkDotNet prints itself, so what lands on the node is the
+                    // table the user would have read in the console, host environment and job legend included.
+                    var logger = new AccumulationLogger();
+                    await ((MarkdownExporter)MarkdownExporter.Console)
+                        .ExportToLogAsync(summary, logger, cancellationToken)
+                        .ConfigureAwait(false);
+
+                    report = logger.GetLog();
+                }
+                catch (Exception exception) when (exception is not OperationCanceledException)
+                {
+                    var warning = new WarningMessageOutputDeviceData(
+                        $"The summary table of {type.GetCorrectCSharpTypeName(prefixWithGlobal: false)} could not be rendered, " +
+                        $"so it is not reported on its group: {exception.Message}");
+
+                    await serviceProvider.GetOutputDevice()
+                        .DisplayAsync(this, warning, cancellationToken)
+                        .ConfigureAwait(false);
+
+                    continue;
+                }
+
+                var node = BenchmarkTestNode.CreateGroupNode(type, new StandardOutputProperty(report));
 
                 await context.MessageBus
                     .PublishAsync(this, new TestNodeUpdateMessage(sessionUid, node))
@@ -405,14 +434,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 context.CancellationToken.ThrowIfCancellationRequested();
 
                 var node = benchmarks[0].Node;
+                var group = new TestNodeUid(node.GroupUid);
 
                 await context.MessageBus.PublishAsync(
                     this,
-                    new TestNodeUpdateMessage(sessionUid, node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance))).ConfigureAwait(false);
+                    new TestNodeUpdateMessage(sessionUid, node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance), group)).ConfigureAwait(false);
 
                 await context.MessageBus.PublishAsync(
                     this,
-                    new TestNodeUpdateMessage(sessionUid, node.ToTestNode(new FailedTestNodeStateProperty(error)))).ConfigureAwait(false);
+                    new TestNodeUpdateMessage(sessionUid, node.ToTestNode(new FailedTestNodeStateProperty(error)), group)).ConfigureAwait(false);
             }
 
             // With no benchmark to carry it, the refusal would be a run that reported nothing and exited successfully.
@@ -479,13 +509,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 "representation of the parameters. Give the colliding benchmarks distinct descriptions, distinct " +
                 "jobs, or distinct parameter ToString() results.";
 
-            await context.MessageBus.PublishAsync(
-                this,
-                new TestNodeUpdateMessage(sessionUid, node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance))).ConfigureAwait(false);
+            var group = new TestNodeUid(node.GroupUid);
 
             await context.MessageBus.PublishAsync(
                 this,
-                new TestNodeUpdateMessage(sessionUid, node.ToTestNode(new FailedTestNodeStateProperty(error)))).ConfigureAwait(false);
+                new TestNodeUpdateMessage(sessionUid, node.ToTestNode(InProgressTestNodeStateProperty.CachedInstance), group)).ConfigureAwait(false);
+
+            await context.MessageBus.PublishAsync(
+                this,
+                new TestNodeUpdateMessage(sessionUid, node.ToTestNode(new FailedTestNodeStateProperty(error)), group)).ConfigureAwait(false);
         }
 
         /// <summary>

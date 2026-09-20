@@ -141,11 +141,15 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// <param name="type">The type declaring the benchmarks.</param>
         /// <returns>The uid of the group node.</returns>
         /// <remarks>
-        /// A benchmark's own uid is the guid BenchmarkDotNet hashes out of its identity, so a type name can never be
-        /// mistaken for one. A closed generic type carries its type arguments in the name, which is what keeps the
-        /// instantiations of a generic benchmark class apart - BenchmarkDotNet summarises them separately too.
+        /// The runtime's own name for the type, and not the C# one the display name uses:
+        /// <see cref="ReflectionExtensions.GetCorrectCSharpTypeName"/> walks up to the first base type that is
+        /// visible, so every internal benchmark class in an assembly is named `System.Object` by it. Those types are
+        /// rejected by CompilationValidator, but not before their nodes have been reported, and a uid built that way
+        /// would collapse all of them onto one group - and onto the group of any public base they derive from,
+        /// whose summary the collision would then overwrite. A benchmark's own uid is a guid, so a type name can
+        /// never be mistaken for one.
         /// </remarks>
-        public static string GetGroupUid(Type type) => type.GetCorrectCSharpTypeName(prefixWithGlobal: false);
+        public static string GetGroupUid(Type type) => type.FullName ?? type.Name;
 
         /// <summary>
         /// Creates the node the benchmarks of a type are reported under.
@@ -165,14 +169,13 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             foreach (var property in extraProperties)
                 properties.Add(property);
 
-            // The name is also the identity: a type is named the same way wherever the tree is built, so a discovery
-            // and the run that follows it agree on the group without having to carry one across the two processes.
-            var name = GetGroupUid(type);
-
             return new TestNode
             {
-                Uid = new TestNodeUid(name),
-                DisplayName = name,
+                Uid = new TestNodeUid(GetGroupUid(type)),
+
+                // The same name the benchmarks of this type are prefixed with, so that the group is labelled the way
+                // its children spell their class - see the display name built by Create.
+                DisplayName = type.GetCorrectCSharpTypeName(prefixWithGlobal: false),
                 Properties = properties
             };
         }

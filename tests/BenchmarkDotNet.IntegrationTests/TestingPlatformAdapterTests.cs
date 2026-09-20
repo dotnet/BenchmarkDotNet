@@ -265,12 +265,73 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.NotEmpty(ran);
             Assert.All(ran, node => Assert.Equal(group.Uid, node.Parent));
 
-            // The markdown table BenchmarkDotNet prints to the console, one row per benchmark that ran.
+            // The markdown table BenchmarkDotNet prints to the console, one row per benchmark that ran. The rows are
+            // told apart by their parameter value and not by the method name, which all three share - asserting the
+            // name would pass on a single-row table just as well.
             Assert.Contains("| Method", group.StandardOutput);
-            Assert.All(ran, node => Assert.Contains(node.DisplayName.Split('(')[0].Split('.')[^1], group.StandardOutput));
+
+            var values = ran
+                .Select(node => Regex.Match(node.DisplayName, @"\(Value: (?<value>[^)]+)\)").Groups["value"].Value)
+                .ToArray();
+
+            Assert.Equal(ran.Count, values.Distinct(StringComparer.Ordinal).Count());
+            Assert.All(values, value => Assert.Contains(value, group.StandardOutput));
+
+            var rows = group.StandardOutput
+                .Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries)
+                .Where(line => line.StartsWith("| Identity", StringComparison.Ordinal))
+                .ToArray();
+
+            Assert.Equal(ran.Count, rows.Length);
 
             // A summary is not a test: carrying no execution state is what keeps the group out of the run's counts.
             Assert.Equal(string.Empty, group.ExecutionState);
+        }
+
+        [Fact]
+        public void EachClosedGenericTypeGetsItsOwnGroupAndSummary()
+        {
+            // BenchmarkDotNet summarises one type at a time, and a generic benchmark class is a different type per
+            // instantiation. The group uid is the runtime's name for the type, which carries the type arguments, so
+            // the instantiations must not collapse onto one group - and the summary of each has to land on the group
+            // its own benchmarks hang from.
+            var (_, ran, groups) = TestingPlatformServerModeSession.DiscoverThenRun(
+                GetProbeApplication(PassingProbes),
+                "GenericProbe<",
+                Timeout);
+
+            Assert.Equal(3, ran.Count);
+            Assert.Equal(3, groups.Count);
+            Assert.Equal(3, groups.Select(group => group.Uid).Distinct(StringComparer.Ordinal).Count());
+
+            // A group no benchmark points at would be an empty node in the tree, which is what a summary landing on
+            // a type the leaves do not share would produce.
+            Assert.All(groups, group =>
+            {
+                Assert.Contains(ran, node => node.Parent == group.Uid);
+                Assert.Contains("| Method", group.StandardOutput);
+            });
+        }
+
+        [Fact]
+        public void ABenchmarkReportedThroughTheCollisionPathHangsFromTheSameGroupItWasDiscoveredUnder()
+        {
+            // The collision path reports its nodes itself rather than through the event processor, so it is its own
+            // opportunity to contradict the parent discovery gave the node - which would leave the failed benchmark
+            // at the root of the tree next to an empty, childless group.
+            var (discovered, ran, groups) = TestingPlatformServerModeSession.DiscoverThenRun(
+                GetProbeApplication(FailingProbes),
+                "CollisionProbe.Identity",
+                Timeout);
+
+            var group = Assert.Single(groups);
+            var failed = Assert.Single(ran);
+            var discoveredNode = Assert.Single(discovered, node => node.Uid == failed.Uid);
+
+            Assert.Equal($"{FailingProbes}.CollisionProbe", group.Uid);
+            Assert.Equal("failed", failed.ExecutionState);
+            Assert.Equal(group.Uid, failed.Parent);
+            Assert.Equal(group.Uid, discoveredNode.Parent);
         }
 
         [Fact]
