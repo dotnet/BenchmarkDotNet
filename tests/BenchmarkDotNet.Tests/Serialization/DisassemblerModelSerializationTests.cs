@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Serialization;
+using BenchmarkDotNet.Tests.XUnit;
 using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
 using Iced.Intel;
@@ -104,7 +105,7 @@ public class DisassemblerModelSerializationTests
         Assert.Equivalent(model, result, strict: true);
     }
 
-    [Fact]
+    [FactEnvSpecific("ARM64 disassembler is not supported on .NET Framework or Windows+Arm environment", EnvRequirement.NonFullFramework, EnvRequirement.NonWindowsArm)]
     public void Arm64AsmSerializationTest()
     {
         // Arrange
