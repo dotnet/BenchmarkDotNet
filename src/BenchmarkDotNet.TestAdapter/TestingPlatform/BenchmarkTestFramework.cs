@@ -313,6 +313,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 runCancellation.Cancel();
             }
 
+            ExceptionDispatchInfo? runFailure = null;
             try
             {
                 // The run has to be over before the request completes, otherwise it would carry on in the background
@@ -323,11 +324,29 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             {
                 // The run was stopped because publishing failed, so that failure is the one worth reporting.
             }
+            catch (Exception exception)
+            {
+                // Reported below, once what the run did manage to write has been. BenchmarkDotNet disposes the
+                // parameter values in the finally of its run stage and reports what their disposal threw, so a run
+                // that benchmarked everything successfully still arrives here - and its log is the only account of
+                // it there is.
+                runFailure = ExceptionDispatchInfo.Capture(exception);
+            }
 
             drainFailure?.Throw();
 
-            await PublishSummariesAsync(context, sessionUid, eventProcessor, cancellationToken).ConfigureAwait(false);
-            await PublishArtifactsAsync(context, sessionUid, summaries, startedAt).ConfigureAwait(false);
+            if (runFailure is null)
+                await PublishSummariesAsync(context, sessionUid, eventProcessor, cancellationToken).ConfigureAwait(false);
+
+            // A run that threw returned no summaries, so the ones the event processor collected as the types were
+            // run name its log instead. Neither has any when the run threw before it began.
+            await PublishArtifactsAsync(
+                context,
+                sessionUid,
+                summaries.Length > 0 ? summaries : [.. eventProcessor.Summaries.Select(collected => collected.Summary)],
+                startedAt).ConfigureAwait(false);
+
+            runFailure?.Throw();
         }
 
         /// <summary>
@@ -386,12 +405,20 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// already exported by the time a summary reaches this adapter, so the folder is read rather than the
         /// exporters run a second time - which would write a second set of files next to the ones the run reported.
         /// Nothing clears that folder between runs and a title carries no timestamp, so a file an earlier run left
-        /// behind bears the name this one looks for: only the files written since the run began are its own.
+        /// behind bears the name this one looks for: only the files written since the run began are its own. The
+        /// comparison is of a wall clock reading against a file system timestamp, which a file system that
+        /// truncates to two seconds - or a share whose clock trails this one - would round the wrong way, so the
+        /// start is taken with tolerance. A run that left files behind ran minutes ago, not seconds.
         /// </remarks>
+        /// <summary>
+        /// How far before the run a file may be stamped and still be taken for one of its own.
+        /// </summary>
+        private static readonly TimeSpan FileTimeTolerance = TimeSpan.FromSeconds(5);
+
         private static string[] GetExportedReports(Summary summary, DateTime startedAt)
             => Directory.Exists(summary.ResultsDirectoryPath)
                 ? [.. Directory.GetFiles(summary.ResultsDirectoryPath, summary.Title + "-*")
-                    .Where(file => File.GetLastWriteTimeUtc(file) >= startedAt)]
+                    .Where(file => File.GetLastWriteTimeUtc(file) >= startedAt - FileTimeTolerance)]
                 : [];
 
         /// <summary>
