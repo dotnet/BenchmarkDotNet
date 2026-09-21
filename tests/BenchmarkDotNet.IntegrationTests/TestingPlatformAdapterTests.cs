@@ -276,6 +276,25 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        public void TheLogIsReportedEvenWhenTheRunStopsAtValidation()
+        {
+            // The run whose log the user needs most: an unoptimized assembly fails JitOptimizationsValidator, which
+            // is critical, so BenchmarkDotNet returns before the stage the per-type summaries are raised from. The
+            // failure is explained in the log and nowhere else, so reporting what a completed run produced would
+            // report nothing here.
+            var session = TestingPlatformServerModeSession.DiscoverThenRunSession(
+                GetProbeApplication(UnoptimizedProbes),
+                "SharedValueProbe.Length",
+                Timeout);
+
+            var log = Assert.Single(
+                session.Attachments,
+                attachment => attachment.Uri.EndsWith(".log", StringComparison.OrdinalIgnoreCase));
+
+            Assert.Contains("which defines benchmarks is non-optimized", File.ReadAllText(log.Uri), StringComparison.Ordinal);
+        }
+
+        [Fact]
         public void TheExportedReportOfATypeIsReportedOnTheRun()
         {
             // The reports the exporters of the config wrote are reported once, on the run: reporting them on the
@@ -638,11 +657,6 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Equal("created=2 disposed=0", Assert.Single(report.AlreadyDisposed));
         }
 
-        /// <summary>
-        /// Runs the application that drives the adapter's platform types directly, and splits what it reported into
-        /// its sections.
-        /// </summary>
-        /// <returns>The lines of each section, and the benchmarks the discovery request listed.</returns>
         [Fact]
         public void ABenchmarkClassThatIsNotVisibleIsNamedAfterItselfRatherThanItsBase()
         {
@@ -664,6 +678,11 @@ namespace BenchmarkDotNet.IntegrationTests
                 report.InternalTypes);
         }
 
+        /// <summary>
+        /// Runs the application that drives the adapter's platform types directly, and splits what it reported into
+        /// its sections.
+        /// </summary>
+        /// <returns>The lines of each section, and the benchmarks the discovery request listed.</returns>
         private InternalsReport RunInternalsProbe()
         {
             var (exitCode, standardOutput) = Execute(InternalsProbe, []);

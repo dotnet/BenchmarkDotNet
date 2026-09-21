@@ -104,7 +104,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 var (discovered, ran, groups) = session.Run(runFilter, discoverAgain);
 
-                return new ServerSession(discovered, ran, groups, session.attachments, session.logs);
+                // Copies: the reader thread lives until the session is disposed, below this line, and a test
+                // enumerating a list it is still appending to would throw rather than fail for a reason.
+                lock (session.attachments)
+                lock (session.logs)
+                    return new ServerSession(discovered, ran, groups, [.. session.attachments], [.. session.logs]);
             }
             finally
             {
@@ -324,8 +328,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 lock (logs)
                 {
                     logs.Add(new ServerLogMessage(
-                        parameters.GetProperty("level").GetString()!,
-                        parameters.GetProperty("message").GetString() ?? ""));
+                        parameters.TryGetProperty("level", out var level) ? level.GetString() ?? "" : "",
+                        parameters.TryGetProperty("message", out var message) ? message.GetString() ?? "" : ""));
                 }
 
                 return;

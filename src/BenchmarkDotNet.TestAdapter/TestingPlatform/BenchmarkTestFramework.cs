@@ -256,6 +256,12 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                         .CreateImmutableConfig()))
                 .ToArray();
 
+            // What BenchmarkDotNet wrote for this run is reported once it is over, and the exporters write into a
+            // folder that holds the files of previous runs too, so the files of this one are told apart by when they
+            // were written.
+            var startedAt = DateTime.UtcNow;
+            Summary[] summaries = [];
+
             // BenchmarkDotNet blocks the calling thread for the whole run, so it gets a thread of its own and the
             // queued messages are published from here as they are produced.
             var runTask = Task.Run(
@@ -263,7 +269,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
                 {
                     try
                     {
-                        BenchmarkRunner.Run(runInfos, runCancellation.Token);
+                        summaries = BenchmarkRunner.Run(runInfos, runCancellation.Token);
                     }
                     finally
                     {
@@ -321,7 +327,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             drainFailure?.Throw();
 
             await PublishSummariesAsync(context, sessionUid, eventProcessor, cancellationToken).ConfigureAwait(false);
-            await PublishArtifactsAsync(context, sessionUid, eventProcessor).ConfigureAwait(false);
+            await PublishArtifactsAsync(context, sessionUid, summaries, startedAt).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -339,19 +345,20 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         private async Task PublishArtifactsAsync(
             ExecuteRequestContext context,
             SessionUid sessionUid,
-            BenchmarkEventProcessor eventProcessor)
+            Summary[] summaries,
+            DateTime startedAt)
         {
             // One run logs to one file, however many types it ran, so the summaries name the same log between them.
             var published = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var (_, summary) in eventProcessor.Summaries)
+            foreach (var summary in summaries)
             {
                 await PublishArtifactAsync(
                     summary.LogFilePath,
                     "BenchmarkDotNet log",
                     "Everything BenchmarkDotNet logged while running the benchmarks.").ConfigureAwait(false);
 
-                foreach (var report in GetExportedReports(summary))
+                foreach (var report in GetExportedReports(summary, startedAt))
                 {
                     await PublishArtifactAsync(
                         report,
@@ -378,10 +385,13 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         /// Every exporter names what it writes after the title of the summary it exports, and BenchmarkDotNet has
         /// already exported by the time a summary reaches this adapter, so the folder is read rather than the
         /// exporters run a second time - which would write a second set of files next to the ones the run reported.
+        /// Nothing clears that folder between runs and a title carries no timestamp, so a file an earlier run left
+        /// behind bears the name this one looks for: only the files written since the run began are its own.
         /// </remarks>
-        private static string[] GetExportedReports(Summary summary)
+        private static string[] GetExportedReports(Summary summary, DateTime startedAt)
             => Directory.Exists(summary.ResultsDirectoryPath)
-                ? Directory.GetFiles(summary.ResultsDirectoryPath, summary.Title + "-*")
+                ? [.. Directory.GetFiles(summary.ResultsDirectoryPath, summary.Title + "-*")
+                    .Where(file => File.GetLastWriteTimeUtc(file) >= startedAt)]
                 : [];
 
         /// <summary>
