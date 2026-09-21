@@ -232,7 +232,7 @@ namespace BenchmarkDotNet.Running
             int iterationCount = baselineJob.Run.IterationCount;
             BenchmarkRunInfo[] benchmarksWithoutInvocationCount = await TypeFilter.FilterAsync(effectiveConfig, benchmarksToFilter, cancellationToken).ConfigureAwait();
             BenchmarkRunInfo[] benchmarksWithInvocationCount = benchmarksWithoutInvocationCount
-                .Select(benchmarkInfo => new BenchmarkRunInfo(
+                .Select(benchmarkInfo => benchmarkInfo.WithBenchmarks(
                     benchmarkInfo.BenchmarksCases.Select(benchmark =>
                         new BenchmarkCase(
                             benchmark.Descriptor,
@@ -244,8 +244,7 @@ namespace BenchmarkDotNet.Running
                                 .WithInvocationCount(dictionary[(benchmark.Descriptor, benchmark.Parameters)].Operations)
                                 .WithUnrollFactor(dictionary[(benchmark.Descriptor, benchmark.Parameters)].Operations % 16 == 0 ? 16 : 1),
                             benchmark.Parameters,
-                            benchmark.Config)).ToArray(),
-                    benchmarkInfo.Type, benchmarkInfo.Config, benchmarkInfo.CompositeInProcessDiagnoser))
+                            benchmark.Config)).ToArray()))
                 .ToArray();
 
             logger.WriteLineHeader("Actual benchmarking is going to happen now!");

@@ -95,11 +95,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void WriteOnlyPropertyDoesThrowNullReferenceException()
         {
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(ClassWithWriteOnlyProperty)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(ClassWithWriteOnlyProperty)).DeclarationErrors);
 
-            Assert.Contains(nameof(ClassWithWriteOnlyProperty.WriteOnlyValues), exception.Message);
-            Assert.Contains("no public, accessible method/property", exception.Message);
+            Assert.Contains(nameof(ClassWithWriteOnlyProperty.WriteOnlyValues), error.Message);
+            Assert.Contains("no public, accessible method/property", error.Message);
         }
 
         public class ClassWithWriteOnlyProperty
@@ -319,11 +318,10 @@ namespace BenchmarkDotNet.Tests
 #endif
         public void AnArrayIsRefusedWhereTheParameterOnlyConvertsFromIt(Type benchmarkType, string takes)
         {
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(benchmarkType));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(benchmarkType).DeclarationErrors);
 
-            Assert.Contains($"is declared to yield Byte[] for a {takes} argument", exception.Message);
-            Assert.Contains($"declare the source to yield {takes} or object", exception.Message);
+            Assert.Contains($"is declared to yield Byte[] for a {takes} argument", error.Message);
+            Assert.Contains($"declare the source to yield {takes} or object", error.Message);
         }
 
         // A source declared to yield object says nothing about what it holds, and a null says nothing either, so
@@ -332,11 +330,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void ANullIsRefusedForAByRefLikeParameterWhereTheSourceNamesOnlyObject()
         {
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(NullFromObjectToByRefLike)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(NullFromObjectToByRefLike)).DeclarationErrors);
 
-            Assert.Contains("[ArgumentsSource(Values)] provides null for the ReadOnlySpan<Byte> parameter 'a'", exception.Message);
-            Assert.Contains("which is a value type - null is not one of its values", exception.Message);
+            Assert.Contains("[ArgumentsSource(Values)] provides null for the ReadOnlySpan<Byte> parameter 'a'", error.Message);
+            Assert.Contains("which is a value type - null is not one of its values", error.Message);
         }
 
         public class NullFromObjectToByRefLike
@@ -351,11 +348,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void ANullIsRefusedForAValueTypeParameterWhereTheSourceNamesOnlyObject()
         {
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(NullFromObjectToValueType)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(NullFromObjectToValueType)).DeclarationErrors);
 
-            Assert.Contains("[ArgumentsSource(Values)] provides null for the Int32 parameter 'a'", exception.Message);
-            Assert.Contains("which is a value type - null is not one of its values", exception.Message);
+            Assert.Contains("[ArgumentsSource(Values)] provides null for the Int32 parameter 'a'", error.Message);
+            Assert.Contains("which is a value type - null is not one of its values", error.Message);
         }
 
         public class NullFromObjectToValueType
@@ -397,11 +393,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void ANullArgumentIsRefusedForAByRefLikeParameter()
         {
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(NullArgumentToByRefLike)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(NullArgumentToByRefLike)).DeclarationErrors);
 
-            Assert.Contains("[Arguments] on Run provides null for the ReadOnlySpan<Byte> parameter 'a'", exception.Message);
-            Assert.Contains("which is a value type - null is not one of its values", exception.Message);
+            Assert.Contains("[Arguments] on Run provides null for the ReadOnlySpan<Byte> parameter 'a'", error.Message);
+            Assert.Contains("which is a value type - null is not one of its values", error.Message);
         }
 
         public class NullArgumentToByRefLike
@@ -510,11 +505,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void AnObjectArrayIsRefusedForASingleParameterOfAnotherType()
         {
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(ArgumentListSource.DeclaredUnrecognised)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(ArgumentListSource.DeclaredUnrecognised)).DeclarationErrors);
 
-            Assert.Contains("is declared to yield Object[] for a IBox argument", exception.Message);
-            Assert.Contains("never a one-element array wrapping it", exception.Message);
+            Assert.Contains("is declared to yield Object[] for a IBox argument", error.Message);
+            Assert.Contains("never a one-element array wrapping it", error.Message);
         }
 
         // The erased-enum display branch was reached only by attribute constants before this work, so the value
@@ -715,11 +709,10 @@ namespace BenchmarkDotNet.Tests
         {
             // Reflection would otherwise fail with "Late bound operations cannot be performed on types or methods
             // for which ContainsGenericParameters is true", which names nothing the user wrote.
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(GenericSourceMethod)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(GenericSourceMethod)).DeclarationErrors);
 
-            Assert.Contains("is generic", exception.Message);
-            Assert.Contains(nameof(GenericSourceMethod.Values), exception.Message);
+            Assert.Contains("is generic", error.Message);
+            Assert.Contains(nameof(GenericSourceMethod.Values), error.Message);
         }
 
 #pragma warning disable BDN1310
@@ -854,11 +847,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void AsyncEnumerablePatternParamsSourceIsRejected()
         {
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(AsyncEnumerablePatternParams)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncEnumerablePatternParams)).DeclarationErrors);
 
-            Assert.Contains(nameof(AsyncEnumerablePatternParams.Values), exception.Message);
-            Assert.Contains("does not implement IEnumerable or IAsyncEnumerable", exception.Message);
+            Assert.Contains(nameof(AsyncEnumerablePatternParams.Values), error.Message);
+            Assert.Contains("does not implement IEnumerable or IAsyncEnumerable", error.Message);
         }
 
 #pragma warning disable BDN1306
@@ -891,5 +883,29 @@ namespace BenchmarkDotNet.Tests
             public int Run() => Value;
         }
 #pragma warning restore BDN1306
+
+        [Fact]
+        public void ARowThatIsNotTheDeclaredTupleIsReported()
+        {
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(RowIsNotTheDeclaredTuple)).DeclarationErrors);
+
+            Assert.Contains("expects an argument list from [ArgumentsSource(Values)], but Int32 was provided", error.Message);
+        }
+
+        public class RowIsNotTheDeclaredTuple
+        {
+            public static IEnumerable<(int, string)> Values() => new Disagrees();
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Values))]
+            public void Run(int a, string b) { }
+
+            private class Disagrees : IEnumerable<(int, string)>
+            {
+                public IEnumerator<(int, string)> GetEnumerator() => Enumerable.Empty<(int, string)>().GetEnumerator();
+
+                System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => new object[] { 42 }.GetEnumerator();
+            }
+        }
     }
 }

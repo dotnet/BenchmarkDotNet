@@ -199,8 +199,9 @@ namespace BenchmarkDotNet.Tests
             var benchmarkDotNetAssembly = typeof(MockFactory.MockBenchmarkClass).GetTypeInfo().Assembly;
             var streamLoadedAssembly = Assembly.Load(File.ReadAllBytes(benchmarkDotNetAssembly.Location));
             var assemblyType = streamLoadedAssembly.GetRunnableBenchmarks().Select(type => type).First();
+            var assemblyMethod = assemblyType.GetMethods().First(method => method.HasAttribute<global::BenchmarkDotNet.Attributes.BenchmarkAttribute>());
 
-            var target = new Descriptor(assemblyType, MockFactory.MockMethodInfo);
+            var target = new Descriptor(assemblyType, assemblyMethod);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, config);
 
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999, new([])) };

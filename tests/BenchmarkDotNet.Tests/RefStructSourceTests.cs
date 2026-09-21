@@ -16,11 +16,10 @@ public class RefStructSourceTests
     [Fact]
     public void DiscoveryReportsARefStructElement()
     {
-        var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-            () => BenchmarkConverter.TypeToBenchmarks(typeof(YieldsRefStruct)));
+        var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(YieldsRefStruct)).DeclarationErrors);
 
-        Assert.Contains("which is a ref struct", exception.Message);
-        Assert.Contains("Span<Int32>", exception.Message);
+        Assert.Contains("which is a ref struct", error.Message);
+        Assert.Contains("Span<Int32>", error.Message);
     }
 
     public class YieldsRefStruct
@@ -38,11 +37,10 @@ public class RefStructSourceTests
     [Fact]
     public void DiscoveryReportsARefStructElementFromAnAsyncSource()
     {
-        var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-            () => BenchmarkConverter.TypeToBenchmarks(typeof(YieldsRefStructAsynchronously)));
+        var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(YieldsRefStructAsynchronously)).DeclarationErrors);
 
-        Assert.Contains("which is a ref struct", exception.Message);
-        Assert.Contains("Span<Int32>", exception.Message);
+        Assert.Contains("which is a ref struct", error.Message);
+        Assert.Contains("Span<Int32>", error.Message);
     }
 
     public class YieldsRefStructAsynchronously
@@ -63,11 +61,10 @@ public class RefStructSourceTests
     [Fact]
     public void DiscoveryReportsARefStructSubstitution()
     {
-        var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-            () => BenchmarkConverter.TypeToBenchmarks(typeof(AdmitsARefStruct<Span<int>>)));
+        var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(AdmitsARefStruct<Span<int>>)).DeclarationErrors);
 
-        Assert.Contains("which is a ref struct", exception.Message);
-        Assert.Contains("Span<Int32>", exception.Message);
+        Assert.Contains("which is a ref struct", error.Message);
+        Assert.Contains("Span<Int32>", error.Message);
     }
 
     [Fact]
