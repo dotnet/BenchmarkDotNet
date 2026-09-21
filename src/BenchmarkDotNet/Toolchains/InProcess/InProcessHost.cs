@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         private readonly List<string> inProcessDiagnoserLines = [];
         private readonly List<string> prefixedLines = [];
 
-        public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser diagnoser, CancellationToken cancellationToken)
+        public InProcessHost(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, Type? runnableType, ILogger logger, IDiagnoser diagnoser, CancellationToken cancellationToken)
         {
             this.logger = logger;
             this.diagnoser = diagnoser;
@@ -30,7 +30,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 diagnoserActionParameters = new DiagnoserActionParameters(
                     Process.GetCurrentProcess(),
                     benchmarkCase,
-                    default);
+                    benchmarkId)
+                {
+                    InProcessRunnableType = runnableType
+                };
         }
 
         public RunResults RunResults { get; private set; }

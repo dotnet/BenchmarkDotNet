@@ -11,6 +11,11 @@ namespace BenchmarkDotNet.Disassemblers
         [JsonIgnore]
         internal string TypeName = typeName ?? "";
 
+        // Identifies the type exactly when the disassembler runs in the process that loaded it. Several loaded modules can
+        // define a type of the same name: an in-process toolchain emits the same runnable type names on every run.
+        [JsonIgnore]
+        internal IntPtr TypeHandle;
+
         [JsonInclude]
         internal string MethodName = methodName;
 
