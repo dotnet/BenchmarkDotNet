@@ -9,7 +9,7 @@ using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.NetCoreApp;
 using JetBrains.Annotations;
 using System.Reflection;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -17,42 +17,42 @@ namespace BenchmarkDotNet.Tests
     {
         private FileInfo TestAssemblyFileInfo = new FileInfo(typeof(CsProjBuilderTests).Assembly.Location);
         private const string runtimeHostConfigurationOptionChunk = """
-<ItemGroup>
-  <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
-</ItemGroup>
-""";
+            <ItemGroup>
+              <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
+            </ItemGroup>
+            """;
 
         [Theory]
         [InlineData("net471")]
         [InlineData("netcoreapp3.1")]
         public void ItsPossibleToCustomizeProjectSdkBasedOnProjectSdkFromTheProjectFile(string targetFrameworkMoniker)
         {
-            const string withCustomProjectSdk = @"
-<Project Sdk=""CUSTOM"">
-</Project>
-";
+            const string withCustomProjectSdk = """
+                <Project Sdk="CUSTOM">
+                </Project>
+                """;
             AssertParsedSdkName(withCustomProjectSdk, targetFrameworkMoniker, "CUSTOM");
         }
 
         [Fact]
         public void ItsImpossibleToCustomizeProjectSdkForFullFrameworkAppsBasedOnTheImportOfSdk()
         {
-            const string withCustomProjectImport = @"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <Import Sdk=""Microsoft.NET.Sdk.WindowsDesktop"" Project=""Sdk.props"" Condition=""'$(TargetFramework)'=='netcoreapp3.1'""/>
-</Project>
-";
+            const string withCustomProjectImport = """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <Import Sdk="Microsoft.NET.Sdk.WindowsDesktop" Project="Sdk.props" Condition="'$(TargetFramework)'=='netcoreapp3.1'"/>
+                </Project>
+                """;
             AssertParsedSdkName(withCustomProjectImport, "net471", "Microsoft.NET.Sdk");
         }
 
         [Fact]
         public void ItsPossibleToCustomizeProjectSdkForNetCoreAppsBasedOnTheImportOfSdk()
         {
-            const string withCustomProjectImport = @"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <Import Sdk=""Microsoft.NET.Sdk.WindowsDesktop"" Project=""Sdk.props"" Condition=""'$(TargetFramework)'=='netcoreapp3.1'""/>
-</Project>
-";
+            const string withCustomProjectImport = """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <Import Sdk="Microsoft.NET.Sdk.WindowsDesktop" Project="Sdk.props" Condition="'$(TargetFramework)'=='netcoreapp3.1'"/>
+                </Project>
+                """;
             AssertParsedSdkName(withCustomProjectImport, "netcoreapp3.1", "Microsoft.NET.Sdk.WindowsDesktop");
         }
 
@@ -61,70 +61,73 @@ namespace BenchmarkDotNet.Tests
         {
             var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = targetFrameworkMoniker });
 
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(csProjContent);
-            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
+            var benchmarkProject = XElement.Parse(csProjContent);
 
-            Assert.Equal(expectedSdkValue, sdkName);
-            Assert.Empty(customProperties);
+            Assert.Equal(expectedSdkValue, sut.GetSdkName(benchmarkProject));
+            Assert.Empty(CsProjBuilder.GetSettingsToCopy(benchmarkProject, TestAssemblyFileInfo));
         }
 
-        private static void AssertCustomProperties(string expected, string actual)
+        [Fact]
+        public void SdkNameAndVersionAreParsedFromTheSdkElement()
         {
-            Assert.Equal(expected.Replace("\r", "").Replace("\n", Environment.NewLine), actual);
+            const string withSdkElement = """
+                <Project>
+                  <Sdk Name="CUSTOM" Version="1.2.3" />
+                </Project>
+                """;
+            AssertParsedSdkName(withSdkElement, "net471", "CUSTOM/1.2.3");
+        }
+
+        [AssertionMethod]
+        private void AssertCopiedSettings(string csProjContent, string expectedSettings)
+        {
+            var copied = Assert.Single(CsProjBuilder.GetSettingsToCopy(XElement.Parse(csProjContent), TestAssemblyFileInfo));
+
+            Assert.Equal(XElement.Parse(expectedSettings).ToString(), copied.ToString());
         }
 
         [Fact]
         public void UseWpfSettingGetsCopied()
         {
-            const string withUseWpfTrue = @"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <UseWpf>true</UseWpf>
-  </PropertyGroup>
-</Project>
-";
-            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
-
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(withUseWpfTrue);
-            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
-
-            AssertCustomProperties(@"<PropertyGroup>
-  <UseWpf>true</UseWpf>
-</PropertyGroup>", customProperties);
-            Assert.Equal("Microsoft.NET.Sdk", sdkName);
+            const string withUseWpfTrue = """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <PropertyGroup>
+                    <PlatformTarget>AnyCPU</PlatformTarget>
+                    <UseWpf>true</UseWpf>
+                  </PropertyGroup>
+                </Project>
+                """;
+            AssertCopiedSettings(withUseWpfTrue, """
+                <PropertyGroup>
+                  <UseWpf>true</UseWpf>
+                </PropertyGroup>
+                """);
         }
 
         [Fact]
         public void SettingsFromPropsFileImportedUsingAbsolutePathGetCopies()
         {
-            const string imported = @"
-<Project>
-  <PropertyGroup>
-    <LangVersion>9.9</LangVersion>
-  </PropertyGroup>
-</Project>
-";
+            const string imported = """
+                <Project>
+                  <PropertyGroup>
+                    <LangVersion>9.9</LangVersion>
+                  </PropertyGroup>
+                </Project>
+                """;
             var propsFilePath = Path.Combine(TestAssemblyFileInfo.DirectoryName!, "test.props");
             File.WriteAllText(propsFilePath, imported);
 
-            string importingAbsolutePath = $@"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <Import Project=""{propsFilePath}"" />
-</Project>";
+            string importingAbsolutePath = $"""
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <Import Project="{propsFilePath}" />
+                </Project>
+                """;
 
-            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
-
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(importingAbsolutePath);
-            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
-
-            AssertCustomProperties(@"<PropertyGroup>
-  <LangVersion>9.9</LangVersion>
-</PropertyGroup>", customProperties);
-            Assert.Equal("Microsoft.NET.Sdk", sdkName);
+            AssertCopiedSettings(importingAbsolutePath, """
+                <PropertyGroup>
+                  <LangVersion>9.9</LangVersion>
+                </PropertyGroup>
+                """);
 
             File.Delete(propsFilePath);
         }
@@ -132,31 +135,27 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void SettingsFromPropsFileImportedUsingRelativePathGetCopies()
         {
-            const string imported = @"
-<Project>
-  <PropertyGroup>
-    <LangVersion>9.9</LangVersion>
-  </PropertyGroup>
-</Project>
-";
+            const string imported = """
+                <Project>
+                  <PropertyGroup>
+                    <LangVersion>9.9</LangVersion>
+                  </PropertyGroup>
+                </Project>
+                """;
             var propsFilePath = Path.Combine(TestAssemblyFileInfo.DirectoryName!, "test.props");
             File.WriteAllText(propsFilePath, imported);
 
-            string importingRelativePath = $@"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <Import Project="".{Path.DirectorySeparatorChar}test.props"" />
-</Project>";
+            string importingRelativePath = $"""
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <Import Project=".{Path.DirectorySeparatorChar}test.props" />
+                </Project>
+                """;
 
-            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
-
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(importingRelativePath);
-            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
-
-            AssertCustomProperties(@"<PropertyGroup>
-  <LangVersion>9.9</LangVersion>
-</PropertyGroup>", customProperties);
-            Assert.Equal("Microsoft.NET.Sdk", sdkName);
+            AssertCopiedSettings(importingRelativePath, """
+                <PropertyGroup>
+                  <LangVersion>9.9</LangVersion>
+                </PropertyGroup>
+                """);
 
             File.Delete(propsFilePath);
         }
@@ -164,41 +163,30 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void RuntimeHostConfigurationOptionIsCopied()
         {
-            string source = $@"
-<Project Sdk=""Microsoft.NET.Sdk"">
-{runtimeHostConfigurationOptionChunk}
-</Project>";
+            string source = $"""
+                <Project Sdk="Microsoft.NET.Sdk">
+                {runtimeHostConfigurationOptionChunk}
+                </Project>
+                """;
 
-            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
-
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(source);
-            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
-
-            AssertCustomProperties(runtimeHostConfigurationOptionChunk, customProperties);
-            Assert.Equal("Microsoft.NET.Sdk", sdkName);
+            AssertCopiedSettings(source, runtimeHostConfigurationOptionChunk);
         }
 
         [Fact]
         public void WarningsAsErrorsSettingGetsCopied()
         {
-            const string withWarningsAsErrors = @"
-<Project Sdk=""Microsoft.NET.Sdk"">
-  <PropertyGroup>
-    <WarningsAsErrors>NU1102;NU1603</WarningsAsErrors>
-  </PropertyGroup>
-</Project>
-";
-            var sut = new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
-
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(withWarningsAsErrors);
-            var (customProperties, sdkName) = sut.GetSettingsThatNeedToBeCopied(xmlDoc, TestAssemblyFileInfo);
-
-            AssertCustomProperties(@"<PropertyGroup>
-  <WarningsAsErrors>NU1102;NU1603</WarningsAsErrors>
-</PropertyGroup>", customProperties);
-            Assert.Equal("Microsoft.NET.Sdk", sdkName);
+            const string withWarningsAsErrors = """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <PropertyGroup>
+                    <WarningsAsErrors>NU1102;NU1603</WarningsAsErrors>
+                  </PropertyGroup>
+                </Project>
+                """;
+            AssertCopiedSettings(withWarningsAsErrors, """
+                <PropertyGroup>
+                  <WarningsAsErrors>NU1102;NU1603</WarningsAsErrors>
+                </PropertyGroup>
+                """);
         }
 
         [Fact]
@@ -211,8 +199,9 @@ namespace BenchmarkDotNet.Tests
             var benchmarkDotNetAssembly = typeof(MockFactory.MockBenchmarkClass).GetTypeInfo().Assembly;
             var streamLoadedAssembly = Assembly.Load(File.ReadAllBytes(benchmarkDotNetAssembly.Location));
             var assemblyType = streamLoadedAssembly.GetRunnableBenchmarks().Select(type => type).First();
+            var assemblyMethod = assemblyType.GetMethods().First(method => method.HasAttribute<global::BenchmarkDotNet.Attributes.BenchmarkAttribute>());
 
-            var target = new Descriptor(assemblyType, MockFactory.MockMethodInfo);
+            var target = new Descriptor(assemblyType, assemblyMethod);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, config);
 
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, config.CreateImmutableConfig(), 999, new([])) };

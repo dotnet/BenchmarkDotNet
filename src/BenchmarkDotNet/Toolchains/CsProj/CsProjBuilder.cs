@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Toolchains.CsProj
@@ -131,7 +130,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
         protected override async ValueTask GenerateProjectAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger, CancellationToken cancellationToken)
         {
-            await SaveProjectAsync(CreateProject(buildPartition, artifactsPaths, logger), artifactsPaths.ProjectFilePath, cancellationToken).ConfigureAwait(false);
+            await SaveXmlAsync(CreateProject(buildPartition, artifactsPaths, logger), artifactsPaths.ProjectFilePath, cancellationToken).ConfigureAwait(false);
 
             // Integration tests are built without dependencies, so we skip gathering dlls.
             if (buildPartition.ForcedNoDependenciesForIntegrationTests)
@@ -140,10 +139,10 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             await GatherReferencesAsync(buildPartition, artifactsPaths, logger, cancellationToken).ConfigureAwait(false);
         }
 
-        protected static async ValueTask SaveProjectAsync(XDocument project, string path, CancellationToken cancellationToken)
+        protected static async ValueTask SaveXmlAsync(XDocument document, string path, CancellationToken cancellationToken)
         {
             using var stream = File.Create(path);
-            await project.SaveAsync(stream, SaveOptions.None, cancellationToken).ConfigureAwait(false);
+            await document.SaveAsync(stream, SaveOptions.None, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -155,26 +154,18 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         {
             var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger);
 
-            var xmlDoc = new XmlDocument();
-            xmlDoc.Load(projectFile.FullName);
-            var (customProperties, sdkName) = GetSettingsThatNeedToBeCopied(xmlDoc, projectFile);
+            var benchmarkProject = XDocument.Load(projectFile.FullName).Root!;
 
-            var project = new XElement("Project", new XAttribute("Sdk", GetSdkName(sdkName)));
+            var project = new XElement("Project", new XAttribute("Sdk", GetSdkName(benchmarkProject)));
 
             AddEarlyProperties(project, buildPartition, artifactsPaths, projectFile);
             AddProjectContent(project, buildPartition, artifactsPaths, projectFile);
-            AddCopiedSettings(project, customProperties);
+            AddCopiedSettings(project, benchmarkProject, projectFile);
             AddLateProperties(project, buildPartition, artifactsPaths, projectFile);
             AddGatheredReferences(project);
 
             return new XDocument(project);
         }
-
-        /// <summary>
-        /// The SDK the generated project declares. It follows the benchmark project unless a toolchain needs
-        /// a specific one.
-        /// </summary>
-        protected virtual string GetSdkName(string benchmarkProjectSdkName) => benchmarkProjectSdkName;
 
         /// <summary>
         /// Properties that must be in place before anything else reads them. Nothing later may decide where
@@ -226,16 +217,16 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 new XElement("Compile", new XAttribute("Include", Path.GetFileName(artifactsPaths.ProgramCodePath)))));
 
         /// <summary>
-        /// Settings copied from the benchmark project, parsed rather than pasted so whatever they hold stays
-        /// inside its own elements.
+        /// Settings copied from the benchmark project and the .props files it imports.
         /// </summary>
-        protected static void AddCopiedSettings(XElement project, string customProperties)
+        protected virtual void AddCopiedSettings(XElement project, XElement benchmarkProject, FileInfo projectFile)
         {
-            if (customProperties.IsBlank())
+            var settings = GetSettingsToCopy(benchmarkProject, projectFile).ToArray();
+            if (settings.Length == 0)
                 return;
 
             project.Add(new XComment(" Begin copied settings from benchmarks project "));
-            project.Add(ParseFragment(customProperties));
+            project.Add(settings);
             project.Add(new XComment(" End copied settings "));
         }
 
@@ -248,7 +239,14 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             project.Add(new XElement("PropertyGroup",
                 new XElement("LangVersion", new XAttribute("Condition", LangVersionCondition), "latest")));
 
-            project.Add(ParseFragment(GetRuntimeSettings(buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc, buildPartition.Resolver)));
+            var gcMode = buildPartition.RepresentativeBenchmarkCase.Job.Environment.Gc;
+            var resolver = buildPartition.Resolver;
+            project.Add(new XElement("PropertyGroup",
+                new XElement("ServerGarbageCollection", gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()),
+                new XElement("ConcurrentGarbageCollection", gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()),
+                gcMode.HasValue(GcMode.RetainVmCharacteristic)
+                    ? new XElement("RetainVMGarbageCollection", gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase())
+                    : null));
         }
 
         /// <summary>
@@ -288,9 +286,6 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         private const string DesignTimeFacades = "ImplicitlyExpandDesignTimeFacades";
         private const string GatheredReferencesListName = "$(MSBuildThisFileDirectory)" + GatherReferencesName + ".txt";
         private const string GatheredReferencesPropsName = "$(MSBuildThisFileDirectory)" + GatherReferencesName + ".props";
-
-        private static IEnumerable<XElement> ParseFragment(string xml)
-            => xml.IsBlank() ? [] : XElement.Parse($"<Root>{xml}</Root>").Elements();
 
         private static IEnumerable<string> ReadGatheredReferences(ArtifactsPaths artifactsPaths)
         {
@@ -361,154 +356,102 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 ));
             }
 
-            await SaveProjectAsync(
+            await SaveXmlAsync(
                 new XDocument(new XElement("Project", itemGroup)),
                 Path.Combine(artifactsPaths.BuildArtifactsDirectoryPath, $"{GatherReferencesName}.props"),
                 cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// returns an MSBuild string that defines Runtime settings
+        /// The SDK the generated project declares. It follows the benchmark project, whether that declares it
+        /// on an SDK import, on the project element, or as an Sdk child element, unless a toolchain needs a
+        /// specific one.
         /// </summary>
-        [PublicAPI]
-        protected virtual string GetRuntimeSettings(GcMode gcMode, IResolver resolver)
+        protected internal virtual string GetSdkName(XElement benchmarkProject)
         {
-            var builder = new StringBuilder(80)
-                .AppendLine($"<PropertyGroup>")
-                .AppendLine($"    <ServerGarbageCollection>{gcMode.ResolveValue(GcMode.ServerCharacteristic, resolver).ToLowerCase()}</ServerGarbageCollection>")
-                .AppendLine($"    <ConcurrentGarbageCollection>{gcMode.ResolveValue(GcMode.ConcurrentCharacteristic, resolver).ToLowerCase()}</ConcurrentGarbageCollection>");
-
-            if (gcMode.HasValue(GcMode.RetainVmCharacteristic))
-                builder.AppendLine($"    <RetainVMGarbageCollection>{gcMode.ResolveValue(GcMode.RetainVmCharacteristic, resolver).ToLowerCase()}</RetainVMGarbageCollection>");
-
-            return builder.AppendLine("  </PropertyGroup>").ToString();
-        }
-
-        // the host project or one of the .props file that it imports might contain some custom settings that needs to be copied, sth like
-        // <NetCoreAppImplicitPackageVersion>2.0.0-beta-001607-00</NetCoreAppImplicitPackageVersion>
-        // <RuntimeFrameworkVersion>2.0.0-beta-001607-00</RuntimeFrameworkVersion>
-        protected internal (string customProperties, string sdkName) GetSettingsThatNeedToBeCopied(XmlDocument xmlDoc, FileInfo projectFile)
-        {
-            XmlElement projectElement = xmlDoc.DocumentElement!;
             // custom SDKs are not added for non-netcoreapp apps (like net471), so when the TFM != netcoreapp we dont parse "<Import Sdk="
             // we don't allow for that mostly to prevent from edge cases like the following
             // <Import Sdk="Microsoft.NET.Sdk.WindowsDesktop" Project="Sdk.props" Condition="'$(TargetFramework)'=='netcoreapp3.0'"/>
-            string? sdkName = null;
             if (Settings.TargetFrameworkMoniker.StartsWith("netcoreapp", StringComparison.InvariantCultureIgnoreCase))
             {
-                foreach (XmlElement importElement in projectElement.GetElementsByTagName("Import"))
+                foreach (XElement importElement in DescendantsNamed(benchmarkProject, "Import"))
                 {
-                    sdkName = importElement.GetAttribute("Sdk");
-                    if (sdkName.IsNotBlank())
-                    {
-                        break;
-                    }
+                    string importSdkName = GetAttribute(importElement, "Sdk");
+                    if (importSdkName.IsNotBlank())
+                        return importSdkName;
                 }
             }
-            if (sdkName.IsBlank())
+
+            string sdkName = GetAttribute(benchmarkProject, "Sdk");
+            if (sdkName.IsNotBlank())
+                return sdkName;
+
+            foreach (XElement sdkElement in DescendantsNamed(benchmarkProject, "Sdk"))
             {
-                sdkName = projectElement.GetAttribute("Sdk");
-            }
-            // If Sdk isn't an attribute on the Project element, it could be a child element.
-            if (sdkName.IsBlank())
-            {
-                foreach (XmlElement sdkElement in projectElement.GetElementsByTagName("Sdk"))
-                {
-                    sdkName = sdkElement.GetAttribute("Name");
-                    if (sdkName.IsBlank())
-                    {
-                        continue;
-                    }
-                    string version = sdkElement.GetAttribute("Version");
-                    // Version is optional
-                    if (version.IsNotBlank())
-                    {
-                        sdkName += $"/{version}";
-                    }
-                    break;
-                }
-            }
-            if (sdkName.IsBlank())
-            {
-                sdkName = DefaultSdkName;
+                sdkName = GetAttribute(sdkElement, "Name");
+                if (sdkName.IsBlank())
+                    continue;
+
+                // Version is optional
+                string version = GetAttribute(sdkElement, "Version");
+                return version.IsNotBlank() ? $"{sdkName}/{version}" : sdkName;
             }
 
-            XmlDocument? itemGroupsettings = null;
-            XmlDocument? propertyGroupSettings = null;
-
-            GetSettingsThatNeedToBeCopied(projectElement, ref itemGroupsettings, ref propertyGroupSettings, projectFile);
-
-            List<string> customSettings = new List<string>(2);
-            if (itemGroupsettings != null)
-            {
-                customSettings.Add(GetIndentedXmlString(itemGroupsettings));
-            }
-            if (propertyGroupSettings != null)
-            {
-                customSettings.Add(GetIndentedXmlString(propertyGroupSettings));
-            }
-
-            return (string.Join(Environment.NewLine + Environment.NewLine, customSettings), sdkName);
+            return DefaultSdkName;
         }
 
-        private static void GetSettingsThatNeedToBeCopied(XmlElement projectElement, ref XmlDocument? itemGroupsettings, ref XmlDocument? propertyGroupSettings, FileInfo projectFile)
+        /// <summary>
+        /// The settings from the benchmark project, and the .props files it imports, that the generated project
+        /// needs as well, such as RuntimeFrameworkVersion. Items and properties come back as one group each,
+        /// and a group is left out when nothing in it needs copying.
+        /// </summary>
+        internal static IEnumerable<XElement> GetSettingsToCopy(XElement benchmarkProject, FileInfo projectFile)
         {
-            CopyProperties(projectElement, ref itemGroupsettings, "ItemGroup");
-            CopyProperties(projectElement, ref propertyGroupSettings, "PropertyGroup");
+            var itemGroup = new XElement("ItemGroup");
+            var propertyGroup = new XElement("PropertyGroup");
 
-            foreach (XmlElement importElement in projectElement.GetElementsByTagName("Import"))
+            CollectSettingsToCopy(benchmarkProject, itemGroup, propertyGroup, projectFile);
+
+            return new[] { itemGroup, propertyGroup }.Where(group => group.HasElements);
+        }
+
+        private static void CollectSettingsToCopy(XElement projectElement, XElement itemGroup, XElement propertyGroup, FileInfo projectFile)
+        {
+            var directoryName = projectFile.DirectoryName ?? throw new DirectoryNotFoundException(projectFile.DirectoryName);
+
+            CopySettings(projectElement, itemGroup);
+            CopySettings(projectElement, propertyGroup);
+
+            foreach (XElement importElement in DescendantsNamed(projectElement, "Import"))
             {
-                string propsFilePath = importElement.GetAttribute("Project");
-                var directoryName = projectFile.DirectoryName ?? throw new DirectoryNotFoundException(projectFile.DirectoryName);
+                string propsFilePath = GetAttribute(importElement, "Project");
                 string absolutePath = File.Exists(propsFilePath)
                     ? propsFilePath // absolute path or relative to current dir
                     : Path.Combine(directoryName, propsFilePath); // relative to csproj
                 if (File.Exists(absolutePath))
                 {
-                    var importXmlDoc = new XmlDocument();
-                    importXmlDoc.Load(absolutePath);
-                    GetSettingsThatNeedToBeCopied(importXmlDoc.DocumentElement!, ref itemGroupsettings, ref propertyGroupSettings, projectFile);
+                    CollectSettingsToCopy(XDocument.Load(absolutePath).Root!, itemGroup, propertyGroup, projectFile);
                 }
             }
         }
 
-        private static void CopyProperties(XmlElement projectElement, ref XmlDocument? copyToDocument, string groupName)
+        private static void CopySettings(XElement projectElement, XElement copyToGroup)
         {
-            XmlElement? itemGroupElement = copyToDocument?.DocumentElement;
-            foreach (XmlElement groupElement in projectElement.GetElementsByTagName(groupName))
+            foreach (XElement setting in DescendantsNamed(projectElement, copyToGroup.Name.LocalName).Elements())
             {
-                foreach (var node in groupElement.ChildNodes)
+                if (SettingsWeWantToCopy.Contains(setting.Name.LocalName))
                 {
-                    if (node is XmlElement setting && SettingsWeWantToCopy.Contains(setting.Name))
-                    {
-                        if (copyToDocument is null)
-                        {
-                            copyToDocument = new XmlDocument();
-                            itemGroupElement = copyToDocument.CreateElement(groupName);
-                            copyToDocument.AppendChild(itemGroupElement);
-                        }
-                        XmlNode copiedNode = copyToDocument.ImportNode(setting, true);
-                        itemGroupElement!.AppendChild(copiedNode);
-                    }
+                    copyToGroup.Add(new XElement(setting));
                 }
             }
         }
 
-        private static string GetIndentedXmlString(XmlDocument doc)
-        {
-            StringBuilder sb = new StringBuilder();
-            XmlWriterSettings settings = new XmlWriterSettings
-            {
-                OmitXmlDeclaration = true,
-                Indent = true,
-                IndentChars = "  "
-            };
-            using (XmlWriter writer = XmlWriter.Create(sb, settings))
-            {
-                doc.Save(writer);
-            }
-            return sb.ToString();
-        }
+        // Matched by local name so that projects declaring the legacy MSBuild namespace are still read.
+        private static IEnumerable<XElement> DescendantsNamed(XElement element, string localName)
+            => element.Descendants().Where(descendant => descendant.Name.LocalName == localName);
+
+        private static string GetAttribute(XElement element, string name)
+            => element.Attribute(name)?.Value ?? "";
 
         /// <summary>
         /// returns a path to the project file which defines the benchmarks

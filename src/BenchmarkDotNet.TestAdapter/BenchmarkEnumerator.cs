@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Extensions;
+﻿using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
@@ -84,11 +84,8 @@ namespace BenchmarkDotNet.TestAdapter
             // If the assembly is a debug assembly, then only display the benchmarks that will run in-process. This
             // will allow people to debug their benchmarks from a test runner if they wish.
             var runnable = all
-                .Select(runInfo => new BenchmarkRunInfo(
-                    runInfo.BenchmarksCases.Where(c => c.GetToolchain().IsInProcess).ToArray(),
-                    runInfo.Type,
-                    runInfo.Config,
-                    runInfo.CompositeInProcessDiagnoser))
+                .Select(runInfo => runInfo.WithBenchmarks(
+                    runInfo.BenchmarksCases.Where(c => c.GetToolchain().IsInProcess).ToArray()))
                 .Where(runInfo => runInfo.BenchmarksCases.Length > 0)
                 .ToArray();
 

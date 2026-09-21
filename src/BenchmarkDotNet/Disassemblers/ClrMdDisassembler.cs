@@ -4,6 +4,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Portability;
 using Microsoft.Diagnostics.Runtime;
+using Microsoft.Diagnostics.Runtime.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Disassemblers
@@ -77,7 +78,7 @@ namespace BenchmarkDotNet.Disassemblers
             var state = new State(runtime, args.RuntimeVersion);
 
             // Null when the caller passed filters: nothing enqueues the entry point then, so there is none to strip below.
-            ClrMethod? entryPoint = null;
+            IClrMethod? entryPoint = null;
 
             if (args.Filters.Length > 0)
             {
@@ -119,9 +120,9 @@ namespace BenchmarkDotNet.Disassemblers
         {
             Regex[] filters = GlobFilter.ToRegex(args.Filters);
 
-            foreach (ClrModule module in state.Runtime.EnumerateModules())
-                foreach (ClrType type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).WhereNotNull())
-                    foreach (ClrMethod method in type.Methods.Where(method => method.Signature.IsNotBlank()))
+            foreach (var module in state.Runtime.EnumerateModules())
+                foreach (var type in module.EnumerateTypeDefToMethodTableMap().Select(map => state.Runtime.GetTypeByMethodTable(map.MethodTable)).WhereNotNull())
+                    foreach (var method in type.Methods.Where(method => method.Signature.IsNotBlank()))
                     {
                         if (method.NativeCode > 0)
                         {
@@ -166,7 +167,7 @@ namespace BenchmarkDotNet.Disassemblers
             return result.ToArray();
         }
 
-        private static bool CanBeDisassembled(ClrMethod method) => method.ILOffsetMap.Length > 0 && method.NativeCode > 0;
+        private static bool CanBeDisassembled(IClrMethod method) => method.ILOffsetMap.Length > 0 && method.NativeCode > 0;
 
         private DisassembledMethod DisassembleMethod(MethodInfo methodInfo, State state, ClrMdArgs args, DisassemblySyntax syntax, SourceCodeProvider sourceCodeProvider)
         {
@@ -215,7 +216,7 @@ namespace BenchmarkDotNet.Disassemblers
             };
         }
 
-        private IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax)
+        private IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, IClrMethod currentMethod, DisassemblySyntax syntax)
         {
             ulong startAddress = map.StartAddress;
             uint size = (uint)(map.EndAddress - map.StartAddress);
@@ -236,9 +237,9 @@ namespace BenchmarkDotNet.Disassemblers
             return Decode(code, startAddress, state, depth, currentMethod, syntax);
         }
 
-        protected abstract IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, ClrMethod currentMethod, DisassemblySyntax syntax);
+        protected abstract IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, IClrMethod currentMethod, DisassemblySyntax syntax);
 
-        private static ILToNativeMap[] GetCompleteNativeMap(ClrMethod method, ClrRuntime runtime)
+        private static ILToNativeMap[] GetCompleteNativeMap(IClrMethod method, IClrRuntime runtime)
         {
             // it's better to use one single map rather than few small ones
             // it's simply easier to get next instruction when decoding ;)
@@ -260,10 +261,10 @@ namespace BenchmarkDotNet.Disassemblers
                 .ToArray();
         }
 
-        private static DisassembledMethod CreateEmpty(ClrMethod method, string reason)
+        private static DisassembledMethod CreateEmpty(IClrMethod method, string reason)
             => DisassembledMethod.Empty(method.Signature ?? "", method.NativeCode, reason);
 
-        protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, int depth, ClrMethod currentMethod)
+        protected void TryTranslateAddressToName(ulong address, bool isAddressPrecodeMD, State state, int depth, IClrMethod currentMethod)
         {
             if (!IsValidAddress(address) || state.AddressToNameMapping.ContainsKey(address))
                 return;

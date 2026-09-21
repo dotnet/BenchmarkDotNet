@@ -96,7 +96,10 @@ namespace BenchmarkDotNet.Running
             foreach (var type in types)
             {
                 var info = await BenchmarkConverter.TypeToBenchmarksAsync(type, effectiveConfig, cancellationToken).ConfigureAwait();
-                if (info.BenchmarksCases.Any())
+
+                // A type left with no cases is kept where discovery refused one of its declarations: dropping it
+                // would take the reason with it, and the run would tell the user their filter matched nothing.
+                if (info.BenchmarksCases.Any() || info.DeclarationErrors.Length > 0)
                     result.Add(info);
             }
             return result.ToArray();

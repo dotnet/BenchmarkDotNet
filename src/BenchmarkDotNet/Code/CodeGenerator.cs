@@ -247,7 +247,7 @@ namespace BenchmarkDotNet.Code
 
         private static string[] GetFieldsContainerFields(BenchmarkCase benchmarkCase, string[] extraFields)
             => benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} {RunnableConstants.ArgFieldPrefix}{index};")
+                .Select((parameter, index) => $"public {benchmarkCase.Parameters.GetArgument(parameter.Name!).ParameterValue.SourceType.GetCorrectCSharpTypeName()} {RunnableConstants.ArgFieldPrefix}{index};")
                 .Concat(extraFields)
                 .ToArray();
 
@@ -516,15 +516,6 @@ namespace BenchmarkDotNet.Code
             @switch.AppendLine("}");
 
             return @switch.ToString();
-        }
-
-        private static Type GetFieldType(Type argumentType, ParameterInstance argument)
-        {
-            // #774 we can't store ByRefLike in a field, so we store what the value is cast to (which is later converted back to the ByRefLike when we load the arguments).
-            if (argumentType.WithoutRefModifier().IsByRefLike() && argument.Value is { } value)
-                return value.GetType();
-
-            return argumentType;
         }
     }
 

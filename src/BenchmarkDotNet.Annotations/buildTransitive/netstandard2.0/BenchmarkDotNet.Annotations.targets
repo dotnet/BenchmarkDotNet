@@ -8,4 +8,24 @@
 
   <!-- The weaving logic is shared with BenchmarkDotNet.Weaver.targets. See the common file for details. -->
   <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Weaver.Common.targets" />
+
+  <Target Name="_BenchmarkDotNetGatherAnalyzers">
+    <ItemGroup>
+      <_BenchmarkDotNetAnalyzer Include="@(Analyzer)" Condition="'%(Analyzer.NuGetPackageId)' == 'BenchmarkDotNet.Annotations'" />
+    </ItemGroup>
+  </Target>
+
+  <!-- The analyzers ship one assembly per compiler version under analyzers/dotnet/roslyn<version>, the lowest being
+       Roslyn 4.0. Choosing among those folders needs SDK 6 or later; every older host is handed all of them at once
+       and, because they share an assembly name, resolves the whole set to one arbitrary path - so nothing loads and
+       every analyzer in it is reported as CS8032, which a consumer building with TreatWarningsAsErrors sees as a
+       build failure. Take them back out again rather than hand over a set that cannot work. -->
+  <Target Name="_BenchmarkDotNetRemoveAnalyzers"
+          Condition="'$(SupportsRoslynComponentVersioning)' != 'true'"
+          AfterTargets="ResolvePackageDependenciesForBuild;ResolveNuGetPackageAssets"
+          DependsOnTargets="_BenchmarkDotNetGatherAnalyzers">
+    <ItemGroup>
+      <Analyzer Remove="@(_BenchmarkDotNetAnalyzer)" />
+    </ItemGroup>
+  </Target>
 </Project>

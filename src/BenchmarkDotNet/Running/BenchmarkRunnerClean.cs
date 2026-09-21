@@ -700,9 +700,15 @@ namespace BenchmarkDotNet.Running
 
             foreach (var benchmarkRunInfo in benchmarkRunInfos)
             {
+                // Reported whether or not the type was left with any cases. A type whose only benchmark method was
+                // refused has none, and without this the reason would be replaced by the generic line below.
+                validationErrors.AddRange(benchmarkRunInfo.DeclarationErrors);
+
                 if (!benchmarkRunInfo.ContainsBenchmarkDeclarations)
                 {
-                    validationErrors.Add(new ValidationError(true, $"No [Benchmark] attribute found on '{benchmarkRunInfo.Type.Name}' benchmark case."));
+                    if (benchmarkRunInfo.DeclarationErrors.Length == 0)
+                        validationErrors.Add(new ValidationError(true, $"No [Benchmark] attribute found on '{benchmarkRunInfo.Type.Name}' benchmark case."));
+
                     continue;
                 }
 
@@ -726,13 +732,7 @@ namespace BenchmarkDotNet.Running
                     }
                 }
 
-                runInfos.Add(
-                    new BenchmarkRunInfo(
-                        validBenchmarks.ToArray(),
-                        benchmarkRunInfo.Type,
-                        benchmarkRunInfo.Config,
-                        benchmarkRunInfo.CompositeInProcessDiagnoser
-                    ));
+                runInfos.Add(benchmarkRunInfo.WithBenchmarks(validBenchmarks.ToArray()));
 
 
             }

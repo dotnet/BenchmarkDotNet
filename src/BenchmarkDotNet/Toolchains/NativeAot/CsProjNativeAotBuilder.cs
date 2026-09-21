@@ -64,17 +64,14 @@ internal sealed class CsProjNativeAotBuilder : CsProjBuilder
         if (!settings.UseNuGetClearTag && feeds is [{ Value: DefaultNuGetFeed }])
             return;
 
-        string content = $"""
-        <?xml version="1.0" encoding="utf-8"?>
-        <configuration>
-          <packageSources>
-            {(settings.UseNuGetClearTag ? "<clear/>" : string.Empty)}
-            {string.Join(Environment.NewLine + "    ", feeds.Select(feed => $"<add key=\"{feed.Key}\" value=\"{feed.Value}\" />"))}
-          </packageSources>
-        </configuration>
-        """;
+        var configuration = new XElement("configuration",
+            new XElement("packageSources",
+                settings.UseNuGetClearTag ? new XElement("clear") : null,
+                feeds.Select(feed => new XElement("add",
+                    new XAttribute("key", feed.Key),
+                    new XAttribute("value", feed.Value)))));
 
-        await File.WriteAllTextAsync(artifactsPaths.NuGetConfigPath, content, cancellationToken).ConfigureAwait(false);
+        await SaveXmlAsync(new XDocument(configuration), artifactsPaths.NuGetConfigPath, cancellationToken).ConfigureAwait(false);
     }
 
     // The ILCompiler is restored either from a NuGet feed, or from a local runtime build (which also needs the dotnet nightly feed).
@@ -154,28 +151,24 @@ internal sealed class CsProjNativeAotBuilder : CsProjBuilder
     /// </summary>
     private ValueTask GenerateReflectionFileAsync(ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
     {
-        const string content = """
-        <Directives>
-            <Application>
-                <Assembly Name="System.Runtime">
-                    <Type Name="System.GC" Dynamic="Required All" />
-                </Assembly>
-                <Assembly Name="System.Threading.ThreadPool">
-                    <Type Name="System.Threading.ThreadPool" Dynamic="Required All" />
-                </Assembly>
-                <Assembly Name="System.Threading">
-                    <Type Name="System.Threading.Monitor" Dynamic="Required All" />
-                </Assembly>
-            </Application>
-        </Directives>
-
-        """;
+        var directives = new XElement("Directives",
+            new XElement("Application",
+                RequiredType("System.Runtime", "System.GC"),
+                RequiredType("System.Threading.ThreadPool", "System.Threading.ThreadPool"),
+                RequiredType("System.Threading", "System.Threading.Monitor")));
 
         string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!;
         if (directoryName == null)
             throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
 
-        return new(File.WriteAllTextAsync(Path.Combine(directoryName, GeneratedRdXmlFileName), content, cancellationToken));
+        return SaveXmlAsync(new XDocument(directives), Path.Combine(directoryName, GeneratedRdXmlFileName), cancellationToken);
+
+        static XElement RequiredType(string assemblyName, string typeName)
+            => new("Assembly",
+                new XAttribute("Name", assemblyName),
+                new XElement("Type",
+                    new XAttribute("Name", typeName),
+                    new XAttribute("Dynamic", "Required All")));
     }
 
     private string GetCurrentInstructionSet(Platform platform)

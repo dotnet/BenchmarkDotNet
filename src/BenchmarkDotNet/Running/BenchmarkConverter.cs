@@ -7,6 +7,7 @@ using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Reports;
+using BenchmarkDotNet.Validators;
 using System.Collections;
 using System.Collections.Immutable;
 using System.Reflection;
@@ -25,8 +26,10 @@ namespace BenchmarkDotNet.Running
 
         public static ValueTask<BenchmarkRunInfo> TypeToBenchmarksAsync(Type type, IConfig? config = null, CancellationToken cancellationToken = default)
         {
+            // Nothing of an open generic type can be read - BenchmarkSwitcher is what substitutes the type arguments -
+            // so this is the one declaration error that leaves behind no cases to report it alongside.
             if (type.IsGenericTypeDefinition)
-                throw new InvalidBenchmarkDeclarationException($"{type.Name} is generic type definition, use BenchmarkSwitcher for it"); // for "open generic types" should be used BenchmarkSwitcher
+                return new(EmptyRunInfo(type, config, $"{type.Name} is generic type definition, use BenchmarkSwitcher for it"));
 
             // We should check all methods including private to notify users about private methods with the [Benchmark] attribute
             var benchmarkMethods = GetOrderedBenchmarkMethods(type.GetMethods(AllMethodsFlags));
@@ -57,15 +60,17 @@ namespace BenchmarkDotNet.Running
             var allMethods = type.GetMethods(AllMethodsFlags); // benchmarkMethods can be filtered, without Setups, look #564
             var configPerType = GetFullTypeConfig(type, config);
 
-            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(allMethods, "GlobalSetup");
-            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(allMethods, "GlobalCleanup");
-            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allMethods, "IterationSetup");
-            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allMethods, "IterationCleanup");
+            var declarationErrors = new List<ValidationError>();
+
+            var globalSetupMethods = GetAttributedMethods<GlobalSetupAttribute>(allMethods, "GlobalSetup", declarationErrors);
+            var globalCleanupMethods = GetAttributedMethods<GlobalCleanupAttribute>(allMethods, "GlobalCleanup", declarationErrors);
+            var iterationSetupMethods = GetAttributedMethods<IterationSetupAttribute>(allMethods, "IterationSetup", declarationErrors);
+            var iterationCleanupMethods = GetAttributedMethods<IterationCleanupAttribute>(allMethods, "IterationCleanup", declarationErrors);
 
             var targets = GetTargets(benchmarkMethods, type, globalSetupMethods, globalCleanupMethods, iterationSetupMethods, iterationCleanupMethods,
-                configPerType).ToArray();
+                configPerType, declarationErrors);
 
-            var parameterInstances = await GetParameterInstancesAsync(type, configPerType.SummaryStyle, cancellationToken).ConfigureAwait();
+            var parameterInstances = await GetParameterInstancesAsync(type, configPerType.SummaryStyle, declarationErrors, cancellationToken).ConfigureAwait();
 
             var benchmarks = new List<BenchmarkCase>();
 
@@ -73,7 +78,7 @@ namespace BenchmarkDotNet.Running
 
             foreach (var target in targets)
             {
-                var argumentsInstances = await GetArgumentsInstancesAsync(target.WorkloadMethod, target.Type, configPerType.SummaryStyle, cancellationToken).ConfigureAwait();
+                var argumentsInstances = await GetArgumentsInstancesAsync(target.WorkloadMethod, target.Type, configPerType.SummaryStyle, declarationErrors, cancellationToken).ConfigureAwait();
 
                 var targetParameterInstances =
                     (from parameterInstance in parameterInstances
@@ -95,7 +100,21 @@ namespace BenchmarkDotNet.Running
             var orderedBenchmarks = configPerType.Orderer.GetExecutionOrder([.. benchmarks]).ToArray();
             var compositeInProcessDiagnoser = new Diagnosers.CompositeInProcessDiagnoser([.. configPerType.GetDiagnosers().OfType<Diagnosers.IInProcessDiagnoser>()]);
 
-            return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType, containsBenchmarkDeclarations, compositeInProcessDiagnoser);
+            // Collapse duplicate errors.
+            return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType, containsBenchmarkDeclarations, compositeInProcessDiagnoser, [.. declarationErrors.Distinct()]);
+        }
+
+        private static BenchmarkRunInfo EmptyRunInfo(Type type, IConfig? config, string error)
+        {
+            var configPerType = GetFullTypeConfig(type, config);
+
+            return new BenchmarkRunInfo(
+                [],
+                type,
+                configPerType,
+                containsBenchmarkDeclarations: false,
+                new Diagnosers.CompositeInProcessDiagnoser([.. configPerType.GetDiagnosers().OfType<Diagnosers.IInProcessDiagnoser>()]),
+                [new ValidationError(isCritical: true, error)]);
         }
 
         private static ImmutableConfig GetFullTypeConfig(Type type, IConfig? config)
@@ -125,16 +144,18 @@ namespace BenchmarkDotNet.Running
             return ImmutableConfigBuilder.Create(config);
         }
 
-        private static IEnumerable<Descriptor> GetTargets(
+        private static Descriptor[] GetTargets(
             MethodInfo[] targetMethods,
             Type type,
             Tuple<MethodInfo, TargetedAttribute>[] globalSetupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] globalCleanupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] iterationSetupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] iterationCleanupMethods,
-            IConfig config)
+            IConfig config,
+            List<ValidationError> declarationErrors)
         {
             return targetMethods
+                .Where(methodInfo => IsCallable("Benchmark", methodInfo, declarationErrors))
                 .Select(methodInfo => CreateDescriptor(type,
                                                    GetTargetedMatchingMethod(methodInfo, globalSetupMethods),
                                                    methodInfo,
@@ -143,23 +164,20 @@ namespace BenchmarkDotNet.Running
                                                    GetTargetedMatchingMethod(methodInfo, iterationCleanupMethods),
                                                    methodInfo.ResolveAttribute<BenchmarkAttribute>()!,
                                                    targetMethods,
-                                                   config));
+                                                   config))
+                .ToArray();
         }
 
         private static MethodInfo? GetTargetedMatchingMethod(MethodInfo benchmarkMethod, Tuple<MethodInfo, TargetedAttribute>[] methods)
             => methods.Where(method => method.Item2.Match(benchmarkMethod)).Select(method => method.Item1).FirstOrDefault();
 
-        private static Tuple<MethodInfo, TargetedAttribute>[] GetAttributedMethods<T>(MethodInfo[] methods, string methodName) where T : TargetedAttribute
+        private static Tuple<MethodInfo, TargetedAttribute>[] GetAttributedMethods<T>(MethodInfo[] methods, string methodName, List<ValidationError> declarationErrors) where T : TargetedAttribute
         {
-            return methods.SelectMany(m => m.GetCustomAttributes<T>()
-                .Select(attr =>
-                {
-                    AssertMethodIsAccessible(methodName, m);
-                    AssertMethodHasCorrectSignature(methodName, m);
-                    AssertMethodIsNotGeneric(methodName, m);
-
-                    return new Tuple<MethodInfo, TargetedAttribute>(m, attr);
-                })).OrderByDescending(x => x.Item2.Targets?.Length ?? 0).ToArray();
+            return methods
+                .Select(method => (method, attributes: method.GetCustomAttributes<T>().ToArray()))
+                .Where(pair => pair.attributes.Length > 0 && IsCallable(methodName, pair.method, declarationErrors))
+                .SelectMany(pair => pair.attributes.Select(attr => new Tuple<MethodInfo, TargetedAttribute>(pair.method, attr)))
+                .OrderByDescending(x => x.Item2.Targets?.Length ?? 0).ToArray();
         }
 
         private static Descriptor CreateDescriptor(
@@ -186,33 +204,36 @@ namespace BenchmarkDotNet.Running
                 categories: categoryDiscoverer.GetCategories(methodInfo),
                 operationsPerInvoke: attr.OperationsPerInvoke,
                 methodIndex: Array.IndexOf(targetMethods, methodInfo));
-            AssertMethodHasCorrectSignature("Benchmark", methodInfo);
-            AssertMethodIsAccessible("Benchmark", methodInfo);
-            AssertMethodIsNotGeneric("Benchmark", methodInfo);
             return target;
         }
 
-        private static async ValueTask<IReadOnlyList<ParameterInstances>> GetParameterInstancesAsync(Type type, SummaryStyle summaryStyle, CancellationToken cancellationToken)
+        private static async ValueTask<IReadOnlyList<ParameterInstances>> GetParameterInstancesAsync(Type type, SummaryStyle summaryStyle, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
         {
-            IEnumerable<ParameterValues> GetValues<TAttribute>(Func<TAttribute, Type, IReadOnlyList<ParameterValue>> getValidValues) where TAttribute : PriorityAttribute
-                => type.GetTypeMembersWithGivenAttribute<TAttribute>(ReflectionExtensions.ParameterMemberFlags)
+            List<ParameterValues> GetValues<TAttribute>(Func<TAttribute, ParameterDefinition, IReadOnlyList<ParameterValue>> getValidValues) where TAttribute : PriorityAttribute
+                => [.. type.GetTypeMembersWithGivenAttribute<TAttribute>(ReflectionExtensions.ParameterMemberFlags)
                     .Select(member =>
-                        new ParameterValues(
-                            new(member.Name, member.IsStatic, isArgument: false, member.ParameterType, member.Attribute.Priority),
-                            getValidValues(member.Attribute, member.ParameterType)
-                        )
-                    );
+                    {
+                        var definition = new ParameterDefinition(member.Name, member.IsStatic, isArgument: false, member.ParameterType, member.Attribute.Priority);
 
-            var parameters = GetValues<ParamsAttribute>((attribute, parameterType) => GetValidValues(attribute.Values, parameterType)).ToList();
+                        return new ParameterValues(definition, getValidValues(member.Attribute, definition));
+                    })];
+
+            var parameters = GetValues<ParamsAttribute>((attribute, definition) => GetValidValues(attribute.Values, definition, "[Params]", declarationErrors));
+
+            // A member whose source could not be read is left out, so the others still range over their values.
             foreach (var member in type.GetTypeMembersWithGivenAttribute<ParamsSourceAttribute>(ReflectionExtensions.ParameterMemberFlags))
             {
                 var targetType = member.Attribute.Type ?? type;
-                var (source, values) = await GetValidValuesForParamsSourceAsync(targetType, member.Attribute.Name, cancellationToken).ConfigureAwait();
-                parameters.Add(new ParameterValues(
-                    new ParameterDefinition(member.Name, member.IsStatic, isArgument: false, member.ParameterType, member.Attribute.Priority),
-                    SmartParamBuilder.CreateForParams(member.ParameterType, source, values)));
+
+                if (await GetValidValuesForParamsSourceAsync(targetType, member.Attribute.Name, declarationErrors, cancellationToken).ConfigureAwait() is not { } read)
+                    continue;
+
+                var definition = new ParameterDefinition(member.Name, member.IsStatic, isArgument: false, member.ParameterType, member.Attribute.Priority);
+
+                parameters.Add(new ParameterValues(definition, SmartParamBuilder.CreateForParams(definition, read.source, read.values, declarationErrors)));
             }
-            parameters.AddRange(GetValues<ParamsAllValuesAttribute>((_, parameterType) => GetValidValues(GetAllValidValues(parameterType), parameterType)));
+            parameters.AddRange(GetValues<ParamsAllValuesAttribute>((_, definition) =>
+                GetValidValues(GetAllValidValues(definition.ParameterType), definition, "[ParamsAllValues]", declarationErrors)));
 
             // Each member ranges over its values independently, so the cases are their cartesian product: every case so far is re-made once per value
             // of the next parameter. The seed is the single empty case, which is also the answer for a benchmark that has no parameters at all.
@@ -238,7 +259,23 @@ namespace BenchmarkDotNet.Running
             return cases;
         }
 
-        private static async ValueTask<IReadOnlyList<ParameterInstances>> GetArgumentsInstancesAsync(MethodInfo benchmark, Type benchmarkType, SummaryStyle summaryStyle, CancellationToken cancellationToken)
+        /// <summary>
+        /// One argument written into the benchmark's own attribute, and the type the generated code holds it as -
+        /// or null where the parameter has no such value. That type is the parameter's own, except for a
+        /// by-ref-like one, which no field can hold (#774): it is reached through the conversion the value's own
+        /// type declares, so only the value names what holds it - which is also why a null has to be refused
+        /// before this can ask.
+        /// </summary>
+        private static ParameterInstance? Argument(MethodInfo benchmark, ParameterDefinition definition, object? value, SummaryStyle summaryStyle, List<ValidationError> declarationErrors)
+        {
+            if (SmartParamBuilder.RefusesNull($"[Arguments] on {benchmark.Name}", definition, value, declarationErrors))
+                return null;
+
+            var sourceType = definition.ParameterType.WithoutRefModifier().IsByRefLike() ? value!.GetType() : definition.ParameterType;
+            return new ParameterInstance(definition, new ParameterValue.Constant(value, sourceType), summaryStyle);
+        }
+
+        private static async ValueTask<IReadOnlyList<ParameterInstances>> GetArgumentsInstancesAsync(MethodInfo benchmark, Type benchmarkType, SummaryStyle summaryStyle, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
         {
             int priority = benchmark.GetCustomAttributes<PriorityAttribute>().Sum(attribute => attribute.Priority);
 
@@ -255,18 +292,21 @@ namespace BenchmarkDotNet.Running
             foreach (var argumentsAttribute in benchmark.GetCustomAttributes<ArgumentsAttribute>())
             {
                 if (parameterDefinitions.Length != argumentsAttribute.Values.Length)
-                    throw new InvalidOperationException($"Benchmark {benchmark.Name} has invalid number of defined arguments provided with [Arguments]! {argumentsAttribute.Values.Length} instead of {parameterDefinitions.Length}.");
+                {
+                    declarationErrors.Add(new ValidationError(isCritical: true,
+                        $"Benchmark {benchmark.Name} has invalid number of defined arguments provided with [Arguments]! {argumentsAttribute.Values.Length} instead of {parameterDefinitions.Length}."));
 
-                result.Add(
-                    new(argumentsAttribute.Values
-                        .Select((value, index) =>
-                        {
-                            var definition = parameterDefinitions[index];
-                            return new ParameterInstance(definition, new ParameterValue.Constant(value, definition.ParameterType), summaryStyle);
-                        })
-                        .ToArray()
-                    )
-                );
+                    continue;
+                }
+
+                // Every argument is read before the row is judged, so one the parameter refuses does not hide the
+                // next - and a row missing any of them is left out rather than reported twice.
+                var arguments = argumentsAttribute.Values
+                    .Select((value, index) => Argument(benchmark, parameterDefinitions[index], value, summaryStyle, declarationErrors))
+                    .ToArray();
+
+                if (arguments.All(argument => argument is not null))
+                    result.Add(new ParameterInstances(arguments!));
             }
 
             if (!benchmark.HasAttribute<ArgumentsSourceAttribute>())
@@ -275,9 +315,14 @@ namespace BenchmarkDotNet.Running
             var argumentsSourceAttribute = benchmark.GetCustomAttribute<ArgumentsSourceAttribute>()!;
             var targetType = argumentsSourceAttribute.Type ?? benchmarkType;
 
-            var valuesInfo = await GetValidValuesForParamsSourceAsync(targetType, argumentsSourceAttribute.Name, cancellationToken).ConfigureAwait();
+            if (await GetValidValuesForParamsSourceAsync(targetType, argumentsSourceAttribute.Name, declarationErrors, cancellationToken).ConfigureAwait() is not { } valuesInfo)
+                return result;
+
             for (int sourceIndex = 0; sourceIndex < valuesInfo.values.Length; sourceIndex++)
-                result.Add(SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex, summaryStyle));
+            {
+                if (SmartParamBuilder.CreateForArguments(benchmark, parameterDefinitions, valuesInfo, sourceIndex, summaryStyle, declarationErrors) is { } instances)
+                    result.Add(instances);
+            }
 
             return result;
         }
@@ -285,34 +330,46 @@ namespace BenchmarkDotNet.Running
         private static ImmutableArray<BenchmarkCase> GetFilteredBenchmarks(BenchmarkCase[] benchmarks, IEnumerable<IFilter> filters)
             => [.. benchmarks.Where(benchmark => filters.All(filter => filter.Predicate(benchmark)))];
 
-        private static void AssertMethodHasCorrectSignature(string methodType, MethodInfo methodInfo)
+        /// <summary>
+        /// Whether a method BenchmarkDotNet is going to call is one it can call. Every problem a method has is
+        /// reported rather than only the first, and the method is then left out - which costs only the cases it
+        /// would have produced, so the rest of the type is still read.
+        /// </summary>
+        private static bool IsCallable(string methodType, MethodInfo methodInfo, List<ValidationError> declarationErrors)
         {
+            int before = declarationErrors.Count;
+
             if (methodInfo.GetParameters().Any() && !methodInfo.HasAttribute<ArgumentsAttribute>() && !methodInfo.HasAttribute<ArgumentsSourceAttribute>())
-                throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments.");
-        }
+                declarationErrors.Add(new ValidationError(isCritical: true,
+                    $"{methodType} method {methodInfo.Name} has incorrect signature.\nMethod shouldn't have any arguments."));
 
-        private static void AssertMethodIsAccessible(string methodType, MethodInfo methodInfo)
-        {
-            if (!methodInfo.IsPublic)
-                throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public.");
             /* Moved the code that verifies if DeclaringType of a given MethodInfo (a method) is publicly accessible to CompilationValidator */
-        }
+            if (!methodInfo.IsPublic)
+                declarationErrors.Add(new ValidationError(isCritical: true,
+                    $"{methodType} method {methodInfo.Name} has incorrect access modifiers.\nMethod must be public."));
 
-        private static void AssertMethodIsNotGeneric(string methodType, MethodInfo methodInfo)
-        {
             if (methodInfo.IsGenericMethod)
-                throw new InvalidBenchmarkDeclarationException($"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported.");
+                declarationErrors.Add(new ValidationError(isCritical: true,
+                    $"{methodType} method {methodInfo.Name} is generic.\nGeneric {methodType} methods are not supported."));
+
+            return declarationErrors.Count == before;
         }
 
-        private static IReadOnlyList<ParameterValue> GetValidValues(object?[] values, Type parameterType)
-            => [.. values.Select(value => new ParameterValue.Constant(value, parameterType))];
+        // Every value is asked, so one the parameter refuses does not hide the next.
+        private static IReadOnlyList<ParameterValue> GetValidValues(object?[] values, ParameterDefinition definition, string origin, List<ValidationError> declarationErrors)
+            => [.. values
+                .Where(value => !SmartParamBuilder.RefusesNull(origin, definition, value, declarationErrors))
+                .Select(value => new ParameterValue.Constant(value, definition.ParameterType))];
 
-        private static async ValueTask<(MemberInfo source, object?[] values)> GetValidValuesForParamsSourceAsync(Type sourceType, string sourceName, CancellationToken cancellationToken)
+        private static async ValueTask<(MemberInfo source, object?[] values)?> GetValidValuesForParamsSourceAsync(Type sourceType, string sourceName, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
         {
             var source = sourceType.FindSourceMember(sourceName);
 
             if (source == null)
-                throw NoSourceMemberFound(sourceType, sourceName);
+            {
+                declarationErrors.Add(NoSourceMemberFound(sourceType, sourceName));
+                return null;
+            }
 
             // A source method may have parameters as long as they are all optional (e.g. an async iterator with an
             // [EnumeratorCancellation] CancellationToken); we invoke it with their default values.
@@ -320,19 +377,21 @@ namespace BenchmarkDotNet.Running
                 ? method.Invoke(method.IsStatic ? null : Activator.CreateInstance(sourceType), GetDefaultArguments(method))
                 : ((PropertyInfo) source).GetValue(((PropertyInfo) source).GetMethod!.IsStatic ? null : Activator.CreateInstance(sourceType)!);
 
-            return (source, await ToArrayAsync(sourceValue, source, sourceType, cancellationToken).ConfigureAwait());
+            return await ToArrayAsync(sourceValue, source, sourceType, declarationErrors, cancellationToken).ConfigureAwait() is { } values
+                ? (source, values)
+                : null;
         }
 
-        private static InvalidBenchmarkDeclarationException NoSourceMemberFound(Type sourceType, string sourceName)
+        private static ValidationError NoSourceMemberFound(Type sourceType, string sourceName)
         {
             var namedMethods = sourceType.GetAllMethods().Where(method => method.Name == sourceName && method.IsPublic).ToArray();
 
             if (namedMethods.Any(method => method.IsGenericMethodDefinition))
-                return new InvalidBenchmarkDeclarationException($"Source method {sourceName} of type {sourceType.GetDisplayName()} is generic.\nGeneric source methods are not supported.");
+                return new ValidationError(isCritical: true, $"Source method {sourceName} of type {sourceType.GetDisplayName()} is generic.\nGeneric source methods are not supported.");
 
-            return namedMethods.Length > 0
-                ? new InvalidBenchmarkDeclarationException($"{sourceType.Name}.{sourceName} has required parameters, unable to read values for [ParamsSource]/[ArgumentsSource]. A source method must be parameterless or have only optional parameters.")
-                : new InvalidBenchmarkDeclarationException($"{sourceType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource].");
+            return new ValidationError(isCritical: true, namedMethods.Length > 0
+                ? $"{sourceType.Name}.{sourceName} has required parameters, unable to read values for [ParamsSource]/[ArgumentsSource]. A source method must be parameterless or have only optional parameters."
+                : $"{sourceType.Name} has no public, accessible method/property called {sourceName}, unable to read values for [ParamsSource].");
         }
 
         // Default argument values for an all-optional-parameter source method. A parameter can be optional without declaring
@@ -350,7 +409,7 @@ namespace BenchmarkDotNet.Running
             return arguments;
         }
 
-        private static async ValueTask<object?[]> ToArrayAsync(object? sourceValue, MemberInfo memberInfo, Type type, CancellationToken cancellationToken)
+        private static async ValueTask<object?[]?> ToArrayAsync(object? sourceValue, MemberInfo memberInfo, Type type, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
         {
             var sourceType = memberInfo is MethodInfo methodInfo
                 ? methodInfo.ReturnType
@@ -359,16 +418,25 @@ namespace BenchmarkDotNet.Running
             // Checked before the shape, so a null async source reports the same declaration error a null
             // synchronous source does instead of failing while being enumerated.
             if (sourceValue == null)
-                throw new InvalidBenchmarkDeclarationException($"{memberInfo.Name} of type {type.Name} returned null, unable to read values for [ParamsSource]/[ArgumentsSource].");
+            {
+                declarationErrors.Add(new ValidationError(isCritical: true,
+                    $"{memberInfo.Name} of type {type.Name} returned null, unable to read values for [ParamsSource]/[ArgumentsSource]."));
+
+                return null;
+            }
 
             // Reading the values puts each into an object[], which a ref struct cannot enter - the enumeration fails
             // inside reflection saying nothing about the benchmark. Expressible since .NET 10 gave IEnumerable<T> an
             // allows-ref-struct type parameter. Asked of both shapes, and so ahead of either: an async source reads
             // its values into the same object[]. SourceReturnTypeValidator reports the declaration this substitutes.
             if (memberInfo.GetSourceReturnType().TryGetSourceElementType(out var refLikeCandidate) && refLikeCandidate.IsByRefLike())
-                throw new InvalidBenchmarkDeclarationException(
+            {
+                declarationErrors.Add(new ValidationError(isCritical: true,
                     $"{type.Name}.{memberInfo.Name} yields {refLikeCandidate.GetDisplayName()}, which is a ref struct, and BenchmarkDotNet cannot read a value into one."
-                    + " Please, yield what the value is built from - IEnumerable<byte[]> for a ReadOnlySpan<byte> parameter - and let the benchmark take the ref struct.");
+                    + " Please, yield what the value is built from - IEnumerable<byte[]> for a ReadOnlySpan<byte> parameter - and let the benchmark take the ref struct."));
+
+                return null;
+            }
 
             // Only IAsyncEnumerable<T> is supported for async sources (not the await-foreach pattern). Decided from
             // the declared type, and before the synchronous check, because that is what the generated code binds:
@@ -390,7 +458,10 @@ namespace BenchmarkDotNet.Running
             if (sourceValue is IEnumerable collection)
                 return [.. collection];
 
-            throw new InvalidBenchmarkDeclarationException($"{memberInfo.Name} of type {type.Name} does not implement IEnumerable or IAsyncEnumerable<T>, unable to read values for [ParamsSource]");
+            declarationErrors.Add(new ValidationError(isCritical: true,
+                $"{memberInfo.Name} of type {type.Name} does not implement IEnumerable or IAsyncEnumerable<T>, unable to read values for [ParamsSource]"));
+
+            return null;
         }
 
         private static object?[] GetAllValidValues(Type parameterType)

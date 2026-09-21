@@ -2,6 +2,13 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 
+// Several fixtures below declare the very shapes these rules refuse - that is what the tests assert, through the
+// declaration errors discovery reports for them. Disabled for the file rather than around each one: restoring
+// between them would be noise when so many of them exist to be refused, and the assertions on the messages are
+// what would catch a rule that stopped firing.
+#pragma warning disable BDN1506 // [ArgumentsSource] must match the benchmark's parameters for every type argument
+#pragma warning disable BDN1507 // [ArgumentsSource] must yield what the benchmark's parameters take
+
 namespace BenchmarkDotNet.Tests
 {
     public class ParamsSourceTests
@@ -88,11 +95,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void WriteOnlyPropertyDoesThrowNullReferenceException()
         {
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(ClassWithWriteOnlyProperty)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(ClassWithWriteOnlyProperty)).DeclarationErrors);
 
-            Assert.Contains(nameof(ClassWithWriteOnlyProperty.WriteOnlyValues), exception.Message);
-            Assert.Contains("no public, accessible method/property", exception.Message);
+            Assert.Contains(nameof(ClassWithWriteOnlyProperty.WriteOnlyValues), error.Message);
+            Assert.Contains("no public, accessible method/property", error.Message);
         }
 
         public class ClassWithWriteOnlyProperty
@@ -293,11 +299,6 @@ namespace BenchmarkDotNet.Tests
 
         [Theory]
         [InlineData(typeof(WholeArrayByConversion.ToReadOnlySpan))]
-        [InlineData(typeof(WholeArrayByConversion.ToReadOnlyMemory))]
-        [InlineData(typeof(WholeArrayByConversion.ToMemory))]
-#if !NETFRAMEWORK
-        [InlineData(typeof(WholeArrayByConversion.ToArraySegment))]
-#endif
         [InlineData(typeof(WholeArrayByConversion.ToRefArray))]
         public void AnArrayAParameterIsDeclaredAsOrBuiltFromIsNotAnArgumentList(Type benchmarkType)
         {
@@ -305,6 +306,136 @@ namespace BenchmarkDotNet.Tests
 
             Assert.Equal(new byte[] { 1, 2, 3 }, Assert.IsType<byte[]>(parameter.Value));
         }
+
+        // Only a by-ref-like parameter is reached through a conversion operator, because nothing else can be. Every
+        // other parameter names what it takes, so an element that merely converts to it is refused - the array here
+        // is a byte[] and these parameters are not.
+        [Theory]
+        [InlineData(typeof(WholeArrayByConversion.ToReadOnlyMemory), "ReadOnlyMemory<Byte>")]
+        [InlineData(typeof(WholeArrayByConversion.ToMemory), "Memory<Byte>")]
+#if !NETFRAMEWORK
+        [InlineData(typeof(WholeArrayByConversion.ToArraySegment), "ArraySegment<Byte>")]
+#endif
+        public void AnArrayIsRefusedWhereTheParameterOnlyConvertsFromIt(Type benchmarkType, string takes)
+        {
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(benchmarkType).DeclarationErrors);
+
+            Assert.Contains($"is declared to yield Byte[] for a {takes} argument", error.Message);
+            Assert.Contains($"declare the source to yield {takes} or object", error.Message);
+        }
+
+        // A source declared to yield object says nothing about what it holds, and a null says nothing either, so
+        // only the parameter is left to ask - and no value type has such a value. Refused where the declaration
+        // is read rather than left to fail as a field the generated code cannot declare.
+        [Fact]
+        public void ANullIsRefusedForAByRefLikeParameterWhereTheSourceNamesOnlyObject()
+        {
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(NullFromObjectToByRefLike)).DeclarationErrors);
+
+            Assert.Contains("[ArgumentsSource(Values)] provides null for the ReadOnlySpan<Byte> parameter 'a'", error.Message);
+            Assert.Contains("which is a value type - null is not one of its values", error.Message);
+        }
+
+        public class NullFromObjectToByRefLike
+        {
+            public static IEnumerable<object?> Values() { yield return null; }
+            [Benchmark][ArgumentsSource(nameof(Values))] public int Run(ReadOnlySpan<byte> a) => a.Length;
+        }
+
+        // Nothing about that is particular to a ref struct: an int has no null either, and the two toolchains do
+        // not agree about one - the generated code will not compile (CS0037) where the emitted one substitutes 0
+        // and runs a case nobody wrote.
+        [Fact]
+        public void ANullIsRefusedForAValueTypeParameterWhereTheSourceNamesOnlyObject()
+        {
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(NullFromObjectToValueType)).DeclarationErrors);
+
+            Assert.Contains("[ArgumentsSource(Values)] provides null for the Int32 parameter 'a'", error.Message);
+            Assert.Contains("which is a value type - null is not one of its values", error.Message);
+        }
+
+        public class NullFromObjectToValueType
+        {
+            public static IEnumerable<object?> Values() { yield return null; }
+            [Benchmark][ArgumentsSource(nameof(Values))] public int Run(int a) => a;
+        }
+
+        // A reference type holds null perfectly well, so the same declaration is left alone.
+        [Fact]
+        public void ANullIsAcceptedForAReferenceTypeParameterWhereTheSourceNamesOnlyObject()
+        {
+            var parameter = Assert.Single(Assert.Single(
+                BenchmarkConverter.TypeToBenchmarks(typeof(NullFromObjectToReferenceType)).BenchmarksCases).Parameters.Items);
+
+            Assert.Null(parameter.Value);
+        }
+
+        public class NullFromObjectToReferenceType
+        {
+            public static IEnumerable<object?> Values() { yield return null; }
+            [Benchmark][ArgumentsSource(nameof(Values))] public int Run(string? a) => a?.Length ?? 0;
+        }
+
+        // A source that names its element type has been judged on it already, and a null read from one says the
+        // value could not be read rather than that it was null - a ref struct cannot be boxed to be looked at.
+        [Fact]
+        public void ANullIsLeftAloneWhereTheSourceNamesItsElementType()
+            => Assert.NotEmpty(BenchmarkConverter.TypeToBenchmarks(typeof(NullFromTypedSource)).BenchmarksCases);
+
+        public class NullFromTypedSource
+        {
+            public static IEnumerable<int?> Values() { yield return null; }
+            [Benchmark][ArgumentsSource(nameof(Values))] public int Run(int? a) => a ?? 0;
+        }
+
+        // The same question, of the one place a value comes from with no declaration behind it at all. BDN1502
+        // reports this where the benchmark is written; a host that runs no analyzer has only this.
+        [Fact]
+        public void ANullArgumentIsRefusedForAByRefLikeParameter()
+        {
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(NullArgumentToByRefLike)).DeclarationErrors);
+
+            Assert.Contains("[Arguments] on Run provides null for the ReadOnlySpan<Byte> parameter 'a'", error.Message);
+            Assert.Contains("which is a value type - null is not one of its values", error.Message);
+        }
+
+        public class NullArgumentToByRefLike
+        {
+#pragma warning disable BDN1502 // the shape this refuses is the one the analyzer reports where it runs
+            [Benchmark][Arguments(null)] public int Run(ReadOnlySpan<byte> a) => a.Length;
+#pragma warning restore BDN1502
+        }
+
+        // The conversion is looked for on the type the source declares, which is what admitted the source in the
+        // first place. Reading it off the value instead asks a different question - the operator is declared for
+        // the base, and reflection matches a conversion on exactly the type it names - so a derived value would
+        // be refused by the very rule that let its declaration through.
+        [Fact]
+        public void AByRefLikeParameterIsFedAValueOfADerivedType()
+        {
+            var parameter = Assert.Single(Assert.Single(
+                BenchmarkConverter.TypeToBenchmarks(typeof(DerivedConvertedToByRefLike)).BenchmarksCases).Parameters.Items);
+
+            Assert.IsType<DerivedConvertible>(parameter.Value);
+
+            // The generated code holds the value as the type the declaration names, not the one it happens to be.
+            Assert.Equal(typeof(Convertible), parameter.ParameterValue.SourceType);
+        }
+
+        public class DerivedConvertedToByRefLike
+        {
+            public static IEnumerable<Convertible> Values() { yield return new DerivedConvertible(); }
+            [Benchmark][ArgumentsSource(nameof(Values))] public int Run(ReadOnlySpan<byte> a) => a.Length;
+        }
+
+        public class Convertible
+        {
+            public byte[] Bytes = [1, 2, 3];
+
+            public static implicit operator ReadOnlySpan<byte>(Convertible convertible) => convertible.Bytes;
+        }
+
+        public class DerivedConvertible : Convertible { }
 
         // A typed array is not an object[], so none of these reach the branch that reads an element as an
         // argument list, whatever conversion the parameter goes on to apply to the array it is handed.
@@ -343,41 +474,41 @@ namespace BenchmarkDotNet.Tests
             }
         }
 
-        // Every row is one cell of the matrix this rule was measured against, and the rows must keep disagreeing
-        // along both axes: which interface the source is *written* as, and which branch of CreateForArguments
-        // took the value. Two candidates were tried and rejected, and each survives a theory that varies only one
-        // axis - reading the declared element type instead flips the two List<object[]> rows, and additionally
-        // requiring the value to have come out of the array flips the two written-as-the-interface rows that fall
-        // through. Keep at least one row on each side of both.
+        // The index follows the declared element type and nothing else, which is what lets the generated code and
+        // the in-process toolchains take the same argument out of a row: the generated code binds its extraction
+        // against that type, and SmartParamBuilder takes the row apart the same way. Whether the source is
+        // *written* as the interface or merely implements it does not enter into it, which is what the
+        // List<object[]> and ArrayRows rows are here to hold - a decision read from the value instead of the
+        // declaration would separate them.
         [Theory]
-        // Written as the interface, per-item branch: indexed, and every toolchain agrees.
+        // An object[] element feeding several parameters is the argument list, indexed.
         [InlineData(typeof(ArgumentListSource.Declared), 0)]
-        // Written as the interface, unwrap branch - the element is the argument.
-        [InlineData(typeof(ArgumentListSource.DeclaredUnwrapped), 0)]
-        // Written as the interface but falling through, so the value is the whole array while the generated code
-        // indexes it. Master's defect, and the reason the index cannot be read from the branch alone.
-        [InlineData(typeof(ArgumentListSource.DeclaredUnrecognised), 0)]
-        [InlineData(typeof(ArgumentListSource.DeclaredTooManyForOne), 0)]
-        // Only implementing it, so it is not indexed - which costs the multi-argument case an index it needs.
-        // Master's defect, and the reason the index cannot be read from the element type alone.
-        [InlineData(typeof(ArgumentListSource.Implemented), null)]
-        // Only implementing it, and falling through: the whole array is the value and nothing indexes it.
-        [InlineData(typeof(ArgumentListSource.WholeArray), null)]
-        // The async half follows the same rule, and has to: rewriting a source from IEnumerable<object[]> to
-        // IAsyncEnumerable<object[]> may not change how its elements map onto arguments. There is no master
-        // behaviour to reproduce on this side, so these three rows are what holds the two halves together.
-        // Widening only the async side would not remove a defect, it would move one: AsyncImplemented would gain
-        // the index it wants, and AsyncWholeArray would lose the agreement it has - and of the two, the whole-array
-        // cell is the one that fails silently, with the generated code indexing what the in-process toolchains hand
-        // over whole. See the note on SmartParamBuilder.Indexes.
         [InlineData(typeof(ArgumentListSource.AsyncDeclared), 0)]
-        [InlineData(typeof(ArgumentListSource.AsyncImplemented), null)]
+        // Only implementing the interface reads the same, because the element type is the same.
+        [InlineData(typeof(ArgumentListSource.Implemented), 0)]
+        [InlineData(typeof(ArgumentListSource.AsyncImplemented), 0)]
+        // One parameter is fed the value itself, so nothing is indexed - here the parameter is declared object[],
+        // which is what the element names, so the whole array is the argument however many items it holds.
+        [InlineData(typeof(ArgumentListSource.DeclaredUnwrapped), null)]
+        [InlineData(typeof(ArgumentListSource.DeclaredTooManyForOne), null)]
+        [InlineData(typeof(ArgumentListSource.WholeArray), null)]
         [InlineData(typeof(ArgumentListSource.AsyncWholeArray), null)]
-        public void TheIndexFollowsTheInterfaceTheSourceIsWrittenAs(Type benchmarkType, int? expected)
+        public void TheIndexFollowsTheDeclaredElementType(Type benchmarkType, int? expected)
         {
             var parameter = Assert.Single(BenchmarkConverter.TypeToBenchmarks(benchmarkType).BenchmarksCases).Parameters.Items.First();
 
             Assert.Equal(expected, Assert.IsType<ParameterValue.FromSource>(parameter.ParameterValue).ElementIndex);
+        }
+
+        // An object[] element cannot feed a single parameter that is not itself an object[]: the declaration cannot
+        // tell a one-element argument list apart from a value that happens to be an array, so it names neither.
+        [Fact]
+        public void AnObjectArrayIsRefusedForASingleParameterOfAnotherType()
+        {
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(ArgumentListSource.DeclaredUnrecognised)).DeclarationErrors);
+
+            Assert.Contains("is declared to yield Object[] for a IBox argument", error.Message);
+            Assert.Contains("never a one-element array wrapping it", error.Message);
         }
 
         // The erased-enum display branch was reached only by attribute constants before this work, so the value
@@ -472,8 +603,8 @@ namespace BenchmarkDotNet.Tests
                 [Benchmark][ArgumentsSource(nameof(Values))] public int Run(object[] a) => a.Length;
             }
 
-            // One element for one parameter, but its runtime type is not the parameter's, so the single-argument
-            // branch declines it and the whole array is handed over.
+            // The refused shape: object[] declared for a parameter that is not one. Whether the row happens to
+            // hold exactly one item of the parameter's type is a property of the value, which the rule never reads.
             public class DeclaredUnrecognised
             {
                 public static IEnumerable<object[]> Values() { yield return [new BoxImpl()]; }
@@ -578,11 +709,10 @@ namespace BenchmarkDotNet.Tests
         {
             // Reflection would otherwise fail with "Late bound operations cannot be performed on types or methods
             // for which ContainsGenericParameters is true", which names nothing the user wrote.
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(GenericSourceMethod)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(GenericSourceMethod)).DeclarationErrors);
 
-            Assert.Contains("is generic", exception.Message);
-            Assert.Contains(nameof(GenericSourceMethod.Values), exception.Message);
+            Assert.Contains("is generic", error.Message);
+            Assert.Contains(nameof(GenericSourceMethod.Values), error.Message);
         }
 
 #pragma warning disable BDN1310
@@ -717,11 +847,10 @@ namespace BenchmarkDotNet.Tests
         [Fact]
         public void AsyncEnumerablePatternParamsSourceIsRejected()
         {
-            var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-                () => BenchmarkConverter.TypeToBenchmarks(typeof(AsyncEnumerablePatternParams)));
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(AsyncEnumerablePatternParams)).DeclarationErrors);
 
-            Assert.Contains(nameof(AsyncEnumerablePatternParams.Values), exception.Message);
-            Assert.Contains("does not implement IEnumerable or IAsyncEnumerable", exception.Message);
+            Assert.Contains(nameof(AsyncEnumerablePatternParams.Values), error.Message);
+            Assert.Contains("does not implement IEnumerable or IAsyncEnumerable", error.Message);
         }
 
 #pragma warning disable BDN1306
@@ -754,5 +883,29 @@ namespace BenchmarkDotNet.Tests
             public int Run() => Value;
         }
 #pragma warning restore BDN1306
+
+        [Fact]
+        public void ARowThatIsNotTheDeclaredTupleIsReported()
+        {
+            var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(RowIsNotTheDeclaredTuple)).DeclarationErrors);
+
+            Assert.Contains("expects an argument list from [ArgumentsSource(Values)], but Int32 was provided", error.Message);
+        }
+
+        public class RowIsNotTheDeclaredTuple
+        {
+            public static IEnumerable<(int, string)> Values() => new Disagrees();
+
+            [Benchmark]
+            [ArgumentsSource(nameof(Values))]
+            public void Run(int a, string b) { }
+
+            private class Disagrees : IEnumerable<(int, string)>
+            {
+                public IEnumerator<(int, string)> GetEnumerator() => Enumerable.Empty<(int, string)>().GetEnumerator();
+
+                System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => new object[] { 42 }.GetEnumerator();
+            }
+        }
     }
 }

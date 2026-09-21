@@ -12,6 +12,7 @@ using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using Microsoft.Diagnostics.Tracing.Session;
+using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
@@ -123,65 +124,72 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             var cvPathFile = Path.ChangeExtension(traceFilePath, ".CvTrace");
             var traceFileName = Path.GetFileName(traceFilePath);
 
-            File.WriteAllText(cvPathFile,
-$@"<?xml version=""1.0""?>
-<ConcurrencyTrace xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" MajorVersion=""1"" MinorVersion=""0"">
-  <Config MajorVersion=""1"" MinorVersion=""0"">
-    <DeleteEtlsAfterAnalysis>false</DeleteEtlsAfterAnalysis>
-    <TraceLocation>{directoryPath}</TraceLocation>
-    <Markers>
-      <MarkerProvider Name=""ConcurrencyVisualizer.Markers"" Guid=""{ConcurrencyVisualizerMarkersId}"" Level=""Low"" />
-      <MarkerProvider Name=""System.Threading.Tasks"" Guid=""{TplEtwProviderTraceEventParser.ProviderGuid}"" Level=""Normal"" />
-      <MarkerProvider Name=""System.Threading.Tasks.Dataflow"" Guid=""{TplDataflowId}"" Level=""Normal"" />
-      <MarkerProvider Name=""System.Threading"" Guid=""{TplSynchronizationId}"" Level=""Normal"" />
-      <MarkerProvider Name=""System.Collections.Concurrent"" Guid=""{ManagedConcurrentCollectionsId}"" Level=""Normal"" />
-      <MarkerProvider Name=""System.Linq.Parallel"" Guid=""{PlinqId}"" Level=""Normal"" />
-    </Markers>
-    <FilterConfig>
-      <CollectClrEvents>true</CollectClrEvents>
-      <ClrCollectionOptions>None</ClrCollectionOptions>
-      <CollectSampleEvents>true</CollectSampleEvents>
-      <CollectGpuEvents>false</CollectGpuEvents>
-      <CollectFileIO>true</CollectFileIO>
-    </FilterConfig>
-    <UserBufferSettings>
-      <BufferFlushTimer>0</BufferFlushTimer>
-      <BufferSize>256</BufferSize>
-      <MinimumBuffers>512</MinimumBuffers>
-      <MaximumBuffers>1024</MaximumBuffers>
-    </UserBufferSettings>
-    <KernelBufferSettings>
-      <BufferFlushTimer>0</BufferFlushTimer>
-      <BufferSize>256</BufferSize>
-      <MinimumBuffers>512</MinimumBuffers>
-      <MaximumBuffers>1024</MaximumBuffers>
-    </KernelBufferSettings>
-    {GenerateCodeInfo(parameters)}
-  </Config>
-  <Pid>{processId}</Pid>
-  <EtwSourceFileNames>
-    <EtwSourceFile>{traceFileName}</EtwSourceFile>
-  </EtwSourceFileNames>
-  <TraceProcesses />
-  <NtToDosMaps>
-    <NtToDosNameMap NtName=""\??\"" DosName="""" />
-    <NtToDosNameMap NtName=""\SystemRoot\"" DosName=""C:\WINDOWS\"" />
-    <NtToDosNameMap NtName=""\Windows\"" DosName=""C:\WINDOWS\"" />
-  </NtToDosMaps>
-</ConcurrencyTrace>
-");
+            var trace = new XElement("ConcurrencyTrace",
+                new XAttribute(XNamespace.Xmlns + "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
+                new XAttribute(XNamespace.Xmlns + "xsd", "http://www.w3.org/2001/XMLSchema"),
+                new XAttribute("MajorVersion", "1"),
+                new XAttribute("MinorVersion", "0"),
+                new XElement("Config",
+                    new XAttribute("MajorVersion", "1"),
+                    new XAttribute("MinorVersion", "0"),
+                    new XElement("DeleteEtlsAfterAnalysis", "false"),
+                    new XElement("TraceLocation", directoryPath),
+                    new XElement("Markers",
+                        MarkerProvider("ConcurrencyVisualizer.Markers", ConcurrencyVisualizerMarkersId, "Low"),
+                        MarkerProvider("System.Threading.Tasks", TplEtwProviderTraceEventParser.ProviderGuid, "Normal"),
+                        MarkerProvider("System.Threading.Tasks.Dataflow", TplDataflowId, "Normal"),
+                        MarkerProvider("System.Threading", TplSynchronizationId, "Normal"),
+                        MarkerProvider("System.Collections.Concurrent", ManagedConcurrentCollectionsId, "Normal"),
+                        MarkerProvider("System.Linq.Parallel", PlinqId, "Normal")),
+                    new XElement("FilterConfig",
+                        new XElement("CollectClrEvents", "true"),
+                        new XElement("ClrCollectionOptions", "None"),
+                        new XElement("CollectSampleEvents", "true"),
+                        new XElement("CollectGpuEvents", "false"),
+                        new XElement("CollectFileIO", "true")),
+                    BufferSettings("UserBufferSettings"),
+                    BufferSettings("KernelBufferSettings"),
+                    GenerateCodeInfo(parameters)),
+                new XElement("Pid", processId),
+                new XElement("EtwSourceFileNames",
+                    new XElement("EtwSourceFile", traceFileName)),
+                new XElement("TraceProcesses"),
+                new XElement("NtToDosMaps",
+                    NtToDosNameMap(@"\??\", ""),
+                    NtToDosNameMap(@"\SystemRoot\", @"C:\WINDOWS\"),
+                    NtToDosNameMap(@"\Windows\", @"C:\WINDOWS\")));
+
+            new XDocument(new XDeclaration("1.0", null, null), trace).Save(cvPathFile);
 
             return cvPathFile;
         }
 
-        private string GenerateCodeInfo(DiagnoserActionParameters parameters)
+        private static XElement MarkerProvider(string name, Guid id, string level)
+            => new("MarkerProvider",
+                new XAttribute("Name", name),
+                new XAttribute("Guid", id),
+                new XAttribute("Level", level));
+
+        private static XElement BufferSettings(string name)
+            => new(name,
+                new XElement("BufferFlushTimer", "0"),
+                new XElement("BufferSize", "256"),
+                new XElement("MinimumBuffers", "512"),
+                new XElement("MaximumBuffers", "1024"));
+
+        private static XElement NtToDosNameMap(string ntName, string dosName)
+            => new("NtToDosNameMap",
+                new XAttribute("NtName", ntName),
+                new XAttribute("DosName", dosName));
+
+        private XElement GenerateCodeInfo(DiagnoserActionParameters parameters)
         {
             if (!parameters.Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles))
-                return "<JustMyCode />";
+                return new XElement("JustMyCode");
 
             var folderWithDlls = Path.GetDirectoryName(parameters.BenchmarkCase.Descriptor.Type.Assembly.Location);
 
-            return $"<JustMyCode><MyCodeDirectory>{folderWithDlls}</MyCodeDirectory></JustMyCode>";
+            return new XElement("JustMyCode", new XElement("MyCodeDirectory", folderWithDlls));
         }
     }
 }
