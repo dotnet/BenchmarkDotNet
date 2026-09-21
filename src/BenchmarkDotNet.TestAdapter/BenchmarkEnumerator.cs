@@ -60,11 +60,8 @@ namespace BenchmarkDotNet.TestAdapter
                     {
                         // If the assembly is a debug assembly, then only display them if they will run in-process
                         // This will allow people to debug their benchmarks using VSTest if they wish.
-                        benchmarkRunInfo = new BenchmarkRunInfo(
-                            benchmarkRunInfo.BenchmarksCases.Where(c => c.GetToolchain().IsInProcess).ToArray(),
-                            benchmarkRunInfo.Type,
-                            benchmarkRunInfo.Config,
-                            benchmarkRunInfo.CompositeInProcessDiagnoser);
+                        benchmarkRunInfo = benchmarkRunInfo.WithBenchmarks(
+                            benchmarkRunInfo.BenchmarksCases.Where(c => c.GetToolchain().IsInProcess).ToArray());
                     }
 
                     return benchmarkRunInfo;
