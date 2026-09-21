@@ -2,6 +2,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using Microsoft.Testing.Platform.Capabilities.TestFramework;
 using Microsoft.Testing.Platform.Extensions.Messages;
@@ -52,7 +53,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         public string Description => extension.Description;
 
         /// <inheritdoc />
-        public Type[] DataTypesProduced => [typeof(TestNodeUpdateMessage)];
+        public Type[] DataTypesProduced => [typeof(TestNodeUpdateMessage), typeof(SessionFileArtifact)];
 
         /// <summary>
         /// Gets the capabilities the framework was registered with.
@@ -246,15 +247,13 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
             var runInfos = runnable
                 .GroupBy(match => match.RunInfo)
-                .Select(group => new BenchmarkRunInfo(
-                    group.Select(match => match.Node.BenchmarkCase).ToArray(),
-                    group.Key.Type,
-                    group.Key.Config
+                .Select(group => group.Key
+                    .WithBenchmarks(group.Select(match => match.Node.BenchmarkCase).ToArray())
+                    .WithConfig(group.Key.Config
                         .AddEventProcessor(eventProcessor)
                         .AddLogger(logger)
                         .RemoveLoggersOfType<ConsoleLogger>()
-                        .CreateImmutableConfig(),
-                    group.Key.CompositeInProcessDiagnoser))
+                        .CreateImmutableConfig()))
                 .ToArray();
 
             // BenchmarkDotNet blocks the calling thread for the whole run, so it gets a thread of its own and the
@@ -322,7 +321,68 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
             drainFailure?.Throw();
 
             await PublishSummariesAsync(context, sessionUid, eventProcessor, cancellationToken).ConfigureAwait(false);
+            await PublishArtifactsAsync(context, sessionUid, eventProcessor).ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// Reports the files BenchmarkDotNet wrote for this run - its log, and the reports the exporters of the
+        /// config produced - as attachments of the session.
+        /// </summary>
+        /// <remarks>
+        /// The run's own output reaches the output device a line at a time, and a client of the platform's server
+        /// mode receives that as informational log messages: Visual Studio shows the warnings and the errors among
+        /// them and drops the rest, so the build log, the detailed results and the summary table are nowhere to be
+        /// read. All of it is on disk already - BenchmarkDotNet logs the whole run to the summary's log file, and the
+        /// exporters write their reports beside it - so the run reports those files, attachments being the channel a
+        /// client surfaces a whole file through rather than a line of output.
+        /// </remarks>
+        private async Task PublishArtifactsAsync(
+            ExecuteRequestContext context,
+            SessionUid sessionUid,
+            BenchmarkEventProcessor eventProcessor)
+        {
+            // One run logs to one file, however many types it ran, so the summaries name the same log between them.
+            var published = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var (_, summary) in eventProcessor.Summaries)
+            {
+                await PublishArtifactAsync(
+                    summary.LogFilePath,
+                    "BenchmarkDotNet log",
+                    "Everything BenchmarkDotNet logged while running the benchmarks.").ConfigureAwait(false);
+
+                foreach (var report in GetExportedReports(summary))
+                {
+                    await PublishArtifactAsync(
+                        report,
+                        Path.GetFileName(report),
+                        $"The report exported for {summary.Title}.").ConfigureAwait(false);
+                }
+            }
+
+            async Task PublishArtifactAsync(string path, string displayName, string description)
+            {
+                if (!published.Add(path) || !File.Exists(path))
+                    return;
+
+                await context.MessageBus
+                    .PublishAsync(this, new SessionFileArtifact(sessionUid, new FileInfo(path), displayName, description))
+                    .ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// The files the exporters of the config wrote for the given summary.
+        /// </summary>
+        /// <remarks>
+        /// Every exporter names what it writes after the title of the summary it exports, and BenchmarkDotNet has
+        /// already exported by the time a summary reaches this adapter, so the folder is read rather than the
+        /// exporters run a second time - which would write a second set of files next to the ones the run reported.
+        /// </remarks>
+        private static string[] GetExportedReports(Summary summary)
+            => Directory.Exists(summary.ResultsDirectoryPath)
+                ? Directory.GetFiles(summary.ResultsDirectoryPath, summary.Title + "-*")
+                : [];
 
         /// <summary>
         /// Publishes the group node of every type the enumeration matched.

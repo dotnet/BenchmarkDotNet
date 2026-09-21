@@ -245,6 +245,59 @@ namespace BenchmarkDotNet.IntegrationTests
         }
 
         [Fact]
+        public void TheRunReportsWhatBenchmarkDotNetLoggedAsAnAttachment()
+        {
+            // Everything BenchmarkDotNet writes reaches the platform's output device, which a client of its server
+            // mode receives as informational log messages - and an IDE shows the warnings and the errors among those
+            // and drops the rest, so the build log, the detailed results and the summary table are nowhere to be
+            // read. BenchmarkDotNet logs all of it to a file of its own as well, and that file is reported as an
+            // attachment of the run, which is how a client is handed a whole file.
+            var session = TestingPlatformServerModeSession.DiscoverThenRunSession(
+                GetProbeApplication(PassingProbes),
+                "DisposableProbe.Identity(Value: tracked",
+                Timeout);
+
+            var log = Assert.Single(
+                session.Attachments,
+                attachment => attachment.Uri.EndsWith(".log", StringComparison.OrdinalIgnoreCase));
+
+            Assert.Equal("BenchmarkDotNet log", log.DisplayName);
+
+            // The parts of the run the output window never shows, rather than the file merely existing.
+            var logged = File.ReadAllText(log.Uri);
+            Assert.Contains("// * Summary *", logged, StringComparison.Ordinal);
+            Assert.Contains("DisposableProbe", logged, StringComparison.Ordinal);
+
+            // The same content does reach the client as output, at the level an IDE drops - which is what the
+            // attachment above is for. Asserting it keeps the reason the attachment exists from going stale.
+            Assert.Contains(
+                session.Logs,
+                message => message.Level == "Information" && message.Message.Contains("BenchmarkRunner", StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public void TheExportedReportOfATypeIsReportedOnTheRun()
+        {
+            // The reports the exporters of the config wrote are reported once, on the run: reporting them on the
+            // group node as well would list every file twice for a client that shows both, which the console does.
+            var session = TestingPlatformServerModeSession.DiscoverThenRunSession(
+                GetProbeApplication(PassingProbes),
+                "DisposableProbe.Identity(Value: tracked",
+                Timeout);
+
+            Assert.Empty(Assert.Single(session.Groups).Attachments);
+
+            var report = Assert.Single(
+                session.Attachments,
+                attachment => attachment.Uri.EndsWith("-report-github.md", StringComparison.OrdinalIgnoreCase)).Uri;
+
+            // The table of this type, rather than whatever file happened to be next to it.
+            var exported = File.ReadAllText(report);
+            Assert.Contains("| Method", exported, StringComparison.Ordinal);
+            Assert.Contains("tracked-1", exported, StringComparison.Ordinal);
+        }
+
+        [Fact]
         public void TheSummaryTableIsReportedOnTheGroupNodeOfItsType()
         {
             // BenchmarkDotNet writes its summary to the ILogger the adapter gives it, but the platform forwards plain
