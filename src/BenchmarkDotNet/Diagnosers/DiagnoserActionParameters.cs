@@ -21,6 +21,9 @@ namespace BenchmarkDotNet.Diagnosers
 
         public BenchmarkId BenchmarkId { get; }
 
+        /// <summary>The runnable type an in-process toolchain emitted for this benchmark, which only it can name unambiguously.</summary>
+        internal Type? InProcessRunnableType { get; init; }
+
         public ImmutableConfig Config => BenchmarkCase.Config;
     }
 }

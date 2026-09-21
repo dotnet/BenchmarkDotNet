@@ -86,7 +86,11 @@ namespace BenchmarkDotNet.Disassemblers
             }
             else
             {
-                var typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).WhereNotNull().First();
+                // A type handle is the type's method table, so it cannot resolve to a same-named type of another module.
+                var typeWithBenchmark = args.TypeHandle != IntPtr.Zero
+                    ? state.Runtime.GetTypeByMethodTable((ulong)args.TypeHandle.ToInt64())
+                        ?? throw new InvalidOperationException($"No type has the method table {args.TypeHandle.ToInt64():X} ({args.TypeName}).")
+                    : state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).WhereNotNull().First();
 
                 // The whole signature, because the name alone is not enough: ClrType.Methods also surfaces inherited methods
                 // on the desktop CLR, and ClrMethod.Type reports the type being enumerated rather than the declaring one, so

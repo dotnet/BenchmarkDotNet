@@ -222,6 +222,66 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassemblyResult(result, $"{nameof(WithGeneratedMemberNames.Called)}()");
         }
 
+        public class WithTwoBenchmarks
+        {
+            [Benchmark] public void First() => FirstCallee();
+
+            [Benchmark] public void Second() => SecondCallee();
+
+            [MethodImpl(MethodImplOptions.NoInlining)] public void FirstCallee() { }
+
+            [MethodImpl(MethodImplOptions.NoInlining)] public void SecondCallee() { }
+        }
+
+        // Every benchmark of an in-process run is emitted into the same assembly, one runnable type each, so the disassembler
+        // has to be pointed at the runnable of the benchmark it is handling rather than the first one.
+        [Fact]
+        public void InProcessDisassemblyTargetsTheRunnableOfEachBenchmark()
+        {
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+
+            CanExecute<WithTwoBenchmarks>(CreateInProcessConfig(disassemblyDiagnoser));
+
+            Assert.Equal(2, disassemblyDiagnoser.Results.Count);
+            foreach (var pair in disassemblyDiagnoser.Results)
+            {
+                var benchmarkCase = pair.Key;
+                var result = pair.Value;
+                Assert.Empty(result.Errors);
+                string called = benchmarkCase.Descriptor.WorkloadMethod.Name == nameof(WithTwoBenchmarks.First)
+                    ? nameof(WithTwoBenchmarks.FirstCallee)
+                    : nameof(WithTwoBenchmarks.SecondCallee);
+                AssertDisassemblyResult(result, $"{benchmarkCase.Descriptor.WorkloadMethod.Name}()");
+                AssertDisassemblyResult(result, $"{called}()");
+            }
+        }
+
+        // Each in-process run emits its runnables under the same type names, and the assemblies of earlier runs can still be
+        // loaded (never collected when saved to disk, which KeepBenchmarkFiles does on .NET Framework).
+        [Fact]
+        public void InProcessDisassemblyIgnoresRunnablesOfEarlierRuns()
+        {
+            CanExecute<WithCalls>(ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithToolchain(InProcessEmitToolchain.Default))
+                .AddLogger(new OutputLogger(Output))
+                .WithOptions(ConfigOptions.KeepBenchmarkFiles));
+
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+
+            CanExecute<WithGeneratedMemberNames>(CreateInProcessConfig(disassemblyDiagnoser));
+
+            DisassemblyResult result = disassemblyDiagnoser.Results.Single().Value;
+
+            Assert.Empty(result.Errors);
+            AssertDisassemblyResult(result, $"{nameof(WithGeneratedMemberNames.Benchmark)}()");
+            AssertDisassemblyResult(result, $"{nameof(WithGeneratedMemberNames.Called)}()");
+        }
+
+        private IConfig CreateInProcessConfig(IDiagnoser disassemblyDiagnoser)
+            => CreateConfig(JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Default, disassemblyDiagnoser, RunStrategy.ColdStart);
+
         private IConfig CreateConfig(Jit jit, Platform platform, IToolchain toolchain, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
             => ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry.WithJit(jit)
