@@ -32,7 +32,7 @@
     <!-- Microsoft.Testing.Platform.MSBuild brings in Microsoft.Testing.Platform, generates the entry point of the
          benchmark app and provides the `dotnet test` integration. It must flow to the consuming project, so it is
          deliberately not marked as PrivateAssets. -->
-    <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="2.3.3" />
+    <PackageReference Include="Microsoft.Testing.Platform.MSBuild" Version="2.4.1" />
   </ItemGroup>
 
   <ItemGroup>
