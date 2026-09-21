@@ -355,7 +355,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.Equal(3, ran.Count);
             Assert.Equal(3, groups.Count);
-            Assert.Equal(3, groups.Select(group => group.Uid).Distinct(StringComparer.Ordinal).Count());
+            // The type arguments are what tell one instantiation from another, so they are what the uids are read
+            // for: counting distinct uids could not fail, because the session folds the updates of one uid together
+            // before returning them.
+            Assert.All(
+                new[] { "System.Int32", "System.Char", "System.String" },
+                argument => Assert.Single(groups, group => group.Uid.Contains(argument, StringComparison.Ordinal)));
 
             // A group no benchmark points at would be an empty node in the tree, which is what a summary landing on
             // a type the leaves do not share would produce.
@@ -638,6 +643,27 @@ namespace BenchmarkDotNet.IntegrationTests
         /// its sections.
         /// </summary>
         /// <returns>The lines of each section, and the benchmarks the discovery request listed.</returns>
+        [Fact]
+        public void ABenchmarkClassThatIsNotVisibleIsNamedAfterItselfRatherThanItsBase()
+        {
+            // The C# name of a type walks up to the first visible base, which is right for generated code and wrong
+            // for identity and for a label: every internal benchmark class of an assembly answers to `System.Object`
+            // that way, so their groups would collapse onto one node - and onto the group of a visible base they
+            // derive from, whose summary the collision would then overwrite.
+            var report = RunInternalsProbe();
+
+            const string Namespace = "BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals";
+
+            Assert.Equal(
+                new[]
+                {
+                    $"group uid={Namespace}.InternalBenchmarks display={Namespace}.InternalBenchmarks",
+                    $"group uid={Namespace}.DerivedInternalBenchmarks display={Namespace}.DerivedInternalBenchmarks",
+                    $"group uid={Namespace}.VisibleBenchmarks display={Namespace}.VisibleBenchmarks"
+                },
+                report.InternalTypes);
+        }
+
         private InternalsReport RunInternalsProbe()
         {
             var (exitCode, standardOutput) = Execute(InternalsProbe, []);
@@ -650,6 +676,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var handedStart = Array.IndexOf(lines, "== handed");
             var takenBackStart = Array.IndexOf(lines, "== taken-back");
             var alreadyDisposedStart = Array.IndexOf(lines, "== already-disposed");
+            var internalTypesStart = Array.IndexOf(lines, "== internal-types");
             var discoverStart = Array.IndexOf(lines, "== discover");
             var runStart = Array.IndexOf(lines, "== run");
             var emptyStart = Array.IndexOf(lines, "== empty");
@@ -657,8 +684,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.True(
                 abandonedStart >= 0 && handedStart > abandonedStart && takenBackStart > handedStart
-                    && alreadyDisposedStart > takenBackStart && discoverStart > alreadyDisposedStart
-                    && runStart > discoverStart && emptyStart > runStart && end > emptyStart,
+                    && alreadyDisposedStart > takenBackStart && internalTypesStart > alreadyDisposedStart
+                    && discoverStart > internalTypesStart && runStart > discoverStart && emptyStart > runStart
+                    && end > emptyStart,
                 $"The internals probe did not report every section:{Environment.NewLine}{standardOutput}");
 
             var discover = lines[(discoverStart + 1)..runStart];
@@ -667,7 +695,8 @@ namespace BenchmarkDotNet.IntegrationTests
                 lines[(abandonedStart + 1)..handedStart],
                 lines[(handedStart + 1)..takenBackStart],
                 lines[(takenBackStart + 1)..alreadyDisposedStart],
-                lines[(alreadyDisposedStart + 1)..discoverStart],
+                lines[(alreadyDisposedStart + 1)..internalTypesStart],
+                lines[(internalTypesStart + 1)..discoverStart],
                 discover,
                 lines[(runStart + 1)..emptyStart],
                 lines[(emptyStart + 1)..end],
@@ -679,6 +708,7 @@ namespace BenchmarkDotNet.IntegrationTests
             string[] Handed,
             string[] TakenBack,
             string[] AlreadyDisposed,
+            string[] InternalTypes,
             string[] Discover,
             string[] Run,
             string[] Empty,

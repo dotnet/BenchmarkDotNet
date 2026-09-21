@@ -447,10 +447,10 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
                     report = logger.GetLog();
                 }
-                catch (Exception exception) when (exception is not OperationCanceledException)
+                catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
                 {
                     var warning = new WarningMessageOutputDeviceData(
-                        $"The summary table of {type.GetCorrectCSharpTypeName(prefixWithGlobal: false)} could not be rendered, " +
+                        $"The summary table of {BenchmarkTestNode.GetTypeDisplayName(type)} could not be rendered, " +
                         $"so it is not reported on its group: {exception.Message}");
 
                     await serviceProvider.GetOutputDevice()

@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         {
             var benchmarkMethod = benchmarkCase.Descriptor.WorkloadMethod;
             var type = benchmarkCase.Descriptor.Type;
-            var fullClassName = type.GetCorrectCSharpTypeName(prefixWithGlobal: false);
+            var fullClassName = GetTypeDisplayName(type);
             var parametrizedMethodName = FullNameProvider.GetMethodName(benchmarkCase);
             var jobDisplayInfo = benchmarkCase.GetUnrandomizedJobDisplayInfo();
 
@@ -152,6 +152,24 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
         public static string GetGroupUid(Type type) => type.FullName ?? type.Name;
 
         /// <summary>
+        /// Gets the name a type is labelled with, in the tree and in the display name of its benchmarks.
+        /// </summary>
+        /// <param name="type">The type declaring the benchmarks.</param>
+        /// <returns>The name to show.</returns>
+        /// <remarks>
+        /// The C# name is what a reader recognises, but <see cref="ReflectionExtensions.GetCorrectCSharpTypeName"/>
+        /// is a codegen helper: generated code can only name a visible type, so it walks up to the first visible base
+        /// rather than describe the type it was given. A label has no such constraint, and `System.Object` names
+        /// nothing the user wrote - two internal benchmark classes would carry the same label, of a type neither of
+        /// them is. The walk is only taken for a type that is not visible, so that is exactly when the runtime's own
+        /// name is used instead.
+        /// </remarks>
+        internal static string GetTypeDisplayName(Type type)
+            => type.IsPublic || type.IsNestedPublic
+                ? type.GetCorrectCSharpTypeName(prefixWithGlobal: false)
+                : GetGroupUid(type);
+
+        /// <summary>
         /// Creates the node the benchmarks of a type are reported under.
         /// </summary>
         /// <param name="type">The type declaring the benchmarks.</param>
@@ -175,7 +193,7 @@ namespace BenchmarkDotNet.TestAdapter.TestingPlatform
 
                 // The same name the benchmarks of this type are prefixed with, so that the group is labelled the way
                 // its children spell their class - see the display name built by Create.
-                DisplayName = type.GetCorrectCSharpTypeName(prefixWithGlobal: false),
+                DisplayName = GetTypeDisplayName(type),
                 Properties = properties
             };
         }

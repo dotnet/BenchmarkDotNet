@@ -29,6 +29,10 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
             Console.WriteLine("== already-disposed");
             Console.WriteLine(await ReportAlreadyDisposedValuesAsync().ConfigureAwait(false));
 
+            Console.WriteLine("== internal-types");
+            foreach (var line in ReportTypeNames())
+                Console.WriteLine(line);
+
             Console.WriteLine("== discover");
             foreach (var line in await ExecuteAsync(session => new DiscoverTestExecutionRequest(session, new UnrecognisedFilter())).ConfigureAwait(false))
                 Console.WriteLine(line);
@@ -198,6 +202,28 @@ namespace BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals
 
             return $"created={AlreadyDisposedBenchmarks.AlreadyDisposed.Created} "
                 + $"disposed={AlreadyDisposedBenchmarks.AlreadyDisposed.Disposed}";
+        }
+
+        /// <summary>
+        /// Reports the uid and the label of the group node of a benchmark class that is not visible outside this
+        /// assembly, and of one deriving from a class that is.
+        /// </summary>
+        /// <remarks>
+        /// Both are built from the C# name of the type by default, which walks up to the first visible base: every
+        /// internal benchmark class of an assembly answers to `System.Object` that way, so their groups collapse
+        /// onto one node - and onto the group of a visible base they derive from, whose summary the collision then
+        /// overwrites. A type this assembly declares is used rather than a synthesized one, so that the walk is the
+        /// real one and not a reconstruction of it.
+        /// </remarks>
+        /// <returns>The uid and the label of each group, as a line each.</returns>
+        private static IEnumerable<string> ReportTypeNames()
+        {
+            foreach (var type in new[] { typeof(InternalBenchmarks), typeof(DerivedInternalBenchmarks), typeof(VisibleBenchmarks) })
+            {
+                var node = BenchmarkTestNode.CreateGroupNode(type);
+
+                yield return $"group uid={node.Uid.Value} display={node.DisplayName}";
+            }
         }
 
         private static async Task<IReadOnlyList<string>> ExecuteAsync(
