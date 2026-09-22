@@ -12,6 +12,9 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 {
     public class DotNetCliCommand
     {
+        // For publish, --no-dependencies only keeps restore from following project references, so it still builds them.
+        internal const string PublishNoDependenciesArguments = "--no-dependencies /p:BuildProjectReferences=false";
+
         [PublicAPI] public FileInfo? CliPath { get; }
 
         [PublicAPI] public string FilePath { get; }
@@ -127,7 +130,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 // On our CI, Integration tests take too much time, because each benchmark run rebuilds BenchmarkDotNet itself.
                 // To reduce the total duration of the CI workflows, we build all the projects without dependencies
                 var result = await DotNetCliCommandExecutor.ExecuteAsync(
-                    WithArguments(GetPublishCommand(ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} --no-dependencies", "publish-no-deps")),
+                    WithArguments(GetPublishCommand(ArtifactsPaths, BuildPartition, FilePath, TargetFrameworkMoniker, $"{Arguments} {PublishNoDependenciesArguments}", "publish-no-deps")),
                     cancellationToken).ConfigureAwait(false);
                 return result.ToBuildResult(ArtifactsPaths);
             }
