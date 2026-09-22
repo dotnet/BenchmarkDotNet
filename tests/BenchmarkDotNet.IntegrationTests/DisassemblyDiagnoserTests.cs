@@ -24,10 +24,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetAllJits()
         {
-            // In-process disassembly dumps its own process, which hangs on macOS when it runs from an apphost as xUnit v3 requires.
-            // https://github.com/dotnet/BenchmarkDotNet/issues/3076
-            if (!OsDetector.IsMacOS())
-                yield return [JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Default]; // InProcess
+            yield return [JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Default]; // InProcess
 
             if (ContinuousIntegration.IsGitHubDraftPR())
                 yield break;
@@ -120,9 +117,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS())
-                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/3076");
-
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 1, filters: ["*WithCalls*"]));
 
@@ -149,9 +143,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS())
-                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/3076");
-
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
@@ -173,9 +164,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, IToolchain toolchain)
         {
-            if (OsDetector.IsMacOS())
-                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/3076");
-
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
@@ -238,9 +226,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void InProcessDisassemblyTargetsTheRunnableOfEachBenchmark()
         {
-            if (OsDetector.IsMacOS())
-                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/3076");
-
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
@@ -265,9 +250,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void InProcessDisassemblyIgnoresRunnablesOfEarlierRuns()
         {
-            if (OsDetector.IsMacOS())
-                Assert.Skip("https://github.com/dotnet/BenchmarkDotNet/issues/3076");
-
             CanExecute<WithCalls>(ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry.WithToolchain(InProcessEmitToolchain.Default))
                 .AddLogger(new OutputLogger(Output))
