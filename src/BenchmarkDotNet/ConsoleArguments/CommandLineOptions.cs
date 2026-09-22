@@ -104,6 +104,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("packages", Required = false, HelpText = "The directory to restore packages to (optional).")]
         public DirectoryInfo? RestorePath { get; set; }
 
+        [Option("freshPackages", Required = false, Default = false, HelpText = "Restores packages into an empty folder for every build instead of the NuGet global packages folder, so that a package rebuilt locally without changing its version is picked up. Ignored when --packages is set.")]
+        public bool UseFreshPackages { get; set; }
+
         [Option("coreRun", Required = false, HelpText = "Path(s) to CoreRun (optional).")]
         public IReadOnlyList<FileInfo> CoreRunPaths { get; set; } = [];
 

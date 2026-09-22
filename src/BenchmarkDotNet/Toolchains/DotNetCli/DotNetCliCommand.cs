@@ -4,6 +4,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.Results;
 using JetBrains.Annotations;
 using System.Text;
@@ -146,7 +147,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(filePath.ToRelativePath(artifactsPaths).QuoteIfNeeded())
                 // restore doesn't support -f argument.
                 .AppendArgument(GetArtifactsPathArguments(artifactsPaths, buildPartition))
-                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"--packages {artifactsPaths.PackagesDirectoryName.QuoteIfNeeded()}")
+                .AppendArgument(GetPackagesPathArgument(artifactsPaths))
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
@@ -163,7 +164,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
-                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot={artifactsPaths.PackagesDirectoryName.QuoteIfNeeded()}")
+                .AppendArgument(GetPackagesPathArgument(artifactsPaths))
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, filePath, binLogSuffix))
                 .ToString();
 
@@ -177,9 +178,14 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
                 .AppendArgument(GetCustomMsBuildArguments(buildPartition.RepresentativeBenchmarkCase, buildPartition.Resolver))
                 .AppendArgument(extraArguments)
                 .AppendArgument(GetMandatoryMsBuildSettings(buildPartition.BuildConfiguration))
-                .AppendArgument(artifactsPaths.PackagesDirectoryName.IsBlank() ? string.Empty : $"/p:NuGetPackageRoot={artifactsPaths.PackagesDirectoryName.QuoteIfNeeded()}")
+                .AppendArgument(GetPackagesPathArgument(artifactsPaths))
                 .AppendArgument(GetMsBuildBinLogArgument(buildPartition, filePath, binLogSuffix))
                 .ToString();
+
+        // Every command gets the same restore location, because build and publish restore implicitly, and a location given to one
+        // restore only (such as with --packages) would have them restore the project graph somewhere else than the build looks.
+        private static string GetPackagesPathArgument(ArtifactsPaths artifactsPaths)
+            => artifactsPaths.PackagesDirectoryName.IsBlank() ? "" : $"/p:RestorePackagesPath={artifactsPaths.PackagesDirectoryName.QuoteIfNeeded()}";
 
         private static string GetArtifactsPathArguments(ArtifactsPaths artifactsPaths, BuildPartition buildPartition)
         {
@@ -190,7 +196,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
 
             // Absolute normalized path, because a relative one is resolved against each project's own directory rather than the working directory.
             // A subdirectory, so that DefaultItemExcludes (which the SDK sets to $(ArtifactsPath)/**) doesn't cover project-level files like wwwroot/.
-            var artifactsPath = Path.GetFullPath(Path.Combine(artifactsPaths.BuildArtifactsDirectoryPath, ".artifacts"));
+            var artifactsPath = Path.GetFullPath(Path.Combine(artifactsPaths.BuildArtifactsDirectoryPath, CsProjBuilder.ArtifactsFolderName));
 
             // Set as a property rather than --artifacts-path, which is a .NET 8 SDK argument: an older SDK errors on the argument but simply ignores
             // the property. Those partitions get no isolated intermediate output, which is why BenchmarkRunnerClean builds them one at a time.

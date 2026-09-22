@@ -5,6 +5,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Mocks;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.NetCoreApp;
 using JetBrains.Annotations;
@@ -190,7 +191,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void TheDefaultFilePathShouldBeUsedWhenAnAssemblyLocationIsEmpty()
+        public void BuildArtifactsGoBesideTheBenchmarkProjectWhenTheAssemblyLocationIsEmpty()
         {
             const string programName = "testProgram";
             var config = ManualConfig.CreateEmpty().CreateImmutableConfig();
@@ -208,23 +209,62 @@ namespace BenchmarkDotNet.Tests
             var projectBuilder = new SteamLoadedBuildPartition(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
             string binariesPath = projectBuilder.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
 
-            string expectedPath = Path.Combine(Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Bin"), programName);
-            Assert.Equal(expectedPath, binariesPath);
+            var bdnDirectory = new DirectoryInfo(Path.GetDirectoryName(binariesPath)!);
+            Assert.Equal(CsProjBuilder.ProjectLocalFolderName, bdnDirectory.Name);
+            Assert.True(File.Exists(Path.Combine(bdnDirectory.Parent!.FullName, "BenchmarkDotNet.Tests.csproj")));
         }
 
         [Fact]
-        public void TestAssemblyFilePathIsUsedWhenTheAssemblyLocationIsNotEmpty()
+        public void BuildArtifactsGoInAHiddenFolderBesideTheBenchmarkProject()
         {
             const string programName = "testProgram";
             var target = new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo);
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, ManualConfig.CreateEmpty().CreateImmutableConfig());
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0, new([])) };
             var projectBuilder = new SteamLoadedBuildPartition(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
-            var buildPartition = new BuildPartition(benchmarks, new Resolver());
-            string binariesPath = projectBuilder.ResolvePathForBinaries(buildPartition, programName);
+            string binariesPath = projectBuilder.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
 
-            string expectedPath = Path.Combine(Path.GetDirectoryName(buildPartition.AssemblyLocation)!, programName);
-            Assert.Equal(expectedPath, binariesPath);
+            var bdnDirectory = new DirectoryInfo(Path.GetDirectoryName(binariesPath)!);
+            Assert.Equal(CsProjBuilder.ProjectLocalFolderName, bdnDirectory.Name);
+            Assert.True(File.Exists(Path.Combine(bdnDirectory.Parent!.FullName, "BenchmarkDotNet.Tests.csproj")));
+            Assert.Equal(programName, Path.GetFileName(binariesPath));
+        }
+
+        [Theory]
+        [InlineData(CsProjBuilder.ProjectLocalFolderName)]
+        [InlineData("elsewhere")]
+        public void GeneratingHidesOnlyTheProjectLocalFolder(string parentName)
+        {
+            var temporaryDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            try
+            {
+                var buildArtifactsDirectory = Path.Combine(temporaryDirectory, parentName, "testProgram");
+                var binariesDirectory = Path.Combine(buildArtifactsDirectory, "b");
+                var artifactsPaths = new ArtifactsPaths("", buildArtifactsDirectory, binariesDirectory, "", "", "", "", "", "", "", "testProgram", "");
+
+                new SteamLoadedBuildPartition(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" }).CopyRequiredFiles(artifactsPaths);
+
+                var parentAttributes = new DirectoryInfo(Path.Combine(temporaryDirectory, parentName)).Attributes;
+                Assert.Equal(parentName == CsProjBuilder.ProjectLocalFolderName, parentAttributes.HasFlag(FileAttributes.Hidden));
+                Assert.True(Directory.Exists(binariesDirectory));
+            }
+            finally
+            {
+                Directory.Delete(temporaryDirectory, recursive: true);
+            }
+        }
+
+        [Fact]
+        public void FreshPackagesFolderIsRestoredInsideTheBuildDirectory()
+        {
+            var buildArtifactsDirectory = Path.Combine(Path.GetTempPath(), ".bdn", "testProgram");
+            var explicitPackages = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "packages"));
+
+            string Resolve(NetCoreAppSettings settings) => new SteamLoadedBuildPartition(settings).ResolvePackagesPath(buildArtifactsDirectory);
+
+            Assert.Equal("", Resolve(new NetCoreAppSettings()));
+            Assert.Equal(Path.Combine(buildArtifactsDirectory, CsProjBuilder.RestoreFolderName), Resolve(new NetCoreAppSettings { UseFreshPackages = true }));
+            Assert.Equal(explicitPackages.FullName, Resolve(new NetCoreAppSettings { UseFreshPackages = true, PackagesPath = explicitPackages }));
         }
 
         [Fact]
@@ -261,6 +301,10 @@ namespace BenchmarkDotNet.Tests
             {
                 return base.GetBuildArtifactsDirectoryPath(buildPartition, programName);
             }
+
+            internal void CopyRequiredFiles(ArtifactsPaths artifactsPaths) => CopyAllRequiredFiles(artifactsPaths);
+
+            internal string ResolvePackagesPath(string buildArtifactsDirectoryPath) => GetPackagesDirectoryPath(buildArtifactsDirectoryPath);
 
             public SteamLoadedBuildPartition(NetCoreAppSettings settings)
                 : base(settings) { }
