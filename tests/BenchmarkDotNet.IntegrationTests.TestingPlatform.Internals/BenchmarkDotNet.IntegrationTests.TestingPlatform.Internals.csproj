@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <AssemblyTitle>BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals</AssemblyTitle>
+    <AssemblyName>BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals</AssemblyName>
+    <RootNamespace>BenchmarkDotNet.IntegrationTests.TestingPlatform.Internals</RootNamespace>
+
+    <!--
+      This one drives BenchmarkTestFramework itself rather than being driven by Microsoft.Testing.Platform, so it has
+      an entry point of its own and must not be given the generated one. Same reason the adapter sets this.
+    -->
+    <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
+
+    <!-- The benchmarks here exist to be enumerated, not to be run, so the optimization warning is noise. -->
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet.TestAdapter\BenchmarkDotNet.TestAdapter.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\build\common.targets" />
+</Project>

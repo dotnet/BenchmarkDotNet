@@ -99,6 +99,28 @@ namespace BenchmarkDotNet.Exporters
             return name.ToString();
         }
 
+        /// <summary>
+        /// Gets the method name to show to a user, which is the given name followed by the parameters.
+        /// </summary>
+        /// <remarks>
+        /// The name is taken as an argument rather than read off the descriptor, because
+        /// <see cref="Running.Descriptor.WorkloadMethodDisplayInfo"/> is the console table form: it wraps a
+        /// description containing a space, a quote or a bracket in single quotes, so that BenchmarkDotNet's own
+        /// --filter can delimit it. A label shown by an IDE wants the description as it was written.
+        /// </remarks>
+        /// <param name="benchmarkCase">The benchmark case.</param>
+        /// <param name="name">The name of the benchmark, without its parameters.</param>
+        /// <returns>The method name to display.</returns>
+        internal static string GetMethodDisplayName(BenchmarkCase benchmarkCase, string name)
+        {
+            var builder = new StringBuilder(name);
+
+            if (benchmarkCase.HasParameters)
+                builder.Append(GetBenchmarkParameters(benchmarkCase.Descriptor.WorkloadMethod, benchmarkCase.Parameters));
+
+            return builder.ToString();
+        }
+
         private static string GetBenchmarkParameters(MethodInfo method, ParameterInstances benchmarkParameters)
         {
             var methodArguments = method.GetParameters();

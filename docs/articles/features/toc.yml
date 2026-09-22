@@ -16,5 +16,7 @@
   href: event-pipe-profiler.md
 - name: VSProfiler
   href: vsprofiler.md
+- name: Benchmarks as tests
+  href: testadapter.md
 - name: VSTest
   href: vstest.md

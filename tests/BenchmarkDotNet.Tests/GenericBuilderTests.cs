@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Helpers;
 
 namespace BenchmarkDotNet.Tests
@@ -121,6 +122,62 @@ namespace BenchmarkDotNet.Tests
             [Benchmark] public T1 CreateT1() => Activator.CreateInstance<T1>();
 
             [Benchmark] public T2 CreateT2() => Activator.CreateInstance<T2>();
+        }
+
+        [Fact]
+        public void TestTypeWithUnreadableAttributesIsDropped()
+        {
+            // Reflection constructs every attribute of a type in order to hand any of them back, so a [Config] that
+            // cannot be instantiated makes the read of the [GenericTypeArguments] throw. The type is unusable at that
+            // point - BenchmarkConverter would throw on the very same read - so it is dropped, and the benchmarks
+            // that were listed next to it are still returned.
+            var types = GenericBenchmarksBuilder.GetRunnableBenchmarks(
+                [typeof(BenchmarkWithAbstractConfig), typeof(BenchmarkWithInaccessibleConfig), typeof(OneArgGenericBenchmark<>)]);
+
+            Assert.Equal(2, types.Length);
+            Assert.Single(types, typeof(OneArgGenericBenchmark<int>));
+            Assert.Single(types, typeof(OneArgGenericBenchmark<char>));
+        }
+
+        [Fact]
+        public void TestTypeWithUnreadableAttributesIsReportedAsAFailure()
+        {
+            var built = GenericBenchmarksBuilder.BuildGenericsIfNeeded(typeof(BenchmarkWithAbstractConfig)).ToArray();
+
+            var failure = Assert.Single(built);
+            Assert.False(failure.IsSuccess);
+            Assert.Contains(nameof(BenchmarkWithAbstractConfig), failure.Error);
+
+            // Told apart from a [GenericTypeArguments] that did not fit, because only this kind has to be reported
+            // by whoever drops it: GenericBenchmarksValidator needs a surviving benchmark before it ever runs.
+            Assert.True(failure.IsUnreadable);
+        }
+
+        [Fact]
+        public void TestGenericTypeThatFailedToBuildIsNotReportedAsUnreadable()
+        {
+            var built = GenericBenchmarksBuilder.BuildGenericsIfNeeded(typeof(GenericBenchmarkWithConstraintsWrongArgs<,>)).ToArray();
+
+            var failure = Assert.Single(built, candidate => !candidate.IsSuccess);
+            Assert.False(failure.IsUnreadable);
+            Assert.Contains("wrong type argument", failure.Error);
+        }
+
+        [Config(typeof(DebugConfig))] // abstract, so ConfigAttribute's constructor throws
+        public class BenchmarkWithAbstractConfig
+        {
+            [Benchmark] public int Identity() => 1;
+        }
+
+        [Config(typeof(NoPublicConstructorConfig))]
+        public class BenchmarkWithInaccessibleConfig
+        {
+            [Benchmark] public int Identity() => 1;
+
+            private class NoPublicConstructorConfig : ManualConfig
+            {
+                private NoPublicConstructorConfig() { }
+            }
         }
     }
 }

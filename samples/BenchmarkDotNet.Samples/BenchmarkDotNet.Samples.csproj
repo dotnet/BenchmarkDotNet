@@ -38,5 +38,13 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet.Analyzers\BenchmarkDotNet.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
+  <!--
+    Manually import the adapter's build files, since they are not picked up through a ProjectReference. They are what
+    honours the GenerateProgramFile above: this project has its own entry point, so it is not turned into a
+    Microsoft.Testing.Platform application.
+  -->
+  <Import Project="..\..\src\BenchmarkDotNet.TestAdapter\build\BenchmarkDotNet.TestAdapter.props" />
+  <Import Project="..\..\src\BenchmarkDotNet.TestAdapter\build\BenchmarkDotNet.TestAdapter.targets" />
+
   <Import Project="..\..\build\common.targets" />
 </Project>
