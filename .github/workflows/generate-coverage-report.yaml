@@ -37,6 +37,12 @@ jobs:
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.inputs.skip_integration_tests == 'false'}}
         uses: ./.github/actions/setup-additional-tools
+ 
+      # createdump's task_for_pid makes authd evaluate system.privilege.taskport, which prompts for a password on these
+      # headless runners and blocks forever; pre-authorizing it lets in-process disassembly dump its own process.
+      - name: Allow task_for_pid without a password prompt
+        if: runner.os == 'macOS'
+        run: sudo security authorizationdb write system.privilege.taskport allow
 
       - name: Install dotnet-coverage
         run: dotnet tool install --global dotnet-coverage
