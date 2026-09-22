@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
     {
         public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
-            var host = new InProcessHost(executeParameters.BenchmarkCase, executeParameters.Logger, executeParameters.Diagnoser, cancellationToken);
+            var host = new InProcessHost(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, InProcessEmitRunner.GetRunnableType(executeParameters), executeParameters.Logger, executeParameters.Diagnoser, cancellationToken);
 
             int exitCode = -1;
             if (executeOnSeparateThread)

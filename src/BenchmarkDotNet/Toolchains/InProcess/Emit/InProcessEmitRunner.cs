@@ -22,11 +22,7 @@ internal static class InProcessEmitRunner
 
         try
         {
-            var runnableType = ((InProcessEmitArtifactsPath)parameters.BuildResult.ArtifactsPaths)
-                .GeneratedAssembly
-                .GetType(EmittedTypePrefix + parameters.BenchmarkId)!;
-
-            await RunCore(runnableType, host, parameters).ConfigureAwait();
+            await RunCore(GetRunnableType(parameters), host, parameters).ConfigureAwait();
 
             return 0;
         }
@@ -53,6 +49,11 @@ internal static class InProcessEmitRunner
             await host.AfterAllAsync().ConfigureAwait(false);
         }
     }
+
+    internal static Type GetRunnableType(ExecuteParameters parameters)
+        => ((InProcessEmitArtifactsPath)parameters.BuildResult.ArtifactsPaths)
+            .GeneratedAssembly
+            .GetType(EmittedTypePrefix + parameters.BenchmarkId)!;
 
     private static async ValueTask RunCore(Type runnableType, IHost host, ExecuteParameters parameters)
     {

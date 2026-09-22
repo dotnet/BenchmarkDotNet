@@ -86,7 +86,11 @@ namespace BenchmarkDotNet.Disassemblers
             }
             else
             {
-                var typeWithBenchmark = state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).WhereNotNull().First();
+                // A type handle is the type's method table, so it cannot resolve to a same-named type of another module.
+                var typeWithBenchmark = args.TypeHandle != IntPtr.Zero
+                    ? state.Runtime.GetTypeByMethodTable((ulong)args.TypeHandle.ToInt64())
+                        ?? throw new InvalidOperationException($"No type has the method table {args.TypeHandle.ToInt64():X} ({args.TypeName}).")
+                    : state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).WhereNotNull().First();
 
                 // The whole signature, because the name alone is not enough: ClrType.Methods also surfaces inherited methods
                 // on the desktop CLR, and ClrMethod.Type reports the type being enumerated rather than the declaring one, so
@@ -104,9 +108,7 @@ namespace BenchmarkDotNet.Disassemblers
             // we don't want to export the disassembler entry point method which is just an artificial method added to get generic types working.
             // Identified by its native code address rather than its name: a signature does not always carry the declaring
             // type (see AddressToNameMapping below), so a benchmark method of the same name could match it.
-            var filteredMethods = disassembledMethods.Length == 1
-                ? disassembledMethods // if there is only one method we want to return it (most probably benchmark got inlined)
-                : disassembledMethods.Where(method => method.NativeCode != entryPoint?.NativeCode).ToArray();
+            var filteredMethods = disassembledMethods.Where(method => method.NativeCode != entryPoint?.NativeCode).ToArray();
 
             return new DisassemblyResult
             {

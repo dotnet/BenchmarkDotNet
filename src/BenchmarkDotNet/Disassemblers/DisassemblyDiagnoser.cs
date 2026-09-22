@@ -95,9 +95,15 @@ namespace BenchmarkDotNet.Diagnosers
             switch (signal)
             {
                 case HostSignal.AfterAll when (Config.RunInHost || isInProcess) && ShouldUseClrMdDisassembler(benchmark):
-                    results.Add(benchmark, ClrMdDisassembler.AttachAndDisassemble(
-                        BuildClrMdArgs(parameters.BenchmarkCase, $"{RunnableConstants.EmittedTypePrefix}{parameters.BenchmarkId.Value}", parameters.ProcessId))
-                    );
+                    await ThreadPoolHelper.Switch(cancellationToken);
+
+                    var clrMdArgs = BuildClrMdArgs(parameters.BenchmarkCase, $"{RunnableConstants.EmittedTypePrefix}{parameters.BenchmarkId.Value}", parameters.ProcessId);
+                    if (parameters.InProcessRunnableType is { } runnableType)
+                    {
+                        clrMdArgs.TypeName = runnableType.FullName!;
+                        clrMdArgs.TypeHandle = runnableType.TypeHandle.Value;
+                    }
+                    results.Add(benchmark, ClrMdDisassembler.AttachAndDisassemble(clrMdArgs));
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
                     var result = await monoDisassembler.Disassemble(benchmark, cancellationToken).ConfigureAwait(false);
@@ -270,6 +276,7 @@ namespace BenchmarkDotNet.Diagnosers
             var clrMdArgs = _clrMdArgs;
             clrMdArgs.ProcessId = Process.GetCurrentProcess().Id;
             clrMdArgs.TypeName = args.BenchmarkInstance.GetType().FullName!;
+            clrMdArgs.TypeHandle = args.BenchmarkInstance.GetType().TypeHandle.Value;
             _result = DisassemblyDiagnoser.GetClrMdDisassembler().AttachAndDisassemble(clrMdArgs);
             return new();
         }
