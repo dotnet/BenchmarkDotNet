@@ -190,12 +190,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         name: Setup node
         with:
           node-version: "24"
       - name: Install cSpell
-        run: npm install -g cspell@9.7.0
+        run: npm install -g cspell@10.3.3
       - name: Copy cSpell config
         run: cp ./build/cSpell.json ./cSpell.json
       - name: Run cSpell

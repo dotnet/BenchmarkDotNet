@@ -9,7 +9,7 @@ runs:
   using: composite
   steps:
     - name: Set up node
-      uses: actions/setup-node@v6
+      uses: actions/setup-node@v7
       with:
         node-version: "22" # Temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/3154
 

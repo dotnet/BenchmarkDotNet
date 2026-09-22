@@ -60,7 +60,7 @@ jobs:
     timeout-minutes: 60 # Explicitly set timeout. When wrong input parameter is passed. It may continue to run until it times out (Default:360 minutes))
     steps:
       # Checkout
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       
       # Add Windows Defender Exclusions
       - uses: ./.github/actions/add-windowsdefender-exclusions
