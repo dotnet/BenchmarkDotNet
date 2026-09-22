@@ -29,9 +29,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetToolchains()
         {
-            if (OsDetector.IsWindows() && Portability.RuntimeInformation.IsFullFramework)
+            if (OsDetector.IsWindows())
             {
-                // Skip InProcessEmitToolchain tests on Windows +.NET Framework environment.
+                // Skip InProcessEmitToolchain tests on Windows environment.
                 // Because when running tests with xunit v3, memory allocation tests are flaky.
                 // See following issues.
                 // https://github.com/dotnet/BenchmarkDotNet/issues/2779
