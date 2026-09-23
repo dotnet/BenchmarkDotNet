@@ -539,6 +539,18 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void FreshPackagesParsedCorrectly()
+        {
+            var config = ConfigParser.Parse(["-r", "netcoreapp3.1", "--freshPackages"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Single(config.GetJobs());
+            var toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.True(((DotNetCliBuilder)toolchain.Builder).Settings.UseFreshPackages);
+        }
+
+        [Fact]
         public void UserCanSpecifyAffinity()
         {
             const ulong affinity = 0b1010;

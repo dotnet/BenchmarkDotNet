@@ -33,11 +33,11 @@ How to troubleshoot the build process:
 
 1. Run the benchmarks with `--logBuildOutput` command line argument.
 2. Read the error message. If it does not contain the answer to your problem, please continue to the next step.
-3. Go to the build artifacts folder (path printed by BDN).
+3. Re-run with `--keepFiles` and go to the build artifacts folder (path printed by BDN at the end of the run).
 4. The folder should contain: 
-   * a file with source code (ends with `.notcs` to make sure IDE don't include it in other projects by default)
-   * a project file (`.csproj`)
-   * a script file (`.bat` on Windows, `.sh` for other OSes) which should be doing exactly the same thing as BDN does:
+   * a file with source code (`gen.cs`)
+   * a project file (`gen.csproj`)
+   * a script file (`build.bat` on Windows, `build.sh` for other OSes) which should be doing exactly the same thing as BDN does:
      * dotnet restore
      * dotnet build (with some parameters like `-c Release`)
 5. Run the script, read the error message. From here you continue with the troubleshooting like it was a project in your solution.

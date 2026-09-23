@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BenchmarkDotNet.ConsoleArguments;
 
 namespace BenchmarkDotNet.Toolchains.DotNetCli;
@@ -12,6 +11,11 @@ public abstract record DotNetCliSettings : ISettings
     public FileInfo? CliPath { get; init; }
     /// <summary>The directory to restore packages to.</summary>
     public DirectoryInfo? PackagesPath { get; init; }
+    /// <summary>
+    /// Restores packages into an empty folder inside each build's directory instead of the NuGet global packages folder,
+    /// so that a package rebuilt locally without changing its version is picked up. Ignored when <see cref="PackagesPath"/> is set.
+    /// </summary>
+    public bool UseFreshPackages { get; init; }
     /// <summary>The target framework moniker to build for. If blank, the toolchain derives it from the runtime.</summary>
     public string TargetFrameworkMoniker { get; init; } = "";
 
@@ -19,6 +23,7 @@ public abstract record DotNetCliSettings : ISettings
     {
         CliPath = options.CliPath;
         PackagesPath = options.RestorePath;
+        UseFreshPackages = options.UseFreshPackages;
     }
 
     protected DotNetCliSettings() { }
@@ -28,6 +33,7 @@ public abstract record DotNetCliSettings : ISettings
     {
         settings[nameof(CliPath)] = CliPath?.FullName;
         settings[nameof(PackagesPath)] = PackagesPath?.FullName;
+        settings[nameof(UseFreshPackages)] = UseFreshPackages;
         settings[nameof(TargetFrameworkMoniker)] = TargetFrameworkMoniker;
     }
 
@@ -39,8 +45,9 @@ public abstract record DotNetCliSettings : ISettings
             && EqualityContract == other.EqualityContract
             && CliPath?.FullName == other.CliPath?.FullName
             && PackagesPath?.FullName == other.PackagesPath?.FullName
+            && UseFreshPackages == other.UseFreshPackages
             && TargetFrameworkMoniker == other.TargetFrameworkMoniker;
 
     public override int GetHashCode()
-        => HashCode.Combine(CliPath?.FullName, PackagesPath?.FullName, TargetFrameworkMoniker);
+        => HashCode.Combine(CliPath?.FullName, PackagesPath?.FullName, UseFreshPackages, TargetFrameworkMoniker);
 }
