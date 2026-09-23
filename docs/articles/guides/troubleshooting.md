@@ -35,7 +35,7 @@ How to troubleshoot the build process:
 2. Read the error message. If it does not contain the answer to your problem, please continue to the next step.
 3. Go to the build artifacts folder (path printed by BDN).
 4. The folder should contain: 
-   * a file with source code (ends with `.notcs` to make sure IDE don't include it in other projects by default)
+   * a file with source code (`.cs`)
    * a project file (`.csproj`)
    * a script file (`.bat` on Windows, `.sh` for other OSes) which should be doing exactly the same thing as BDN does:
      * dotnet restore
