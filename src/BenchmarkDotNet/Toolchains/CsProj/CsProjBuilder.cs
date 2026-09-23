@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         /// </summary>
         private void AppendPublish(StringBuilder content, BuildPartition buildPartition, ArtifactsPaths artifactsPaths)
             => AppendCall(content, buildPartition.ForcedNoDependenciesForIntegrationTests
-                ? DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, Settings.TargetFrameworkMoniker, "--no-dependencies", "publish-no-deps")
+                ? DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, Settings.TargetFrameworkMoniker, DotNetCliCommand.PublishNoDependenciesArguments, "publish-no-deps")
                 : DotNetCliCommand.GetPublishCommand(artifactsPaths, buildPartition, artifactsPaths.ProjectFilePath, Settings.TargetFrameworkMoniker, null, "publish"));
 
         private void AppendCall(StringBuilder content, string command)
