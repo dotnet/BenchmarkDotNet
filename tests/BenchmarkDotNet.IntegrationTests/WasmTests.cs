@@ -19,27 +19,16 @@ namespace BenchmarkDotNet.IntegrationTests
     /// </summary>
     public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
-        private const string V8SkipReason = "JSVU does not support ARM on Windows or Linux";
-        // WASM AOT does not build on Windows arm64: the mono-aot-cross toolchain runs but does not emit the
-        // *_compiled_methods.txt token file, so WasmApp.Common.targets fails. It works on Linux arm64.
-        private const string WasmAotWindowsArmSkipReason = "WASM AOT does not build on Windows arm64";
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(TestData.WasmIsSupported), MemberType = typeof(TestData))]
 
-        [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
-        [InlineDataEnvSpecific([RuntimeMoniker.MonoWasm10_0, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
-        [InlineData(RuntimeMoniker.MonoWasm10_0, "node")]
-        [InlineDataEnvSpecific([RuntimeMoniker.MonoWasmAot10_0, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
-        [InlineDataEnvSpecific([RuntimeMoniker.MonoWasmAot10_0, "node"], WasmAotWindowsArmSkipReason, [EnvRequirement.NonWindowsArm])]
-        // CoreWasm is not tested yet because it is still experimental .
-        //[InlineDataEnvSpecific([RuntimeMoniker.CoreWasm11_0, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
-        //[InlineData(RuntimeMoniker.CoreWasm11_0, "node")]
         public void WasmIsSupported(string runtimeMoniker, string javaScriptEngine)
         {
             CanExecute<WasmBenchmark>(GetConfig(runtimeMoniker, javaScriptEngine));
         }
 
-        [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
-        [InlineDataEnvSpecific(["v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
-        [InlineData("node")]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(TestData.WasmSupportsInProcessDiagnosers), MemberType = typeof(TestData))]
         public void WasmSupportsInProcessDiagnosers(string javaScriptEngine)
         {
             try
@@ -58,9 +47,8 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
-        [InlineDataEnvSpecific(["v8", "custom-main-v8.mjs", WasmIpcType.FileStdOut], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
-        [InlineData("node", "custom-main-node.mjs", WasmIpcType.WebSocket)]
+        [Theory(SkipTestWithoutData = true)]
+        [MemberData(nameof(TestData.WasmSupportsCustomMainJs), MemberType = typeof(TestData))]
         public void WasmSupportsCustomMainJs(string javaScriptEngine, string customMainJs, WasmIpcType ipcType)
         {
             var mainJsTemplate = new FileInfo(Path.Combine("wwwroot", customMainJs));
@@ -90,5 +78,59 @@ namespace BenchmarkDotNet.IntegrationTests
                 .WithOption(ConfigOptions.LogBuildOutput, true)
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
         }
+    }
+
+    public static class TestData
+    {
+        public static IEnumerable<TheoryDataRow<string, string>> WasmIsSupported()
+        {
+            if (EnvRequirementChecker.GetSkip(EnvRequirement.NonGitHubDraftPR) != null)
+                yield break;
+
+            yield return new(RuntimeMoniker.MonoWasm10_0, "node");
+
+            if (IsV8Supported())
+            {
+                yield return new(RuntimeMoniker.MonoWasm10_0, "v8");
+                yield return new(RuntimeMoniker.MonoWasmAot10_0, "v8");
+
+                // CoreWasm is not tested yet because it is still experimental.
+                // yield return new(RuntimeMoniker.CoreWasm11_0, "v8");
+            }
+
+            // WASM AOT does not build on Windows arm64: the mono-aot-cross toolchain runs but does not emit the
+            // *_compiled_methods.txt token file, so WasmApp.Common.targets fails. It works on Linux arm64.
+            if (EnvRequirementChecker.GetSkip(EnvRequirement.NonWindowsArm) == null)
+                yield return new(RuntimeMoniker.MonoWasmAot10_0, "node");
+
+            // CoreWasm is not tested yet because it is still experimental.
+            // yield return new(RuntimeMoniker.CoreWasm11_0, "node");
+        }
+
+        public static IEnumerable<TheoryDataRow<string>> WasmSupportsInProcessDiagnosers()
+        {
+            if (EnvRequirementChecker.GetSkip(EnvRequirement.NonGitHubDraftPR) != null)
+                yield break;
+
+            if (IsV8Supported())
+                yield return new("v8");
+
+            yield return new("node");
+        }
+
+        public static IEnumerable<TheoryDataRow<string, string, WasmIpcType>> WasmSupportsCustomMainJs()
+        {
+            if (EnvRequirementChecker.GetSkip(EnvRequirement.NonGitHubDraftPR) != null)
+                yield break;
+
+            if (IsV8Supported())
+                yield return new("v8", "custom-main-v8.mjs", WasmIpcType.FileStdOut);
+
+            yield return new("node", "custom-main-node.mjs", WasmIpcType.WebSocket);
+        }
+
+        // JSVU does not support ARM on Windows or Linux
+        private static bool IsV8Supported()
+            => EnvRequirementChecker.GetSkip([EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm]) == null;
     }
 }

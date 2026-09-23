@@ -12,7 +12,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.Wasm;
@@ -83,7 +82,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
     }
 
     [Theory]
-    [MemberData(nameof(CancellationToolchains), DisableDiscoveryEnumeration = true)]
+    [MemberData(nameof(TestData.Toolchains), MemberType = typeof(TestData), DisableDiscoveryEnumeration = true)]
     public void StaticCancellationTokenOnABaseTypeReceivesToken(IToolchain toolchain)
     {
         var config = ManualConfig.CreateEmpty()
@@ -93,20 +92,8 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         CanExecute<InheritsStaticCancellationToken>(config);
     }
 
-    public static IEnumerable<object[]> CancellationToolchains()
-    {
-        yield return [InProcessNoEmitToolchain.Default];
-        yield return [InProcessEmitToolchain.Default];
-
-        if (ContinuousIntegration.IsGitHubDraftPR())
-            yield break;
-
-        yield return [Job.Default.GetToolchain()];
-    }
-
-    [TheoryEnvSpecific("JSVU does not support ARM on Windows or Linux", EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR)]
-    [InlineData("v8")]
-    [InlineData("node")]
+    [Theory]
+    [MemberData(nameof(TestData.JavaScriptEngines), MemberType = typeof(TestData))]
     public void BenchmarkWithCancellationTokenProperty_ReceivesToken_Wasm(string javaScriptEngine)
     {
         var logger = new OutputLogger(Output);
@@ -165,9 +152,8 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await BenchmarkRunner.RunAsync<SimpleBenchmark>(config, cancellationToken: cts.Token));
     }
 
-    [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
-    [InlineDataEnvSpecific("v8", "JSVU does not support ARM on Windows or Linux", [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR])]
-    [InlineData("node")]
+    [Theory(SkipTestWithoutData = true)]
+    [MemberData(nameof(TestData.JavaScriptEngines), MemberType = typeof(TestData))]
     public async Task RunWithCancellationTokenIsCancelled_Wasm(string javaScriptEngine)
     {
         var cts = new CancellationTokenSource();
@@ -251,5 +237,31 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         public IEnumerable<Metric> ProcessResults(DiagnoserResults results) => [];
 
         public void DisplayResults(ILogger logger) { }
+    }
+
+    public static class TestData
+    {
+        public static IEnumerable<TheoryDataRow<string>> JavaScriptEngines()
+        {
+            if (EnvRequirementChecker.GetSkip(EnvRequirement.NonGitHubDraftPR) != null)
+                yield break;
+
+            // JSVU does not support ARM on Windows or Linux
+            if (EnvRequirementChecker.GetSkip(EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm, EnvRequirement.NonGitHubDraftPR) == null)
+                yield return "v8";
+
+            yield return "node";
+        }
+
+        public static IEnumerable<TheoryDataRow<IToolchain>> Toolchains()
+        {
+            yield return new(InProcessNoEmitToolchain.Default);
+            yield return new(InProcessEmitToolchain.Default);
+
+            if (ContinuousIntegration.IsGitHubDraftPR())
+                yield break;
+
+            yield return new(Job.Default.GetToolchain());
+        }
     }
 }
