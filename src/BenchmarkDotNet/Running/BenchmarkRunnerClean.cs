@@ -197,6 +197,7 @@ namespace BenchmarkDotNet.Running
                     compositeLogger.WriteLineHeader("// * Artifacts cleanup *");
                     Cleanup(compositeLogger, new HashSet<string>(artifactsToCleanup.Distinct()));
                     compositeLogger.WriteLineInfo("Artifacts cleanup is finished");
+                    LogKeptBuildLocations(compositeLogger, buildResults);
                     compositeLogger.Flush();
 
                     eventProcessor.OnEndRunStage();
@@ -467,6 +468,26 @@ namespace BenchmarkDotNet.Running
             var afterBuild = globalChronometer.GetElapsed();
 
             logger.WriteLineHeader($"// ***** Done, took {GetFormattedDifference(beforeBuild, afterBuild)}   *****");
+        }
+
+        // Build directories are named by partition id only, so this is what tells kept ones apart.
+        private static void LogKeptBuildLocations(ILogger logger, Dictionary<BuildPartition, BuildResult> buildResults)
+        {
+            var kept = buildResults
+                .Where(build => build.Key.RepresentativeBenchmarkCase.Config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles)
+                    && !build.Key.RepresentativeBenchmarkCase.GetToolchain().IsInProcess
+                    && Directory.Exists(build.Value.ArtifactsPaths.BuildArtifactsDirectoryPath))
+                .ToArray();
+            if (kept.Length == 0)
+                return;
+
+            logger.WriteLineHeader("// * Kept generated projects *");
+            foreach (var build in kept)
+            {
+                var jobId = build.Key.RepresentativeBenchmarkCase.Job.ResolvedId;
+                var runtime = build.Key.RepresentativeBenchmarkCase.Job.GetRuntime();
+                logger.WriteLineInfo($"{jobId} ({runtime}): {build.Value.ArtifactsPaths.BuildArtifactsDirectoryPath}");
+            }
         }
 
         private static string GetFormattedDifference(ClockSpan before, ClockSpan after)

@@ -80,6 +80,7 @@ namespace BenchmarkDotNet.Toolchains.Wasm
                 new XElement("TargetFrameworks", Settings.TargetFrameworkMoniker),
                 new XElement("AllowUnsafeBlocks", "true"),
                 new XElement("AppDir", "$(PublishDir)"),
+                new XElement("AssemblyTitle", buildPartition.ProgramName),
                 new XElement("AssemblyName", artifactsPaths.ProgramName),
                 new XElement("RuntimeIdentifier", "browser-wasm"),
                 new XElement("SuppressTrimAnalysisWarnings", "true"),

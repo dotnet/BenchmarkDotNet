@@ -222,13 +222,25 @@ namespace BenchmarkDotNet.Tests
             var benchmarkCase = BenchmarkCase.Create(target, Job.Default, ParameterInstances.Empty, ManualConfig.CreateEmpty().CreateImmutableConfig());
             var benchmarks = new[] { new BenchmarkBuildInfo(benchmarkCase, ManualConfig.CreateEmpty().CreateImmutableConfig(), 0, new([])) };
             var projectBuilder = new SteamLoadedBuildPartition(new NetCoreAppSettings { TargetFrameworkMoniker = "netcoreapp3.1" });
-            string binariesPath = projectBuilder.ResolvePathForBinaries(new BuildPartition(benchmarks, new Resolver()), programName);
+            var buildPartition = new BuildPartition(benchmarks, new Resolver());
+            string binariesPath = projectBuilder.ResolvePathForBinaries(buildPartition, programName);
 
             var bdnDirectory = new DirectoryInfo(Path.GetDirectoryName(binariesPath)!);
             Assert.Equal(CsProjBuilder.ProjectLocalFolderName, bdnDirectory.Name);
             Assert.True(File.Exists(Path.Combine(bdnDirectory.Parent!.FullName, "BenchmarkDotNet.Tests.csproj")));
-            Assert.Equal(programName, Path.GetFileName(binariesPath));
+            Assert.Equal(CsProjBuilder.ToBase36(buildPartition.Id), Path.GetFileName(binariesPath));
         }
+
+        [Theory]
+        [InlineData(0, "0")]
+        [InlineData(9, "9")]
+        [InlineData(10, "a")]
+        [InlineData(35, "z")]
+        [InlineData(36, "10")]
+        [InlineData(1295, "zz")]
+        [InlineData(int.MaxValue, "zik0zj")]
+        public void PartitionIdsAreEncodedAsLowercaseBase36(int id, string expected)
+            => Assert.Equal(expected, CsProjBuilder.ToBase36(id));
 
         [Theory]
         [InlineData(CsProjBuilder.ProjectLocalFolderName)]
