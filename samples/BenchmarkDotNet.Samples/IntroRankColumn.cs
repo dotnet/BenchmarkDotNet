@@ -5,6 +5,7 @@ using BenchmarkDotNet.Order;
 namespace BenchmarkDotNet.Samples
 {
     [ShortRunJob]
+    [UseLocalJobOnly]
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [RankColumn(NumeralSystem.Arabic)]
     [RankColumn(NumeralSystem.Roman)]
