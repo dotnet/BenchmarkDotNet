@@ -136,5 +136,28 @@ public partial class Arm64RegisterValueAccumulatorTests
         // TODO: Current accumulator don't reset registerId.
         // accumulator.RegisterId.Should().Be(Arm64RegisterId.Invalid);
     }
+
+    [Fact]
+    public void MovzThenLdr_ZeroAddress_ShouldNotHaveValue()
+    {
+        // Arrange
+        using var clrRuntime = new MockMemory()
+           .AddPointer(MovzOffset, 0)
+           .ToMockClrRuntime();
+        var accumulator = CreateValueAccumulator(clrRuntime);
+        var instructions = new[]
+        {
+            Arm64TestInstructions.Movz(X0, MovzOffset),      // movz x0, #0x1000
+            Arm64TestInstructions.Ldr(X1, baseRegister: X0), // ldr x1, [x0]
+        };
+        PrintInstructions(instructions);
+
+        // Act
+        accumulator.Feed(instructions[0]);
+        accumulator.Feed(instructions[1]);
+
+        // Assert
+        accumulator.HasValue.Should().BeFalse(); // When LDR load zero. Accumulated state is expected to be resetted.
+    }
 }
 #endif
