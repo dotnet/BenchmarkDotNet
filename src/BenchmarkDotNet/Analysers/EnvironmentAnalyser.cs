@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Analysers
             if (unexpectedExit)
             {
                 var avProducts = summary.HostEnvironmentInfo.AntivirusProducts.Value;
-                if (avProducts.Any())
+                if (avProducts.Count != 0)
                     yield return CreateWarning(CreateWarningAboutAntivirus(avProducts));
             }
 

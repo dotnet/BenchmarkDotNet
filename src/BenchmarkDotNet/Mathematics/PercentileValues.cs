@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Mathematics
             builder.Append(formatter(P50));
             builder.Append("]; [P100: ");
             builder.Append(formatter(P100));
-            builder.Append("]");
+            builder.Append(']');
             return builder.ToString();
         }
 

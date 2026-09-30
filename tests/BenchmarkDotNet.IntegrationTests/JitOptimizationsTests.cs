@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             var warnings = await JitOptimizationsValidator.DontFailOnError.ValidateAsync(benchmarksWithOptimizedDll).ToArrayAsync();
 
-            if (warnings.Any())
+            if (warnings.Length != 0)
             {
                 output.WriteLine("*** Warnings ***");
                 foreach (var warning in warnings)

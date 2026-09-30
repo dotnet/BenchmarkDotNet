@@ -30,7 +30,7 @@ namespace BenchmarkDotNet.Analysers
             var workloadSample = workloadMeasurements.GetStatistics().Sample;
             var threshold = currentFrequency.Value.ToResolution().Nanoseconds / 2;
 
-            var zeroMeasurement = overheadMeasurements.Any()
+            var zeroMeasurement = overheadMeasurements.Length != 0
                 ? ZeroMeasurementHelper.AreIndistinguishable(workloadSample, overheadMeasurements.GetStatistics().Sample)
                 : ZeroMeasurementHelper.IsNegligible(workloadSample, threshold);
 
