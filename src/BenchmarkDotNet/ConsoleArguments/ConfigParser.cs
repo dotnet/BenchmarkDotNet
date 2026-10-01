@@ -267,6 +267,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static Parser CreateParser(ILogger logger)
             => new Parser(settings =>
             {
+                settings.AllowMultiInstance = true;
                 settings.CaseInsensitiveEnumValues = true;
                 settings.CaseSensitive = false;
                 settings.EnableDashDash = true;
