@@ -13,3 +13,4 @@ PowerGetActiveScheme
 LocalFree
 GlobalMemoryStatusEx
 GetLogicalProcessorInformationEx
+GetSystemFirmwareTable

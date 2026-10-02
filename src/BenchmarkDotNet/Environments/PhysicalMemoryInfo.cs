@@ -80,7 +80,7 @@ namespace BenchmarkDotNet.Environments
             return null;
         }
 
-        [SupportedOSPlatform("windows5.1.2600")]
+        [SupportedOSPlatform("windows6.0.6000")]
         private static PhysicalMemoryInfo? GetWindowsMemory()
         {
             var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
@@ -161,19 +161,23 @@ namespace BenchmarkDotNet.Environments
             return (null, null);
         }
 
-        [SupportedOSPlatform("windows5.1.2600")]
-        private static (long? FrequencyMHz, string? MemoryType) GetWindowsSmbiosMemoryDetails()
+        [SupportedOSPlatform("windows6.0.6000")]
+        private static unsafe (long? FrequencyMHz, string? MemoryType) GetWindowsSmbiosMemoryDetails()
         {
             try
             {
                 const uint rsMb = 0x52534D42; // 'RSMB'
-                uint bufferSize = NativeMethods.GetSystemFirmwareTable(rsMb, 0, IntPtr.Zero, 0);
+                var provider = (FIRMWARE_TABLE_PROVIDER)rsMb;
+                uint bufferSize = PInvoke.GetSystemFirmwareTable(provider, rsMb, null, 0);
                 if (bufferSize == 0)
                     return (null, null);
 
                 byte[] buffer = new byte[bufferSize];
-                if (NativeMethods.GetSystemFirmwareTable(rsMb, 0, buffer, bufferSize) == 0)
-                    return (null, null);
+                fixed (byte* pBuffer = buffer)
+                {
+                    if (PInvoke.GetSystemFirmwareTable(provider, rsMb, pBuffer, bufferSize) == 0)
+                        return (null, null);
+                }
 
                 // SMBIOS table header: Data at offset 8
                 int offset = 8;
@@ -230,15 +234,6 @@ namespace BenchmarkDotNet.Environments
             {
                 return (null, null);
             }
-        }
-
-        private static class NativeMethods
-        {
-            [DllImport("kernel32.dll", SetLastError = true)]
-            public static extern uint GetSystemFirmwareTable(uint firmwareTableProviderSignature, uint firmwareTableID, byte[] pFirmwareTableBuffer, uint bufferSize);
-
-            [DllImport("kernel32.dll", SetLastError = true)]
-            public static extern uint GetSystemFirmwareTable(uint firmwareTableProviderSignature, uint firmwareTableID, IntPtr pFirmwareTableBuffer, uint bufferSize);
         }
 
         private static string? MapSmbiosMemoryType(byte type) => type switch
