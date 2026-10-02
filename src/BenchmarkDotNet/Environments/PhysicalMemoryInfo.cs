@@ -168,14 +168,14 @@ namespace BenchmarkDotNet.Environments
             {
                 const uint rsMb = 0x52534D42; // 'RSMB'
                 var provider = (FIRMWARE_TABLE_PROVIDER)rsMb;
-                uint bufferSize = PInvoke.GetSystemFirmwareTable(provider, rsMb, null, 0);
+                uint bufferSize = PInvoke.GetSystemFirmwareTable(provider, 0, null, 0);
                 if (bufferSize == 0)
                     return (null, null);
 
                 byte[] buffer = new byte[bufferSize];
                 fixed (byte* pBuffer = buffer)
                 {
-                    if (PInvoke.GetSystemFirmwareTable(provider, rsMb, pBuffer, bufferSize) == 0)
+                    if (PInvoke.GetSystemFirmwareTable(provider, 0, pBuffer, bufferSize) == 0)
                         return (null, null);
                 }
 
