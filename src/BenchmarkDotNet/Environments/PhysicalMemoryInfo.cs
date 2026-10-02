@@ -1,7 +1,11 @@
 using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Extensions;
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Text;
 using System.Text.RegularExpressions;
 using Windows.Win32;
 using Windows.Win32.System.SystemInformation;
@@ -12,24 +16,44 @@ namespace BenchmarkDotNet.Environments
     {
         public long TotalPhysicalBytes { get; }
         public long? AvailablePhysicalBytes { get; }
+        public long? FrequencyMHz { get; }
+        public string? MemoryType { get; }
 
-        public PhysicalMemoryInfo(long totalPhysicalBytes, long? availablePhysicalBytes = null)
+        public PhysicalMemoryInfo(long totalPhysicalBytes, long? availablePhysicalBytes = null, long? frequencyMHz = null, string? memoryType = null)
         {
             TotalPhysicalBytes = totalPhysicalBytes;
             AvailablePhysicalBytes = availablePhysicalBytes;
+            FrequencyMHz = frequencyMHz;
+            MemoryType = memoryType;
         }
 
         public string ToFormattedString()
         {
             double totalGb = TotalPhysicalBytes / (1024.0 * 1024.0 * 1024.0);
+            var sb = new StringBuilder();
+            sb.Append($"{Math.Round(totalGb, 2)} GB");
+
+            if (MemoryType.IsNotBlank() || FrequencyMHz.HasValue)
+            {
+                sb.Append(" (");
+                if (MemoryType.IsNotBlank())
+                    sb.Append(MemoryType);
+                if (FrequencyMHz.HasValue)
+                {
+                    if (MemoryType.IsNotBlank())
+                        sb.Append('-');
+                    sb.Append($"{FrequencyMHz}MHz");
+                }
+                sb.Append(')');
+            }
 
             if (AvailablePhysicalBytes.HasValue)
             {
                 double availableGb = AvailablePhysicalBytes.Value / (1024.0 * 1024.0 * 1024.0);
-                return $"{Math.Round(totalGb, 2)} GB Total, {Math.Round(availableGb, 2)} GB Available";
+                sb.Append($", {Math.Round(availableGb, 2)} GB Available");
             }
 
-            return $"{Math.Round(totalGb, 2)} GB";
+            return sb.ToString();
         }
     }
 
@@ -61,7 +85,10 @@ namespace BenchmarkDotNet.Environments
         {
             var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
             if (PInvoke.GlobalMemoryStatusEx(ref memStatus))
-                return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys);
+            {
+                var (freq, type) = GetLinuxOrWindowsMemoryDetails();
+                return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys, freq, type);
+            }
 
             return null;
         }
@@ -91,9 +118,42 @@ namespace BenchmarkDotNet.Environments
                 }
 
                 if (total > 0)
-                    return new PhysicalMemoryInfo(total, available);
+                {
+                    var (freq, type) = GetLinuxOrWindowsMemoryDetails();
+                    return new PhysicalMemoryInfo(total, available, freq, type);
+                }
             }
             return null;
+        }
+
+        private static (long? FrequencyMHz, string? MemoryType) GetLinuxOrWindowsMemoryDetails()
+        {
+            try
+            {
+                // Try reading /sys/devices/system/edac/mc/ on Linux
+                if (Directory.Exists("/sys/devices/system/edac/mc"))
+                {
+                    foreach (var mcDir in Directory.GetDirectories("/sys/devices/system/edac/mc", "mc*"))
+                    {
+                        foreach (var dimmDir in Directory.GetDirectories(mcDir, "dimm*"))
+                        {
+                            string typePath = Path.Combine(dimmDir, "dimm_mem_type");
+                            if (File.Exists(typePath))
+                            {
+                                string memType = File.ReadAllText(typePath).Trim();
+                                if (!string.IsNullOrEmpty(memType) && memType != "Unspecified")
+                                    return (null, memType);
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore fallback failures
+            }
+
+            return (null, null);
         }
 
         private static PhysicalMemoryInfo? GetMacMemory()
