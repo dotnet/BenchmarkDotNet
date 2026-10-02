@@ -22,9 +22,16 @@ namespace BenchmarkDotNet.IntegrationTests
     {
         public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output) { }
 
+        // Helper property to skip test on `macos(x64)` because InProcessEmitToolchain test randomly failed on CI.
+        // See: https://github.com/dotnet/BenchmarkDotNet/issues/3086
+        private static bool IsRunningOnMacosX64
+            => OsDetector.IsMacOS() && RuntimeInformation.GetCurrentPlatform() is Platform.X64;
+
         public static IEnumerable<object[]> GetAllJits()
         {
-            yield return [JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Default]; // InProcess
+            // Add InProcessEmitToolchain except for macos(x64)
+            if (!IsRunningOnMacosX64)
+                yield return [JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Default]; // InProcess
 
             if (ContinuousIntegration.IsGitHubDraftPR())
                 yield break;
@@ -226,6 +233,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void InProcessDisassemblyTargetsTheRunnableOfEachBenchmark()
         {
+            if (IsRunningOnMacosX64)
+                return; // TODO: Replace to use Assert.Skip after migrated to xunit v3
+
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
@@ -250,6 +260,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void InProcessDisassemblyIgnoresRunnablesOfEarlierRuns()
         {
+            if (IsRunningOnMacosX64)
+                return; // TODO: Replace to use Assert.Skip after migrated to xunit v3
+
             CanExecute<WithCalls>(ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry.WithToolchain(InProcessEmitToolchain.Default))
                 .AddLogger(new OutputLogger(Output))
