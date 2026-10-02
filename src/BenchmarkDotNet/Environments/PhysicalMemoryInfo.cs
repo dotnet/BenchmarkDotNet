@@ -238,10 +238,10 @@ namespace BenchmarkDotNet.Environments
 
         private static string? MapSmbiosMemoryType(byte type) => type switch
         {
-            0x1A => "DDR3",
-            0x1A + 1 => "DDR4",
-            0x1A + 2 => "LPDDR3",
-            0x1A + 3 => "LPDDR4",
+            0x18 => "DDR3",
+            0x1A => "DDR4",
+            0x1B => "LPDDR3",
+            0x1C => "LPDDR4",
             0x22 => "DDR5",
             0x23 => "LPDDR5",
             _ => null
