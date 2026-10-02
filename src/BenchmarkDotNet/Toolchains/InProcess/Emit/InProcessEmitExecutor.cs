@@ -70,10 +70,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             var oldThreadPriority = thread.Priority;
 
             var affinity = parameters.BenchmarkCase.Job.ResolveValueAsNullable(EnvironmentMode.AffinityCharacteristic);
+            bool processPrioritySet = false;
+            bool threadPrioritySet = false;
             try
             {
-                process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
-                thread.TrySetPriority(ThreadPriority.Highest, parameters.Logger);
+                processPrioritySet = process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
+                threadPrioritySet = thread.TrySetPriority(ThreadPriority.Highest, parameters.Logger);
 
                 if (affinity != null)
                 {
@@ -88,8 +90,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             }
             finally
             {
-                process.TrySetPriority(oldPriority, parameters.Logger);
-                thread.TrySetPriority(oldThreadPriority, parameters.Logger);
+                if (processPrioritySet)
+                    process.TrySetPriority(oldPriority, parameters.Logger);
+                if (threadPrioritySet)
+                    thread.TrySetPriority(oldThreadPriority, parameters.Logger);
 
                 if (affinity != null && oldAffinity != null)
                 {
