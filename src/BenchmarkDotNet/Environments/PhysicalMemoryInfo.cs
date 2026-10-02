@@ -130,6 +130,11 @@ namespace BenchmarkDotNet.Environments
         {
             try
             {
+                if (OsDetector.IsWindows7OrLater())
+                {
+                    return GetWindowsSmbiosMemoryDetails();
+                }
+
                 // Try reading /sys/devices/system/edac/mc/ on Linux
                 if (Directory.Exists("/sys/devices/system/edac/mc"))
                 {
@@ -155,6 +160,97 @@ namespace BenchmarkDotNet.Environments
 
             return (null, null);
         }
+
+        [SupportedOSPlatform("windows5.1.2600")]
+        private static (long? FrequencyMHz, string? MemoryType) GetWindowsSmbiosMemoryDetails()
+        {
+            try
+            {
+                const uint rsMb = 0x52534D42; // 'RSMB'
+                uint bufferSize = NativeMethods.GetSystemFirmwareTable(rsMb, 0, IntPtr.Zero, 0);
+                if (bufferSize == 0)
+                    return (null, null);
+
+                byte[] buffer = new byte[bufferSize];
+                if (NativeMethods.GetSystemFirmwareTable(rsMb, 0, buffer, bufferSize) == 0)
+                    return (null, null);
+
+                // SMBIOS table header: Data at offset 8
+                int offset = 8;
+                long? maxSpeed = null;
+                string? detectedType = null;
+
+                while (offset + 4 <= buffer.Length)
+                {
+                    byte type = buffer[offset];
+                    byte length = buffer[offset + 1];
+
+                    if (length < 4 || offset + length > buffer.Length)
+                        break;
+
+                    // Type 17: Memory Device
+                    if (type == 17 && length >= 0x15)
+                    {
+                        // Memory Type at offset 0x12
+                        byte rawMemoryType = buffer[offset + 0x12];
+                        string? memTypeStr = MapSmbiosMemoryType(rawMemoryType);
+                        if (memTypeStr != null && detectedType == null)
+                        {
+                            detectedType = memTypeStr;
+                        }
+
+                        // Speed in MHz at offset 0x15 (WORD)
+                        if (length >= 0x17)
+                        {
+                            ushort speed = (ushort)(buffer[offset + 0x15] | (buffer[offset + 0x16] << 8));
+                            if (speed > 0 && speed < 0xFFFF)
+                            {
+                                if (maxSpeed == null || speed > maxSpeed.Value)
+                                {
+                                    maxSpeed = speed;
+                                }
+                            }
+                        }
+                    }
+
+                    // Move past formatted area
+                    offset += length;
+
+                    // Skip unformatted string section (double null-terminated)
+                    while (offset < buffer.Length - 1 && !(buffer[offset] == 0 && buffer[offset + 1] == 0))
+                    {
+                        offset++;
+                    }
+                    offset += 2;
+                }
+
+                return (maxSpeed, detectedType);
+            }
+            catch
+            {
+                return (null, null);
+            }
+        }
+
+        private static class NativeMethods
+        {
+            [DllImport("kernel32.dll", SetLastError = true)]
+            public static extern uint GetSystemFirmwareTable(uint firmwareTableProviderSignature, uint firmwareTableID, byte[] pFirmwareTableBuffer, uint bufferSize);
+
+            [DllImport("kernel32.dll", SetLastError = true)]
+            public static extern uint GetSystemFirmwareTable(uint firmwareTableProviderSignature, uint firmwareTableID, IntPtr pFirmwareTableBuffer, uint bufferSize);
+        }
+
+        private static string? MapSmbiosMemoryType(byte type) => type switch
+        {
+            0x1A => "DDR3",
+            0x1A + 1 => "DDR4",
+            0x1A + 2 => "LPDDR3",
+            0x1A + 3 => "LPDDR4",
+            0x22 => "DDR5",
+            0x23 => "LPDDR5",
+            _ => null
+        };
 
         private static PhysicalMemoryInfo? GetMacMemory()
         {
