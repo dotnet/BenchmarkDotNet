@@ -394,7 +394,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         /// Canonical long names of scalar value options.
         /// These options must appear at most once.
         /// </summary>
-        internal static ISet<string> ScalarValueOptionNames =
+        internal static readonly ISet<string> ScalarValueOptionNames =
             new HashSet<string>(CanonicalNames.Values.Except(MultiValueOptionNames), StringComparer.OrdinalIgnoreCase);
     }
 }
