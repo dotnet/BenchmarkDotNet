@@ -15,11 +15,12 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRun;
-using BenchmarkDotNet.Toolchains.Mono;
-using BenchmarkDotNet.Toolchains.Wasm;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.Framework;
+using BenchmarkDotNet.Toolchains.Mono;
+using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 using BenchmarkDotNet.Toolchains.R2R;
+using BenchmarkDotNet.Toolchains.Wasm;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -27,7 +28,6 @@ using Perfolizer.Metrology;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
-using BenchmarkDotNet.Toolchains.NetCoreApp;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -127,6 +127,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             args = expandedArgs;
+            if (TryFindDuplicateScalarOption(args, out string? duplicateOptionName))
+            {
+                logger.WriteLineError($"Option '--{duplicateOptionName}' is defined multiple times.");
+                return (false, default, default);
+            }
+
             using (var parser = CreateParser(logger))
             {
                 parser
@@ -244,6 +250,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             (bool isSuccess, CommandLineOptions? options) result = default;
 
             ILogger logger = NullLogger.Instance;
+            if (TryFindDuplicateScalarOption(args, out _))
+            {
+                updatedArgs = null;
+                return false;
+            }
+
             using (var parser = CreateParser(logger))
             {
                 parser
@@ -267,6 +279,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         private static Parser CreateParser(ILogger logger)
             => new Parser(settings =>
             {
+                settings.AllowMultiInstance = true;
                 settings.CaseInsensitiveEnumValues = true;
                 settings.CaseSensitive = false;
                 settings.EnableDashDash = true;
@@ -274,6 +287,79 @@ namespace BenchmarkDotNet.ConsoleArguments
                 settings.HelpWriter = new LoggerWrapper(logger);
                 settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
             });
+
+        /// <summary>
+        /// Detects a repeated scalar option in the (response-file expanded) args.
+        /// </summary>
+        internal static bool TryFindDuplicateScalarOption(string[] args, out string? duplicateOptionName)
+        {
+            var hashSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            duplicateOptionName = null;
+
+            foreach (string arg in args)
+            {
+                if (arg.Equals("--", StringComparison.Ordinal))
+                    break;
+
+                if (arg.StartsWith("--", StringComparison.Ordinal))
+                {
+                    string text = arg.Substring(2);
+                    if (text.Length == 0)
+                        continue;
+
+                    int equalsIndex = text.IndexOf('=');
+                    string name = equalsIndex >= 0 ? text.Substring(0, equalsIndex) : text;
+                    if (name.Length == 0)
+                        continue;
+
+                    if (!TryGetScalarValueOption(name, out var canonicalName))
+                        continue;
+
+                    if (!hashSet.Add(canonicalName))
+                    {
+                        duplicateOptionName = canonicalName;
+                        return true;
+                    }
+                }
+                else if (arg.StartsWith("-", StringComparison.Ordinal) && arg.Length >= 2)
+                {
+                    // Truncate an attached value (e.g. "-j=dry" scans only "j"), mirroring the long-option branch.
+                    string shorts = arg.Substring(1);
+                    int equalsIndex = shorts.IndexOf('=');
+                    if (equalsIndex >= 0)
+                        shorts = shorts.Substring(0, equalsIndex);
+
+                    // Handle bundling of single-character options (e.g. -tm is equivalent to -t -m).
+                    // Scanning stops at the first unknown char: like the parser, the rest is treated as a value.
+                    foreach (char shortChar in shorts)
+                    {
+                        string shortName = shortChar.ToString();
+                        if (!TryGetScalarValueOption(shortName, out var canonicalName))
+                            break;
+
+                        if (!hashSet.Add(canonicalName))
+                        {
+                            duplicateOptionName = canonicalName;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryGetScalarValueOption(
+            string name,
+            [NotNullWhen(true)] out string? canonicalName)
+        {
+            if (CommandLineOptions.CanonicalNames.TryGetValue(name, out canonicalName))
+                return CommandLineOptions.ScalarValueOptionNames.Contains(canonicalName);
+
+            // Specified name is not a known option or it's not a scalar value option. 
+            canonicalName = null;
+            return false;
+        }
 
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {
