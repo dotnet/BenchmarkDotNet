@@ -1,0 +1,15 @@
+{
+  "commandLineOptions": {
+    "report-xunit-html": true,
+    "report-xunit-trx": true
+  },
+  "platformOptions": {
+  },
+  "environmentVariables": {
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "true",
+    "TESTINGPLATFORM_TELEMETRY_OPTOUT": "true",
+    "TESTINGPLATFORM_UI_LANGUAGE": "en-us"
+  },
+  "xUnit": {
+  }
+}

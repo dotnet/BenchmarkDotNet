@@ -9,22 +9,22 @@ namespace BenchmarkDotNet.IntegrationTests;
 
 public class AsyncEnumerableBenchmarksTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
-    public static TheoryData<IToolchain> GetAllToolchains() =>
+    public static TheoryData<IToolchain> GetAllToolchains() => new(
     [
         InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
         InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
         InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
         InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
         Job.Default.GetToolchain()
-    ];
+    ]);
 
     // InProcessNoEmitToolchain does not support custom async enumerables or [AsyncCallerType].
-    public static TheoryData<IToolchain> GetCustomSupportedToolchains() =>
+    public static TheoryData<IToolchain> GetCustomSupportedToolchains() => new(
     [
         InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
         InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = true }),
         Job.Default.GetToolchain()
-    ];
+    ]);
 
     [Theory]
     [MemberData(nameof(GetAllToolchains), DisableDiscoveryEnumeration = true)]
