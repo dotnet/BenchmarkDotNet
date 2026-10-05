@@ -2,7 +2,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Running;
 
-namespace BenchmarkDotNet.Tests
+namespace BenchmarkDotNet.Tests.Filters
 {
     public class GlobFilterTests
     {
@@ -35,8 +35,8 @@ namespace BenchmarkDotNet.Tests
         [InlineData("*", 2)]
         [InlineData("WRONG", 0)]
         [InlineData("*stillWRONG*", 0)]
-        [InlineData("BenchmarkDotNet.Tests.TypeWithBenchmarksAndParams.TheBenchmark", 2)]
-        [InlineData("BenchmarkDotNet.Tests.TypeWithBenchmarksAndParams.TheBenchmark(A: 100)", 1)]
+        [InlineData("BenchmarkDotNet.Tests.Filters.TypeWithBenchmarksAndParams.TheBenchmark", 2)]
+        [InlineData("BenchmarkDotNet.Tests.Filters.TypeWithBenchmarksAndParams.TheBenchmark(A: 100)", 1)]
         public void TheFilterWorksWithParams(string pattern, int expectedBenchmarks)
         {
             var benchmarkCases = BenchmarkConverter.TypeToBenchmarks(typeof(TypeWithBenchmarksAndParams)).BenchmarksCases;
