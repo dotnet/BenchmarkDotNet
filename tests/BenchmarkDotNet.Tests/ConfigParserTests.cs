@@ -400,10 +400,10 @@ namespace BenchmarkDotNet.Tests
         [Theory]
         [InlineData(RuntimeMoniker.Net12_0, typeof(CsProjCoreToolchain))]
         [InlineData(RuntimeMoniker.NativeAot12_0, typeof(CsProjNativeAotToolchain))]
-        [InlineData(RuntimeMoniker.Mono12_0, typeof(CsProjMonoCoreToolchain))]
+        [InlineData("mono12.0", typeof(CsProjMonoCoreToolchain))]
         [InlineData(RuntimeMoniker.R2R12_0, typeof(CsProjR2RToolchain))]
-        [InlineData(RuntimeMoniker.MonoWasm12_0, typeof(CsProjMonoWasmToolchain))]
-        [InlineData(RuntimeMoniker.MonoWasmAot12_0, typeof(CsProjMonoWasmAotToolchain))]
+        [InlineData("monowasm12.0", typeof(CsProjMonoWasmToolchain))]
+        [InlineData("monowasmaot12.0", typeof(CsProjMonoWasmAotToolchain))]
         [InlineData("corewasm12.0", typeof(CsProjCoreWasmToolchain))]
         public void Net12RuntimesResolveToTheirToolchains(string moniker, Type expectedToolchain)
         {

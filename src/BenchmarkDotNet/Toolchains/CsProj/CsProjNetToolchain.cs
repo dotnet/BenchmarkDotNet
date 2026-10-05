@@ -17,6 +17,25 @@ public abstract class CsProjNetToolchain(string name, Runtime runtime, DotNetCli
 
     public override async IAsyncEnumerable<ValidationError> ValidateAsync(BenchmarkCase benchmarkCase, IResolver resolver)
     {
+        if (Runtime is MonoCoreRuntime or MonoWasmRuntime or MonoWasmAotRuntime)
+        {
+            Version? targetVersion = Runtime.Version;
+            if (settings.TargetFrameworkMoniker.IsNotBlank())
+            {
+                targetVersion = Environments.Runtime.TryParse(settings.TargetFrameworkMoniker, out var targetRuntime)
+                    ? targetRuntime.Version
+                    : null;
+            }
+
+            if (targetVersion is { Major: >= 12 })
+            {
+                yield return new ValidationError(true,
+                    "Mono runtime packs are not available for .NET 12 and later. Select CoreCLR or an earlier target framework.",
+                    benchmarkCase);
+                yield break;
+            }
+        }
+
         await foreach (var validationError in base.ValidateAsync(benchmarkCase, resolver).ConfigureAwait(false))
         {
             yield return validationError;
