@@ -11,6 +11,7 @@ using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Framework;
+using BenchmarkDotNet.Toolchains.Roslyn;
 using JetBrains.Annotations;
 
 namespace BenchmarkDotNet.IntegrationTests
@@ -32,8 +33,16 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddColumnProvider(DefaultColumnProviders.Instance);
         }
 
-        private IConfig CreateInProcessAndRoslynConfig(OutputLogger logger, bool consumeTasksSynchronously = false)
+        private IConfig CreateInProcessAndCompiledConfig(OutputLogger logger, bool consumeTasksSynchronously = false)
         {
+            // The compiled job builds the same generated code the emitter mirrors, for DiffEmit to compare against.
+            var compiledJob = Job.Dry
+                .WithInvocationCount(4)
+                .WithUnrollFactor(4)
+                .WithConsumeTasksSynchronously(consumeTasksSynchronously);
+            if (Portability.RuntimeInformation.IsFullFramework)
+                compiledJob = compiledJob.WithToolchain(RoslynFrameworkToolchain.Default);
+
             var config = new ManualConfig()
                 .AddColumnProvider(DefaultConfig.Instance.GetColumnProviders().ToArray())
                 .AddAnalyser(DefaultConfig.Instance.GetAnalysers().ToArray())
@@ -46,33 +55,22 @@ namespace BenchmarkDotNet.IntegrationTests
                         .WithInvocationCount(4)
                         .WithUnrollFactor(4)
                         .WithConsumeTasksSynchronously(consumeTasksSynchronously))
-                .AddJob(
-                    Job.Dry
-                        .WithToolchain(RoslynFrameworkToolchain.Default)
-                        .WithInvocationCount(4)
-                        .WithUnrollFactor(4)
-                        .WithConsumeTasksSynchronously(consumeTasksSynchronously))
+                .AddJob(compiledJob)
                 .WithOptions(ConfigOptions.KeepBenchmarkFiles)
                 .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
 
             return config;
         }
 
-        private void DiffEmit(Summary summary)
+        private static void DiffEmit(Summary summary)
         {
-            // .Net Core does not support assembly saving so far
-            // SEE https://github.com/dotnet/corefx/issues/4491
-            // TODO: Use new PersistedAssemblyBuilder when BDN and tests are updated to net9.0 or newer.
-            if (!Portability.RuntimeInformation.IsFullFramework)
-                return;
-
-            var benchmarkCase = summary.BenchmarksCases.First();
-            // The benchmark config built jobs with 2 toolchains, 1 InProcessEmit and 1 Roslyn,
-            // so we need to subtract 1 from the partition counter to obtain the emit output.
+            var emittedReport = summary.Reports.First(r => r.BenchmarkCase.GetToolchain() is InProcessEmitToolchain);
+            var compiledReport = summary.Reports.First(r => r.BenchmarkCase.GetToolchain() is not InProcessEmitToolchain);
             NaiveRunnableEmitDiff.RunDiff(
-                $@"{BuildPartition.GetProgramName(benchmarkCase, BuildPartition.s_partitionCounter)}.exe",
-                $@"{BuildPartition.GetProgramName(benchmarkCase, BuildPartition.s_partitionCounter - 1)}Emitted.dll",
-                ConsoleLogger.Default);
+                compiledReport.BuildResult.ArtifactsPaths.ExecutablePath,
+                emittedReport.BuildResult.ArtifactsPaths.ExecutablePath,
+                ConsoleLogger.Default,
+                ignoreAggressiveOptimization: compiledReport.BenchmarkCase.GetToolchain() is RoslynToolchain);
         }
 
         [Fact]
@@ -104,7 +102,7 @@ namespace BenchmarkDotNet.IntegrationTests
             }
         }
 
-        [TheoryEnvSpecific("We can't use Roslyn toolchain for .NET Core because we don't know which assemblies to reference and .NET Core does not support dynamic assembly saving", EnvRequirement.FullFrameworkOnly)]
+        [Theory]
         [InlineData(typeof(SampleBenchmark), false)]
         [InlineData(typeof(RunnableVoidCaseBenchmark), false)]
         [InlineData(typeof(RunnableRefStructCaseBenchmark), false)]
@@ -128,7 +126,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void InProcessBenchmarkEmitsSameIL(Type benchmarkType, bool consumeTasksSynchronously)
         {
             var logger = new OutputLogger(Output);
-            var config = CreateInProcessAndRoslynConfig(logger, consumeTasksSynchronously);
+            var config = CreateInProcessAndCompiledConfig(logger, consumeTasksSynchronously);
 
             var summary = CanExecute(benchmarkType, config);
 

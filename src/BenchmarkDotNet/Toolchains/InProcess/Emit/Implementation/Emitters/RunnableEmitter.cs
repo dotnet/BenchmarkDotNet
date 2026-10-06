@@ -12,6 +12,9 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+#if NET9_0_OR_GREATER
+using System.Runtime.Loader;
+#endif
 using System.Security;
 using static BenchmarkDotNet.Code.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
@@ -91,13 +94,24 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 runnableEmitter.EmitRunnableCore();
             }
 
-            if (saveToDisk)
-            {
-                assemblyBuilder.Save(assemblyFileName);
-                logger.WriteLineInfo($"{assemblyFileName} assembly saved to {assemblyResultPath}");
-            }
+            if (!saveToDisk)
+                return assemblyBuilder;
 
+#if NET9_0_OR_GREATER
+            // A persisted assembly can't run, so the saved image is loaded back next to the benchmarks.
+            using var stream = new MemoryStream();
+            ((PersistedAssemblyBuilder)assemblyBuilder).Save(stream);
+            File.WriteAllBytes(assemblyResultPath, stream.ToArray());
+            logger.WriteLineInfo($"{assemblyFileName} assembly saved to {assemblyResultPath}");
+
+            stream.Position = 0;
+            var benchmarksAssembly = buildPartition.RepresentativeBenchmarkCase.Descriptor.Type.Assembly;
+            return (AssemblyLoadContext.GetLoadContext(benchmarksAssembly) ?? AssemblyLoadContext.Default).LoadFromStream(stream);
+#else
+            assemblyBuilder.Save(assemblyFileName);
+            logger.WriteLineInfo($"{assemblyFileName} assembly saved to {assemblyResultPath}");
             return assemblyBuilder;
+#endif
         }
 
         private static bool ShouldSaveToDisk(IConfig config)
@@ -105,7 +119,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             if (!BenchmarkDotNetInfo.Instance.IsRelease)
             {
                 // we never want to do that in our official NuGet.org package, it's a hack
-                return config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) && Portability.RuntimeInformation.IsFullFramework;
+                return config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles);
             }
 
             return false;
@@ -119,6 +133,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private static AssemblyBuilder DefineAssemblyBuilder(string assemblyResultPath, bool saveToDisk)
         {
             var assemblyName = new AssemblyName { Name = Path.GetFileNameWithoutExtension(assemblyResultPath) };
+
+#if NET9_0_OR_GREATER
+            if (saveToDisk)
+            {
+                var persistedAssemblyBuilder = new PersistedAssemblyBuilder(assemblyName, typeof(object).Assembly);
+                DefineAssemblyAttributes(persistedAssemblyBuilder);
+                return persistedAssemblyBuilder;
+            }
+#endif
 
             var assemblyMode = saveToDisk
                 ? (AssemblyBuilderAccess)3 // https://apisof.net/catalog/System.Reflection.Emit.AssemblyBuilderAccess.RunAndSave
@@ -174,9 +197,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var moduleName = Path.GetFileNameWithoutExtension(moduleFileName)
                ?? throw new ArgumentNullException(nameof(moduleFileName));
 
+#if NET9_0_OR_GREATER
+            var moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
+#else
             var moduleBuilder = saveToDisk
                 ? assemblyBuilder.DefineDynamicModule(moduleName, moduleFileName)
                 : assemblyBuilder.DefineDynamicModule(moduleName);
+#endif
 
             // [module:UnverifiableCodeAttribute()]
             var attributeCtor = typeof(UnverifiableCodeAttribute)
