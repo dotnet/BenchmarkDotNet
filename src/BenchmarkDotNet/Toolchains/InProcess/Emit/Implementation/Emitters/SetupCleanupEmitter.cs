@@ -69,7 +69,16 @@ partial class RunnableEmitter
 
 
     private void EmitAsyncSetupCleanup(string methodName, MethodInfo methodToCall, SetupCleanupKind kind)
-        => EmitAsyncSingleCall(methodName, typeof(AsyncValueTaskMethodBuilder), methodToCall, kind);
+    {
+        if (IsRuntimeAsync(methodToCall))
+        {
+            EmitRuntimeAsyncSetupCleanup(methodName, methodToCall, kind);
+        }
+        else
+        {
+            EmitAsyncSingleCall(methodName, typeof(AsyncValueTaskMethodBuilder), methodToCall, kind);
+        }
+    }
 
     protected virtual void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }
     protected virtual void EmitExtraGlobalSetup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }

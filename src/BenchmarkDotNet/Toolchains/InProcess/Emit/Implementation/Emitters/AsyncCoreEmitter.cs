@@ -1,5 +1,7 @@
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -12,11 +14,30 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
 partial class RunnableEmitter
 {
-    // TODO: update this to support runtime-async.
     private sealed class AsyncCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark, AwaitableInfo awaitableInfo) : AsyncCoreEmitterBase(buildPartition, moduleBuilder, benchmark)
     {
+        private static readonly MethodInfo KeepAliveWithoutBoxingInMethod = typeof(DeadCodeEliminationHelper)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .First(m => m.Name == nameof(DeadCodeEliminationHelper.KeepAliveWithoutBoxing)
+                && m.GetParameters().Length == 1
+                && m.GetParameters()[0].ParameterType.IsByRef);
+
         protected override void EmitWorkloadCore()
         {
+            if (IsRuntimeAsync(Descriptor.WorkloadMethod))
+            {
+                // A runtime-async workload returns a built-in task type, which WorkloadCore returns too unless the caller type is overridden.
+                var workloadCoreReturnType = Descriptor.WorkloadMethod.ResolveAttribute<AsyncCallerTypeAttribute>()?.AsyncCallerType
+                    ?? Descriptor.WorkloadMethod.ReturnType;
+                // Roslyn only compiles the built-in task types as runtime-async, any other task-like keeps its state machine.
+                if (AwaitHelper.IsBuiltInTaskType(workloadCoreReturnType))
+                {
+                    var runtimeAsyncWorkloadCoreMethod = EmitRuntimeAsyncWorkloadCore(workloadCoreReturnType);
+                    startWorkloadMethod = EmitAsyncSingleCall(StartWorkloadMethodName, typeof(AsyncVoidMethodBuilder), runtimeAsyncWorkloadCoreMethod, SetupCleanupKind.Other);
+                    return;
+                }
+            }
+
             var asyncMethodBuilderType = GetWorkloadCoreAsyncMethodBuilderType(Descriptor.WorkloadMethod.ReturnType);
             var builderInfo = BeginAsyncStateMachineTypeBuilder(WorkloadCoreMethodName, asyncMethodBuilderType, runnableBuilder);
             var (asyncStateMachineTypeBuilder, publicFields, (ilBuilder, endTryLabel, returnLabel, stateLocal, thisLocal, returnDefaultLocal)) = builderInfo;
@@ -242,13 +263,7 @@ partial class RunnableEmitter
                         // JIT can't elide whatever produced it.
                         ilBuilder.EmitStloc(resultLocal);
                         ilBuilder.EmitLdloca(resultLocal);
-                        var keepAliveInMethod = typeof(DeadCodeEliminationHelper)
-                            .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                            .First(m => m.Name == nameof(DeadCodeEliminationHelper.KeepAliveWithoutBoxing)
-                                && m.GetParameters().Length == 1
-                                && m.GetParameters()[0].ParameterType.IsByRef)
-                            .MakeGenericMethod(resultType);
-                        ilBuilder.Emit(OpCodes.Call, keepAliveInMethod);
+                        ilBuilder.Emit(OpCodes.Call, KeepAliveWithoutBoxingInMethod.MakeGenericMethod(resultType));
                     }
 
                     // --- Benchmark loop: if (--invokeCount >= 0) goto callBenchmarkLabel ---
@@ -356,6 +371,159 @@ partial class RunnableEmitter
 
                     ilBuilder.EndExceptionBlock();
                 } // end handler
+            }
+        }
+
+        /*
+            private async Task WorkloadCore()
+            {
+                try
+                {
+                    if (await this.fieldsContainer.workloadValueTaskSource.GetIsComplete())
+                    {
+                        return;
+                    }
+                    while (true)
+                    {
+                        StartedClock startedClock = ClockExtensions.Start(this.fieldsContainer.clock);
+                        while (--this.fieldsContainer.invokeCount >= 0)
+                        {
+                            await base.Workload();
+                        }
+                        if (await this.fieldsContainer.workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed()))
+                        {
+                            return;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    fieldsContainer.workloadValueTaskSource.SetException(e);
+                    return;
+                }
+            }
+         */
+        private MethodInfo EmitRuntimeAsyncWorkloadCore(Type workloadCoreReturnType)
+        {
+            var methodBuilder = DefineRuntimeAsyncMethod(WorkloadCoreMethodName, workloadCoreReturnType);
+            // The generated code copies the workload's builder override, which Roslyn keeps as an attribute without using the builder.
+            if (!Descriptor.WorkloadMethod.HasAttribute<AsyncCallerTypeAttribute>()
+                && Descriptor.WorkloadMethod.GetAsyncMethodBuilderAttribute() is { } builderAttribute
+                && builderAttribute.GetType().GetProperty(nameof(AsyncMethodBuilderAttribute.BuilderType), BindingFlags.Public | BindingFlags.Instance)?.GetValue(builderAttribute) is Type builderType)
+            {
+                var attributeCtor = typeof(AsyncMethodBuilderAttribute).GetConstructor([typeof(Type)])
+                    ?? throw new MissingMemberException(nameof(AsyncMethodBuilderAttribute));
+                methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(attributeCtor, [builderType]));
+            }
+
+            var ilBuilder = methodBuilder.GetILGenerator();
+
+            var returnLocal = workloadCoreReturnType.IsGenericType
+                ? ilBuilder.DeclareLocal(workloadCoreReturnType.GetGenericArguments()[0])
+                : null;
+            var startedClockLocal = ilBuilder.DeclareLocal(typeof(StartedClock));
+            var resultLocal = awaitableInfo.ResultType == typeof(void)
+                ? null
+                : ilBuilder.DeclareLocal(awaitableInfo.ResultType);
+            var invokeCountLocal = ilBuilder.DeclareLocal(typeof(long));
+            var exceptionLocal = ilBuilder.DeclareLocal(typeof(Exception));
+
+            var returnLabel = ilBuilder.DefineLabel();
+            var startClockLabel = ilBuilder.DefineLabel();
+            var callBenchmarkLabel = ilBuilder.DefineLabel();
+            var callBenchmarkLoopLabel = ilBuilder.DefineLabel();
+
+            ilBuilder.BeginExceptionBlock();
+            {
+                // if (await workloadValueTaskSource.GetIsComplete()) return default;
+                EmitLoadWorkloadValueTaskSource();
+                ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.GetIsComplete), BindingFlags.Public | BindingFlags.Instance)!);
+                EmitRuntimeAsyncAwait(ilBuilder, typeof(ValueTask<bool>));
+                ilBuilder.Emit(OpCodes.Brfalse, startClockLabel);
+                ilBuilder.MaybeEmitSetLocalToDefault(returnLocal);
+                ilBuilder.Emit(OpCodes.Leave, returnLabel);
+
+                // startedClock = ClockExtensions.Start(clock);
+                ilBuilder.MarkLabel(startClockLabel);
+                ilBuilder.Emit(OpCodes.Ldarg_0);
+                ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
+                ilBuilder.Emit(OpCodes.Ldfld, clockField);
+                ilBuilder.Emit(OpCodes.Call, GetStartClockMethod());
+                ilBuilder.EmitStloc(startedClockLocal);
+                ilBuilder.Emit(OpCodes.Br, callBenchmarkLoopLabel);
+
+                // T result = await base.Workload(); DeadCodeEliminationHelper.KeepAliveWithoutBoxing(in result);
+                ilBuilder.MarkLabel(callBenchmarkLabel);
+                if (!Descriptor.WorkloadMethod.IsStatic)
+                {
+                    ilBuilder.Emit(OpCodes.Ldarg_0);
+                }
+                EmitLoadArgFieldsForCall(ilBuilder, null);
+                ilBuilder.Emit(OpCodes.Call, Descriptor.WorkloadMethod);
+                EmitRuntimeAsyncAwait(ilBuilder, Descriptor.WorkloadMethod.ReturnType);
+                if (resultLocal is not null)
+                {
+                    ilBuilder.EmitStloc(resultLocal);
+                    ilBuilder.EmitLdloca(resultLocal);
+                    ilBuilder.Emit(OpCodes.Call, KeepAliveWithoutBoxingInMethod.MakeGenericMethod(resultLocal.LocalType));
+                }
+
+                // if (--invokeCount >= 0) goto callBenchmarkLabel;
+                ilBuilder.MarkLabel(callBenchmarkLoopLabel);
+                ilBuilder.Emit(OpCodes.Ldarg_0);
+                ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
+                ilBuilder.Emit(OpCodes.Ldflda, invokeCountField);
+                ilBuilder.Emit(OpCodes.Dup);
+                ilBuilder.Emit(OpCodes.Ldind_I8);
+                ilBuilder.Emit(OpCodes.Ldc_I4_1);
+                ilBuilder.Emit(OpCodes.Conv_I8);
+                ilBuilder.Emit(OpCodes.Sub);
+                ilBuilder.EmitStloc(invokeCountLocal);
+                ilBuilder.EmitLdloc(invokeCountLocal);
+                ilBuilder.Emit(OpCodes.Stind_I8);
+                ilBuilder.EmitLdloc(invokeCountLocal);
+                ilBuilder.Emit(OpCodes.Ldc_I4_0);
+                ilBuilder.Emit(OpCodes.Conv_I8);
+                ilBuilder.Emit(OpCodes.Bge, callBenchmarkLabel);
+
+                // if (!await workloadValueTaskSource.SetResultAndGetIsComplete(startedClock.GetElapsed())) goto startClockLabel;
+                EmitLoadWorkloadValueTaskSource();
+                ilBuilder.EmitLdloca(startedClockLocal);
+                ilBuilder.Emit(OpCodes.Call, typeof(StartedClock).GetMethod(nameof(StartedClock.GetElapsed), BindingFlags.Public | BindingFlags.Instance)!);
+                ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.SetResultAndGetIsComplete), BindingFlags.Public | BindingFlags.Instance)!);
+                EmitRuntimeAsyncAwait(ilBuilder, typeof(ValueTask<bool>));
+                ilBuilder.Emit(OpCodes.Brfalse, startClockLabel);
+                // return default;
+                ilBuilder.MaybeEmitSetLocalToDefault(returnLocal);
+                ilBuilder.Emit(OpCodes.Leave, returnLabel);
+            }
+            ilBuilder.BeginCatchBlock(typeof(Exception));
+            {
+                // workloadValueTaskSource.SetException(exception);
+                ilBuilder.EmitStloc(exceptionLocal);
+                EmitLoadWorkloadValueTaskSource();
+                ilBuilder.EmitLdloc(exceptionLocal);
+                ilBuilder.Emit(OpCodes.Callvirt, typeof(WorkloadValueTaskSource).GetMethod(nameof(WorkloadValueTaskSource.SetException), [typeof(Exception)])!);
+                // return default;
+                ilBuilder.MaybeEmitSetLocalToDefault(returnLocal);
+                ilBuilder.Emit(OpCodes.Leave, returnLabel);
+            }
+            ilBuilder.EndExceptionBlock();
+
+            ilBuilder.MarkLabel(returnLabel);
+            if (returnLocal is not null)
+            {
+                ilBuilder.EmitLdloc(returnLocal);
+            }
+            ilBuilder.Emit(OpCodes.Ret);
+
+            return methodBuilder;
+
+            void EmitLoadWorkloadValueTaskSource()
+            {
+                ilBuilder.Emit(OpCodes.Ldarg_0);
+                ilBuilder.Emit(OpCodes.Ldflda, fieldsContainerField);
+                ilBuilder.Emit(OpCodes.Ldfld, workloadValueTaskSourceField);
             }
         }
     }
