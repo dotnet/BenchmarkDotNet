@@ -2,14 +2,14 @@
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</AssemblyTitle>
-    <TargetFrameworks>net472;net10.0</TargetFrameworks>
+    <TargetFrameworks>net472;net8.0;net10.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</AssemblyName>
     <PackageId>BenchmarkDotNet.IntegrationTests.EnabledOptimizations</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    
+
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>

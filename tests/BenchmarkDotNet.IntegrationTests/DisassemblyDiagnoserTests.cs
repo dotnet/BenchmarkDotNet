@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [MethodImpl(MethodImplOptions.NoInlining)] public void Benchmark(bool justAnOverload) { } // we need to test overloads (#562)
         }
 
-        [Theory]
+        [Theory(SkipTestWithoutData = true)]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, IToolchain toolchain)
@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassemblyResult(result, $"{nameof(WithCalls.Recursive)}()");
         }
 
-        [Theory]
+        [Theory(SkipTestWithoutData = true)]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, IToolchain toolchain)
@@ -138,7 +138,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public T Create() => new T();
         }
 
-        [Theory]
+        [Theory(SkipTestWithoutData = true)]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, IToolchain toolchain)
@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public void JustReturn() { }
         }
 
-        [Theory]
+        [Theory(SkipTestWithoutData = true)]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, IToolchain toolchain)
@@ -193,7 +193,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [MethodImpl(MethodImplOptions.NoInlining)] public virtual void ForDisassemblyDiagnoser() { }
         }
 
-        [Theory]
+        [Theory(SkipTestWithoutData = true)]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleWhenBenchmarkDeclaresGeneratedMemberNames(Jit jit, Platform platform, IToolchain toolchain)
