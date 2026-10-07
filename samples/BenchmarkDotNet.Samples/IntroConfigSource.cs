@@ -6,6 +6,7 @@ using BenchmarkDotNet.Jobs;
 namespace BenchmarkDotNet.Samples
 {
     [MyConfigSource(Jit.LegacyJit, Jit.RyuJit)]
+    [UseLocalJobOnly]
     public class IntroConfigSource
     {
         /// <summary>
