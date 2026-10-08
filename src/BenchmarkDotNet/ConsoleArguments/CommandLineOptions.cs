@@ -274,5 +274,127 @@ namespace BenchmarkDotNet.ConsoleArguments
         }
 
         private static string Escape(string input) => UserInteractionHelper.EscapeCommandExample(input);
+
+        /// <summary>
+        /// All options, keyed by short and long name (case-insensitive).
+        /// Value is the canonical long name.
+        /// Keep in sync with the <c>[Option]</c> attributes above (hardcoded by design, no reflection for NativeAOT/trimming safety).
+        /// </summary>
+        internal static readonly IReadOnlyDictionary<string, string> CanonicalNames =
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                // Aliases
+                ["j"] = "job",
+                ["r"] = "runtimes",
+                ["e"] = "exporters",
+                ["m"] = "memory",
+                ["t"] = "threading",
+                ["d"] = "disasm",
+                ["p"] = "profiler",
+                ["f"] = "filter",
+                ["h"] = "hide",
+                ["i"] = "inProcess",
+                ["a"] = "artifacts",
+
+                // Names
+                ["job"] = "job",
+                ["runtimes"] = "runtimes",
+                ["exporters"] = "exporters",
+                ["memory"] = "memory",
+                ["threading"] = "threading",
+                ["exceptions"] = "exceptions",
+                ["disasm"] = "disasm",
+                ["profiler"] = "profiler",
+                ["filter"] = "filter",
+                ["hide"] = "hide",
+                ["inProcess"] = "inProcess",
+                ["artifacts"] = "artifacts",
+                ["outliers"] = "outliers",
+                ["affinity"] = "affinity",
+                ["allStats"] = "allStats",
+                ["allCategories"] = "allCategories",
+                ["anyCategories"] = "anyCategories",
+                ["anyJobCategories"] = "anyJobCategories",
+                ["attribute"] = "attribute",
+                ["join"] = "join",
+                ["title"] = "title",
+                ["keepFiles"] = "keepFiles",
+                ["noOverwrite"] = "noOverwrite",
+                ["counters"] = "counters",
+                ["cli"] = "cli",
+                ["packages"] = "packages",
+                ["freshPackages"] = "freshPackages",
+                ["coreRun"] = "coreRun",
+                ["monoPath"] = "monoPath",
+                ["ilCompilerVersion"] = "ilCompilerVersion",
+                ["ilcPackages"] = "ilcPackages",
+                ["launchCount"] = "launchCount",
+                ["warmupCount"] = "warmupCount",
+                ["minWarmupCount"] = "minWarmupCount",
+                ["maxWarmupCount"] = "maxWarmupCount",
+                ["iterationTime"] = "iterationTime",
+                ["iterationCount"] = "iterationCount",
+                ["minIterationCount"] = "minIterationCount",
+                ["maxIterationCount"] = "maxIterationCount",
+                ["invocationCount"] = "invocationCount",
+                ["unrollFactor"] = "unrollFactor",
+                ["strategy"] = "strategy",
+                ["platform"] = "platform",
+                ["runOncePerIteration"] = "runOncePerIteration",
+                ["info"] = "info",
+                ["apples"] = "apples",
+                ["list"] = "list",
+                ["disasmDepth"] = "disasmDepth",
+                ["disasmFilter"] = "disasmFilter",
+                ["disasmDiff"] = "disasmDiff",
+                ["logBuildOutput"] = "logBuildOutput",
+                ["generateBinLog"] = "generateBinLog",
+                ["buildTimeout"] = "buildTimeout",
+                ["wakeLock"] = "wakeLock",
+                ["stopOnFirstError"] = "stopOnFirstError",
+                ["statisticalTest"] = "statisticalTest",
+                ["disableLogFile"] = "disableLogFile",
+                ["maxWidth"] = "maxWidth",
+                ["envVars"] = "envVars",
+                ["memoryRandomization"] = "memoryRandomization",
+                ["jitTieringMode"] = "jitTieringMode",
+                ["wasmEngine"] = "wasmEngine",
+                ["wasmArgs"] = "wasmArgs",
+                ["wasmMainJsTemplate"] = "wasmMainJsTemplate",
+                ["customRuntimePack"] = "customRuntimePack",
+                ["AOTCompilerPath"] = "AOTCompilerPath",
+                ["wasmProcessTimeout"] = "wasmProcessTimeout",
+                ["noForcedGCs"] = "noForcedGCs",
+                ["evaluateOverhead"] = "evaluateOverhead",
+                ["consumeTasksSynchronously"] = "consumeTasksSynchronously",
+                ["resume"] = "resume"
+            };
+
+        /// <summary>
+        /// Canonical long names of multi values options (It can be specified multiple times)
+        /// </summary>
+        internal static readonly ISet<string> MultiValueOptionNames =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "runtimes",
+                "exporters",
+                "filter",
+                "hide",
+                "allCategories",
+                "anyCategories",
+                "anyJobCategories",
+                "attribute",
+                "counters",
+                "coreRun",
+                "envVars",
+                "disasmFilter"
+            };
+
+        /// <summary>
+        /// Canonical long names of scalar value options.
+        /// These options must appear at most once.
+        /// </summary>
+        internal static readonly ISet<string> ScalarValueOptionNames =
+            new HashSet<string>(CanonicalNames.Values.Except(MultiValueOptionNames), StringComparer.OrdinalIgnoreCase);
     }
 }

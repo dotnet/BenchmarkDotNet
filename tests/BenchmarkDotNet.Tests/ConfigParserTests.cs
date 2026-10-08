@@ -6,30 +6,30 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Exporters.OpenMetrics;
 using BenchmarkDotNet.Exporters.Xml;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRun;
 using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.Framework;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Mono;
-using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
-using BenchmarkDotNet.Toolchains.Framework;
-using Perfolizer.Horology;
-using System.Reflection;
 using BenchmarkDotNet.Toolchains.NetCoreApp;
 using BenchmarkDotNet.Toolchains.R2R;
+using BenchmarkDotNet.Toolchains.Wasm;
+using Perfolizer.Horology;
+using System.Reflection;
 
 namespace BenchmarkDotNet.Tests
 {
@@ -1025,6 +1025,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData("--filter abc", "--filter *")]
         [InlineData("-f abc", "--filter *")]
         [InlineData("-f *", "--filter *")]
+        [InlineData("--filter abc -f abc", "--filter *")]
         [InlineData("--runtimes net7.0 --join", "--filter * --join --runtimes net7.0")]
         [InlineData("--join abc", "--filter * --join")]
         public void CheckUpdateValidArgs(string strArgs, string expected)
@@ -1036,21 +1037,273 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Theory]
-        [InlineData("--filter abc -f abc")]
         [InlineData("--runtimes net")]
+        [InlineData("--job dry --job short")]
+        [InlineData("--join --join")]
         public void CheckUpdateInvalidArgs(string strArgs)
         {
+            // Arrange
             var args = strArgs.Split();
+
+            // Act
             bool isSuccess = ConfigParser.TryUpdateArgs(args, out var updatedArgs, options => options.Filters = ["*"]);
 
-            Assert.Null(updatedArgs);
-            Assert.False(isSuccess);
+            // Assert
+            updatedArgs.Should().BeNull();
+            isSuccess.Should().BeFalse();
         }
 
         private string GetDummyWasmEngine()
         {
             // We know, that this file exists, that's enough.
             return $"--wasmEngine={Assembly.GetExecutingAssembly().Location}";
+        }
+
+        [Fact]
+        public void UserCanSpecifyRuntimes_WithMultipleOptions()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+            string[] args = ["--runtimes", "net8.0", "--runtimes", "net9.0"];
+
+            // Act
+            var (isSuccess, config, options) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            config.Should().NotBeNull();
+            options.Should().NotBeNull();
+            options.Runtimes.Should().Equal("net8.0", "net9.0");
+            config.GetJobs().Should().HaveCount(2);
+            config.GetJobs().First().Meta.Baseline.Should().BeTrue();
+            logger.GetLog().Should().BeEmpty();
+        }
+
+        [Fact]
+        public void UserCanSpecifyExporters_WithMultipleOptions()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+            string[] args = ["--exporters", "json", "--exporters", "html"];
+
+            // Act
+            var (isSuccess, config, _) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            config.Should().NotBeNull();
+            config.GetExporters().Should().Contain(JsonExporter.Default);
+            config.GetExporters().Should().Contain(HtmlExporter.Default);
+            logger.GetLog().Should().BeEmpty();
+        }
+
+        [Theory]
+        [InlineData("--filter", "A", "--filter", "B")]
+        [InlineData("-f", "A", "--filter", "B")]
+        public void UserCanSpecifyFilter_WithMultipleOptions(params string[] args)
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+
+            // Act
+            var (isSuccess, _, options) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            options.Should().NotBeNull();
+            options.Filters.Should().Equal("A", "B");
+            logger.GetLog().Should().BeEmpty();
+        }
+
+        [Fact]
+        public void UserCanSpecifyCoreRunPaths_WithMultipleOptions()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+            var path1 = typeof(object).Assembly.Location;
+            var path2 = typeof(ConfigParserTests).Assembly.Location;
+
+            // Act
+            var (isSuccess, config, _) = ConfigParser.Parse(["--coreRun", path1, "--coreRun", path2], logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            config.Should().NotBeNull();
+            config.GetJobs().Should().HaveCount(2);
+            logger.GetLog().Should().BeEmpty();
+        }
+
+        [Fact]
+        public void UserCanSpecifyEnvVars_WithMultipleOptions()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+            string[] args = ["--envVars", "K1:V1", "--envVars", "K2:V2"];
+
+            // Act
+            var (isSuccess, config, _) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            config.Should().NotBeNull();
+            config.GetJobs().Single().Environment.EnvironmentVariables.Should().HaveCount(2);
+            logger.GetLog().Should().BeEmpty();
+        }
+
+        [Fact]
+        public void UserCanSpecifyRuntimes_WithSingleOption()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+            string[] args = ["--runtimes", "net8.0", "net9.0"];
+
+            // Act
+            var (isSuccess, config, options) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            config.Should().NotBeNull();
+            options.Should().NotBeNull();
+            config.GetJobs().Should().HaveCount(2);
+            logger.GetLog().Should().BeEmpty();
+        }
+
+        [Fact]
+        public void UserCanSpecifyCounters_WithMultipleOptions()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+            string[] args =
+            [
+                "--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}",
+                "--counters", nameof(HardwareCounter.BranchMispredictions)
+            ];
+
+            // Act
+            var (isSuccess, config, _) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            config.Should().NotBeNull();
+            config!.GetHardwareCounters().Should().HaveCount(3);
+            logger.GetLog().Should().BeEmpty();
+        }
+
+        [Fact]
+        public void OptionAfterDashDashIsTreatedAsValue()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+            string[] args = ["--job", "dry", "--", "--job", "short"];
+
+            // Act
+            var (isSuccess, _, _) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            logger.GetLog().Should().BeEmpty();
+        }
+
+        [Fact]
+        public void UserCanNotSpecifyCounters_MoreThan3_RaiseError()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+            string[] args =
+            [
+                "--counters", $"{nameof(HardwareCounter.CacheMisses)}+{nameof(HardwareCounter.InstructionRetired)}",
+                "--counters", $"{nameof(HardwareCounter.BranchMispredictions)}+{nameof(HardwareCounter.Timer)}"
+            ];
+
+            // Act
+            var (isSuccess, _, _) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeFalse();
+
+            var log = logger.GetLog().Trim();
+            log.Should().Be("You can't use more than 3 HardwareCounters at the same time.");
+        }
+
+        [Fact]
+        public void UserCanNotSpecifyCounters_WrongName()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+            string[] args = ["--counters", nameof(HardwareCounter.CacheMisses), "--counters", "WRONG_NAME"];
+
+            // Act
+            var (isSuccess, _, _) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeFalse();
+
+            var log = logger.GetLog().Trim();
+            log.Should().Be("The provided hardware counter \"WRONG_NAME\" is invalid. Available options are: NotSet+Timer+TotalIssues+BranchInstructions+CacheMisses+BranchMispredictions+TotalCycles+UnhaltedCoreCycles+InstructionRetired+UnhaltedReferenceCycles+LlcReference+LlcMisses+BranchInstructionRetired+BranchMispredictsRetired.");
+        }
+
+        [Theory]
+        [InlineData("--join", "--join")]
+        [InlineData("--inProcess", "--inProcess")]
+        [InlineData("--memory", "--memory")]
+        [InlineData("-tm", "-m")]
+        [InlineData("-mm")]
+        public void UserCanNotSpecify_MultipleSameBooleanOptions(params string[] args)
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+
+            // Act
+            var (isSuccess, _, _) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeFalse();
+
+            var log = logger.GetLog().Trim();
+            log.Should().Match($"Option '*' is defined multiple times.");
+        }
+
+        [Theory]
+        [InlineData("-tm")]
+        [InlineData("-m", "-t")]
+        public void UserCanSpecify_BundledDifferentBooleanOptions(params string[] args)
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+
+            // Act
+            var (isSuccess, _, options) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            logger.GetLog().Should().BeEmpty();
+
+            options.Should().NotBeNull();
+            options.UseThreadingDiagnoser.Should().BeTrue();
+            options.UseMemoryDiagnoser.Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData("--job", "dry", "--job", "short")]
+        [InlineData("--job=dry", "--job=short")]
+        [InlineData("-j", "dry", "-j", "short")]
+        [InlineData("-j", "dry", "--job", "short")]
+        [InlineData("--JOB", "dry", "--job", "short")]
+        [InlineData("--launchCount", "1", "--launchCount", "2")]
+        [InlineData("--title", "A", "--title", "B")]
+        public void UserCanNotSpecify_MultipleSameScalarOptions(params string[] args)
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+
+            // Act
+            var (isSuccess, _, _) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeFalse();
+
+            var log = logger.GetLog().Trim();
+            log.Should().Match("Option '*' is defined multiple times.");
         }
     }
 }
