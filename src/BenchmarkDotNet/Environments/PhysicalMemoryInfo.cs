@@ -19,13 +19,15 @@ namespace BenchmarkDotNet.Environments
         public long? AvailablePhysicalBytes { get; }
         public long? FrequencyMts { get; }
         public string? MemoryType { get; }
+        public byte? CasLatency { get; }
 
-        public PhysicalMemoryInfo(long totalPhysicalBytes, long? availablePhysicalBytes = null, long? frequencyMts = null, string? memoryType = null)
+        public PhysicalMemoryInfo(long totalPhysicalBytes, long? availablePhysicalBytes = null, long? frequencyMts = null, string? memoryType = null, byte? casLatency = null)
         {
             TotalPhysicalBytes = totalPhysicalBytes;
             AvailablePhysicalBytes = availablePhysicalBytes;
             FrequencyMts = frequencyMts;
             MemoryType = memoryType;
+            CasLatency = casLatency;
         }
 
         public string ToFormattedString()
@@ -34,7 +36,7 @@ namespace BenchmarkDotNet.Environments
             var sb = new StringBuilder();
             sb.Append($"{Math.Round(totalGb, 2)} GB");
 
-            if (MemoryType.IsNotBlank() || FrequencyMts.HasValue)
+            if (MemoryType.IsNotBlank() || FrequencyMts.HasValue || CasLatency.HasValue)
             {
                 sb.Append(" (");
                 if (MemoryType.IsNotBlank())
@@ -44,6 +46,12 @@ namespace BenchmarkDotNet.Environments
                     if (MemoryType.IsNotBlank())
                         sb.Append('-');
                     sb.Append($"{FrequencyMts}MT/s");
+                }
+                if (CasLatency.HasValue)
+                {
+                    if (MemoryType.IsNotBlank() || FrequencyMts.HasValue)
+                        sb.Append('-');
+                    sb.Append($"CAS{CasLatency}");
                 }
                 sb.Append(')');
             }
@@ -87,8 +95,8 @@ namespace BenchmarkDotNet.Environments
             var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
             if (PInvoke.GlobalMemoryStatusEx(ref memStatus))
             {
-                var (freq, type) = GetLinuxOrWindowsMemoryDetails();
-                return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys, freq, type);
+                var (freq, type, cas) = GetLinuxOrWindowsMemoryDetails();
+                return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys, freq, type, cas);
             }
 
             return null;
@@ -120,14 +128,14 @@ namespace BenchmarkDotNet.Environments
 
                 if (total > 0)
                 {
-                    var (freq, type) = GetLinuxOrWindowsMemoryDetails();
-                    return new PhysicalMemoryInfo(total, available, freq, type);
+                    var (freq, type, cas) = GetLinuxOrWindowsMemoryDetails();
+                    return new PhysicalMemoryInfo(total, available, freq, type, cas);
                 }
             }
             return null;
         }
 
-        private static (long? FrequencyMts, string? MemoryType) GetLinuxOrWindowsMemoryDetails()
+        private static (long? FrequencyMts, string? MemoryType, byte? CasLatency) GetLinuxOrWindowsMemoryDetails()
         {
             try
             {
@@ -148,7 +156,7 @@ namespace BenchmarkDotNet.Environments
                             {
                                 string memType = File.ReadAllText(typePath).Trim();
                                 if (!string.IsNullOrEmpty(memType))
-                                    return (null, memType);
+                                    return (null, memType, null);
                             }
                         }
                     }
@@ -159,11 +167,11 @@ namespace BenchmarkDotNet.Environments
                 // Ignore fallback failures
             }
 
-            return (null, null);
+            return (null, null, null);
         }
 
         [SupportedOSPlatform("windows6.0.6000")]
-        private static unsafe (long? FrequencyMts, string? MemoryType) GetWindowsSmbiosMemoryDetails()
+        private static unsafe (long? FrequencyMts, string? MemoryType, byte? CasLatency) GetWindowsSmbiosMemoryDetails()
         {
             try
             {
@@ -171,19 +179,20 @@ namespace BenchmarkDotNet.Environments
                 var provider = (FIRMWARE_TABLE_PROVIDER)rsMb;
                 uint bufferSize = PInvoke.GetSystemFirmwareTable(provider, 0, null, 0);
                 if (bufferSize == 0)
-                    return (null, null);
+                    return (null, null, null);
 
                 byte[] buffer = new byte[bufferSize];
                 fixed (byte* pBuffer = buffer)
                 {
                     if (PInvoke.GetSystemFirmwareTable(provider, 0, pBuffer, bufferSize) == 0)
-                        return (null, null);
+                        return (null, null, null);
                 }
 
                 // SMBIOS table header: Data at offset 8
                 int offset = 8;
                 long? maxSpeed = null;
                 string? detectedType = null;
+                byte? casLatency = null;
 
                 while (offset + 4 <= buffer.Length)
                 {
@@ -217,6 +226,16 @@ namespace BenchmarkDotNet.Environments
                                 }
                             }
                         }
+
+                        // CAS Latency at offset 0x1C (BYTE)
+                        if (length >= 0x1D && casLatency == null)
+                        {
+                            byte cas = buffer[offset + 0x1C];
+                            if (cas > 0 && cas < 100) // Reasonable CAS latency range
+                            {
+                                casLatency = cas;
+                            }
+                        }
                     }
 
                     // Move past formatted area
@@ -230,11 +249,11 @@ namespace BenchmarkDotNet.Environments
                     offset += 2;
                 }
 
-                return (maxSpeed, detectedType);
+                return (maxSpeed, detectedType, casLatency);
             }
             catch
             {
-                return (null, null);
+                return (null, null, null);
             }
         }
 
@@ -287,7 +306,7 @@ namespace BenchmarkDotNet.Environments
             }
 
             var (freq, type) = GetMacMemorySpecs();
-            return new PhysicalMemoryInfo(total, available, freq, type);
+            return new PhysicalMemoryInfo(total, available, freq, type, null);
         }
 
         private static (long? Frequency, string? Type) GetMacMemorySpecs()
