@@ -17,14 +17,14 @@ namespace BenchmarkDotNet.Environments
     {
         public long TotalPhysicalBytes { get; }
         public long? AvailablePhysicalBytes { get; }
-        public long? FrequencyMHz { get; }
+        public long? FrequencyMts { get; }
         public string? MemoryType { get; }
 
-        public PhysicalMemoryInfo(long totalPhysicalBytes, long? availablePhysicalBytes = null, long? frequencyMHz = null, string? memoryType = null)
+        public PhysicalMemoryInfo(long totalPhysicalBytes, long? availablePhysicalBytes = null, long? frequencyMts = null, string? memoryType = null)
         {
             TotalPhysicalBytes = totalPhysicalBytes;
             AvailablePhysicalBytes = availablePhysicalBytes;
-            FrequencyMHz = frequencyMHz;
+            FrequencyMts = frequencyMts;
             MemoryType = memoryType;
         }
 
@@ -34,16 +34,16 @@ namespace BenchmarkDotNet.Environments
             var sb = new StringBuilder();
             sb.Append($"{Math.Round(totalGb, 2)} GB");
 
-            if (MemoryType.IsNotBlank() || FrequencyMHz.HasValue)
+            if (MemoryType.IsNotBlank() || FrequencyMts.HasValue)
             {
                 sb.Append(" (");
                 if (MemoryType.IsNotBlank())
                     sb.Append(MemoryType);
-                if (FrequencyMHz.HasValue)
+                if (FrequencyMts.HasValue)
                 {
                     if (MemoryType.IsNotBlank())
                         sb.Append('-');
-                    sb.Append($"{FrequencyMHz}MHz");
+                    sb.Append($"{FrequencyMts}MT/s");
                 }
                 sb.Append(')');
             }
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Environments
             return null;
         }
 
-        private static (long? FrequencyMHz, string? MemoryType) GetLinuxOrWindowsMemoryDetails()
+        private static (long? FrequencyMts, string? MemoryType) GetLinuxOrWindowsMemoryDetails()
         {
             try
             {
@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Environments
                             if (File.Exists(typePath))
                             {
                                 string memType = File.ReadAllText(typePath).Trim();
-                                if (!string.IsNullOrEmpty(memType) && memType != "Unspecified")
+                                if (!string.IsNullOrEmpty(memType))
                                     return (null, memType);
                             }
                         }
@@ -163,7 +163,7 @@ namespace BenchmarkDotNet.Environments
         }
 
         [SupportedOSPlatform("windows6.0.6000")]
-        private static unsafe (long? FrequencyMHz, string? MemoryType) GetWindowsSmbiosMemoryDetails()
+        private static unsafe (long? FrequencyMts, string? MemoryType) GetWindowsSmbiosMemoryDetails()
         {
             try
             {
@@ -204,15 +204,16 @@ namespace BenchmarkDotNet.Environments
                             detectedType = memTypeStr;
                         }
 
-                        // Speed in MHz at offset 0x15 (WORD)
+                        // Speed in MHz at offset 0x15 (WORD), convert to MT/s
                         if (length >= 0x17)
                         {
-                            ushort speed = (ushort)(buffer[offset + 0x15] | (buffer[offset + 0x16] << 8));
-                            if (speed > 0 && speed < 0xFFFF)
+                            ushort speedMhz = (ushort)(buffer[offset + 0x15] | (buffer[offset + 0x16] << 8));
+                            if (speedMhz > 0 && speedMhz < 0xFFFF)
                             {
-                                if (maxSpeed == null || speed > maxSpeed.Value)
+                                long speedMts = speedMhz * 2; // DDR: MT/s = MHz × 2
+                                if (maxSpeed == null || speedMts > maxSpeed.Value)
                                 {
-                                    maxSpeed = speed;
+                                    maxSpeed = speedMts;
                                 }
                             }
                         }
@@ -301,9 +302,9 @@ namespace BenchmarkDotNet.Environments
                 string? type = null;
 
                 var speedMatch = Regex.Match(output, @"Speed:\s+(\d+)\s*MHz");
-                if (speedMatch.Success && long.TryParse(speedMatch.Groups[1].Value, out long speed))
+                if (speedMatch.Success && long.TryParse(speedMatch.Groups[1].Value, out long speedMhz))
                 {
-                    freq = speed;
+                    freq = speedMhz * 2; // Convert MHz to MT/s
                 }
 
                 var typeMatch = Regex.Match(output, @"Type:\s+([A-Z0-9]+)");
