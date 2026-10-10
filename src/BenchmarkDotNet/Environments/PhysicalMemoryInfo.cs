@@ -311,15 +311,14 @@ namespace BenchmarkDotNet.Environments
                 }
             }
 
-            var (freq, type) = GetMacMemoryDetails();
+            var (freq, type) = GetMacMemorySpecs();
             return new PhysicalMemoryInfo(total, available, freq, type);
         }
 
-        private static (long? FrequencyMHz, string? MemoryType) GetMacMemoryDetails()
+        private static (long? Frequency, string? Type) GetMacMemorySpecs()
         {
             try
             {
-                // Try system_profiler for detailed memory info
                 var profilerInfo = new ProcessStartInfo("system_profiler", "SPMemoryDataType")
                 {
                     RedirectStandardOutput = true,
@@ -337,22 +336,19 @@ namespace BenchmarkDotNet.Environments
                         long? freq = null;
                         string? type = null;
 
-                        // Pattern: "Speed: 6400 MHz" or "Size: 24 GB"
                         var speedMatch = Regex.Match(output, @"Speed:\s+(\d+)\s*MHz");
                         if (speedMatch.Success && long.TryParse(speedMatch.Groups[1].Value, out long speed))
                         {
                             freq = speed;
                         }
 
-                        // Pattern: "Type: DDR5" or "Type: LPDDR5"
                         var typeMatch = Regex.Match(output, @"Type:\s+([A-Z0-9]+)");
                         if (typeMatch.Success)
                         {
                             type = typeMatch.Groups[1].Value;
                         }
 
-                        if (freq.HasValue || type != null)
-                            return (freq, type);
+                        return (freq, type);
                     }
                 }
             }
