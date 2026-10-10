@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -262,52 +263,25 @@ namespace BenchmarkDotNet.Environments
             long? available = null;
 
             // 1. Get Total Memory
-            var sysctlInfo = new ProcessStartInfo("sysctl", "-n hw.memsize")
-            {
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using (var process = Process.Start(sysctlInfo))
-            {
-                if (process != null)
-                {
-                    string output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
-                    long.TryParse(output.Trim(), out total);
-                }
-            }
-
-            if (total == 0) return null;
+            string? sysctlOutput = ProcessHelper.RunAndReadOutput("sysctl", "-n hw.memsize");
+            if (string.IsNullOrEmpty(sysctlOutput) || !long.TryParse(sysctlOutput!.Trim(), out total) || total == 0)
+                return null;
 
             // 2. Get Free Memory using vm_stat
-            var vmStatInfo = new ProcessStartInfo("vm_stat")
+            string? vmStatOutput = ProcessHelper.RunAndReadOutput("vm_stat");
+            if (!string.IsNullOrEmpty(vmStatOutput))
             {
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using (var process = Process.Start(vmStatInfo))
-            {
-                if (process != null)
+                long pageSize = 4096;
+                var pageSizeMatch = Regex.Match(vmStatOutput, @"page size of (\d+) bytes");
+                if (pageSizeMatch.Success && long.TryParse(pageSizeMatch.Groups[1].Value, out long parsedPageSize))
                 {
-                    string output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
+                    pageSize = parsedPageSize;
+                }
 
-                    long pageSize = 4096;
-                    var pageSizeMatch = Regex.Match(output, @"page size of (\d+) bytes");
-                    if (pageSizeMatch.Success && long.TryParse(pageSizeMatch.Groups[1].Value, out long parsedPageSize))
-                    {
-                        pageSize = parsedPageSize;
-                    }
-
-                    var match = Regex.Match(output, @"Pages free:\s+(\d+)");
-                    if (match.Success && long.TryParse(match.Groups[1].Value, out long pagesFree))
-                    {
-                        available = pagesFree * pageSize;
-                    }
+                var match = Regex.Match(vmStatOutput, @"Pages free:\s+(\d+)");
+                if (match.Success && long.TryParse(match.Groups[1].Value, out long pagesFree))
+                {
+                    available = pagesFree * pageSize;
                 }
             }
 
@@ -319,38 +293,26 @@ namespace BenchmarkDotNet.Environments
         {
             try
             {
-                var profilerInfo = new ProcessStartInfo("system_profiler", "SPMemoryDataType")
+                string? output = ProcessHelper.RunAndReadOutput("system_profiler", "SPMemoryDataType");
+                if (string.IsNullOrEmpty(output))
+                    return (null, null);
+
+                long? freq = null;
+                string? type = null;
+
+                var speedMatch = Regex.Match(output, @"Speed:\s+(\d+)\s*MHz");
+                if (speedMatch.Success && long.TryParse(speedMatch.Groups[1].Value, out long speed))
                 {
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                using (var process = Process.Start(profilerInfo))
-                {
-                    if (process != null)
-                    {
-                        string output = process.StandardOutput.ReadToEnd();
-                        process.WaitForExit();
-
-                        long? freq = null;
-                        string? type = null;
-
-                        var speedMatch = Regex.Match(output, @"Speed:\s+(\d+)\s*MHz");
-                        if (speedMatch.Success && long.TryParse(speedMatch.Groups[1].Value, out long speed))
-                        {
-                            freq = speed;
-                        }
-
-                        var typeMatch = Regex.Match(output, @"Type:\s+([A-Z0-9]+)");
-                        if (typeMatch.Success)
-                        {
-                            type = typeMatch.Groups[1].Value;
-                        }
-
-                        return (freq, type);
-                    }
+                    freq = speed;
                 }
+
+                var typeMatch = Regex.Match(output, @"Type:\s+([A-Z0-9]+)");
+                if (typeMatch.Success)
+                {
+                    type = typeMatch.Groups[1].Value;
+                }
+
+                return (freq, type);
             }
             catch
             {
