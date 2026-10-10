@@ -307,7 +307,7 @@ namespace BenchmarkDotNet.Environments
                     freq = speedMhz * 2; // Convert MHz to MT/s
                 }
 
-                var typeMatch = Regex.Match(output, @"Type:\s+([A-Z0-9]+)");
+                var typeMatch = Regex.Match(output, @"Type:\s+(\S+)");
                 if (typeMatch.Success)
                 {
                     type = typeMatch.Groups[1].Value;
