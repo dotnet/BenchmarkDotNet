@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Environments
         {
             double totalGb = TotalPhysicalBytes / (1024.0 * 1024.0 * 1024.0);
             var sb = new StringBuilder();
-            sb.Append($"{Math.Round(totalGb, 2)} GB");
+            sb.Append($"{Math.Round(totalGb, 2)} GB Total");
 
             if (MemoryType.IsNotBlank() || FrequencyMts.HasValue || CasLatency.HasValue)
             {
