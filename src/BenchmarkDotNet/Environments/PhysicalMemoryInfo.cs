@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Windows.Win32;
 using Windows.Win32.System.SystemInformation;
@@ -313,33 +314,84 @@ namespace BenchmarkDotNet.Environments
         {
             try
             {
-                string? output = ProcessHelper.RunAndReadOutput("system_profiler", "SPMemoryDataType");
-                if (string.IsNullOrEmpty(output))
+                string? jsonOutput = ProcessHelper.RunAndReadOutput("system_profiler", "-json SPMemoryDataType");
+                if (string.IsNullOrEmpty(jsonOutput))
                     return (null, null);
 
-                long? freq = null;
-                string? type = null;
-
-                var speedMatch = Regex.Match(output, @"Speed:\s+(\d+)\s*MHz");
-                if (speedMatch.Success && long.TryParse(speedMatch.Groups[1].Value, out long speedMhz))
+                using (JsonDocument doc = JsonDocument.Parse(jsonOutput!))
                 {
-                    freq = speedMhz * 2; // Convert MHz to MT/s
-                }
+                    var root = doc.RootElement;
 
-                var typeMatch = Regex.Match(output, @"Type:\s+(\S+)");
-                if (typeMatch.Success)
-                {
-                    type = typeMatch.Groups[1].Value;
-                }
+                    if (!root.TryGetProperty("SPMemoryDataType", out JsonElement memoryArray) || memoryArray.ValueKind != JsonValueKind.Array)
+                        return (null, null);
 
-                return (freq, type);
+                    long? maxFreq = null;
+                    string? detectedType = null;
+
+                    foreach (var memoryItem in memoryArray.EnumerateArray())
+                    {
+                        // Try to find Speed property (can be in different formats)
+                        if (memoryItem.TryGetProperty("Speed", out JsonElement speedDirect) && speedDirect.ValueKind == JsonValueKind.String)
+                        {
+                            ParseSpeedValue(speedDirect.GetString(), ref maxFreq);
+                        }
+
+                        // Try _properties array structure
+                        if (memoryItem.TryGetProperty("_properties", out JsonElement properties) && properties.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var prop in properties.EnumerateArray())
+                            {
+                                if (prop.TryGetProperty("Speed", out JsonElement speedProp) && speedProp.ValueKind == JsonValueKind.String)
+                                {
+                                    ParseSpeedValue(speedProp.GetString(), ref maxFreq);
+                                }
+
+                                if (prop.TryGetProperty("Type", out JsonElement typeProp) && typeProp.ValueKind == JsonValueKind.String)
+                                {
+                                    ParseTypeValue(typeProp.GetString(), ref detectedType);
+                                }
+                            }
+                        }
+
+                        // Try Type property (can be at top level)
+                        if (memoryItem.TryGetProperty("Type", out JsonElement typeDirect) && typeDirect.ValueKind == JsonValueKind.String)
+                        {
+                            ParseTypeValue(typeDirect.GetString(), ref detectedType);
+                        }
+                    }
+
+                    return (maxFreq, detectedType);
+                }
             }
             catch
             {
-                // Fallback
+                // Fallback on parsing error
             }
 
             return (null, null);
+        }
+
+        private static void ParseSpeedValue(string? speedStr, ref long? maxFreq)
+        {
+            if (string.IsNullOrEmpty(speedStr))
+                return;
+
+            var speedMatch = Regex.Match(speedStr, @"(\d+)\s*MHz");
+            if (speedMatch.Success && long.TryParse(speedMatch.Groups[1].Value, out long speedMhz) && speedMhz > 0)
+            {
+                long speedMts = speedMhz * 2; // DDR: MT/s = MHz × 2
+                if (maxFreq == null || speedMts > maxFreq.Value)
+                    maxFreq = speedMts;
+            }
+        }
+
+        private static void ParseTypeValue(string? typeStr, ref string? detectedType)
+        {
+            if (string.IsNullOrEmpty(typeStr) || typeStr == "Unknown")
+                return;
+
+            if (detectedType == null)
+                detectedType = typeStr;
         }
     }
 }
