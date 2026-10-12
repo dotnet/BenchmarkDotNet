@@ -214,13 +214,12 @@ namespace BenchmarkDotNet.Environments
                             detectedType = memTypeStr;
                         }
 
-                        // Speed in MHz at offset 0x15 (WORD), convert to MT/s
+                        // Speed at offset 0x15 (WORD) in MT/s (SMBIOS spec)
                         if (length >= 0x17)
                         {
-                            ushort speedMhz = (ushort)(buffer[offset + 0x15] | (buffer[offset + 0x16] << 8));
-                            if (speedMhz > 0 && speedMhz < 0xFFFF)
+                            ushort speedMts = (ushort)(buffer[offset + 0x15] | (buffer[offset + 0x16] << 8));
+                            if (speedMts > 0)
                             {
-                                long speedMts = speedMhz * 2; // DDR: MT/s = MHz × 2
                                 if (maxSpeed == null || speedMts > maxSpeed.Value)
                                 {
                                     maxSpeed = speedMts;
@@ -232,7 +231,7 @@ namespace BenchmarkDotNet.Environments
                         if (length >= 0x1D && casLatency == null)
                         {
                             byte cas = buffer[offset + 0x1C];
-                            if (cas > 0 && cas < 100) // Reasonable CAS latency range
+                            if (cas > 0)
                             {
                                 casLatency = cas;
                             }
