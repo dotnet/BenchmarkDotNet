@@ -436,6 +436,57 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal("12.0.0-dev", ((NativeAotSettings)toolchain.Settings).IlCompilerVersion);
         }
 
+        [Fact]
+        public void UserCanSpecifyMultipleIlcPackagesPaths()
+        {
+            var root = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+            try
+            {
+                var before = root.CreateSubdirectory(Path.Combine("runtime_base", "Shipping"));
+                var after = root.CreateSubdirectory(Path.Combine("runtime", "Shipping"));
+
+                var config = ConfigParser.Parse(["-r", "nativeaot10.0", "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output)).config;
+
+                Assert.NotNull(config);
+                var jobs = config.GetJobs().ToArray();
+                Assert.Equal(2, jobs.Length);
+                var baseline = Assert.Single(jobs, job => job.Meta.Baseline);
+                Assert.Equal("NativeAOT 10.0-runtime_base", baseline.Id);
+                Assert.Equal(before.FullName, ((NativeAotSettings)((CsProjNativeAotToolchain)baseline.GetToolchain()).Settings).LocalIlcPackages?.FullName);
+                var other = Assert.Single(jobs, job => !job.Meta.Baseline);
+                Assert.Equal("NativeAOT 10.0-runtime", other.Id);
+                Assert.Equal(after.FullName, ((NativeAotSettings)((CsProjNativeAotToolchain)other.GetToolchain()).Settings).LocalIlcPackages?.FullName);
+            }
+            finally
+            {
+                root.Delete(recursive: true);
+            }
+        }
+
+        [Fact]
+        public void NonExistingIlcPackagesPathIsRejected()
+        {
+            var existing = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory!;
+            var missing = Path.Combine(existing.FullName, Guid.NewGuid().ToString());
+
+            var (isSuccess, _, _) = ConfigParser.Parse(["-r", "nativeaot10.0", "--ilcPackages", existing.FullName, missing], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
+        }
+
+        [Theory]
+        [InlineData(new[] { "runtime/artifacts/Shipping", "runtime_base/artifacts/Shipping" }, new[] { "runtime", "runtime_base" })]
+        [InlineData(new[] { "a/before/x/Shipping", "a/after/y/Shipping" }, new[] { "before-x", "after-y" })]
+        [InlineData(new[] { "a/Shipping", "a/b/Shipping" }, new[] { "Shipping", "b" })]
+        [InlineData(new[] { "a/Shipping", "a/Shipping" }, new[] { "1", "2" })]
+        public void IlcPackagesDisplayNamesKeepOnlyTheDistinguishingDirectories(string[] relativePaths, string[] expected)
+        {
+            var root = Path.GetTempPath();
+            var paths = relativePaths.Select(path => new DirectoryInfo(Path.Combine(root, path))).ToArray();
+
+            Assert.Equal(expected, ConfigParser.GetIlcPackagesDisplayNames(paths));
+        }
+
         [Theory]
         [InlineData("netcoreapp2.0", true)]
         [InlineData("netcoreapp2.1", true)]
