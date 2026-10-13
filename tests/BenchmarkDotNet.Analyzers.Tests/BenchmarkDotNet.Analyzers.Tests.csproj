@@ -23,8 +23,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.6.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="xunit.v3" Version="4.0.0" />
-    <PackageReference Include="Xunit.Combinatorial" Version="2.1.41" />
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
+    <PackageReference Include="Xunit.Combinatorial" Version="2.1.43" />
   </ItemGroup>
   <ItemGroup>
     <!-- Analyzers and CodeFixers are included via Directory.Build.props, but we need them as regular references for testing -->
