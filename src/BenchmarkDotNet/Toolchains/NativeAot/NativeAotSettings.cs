@@ -29,12 +29,14 @@ public sealed record NativeAotSettings : DotNetCliSettings
 
     public NativeAotSettings() { }
 
-    internal NativeAotSettings(CommandLineOptions options) : base(options)
+    /// <param name="options">the parsed command line options.</param>
+    /// <param name="ilcPackages">one of <see cref="CommandLineOptions.IlcPackages"/>, as each path gets its own job.</param>
+    internal NativeAotSettings(CommandLineOptions options, DirectoryInfo? ilcPackages) : base(options)
     {
-        if (options.IlcPackages != null)
+        if (ilcPackages != null)
         {
             // Restore the ILCompiler from a local runtime build (the generator also adds the dotnet nightly feed).
-            LocalIlcPackages = options.IlcPackages;
+            LocalIlcPackages = ilcPackages;
             IlCompilerVersion = LocalBuildIlCompilerVersion;
             UseTempFolderForRestore = true;
         }

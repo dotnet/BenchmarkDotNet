@@ -328,11 +328,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            if (options.IlcPackages.IsNotNullButDoesNotExist())
-            {
-                logger.WriteLineError($"The provided {nameof(options.IlcPackages)} \"{options.IlcPackages}\" does NOT exist.");
-                return false;
-            }
+            foreach (var ilcPackages in options.IlcPackages)
+                if (ilcPackages.IsNotNullButDoesNotExist())
+                {
+                    logger.WriteLineError($"The provided {nameof(options.IlcPackages)} \"{ilcPackages}\" does NOT exist.");
+                    return false;
+                }
 
             if (options.HardwareCounters.Count() > 3)
             {
@@ -559,16 +560,34 @@ namespace BenchmarkDotNet.ConsoleArguments
                         yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
 
                     foreach (string runtime in options.Runtimes) // known runtimes
-                        yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+                        foreach (var job in CreateJobsForGivenRuntime(baseJob, runtime, options))
+                            yield return job;
                 }
                 else
                 {
                     foreach (string runtime in options.Runtimes) // known runtimes
-                        yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+                        foreach (var job in CreateJobsForGivenRuntime(baseJob, runtime, options))
+                            yield return job;
 
                     foreach (var coreRunPath in options.CoreRunPaths)
                         yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
                 }
+            }
+        }
+
+        private static IEnumerable<Job> CreateJobsForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
+        {
+            // multiple --ilcPackages create one NativeAOT job per local build, the same way multiple --coreRun paths do
+            if (options.IlcPackages.Count > 1 && Runtime.Parse(runtimeId) is NativeAotRuntime aot)
+            {
+                var names = GetIlcPackagesDisplayNames(options.IlcPackages);
+                for (int i = 0; i < options.IlcPackages.Count; i++)
+                    yield return baseJob.WithId($"{aot}-{names[i]}")
+                        .WithToolchain(CsProjNativeAotToolchain.From(aot, new(options, options.IlcPackages[i])));
+            }
+            else
+            {
+                yield return CreateJobForGivenRuntime(baseJob, runtimeId, options);
             }
         }
 
@@ -580,7 +599,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 CoreRuntime core => baseJob.WithId(core.ToString())
                     .WithToolchain(CsProjCoreToolchain.From(core, new(options))),
                 NativeAotRuntime aot => baseJob.WithId(aot.ToString())
-                    .WithToolchain(CsProjNativeAotToolchain.From(aot, new(options))),
+                    .WithToolchain(CsProjNativeAotToolchain.From(aot, new(options, options.IlcPackages.SingleOrDefault()))),
                 R2RRuntime r2r => baseJob.WithId(r2r.ToString())
                     .WithToolchain(CsProjR2RToolchain.From(r2r, new(options))),
                 MonoWasmRuntime wasm => baseJob.WithId(wasm.ToString())
@@ -701,6 +720,48 @@ namespace BenchmarkDotNet.ConsoleArguments
             var lastCommonDirectorySeparatorIndex = coreRunPath.FullName.LastIndexOf(Path.DirectorySeparatorChar, commonLongestPrefixIndex - 1);
 
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
+        }
+
+        /// <summary>
+        /// the names become part of the job id, which ends up in the generated project's file name, so we keep only the
+        /// directories that tell the paths apart and join them without directory separators
+        ///
+        /// for following paths:
+        ///  D:\projects\runtime\artifacts\packages\Release\Shipping
+        ///  D:\projects\runtime_base\artifacts\packages\Release\Shipping
+        ///
+        /// we get:
+        ///
+        /// runtime
+        /// runtime_base
+        /// </summary>
+        internal static string[] GetIlcPackagesDisplayNames(IReadOnlyList<DirectoryInfo> paths)
+        {
+            char[] separators = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
+            var segments = paths
+                .Select(path => path.FullName.Split(separators, StringSplitOptions.RemoveEmptyEntries))
+                .ToArray();
+            int minLength = segments.Min(s => s.Length);
+
+            int commonPrefix = 0;
+            while (commonPrefix < minLength && segments.All(s => s[commonPrefix] == segments[0][commonPrefix]))
+                commonPrefix++;
+
+            int commonSuffix = 0;
+            while (commonPrefix + commonSuffix < minLength
+                && segments.All(s => s[s.Length - 1 - commonSuffix] == segments[0][segments[0].Length - 1 - commonSuffix]))
+                commonSuffix++;
+
+            var names = segments
+                .Select(s => string.Join("-", s.Skip(commonPrefix).Take(s.Length - commonPrefix - commonSuffix)))
+                .Select((name, index) => name.IsBlank() ? segments[index].LastOrDefault() ?? "" : name) // a path that contains another
+                .Select(name => name.AsValidFileName())
+                .ToArray();
+
+            // the same directory given twice (or differing only by casing on Windows) can't be told apart by name
+            return names.All(name => name.IsNotBlank()) && names.Distinct(StringComparer.OrdinalIgnoreCase).Count() == names.Length
+                ? names
+                : names.Select((_, index) => (index + 1).ToString()).ToArray();
         }
     }
 }
