@@ -53,15 +53,17 @@ public class UnitTestRunner(BuildContext context)
                 ["Platform"] = "" // force the tool to not look for the .dll in platform-specific directory
             },
             ArgumentCustomization = args
-                => args.Append("--report-xunit-trx")
+                => args.Append("--no-launch-profile")
+                       // Separate `dotnet run` options from the test app arguments.
+                       .Append("--")
+                       .Append("--report-xunit-trx")
                        .AppendSwitchQuoted("--report-xunit-trx-filename", System.IO.Path.GetFileName(logFile.FullPath))
                        .Append("--no-ansi")
                        .AppendSwitch("--progress", "off")
                        .AppendSwitch("--output", "Detailed")
                        .AppendSwitch("--show-stdout", "Failed")
                        .Append("--diagnostic")
-                       .AppendSwitch("--diagnostic-verbosity", diagnosticVerbosity)
-                       .Append("--no-launch-profile"),
+                       .AppendSwitch("--diagnostic-verbosity", diagnosticVerbosity),
         };
         return settings;
     }
