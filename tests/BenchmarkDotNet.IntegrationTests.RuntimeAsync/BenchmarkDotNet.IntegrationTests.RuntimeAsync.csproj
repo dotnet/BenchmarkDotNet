@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>BenchmarkDotNet.IntegrationTests.RuntimeAsync</AssemblyTitle>
     <TargetFramework>net11.0</TargetFramework>
+    <OutputType>Exe</OutputType>
     <!-- The csproj toolchain copies Features into the generated project, so the emitted runnables are diffed against runtime-async IL. -->
     <Features>$(Features);runtime-async=on</Features>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -16,7 +17,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Using Include="Xunit" />
-    <Using Include="Xunit.Abstractions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\BenchmarkDotNet.IntegrationTests\Shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
@@ -33,13 +33,8 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="[2.8.2]">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>
