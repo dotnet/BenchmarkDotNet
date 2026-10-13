@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
@@ -10,7 +10,6 @@ using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.Loggers;
-using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.Framework;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
@@ -32,6 +31,12 @@ namespace BenchmarkDotNet.IntegrationTests
 
             if (RuntimeInformation.IsFullFramework)
             {
+                if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64)
+                {
+                    // RyuJit for desktop .NET arm64. Supported only on net481, but we have to match the tfm in our test project.
+                    yield return [Jit.RyuJit, Platform.Arm64, CsProjFrameworkToolchain.Net472];
+                }
+                // Framework on arm emulates x86, so these platform targets should work on both.
                 yield return [Jit.LegacyJit, Platform.X86, CsProjFrameworkToolchain.Net472]; // 32bit LegacyJit for desktop .NET
                 yield return [Jit.LegacyJit, Platform.X64, CsProjFrameworkToolchain.Net472]; // 64bit LegacyJit for desktop .NET
                 yield return [Jit.RyuJit, Platform.X64, CsProjFrameworkToolchain.Net472]; // RyuJit for desktop .NET
@@ -87,7 +92,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [MethodImpl(MethodImplOptions.NoInlining)] public void Benchmark(bool justAnOverload) { } // we need to test overloads (#562)
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCalls(Jit jit, Platform platform, IToolchain toolchain)
@@ -107,7 +112,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassemblyResult(result, $"{nameof(WithCalls.Recursive)}()");
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleAllMethodCallsUsingFilters(Jit jit, Platform platform, IToolchain toolchain)
@@ -133,7 +138,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public T Create() => new T();
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleGenericTypes(Jit jit, Platform platform, IToolchain toolchain)
@@ -154,7 +159,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [Benchmark] public void JustReturn() { }
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleInlinableBenchmarks(Jit jit, Platform platform, IToolchain toolchain)
@@ -188,7 +193,7 @@ namespace BenchmarkDotNet.IntegrationTests
             [MethodImpl(MethodImplOptions.NoInlining)] public virtual void ForDisassemblyDiagnoser() { }
         }
 
-        [TheoryEnvSpecific("Not supported on Windows+Arm", EnvRequirement.NonWindowsArm)]
+        [Theory]
         [MemberData(nameof(GetAllJits), DisableDiscoveryEnumeration = true)]
         [Trait(Constants.Category, Constants.BackwardCompatibilityCategory)]
         public void CanDisassembleWhenBenchmarkDeclaresGeneratedMemberNames(Jit jit, Platform platform, IToolchain toolchain)
@@ -204,6 +209,66 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassemblyResult(result, $"{nameof(WithGeneratedMemberNames.Benchmark)}()");
             AssertDisassemblyResult(result, $"{nameof(WithGeneratedMemberNames.Called)}()");
         }
+
+        public class WithTwoBenchmarks
+        {
+            [Benchmark] public void First() => FirstCallee();
+
+            [Benchmark] public void Second() => SecondCallee();
+
+            [MethodImpl(MethodImplOptions.NoInlining)] public void FirstCallee() { }
+
+            [MethodImpl(MethodImplOptions.NoInlining)] public void SecondCallee() { }
+        }
+
+        // Every benchmark of an in-process run is emitted into the same assembly, one runnable type each, so the disassembler
+        // has to be pointed at the runnable of the benchmark it is handling rather than the first one.
+        [Fact]
+        public void InProcessDisassemblyTargetsTheRunnableOfEachBenchmark()
+        {
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+
+            CanExecute<WithTwoBenchmarks>(CreateInProcessConfig(disassemblyDiagnoser));
+
+            Assert.Equal(2, disassemblyDiagnoser.Results.Count);
+            foreach (var pair in disassemblyDiagnoser.Results)
+            {
+                var benchmarkCase = pair.Key;
+                var result = pair.Value;
+                Assert.Empty(result.Errors);
+                string called = benchmarkCase.Descriptor.WorkloadMethod.Name == nameof(WithTwoBenchmarks.First)
+                    ? nameof(WithTwoBenchmarks.FirstCallee)
+                    : nameof(WithTwoBenchmarks.SecondCallee);
+                AssertDisassemblyResult(result, $"{benchmarkCase.Descriptor.WorkloadMethod.Name}()");
+                AssertDisassemblyResult(result, $"{called}()");
+            }
+        }
+
+        // Each in-process run emits its runnables under the same type names, and the assemblies of earlier runs can still be
+        // loaded (never collected when saved to disk, which KeepBenchmarkFiles does on .NET Framework).
+        [Fact]
+        public void InProcessDisassemblyIgnoresRunnablesOfEarlierRuns()
+        {
+            CanExecute<WithCalls>(ManualConfig.CreateEmpty()
+                .AddJob(Job.Dry.WithToolchain(InProcessEmitToolchain.Default))
+                .AddLogger(new OutputLogger(Output))
+                .WithOptions(ConfigOptions.KeepBenchmarkFiles));
+
+            var disassemblyDiagnoser = new DisassemblyDiagnoser(
+                new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
+
+            CanExecute<WithGeneratedMemberNames>(CreateInProcessConfig(disassemblyDiagnoser));
+
+            DisassemblyResult result = disassemblyDiagnoser.Results.Single().Value;
+
+            Assert.Empty(result.Errors);
+            AssertDisassemblyResult(result, $"{nameof(WithGeneratedMemberNames.Benchmark)}()");
+            AssertDisassemblyResult(result, $"{nameof(WithGeneratedMemberNames.Called)}()");
+        }
+
+        private IConfig CreateInProcessConfig(IDiagnoser disassemblyDiagnoser)
+            => CreateConfig(JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Default, disassemblyDiagnoser, RunStrategy.ColdStart);
 
         private IConfig CreateConfig(Jit jit, Platform platform, IToolchain toolchain, IDiagnoser disassemblyDiagnoser, RunStrategy runStrategy)
             => ManualConfig.CreateEmpty()
@@ -226,7 +291,7 @@ namespace BenchmarkDotNet.IntegrationTests
         private void AssertDisassemblyResult(DisassemblyResult result, string methodSignature)
         {
             Assert.Contains(methodSignature, result.Methods.Select(m => m.Name.Split('.').Last()).ToArray());
-            Assert.Contains(result.Methods.Single(m => m.Name.EndsWith(methodSignature)).Maps, map => map.SourceCodes.Any());
+            Assert.Contains(result.Methods.Single(m => m.Name.EndsWith(methodSignature)).Maps, map => map.SourceCodes.Length != 0);
         }
     }
 }

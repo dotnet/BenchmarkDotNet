@@ -532,4 +532,49 @@ Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the param
   <data name="General_Job_RuntimeAndToolchainBothSet_Description" xml:space="preserve">
     <value>The runtime and toolchain characteristics of a job are coupled: setting the toolchain overwrites the runtime with the one the toolchain targets, and setting the runtime clears any explicitly set toolchain. When both are set on the same job, whichever assignment comes last wins and the other is silently discarded — so the outcome depends on ordering rather than on anything visible at the call site. Prefer setting only the Toolchain, which already determines the runtime; the default fix removes the Runtime assignment. If you instead intended the Runtime to win, remove the Toolchain.</value>
   </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_Title" xml:space="preserve">
+    <value>ArgumentsSource must yield an argument list for a multi-argument benchmark</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_MessageFormat" xml:space="preserve">
+    <value>ArgumentsSource &apos;{0}&apos; yields &apos;{1}&apos;, which cannot feed the {2} parameters of &apos;{3}&apos;. Yield a ValueTuple of exactly those types, or object[].</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_Description" xml:space="preserve">
+    <value>A benchmark taking several arguments is fed one element per case holding all of them. That element is a ValueTuple naming each parameter&apos;s type, or an object[]. Any other element type names one value, which cannot be spread across several parameters.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_Title" xml:space="preserve">
+    <value>ArgumentsSource must match the benchmark&apos;s parameters for every type argument</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_MessageFormat" xml:space="preserve">
+    <value>ArgumentsSource &apos;{0}&apos; yields &apos;{1}&apos; for a &apos;{2}&apos; parameter, which cannot be shown to match for every type argument.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_Description" xml:space="preserve">
+    <value>An open declaration is judged on what every substitution guarantees, and the next [GenericTypeArguments] on the class may supply a different one - so this cannot be proved at compile time and is reported as a warning. Discovery judges the substituted types and reports an error there if one of them does not match.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_Title" xml:space="preserve">
+    <value>ArgumentsSource must yield what the benchmark&apos;s parameters take</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_MessageFormat" xml:space="preserve">
+    <value>ArgumentsSource &apos;{0}&apos; yields &apos;{1}&apos; where &apos;{2}&apos; is taken{3}.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_Description" xml:space="preserve">
+    <value>A source names what a parameter takes: the parameter&apos;s own type, or object, which every value enters and casts back out of. A by-ref-like parameter is reached only through a conversion operator, so it names the type that operator takes. Nothing else is cast, because the rules the runtime can check are not the rules the language applies.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_Title" xml:space="preserve">
+    <value>ArgumentsSource should yield a ValueTuple rather than object[]</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_MessageFormat" xml:space="preserve">
+    <value>ArgumentsSource &apos;{0}&apos; can yield &apos;{1}&apos; instead of object[], which writes the argument types down.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_Description" xml:space="preserve">
+    <value>object[] remains supported for a multi-argument benchmark. A ValueTuple says the same thing with each argument&apos;s type declared, so a mismatch is a compile error in the source rather than a cast that fails while the benchmark runs.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_Title" xml:space="preserve">
+    <value>ArgumentsSource should yield the parameter&apos;s own type rather than object</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_MessageFormat" xml:space="preserve">
+    <value>ArgumentsSource &apos;{0}&apos; can yield &apos;{1}&apos; instead of object.</value>
+  </data>
+  <data name="Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_Description" xml:space="preserve">
+    <value>object remains supported, and is the way to defer the decision to the value&apos;s runtime type. Naming the parameter&apos;s own type instead makes a wrong value a compile error in the source rather than a cast that fails while the benchmark runs.</value>
+  </data>
 </root>

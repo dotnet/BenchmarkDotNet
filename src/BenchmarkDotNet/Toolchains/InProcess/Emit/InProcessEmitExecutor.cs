@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
     {
         public async ValueTask<ExecuteResult> ExecuteAsync(ExecuteParameters executeParameters, CancellationToken cancellationToken)
         {
-            var host = new InProcessHost(executeParameters.BenchmarkCase, executeParameters.Logger, executeParameters.Diagnoser, cancellationToken);
+            var host = new InProcessHost(executeParameters.BenchmarkCase, executeParameters.BenchmarkId, InProcessEmitRunner.GetRunnableType(executeParameters), executeParameters.Logger, executeParameters.Diagnoser, cancellationToken);
 
             int exitCode = -1;
             if (executeOnSeparateThread)
@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             }
             host.HandleInProcessDiagnoserResults(executeParameters.BenchmarkCase, executeParameters.CompositeInProcessDiagnoser);
 
-            return ExecuteResult.FromRunResults(host.RunResults, exitCode);
+            return ExecuteResult.FromRunResults(host.RunResults, exitCode, host.PrefixedLines);
         }
 
         private async ValueTask<int> ExecuteCore(IHost host, ExecuteParameters parameters)
@@ -70,10 +70,12 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             var oldThreadPriority = thread.Priority;
 
             var affinity = parameters.BenchmarkCase.Job.ResolveValueAsNullable(EnvironmentMode.AffinityCharacteristic);
+            bool processPrioritySet = false;
+            bool threadPrioritySet = false;
             try
             {
-                process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
-                thread.TrySetPriority(ThreadPriority.Highest, parameters.Logger);
+                processPrioritySet = process.TrySetPriority(ProcessPriorityClass.High, parameters.Logger);
+                threadPrioritySet = thread.TrySetPriority(ThreadPriority.Highest, parameters.Logger);
 
                 if (affinity != null)
                 {
@@ -88,8 +90,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit
             }
             finally
             {
-                process.TrySetPriority(oldPriority, parameters.Logger);
-                thread.TrySetPriority(oldThreadPriority, parameters.Logger);
+                if (processPrioritySet)
+                    process.TrySetPriority(oldPriority, parameters.Logger);
+                if (threadPrioritySet)
+                    thread.TrySetPriority(oldThreadPriority, parameters.Logger);
 
                 if (affinity != null && oldAffinity != null)
                 {

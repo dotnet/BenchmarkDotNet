@@ -8,6 +8,8 @@ namespace BenchmarkDotNet.Helpers
         private readonly CancellationTokenSource cts;
         private readonly ILogger logger;
 
+        public bool IsCancelled => Volatile.Read(ref cancelled) == 1;
+
         private CtrlCCanceler(CancellationTokenSource cts, ILogger logger)
         {
             this.logger = logger;

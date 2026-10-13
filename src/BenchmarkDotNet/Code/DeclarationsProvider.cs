@@ -99,10 +99,28 @@ namespace BenchmarkDotNet.Code
                 Descriptor.WorkloadMethod.GetParameters()
                     .Select((parameter, index) =>
                     {
-                        var refModifier = parameter.ParameterType.IsByRef ? "ref" : string.Empty;
-                        return $"{refModifier} {parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {refModifier} this.{FieldsContainerName}.{ArgFieldPrefix}{index};";
+                        var refModifier = parameter.ParameterType.IsByRef ? "ref " : string.Empty;
+                        return $"{refModifier}{parameter.ParameterType.GetCorrectCSharpTypeName()} arg{index} = {refModifier}{LoadArgument(parameter, index)};";
                     })
             );
+
+        // A by-ref-like parameter is held in its field as the value's own type (#774), so loading it back is the
+        // conversion. The cast is what invokes it: C# applies only an implicit operator to a bare assignment, and
+        // the rule admits an explicit one too - the same pair the in-process emitter looks up.
+        private string LoadArgument(ParameterInfo parameter, int index)
+        {
+            string field = $"this.{FieldsContainerName}.{ArgFieldPrefix}{index}";
+            var parameterType = parameter.ParameterType.WithoutRefModifier();
+
+            if (!parameterType.IsByRefLike())
+                return field;
+
+            // Special-case string-to-ReadOnlySpan<char> (C# first-class-span feature).
+            var held = Benchmark.Parameters.GetArgument(parameter.Name!).ParameterValue.SourceType;
+            return ReflectionExtensions.StringAsSpanMethod(parameterType, held) is { } helper
+                ? $"{helper.DeclaringType!.GetCorrectCSharpTypeName()}.{helper.Name}({field})"
+                : $"({parameterType.GetCorrectCSharpTypeName()}) {field}";
+        }
 
         protected string GetPassArguments()
             => string.Join(
@@ -135,7 +153,7 @@ namespace BenchmarkDotNet.Code
             => string.Join(
                 ", ",
                 Descriptor.WorkloadMethod.GetParameters()
-                    .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} this.{FieldsContainerName}.{ArgFieldPrefix}{index}")
+                    .Select((parameter, index) => $"{CodeGenerator.GetParameterModifier(parameter)} {LoadArgument(parameter, index)}")
             );
     }
 

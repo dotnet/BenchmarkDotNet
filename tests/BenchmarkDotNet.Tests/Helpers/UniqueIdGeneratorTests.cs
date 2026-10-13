@@ -53,9 +53,9 @@ public class UniqueIdGeneratorTests
         // Assert
         uids.Should().BeEquivalentTo(
         [
-            "1195d076-7324-88e9-be38-f686096150d6",
-            "1a59b0ad-fe5b-8bc4-b56e-4c4611296d0a",
-            "17102bb5-975f-8d91-a2d3-3c0da3addea2",
+            "140e2750-1d92-8a60-ae3a-8edba6a46f27",
+            "1ac7693b-dd06-890d-88cb-04758d231ace",
+            "1e1acf16-fda2-88bd-a020-d69af851df96",
 
             "18ba3702-d8a3-8666-9b61-48e7a90e784a",
             "15fa977d-8202-81f3-abf4-c6d0c9d5b18c",

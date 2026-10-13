@@ -38,8 +38,14 @@ namespace BenchmarkDotNet.Running
             int operationsPerInvoke = 1,
             int methodIndex = 0)
         {
-            Assertion.NotNull(nameof(type), type);
-            Assertion.NotNull(nameof(workloadMethod), workloadMethod);
+            ArgumentNullException.ThrowIfNull(type);
+            ArgumentNullException.ThrowIfNull(workloadMethod);
+
+            EnsureDeclaredBy(type, workloadMethod, nameof(workloadMethod));
+            EnsureDeclaredBy(type, globalSetupMethod, nameof(globalSetupMethod));
+            EnsureDeclaredBy(type, globalCleanupMethod, nameof(globalCleanupMethod));
+            EnsureDeclaredBy(type, iterationSetupMethod, nameof(iterationSetupMethod));
+            EnsureDeclaredBy(type, iterationCleanupMethod, nameof(iterationCleanupMethod));
 
             Type = type;
             WorkloadMethod = workloadMethod;
@@ -52,6 +58,22 @@ namespace BenchmarkDotNet.Running
             Baseline = baseline;
             Categories = categories ?? [];
             MethodIndex = methodIndex;
+        }
+
+        /// <summary>
+        /// Every method named here is one BenchmarkDotNet calls on an instance of <paramref name="type"/>, so the
+        /// type has to declare it or inherit it - an inherited one is declared by a base, which is why this asks
+        /// what the type can be assigned to rather than what it declares itself. A method no type declares, emitted
+        /// at run time, names nothing to check against and is left to whatever means to call it.
+        /// </summary>
+        private static void EnsureDeclaredBy(Type type, MethodInfo? method, string paramName)
+        {
+            if (method?.DeclaringType is not { } declaringType || declaringType.IsAssignableFrom(type))
+                return;
+
+            throw new ArgumentException(
+                $"{declaringType.GetDisplayName()}.{method.Name} is not declared by {type.GetDisplayName()} or anything it inherits from, so it cannot be called on one.",
+                paramName);
         }
 
         public override string ToString() => DisplayInfo;

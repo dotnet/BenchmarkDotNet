@@ -197,10 +197,7 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             // `init` counts: the runnable assigns parameters through an object initializer.
             var propertyAccessors = propertyDeclarationSyntax.AccessorList?.Accessors;
             propertyIsMissingAssignableSetter = !HasAssignableAccessor(propertyAccessors, SyntaxKind.SetAccessorDeclaration)
-#if CODE_ANALYSIS_3_8
-                && !HasAssignableAccessor(propertyAccessors, SyntaxKind.InitAccessorDeclaration)
-#endif
-                ;
+                && !HasAssignableAccessor(propertyAccessors, SyntaxKind.InitAccessorDeclaration);
 
             fieldOrPropertyIdentifierLocation = propertyDeclarationSyntax.Identifier.GetLocation();
             declaredNames = ImmutableArray.Create((fieldOrPropertyIdentifier, fieldOrPropertyIdentifierLocation));

@@ -23,7 +23,7 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
 
     private static IEnumerable<RunMode[]> GetRunModeCombinations(int count)
     {
-        var runModes = (RunMode[])Enum.GetValues(typeof(RunMode));
+        var runModes = Enum.GetValues<RunMode>();
 
         if (count == 1)
         {
@@ -49,7 +49,7 @@ public class InProcessDiagnoserTests(ITestOutputHelper output) : BenchmarkTestEx
 
     public static IEnumerable<object[]> GetTestCombinations()
     {
-        var toolchains = (ToolchainType[])Enum.GetValues(typeof(ToolchainType));
+        var toolchains = Enum.GetValues<ToolchainType>();
         var counts = new[] { 1, 3 };
 
         foreach (var toolchain in toolchains)

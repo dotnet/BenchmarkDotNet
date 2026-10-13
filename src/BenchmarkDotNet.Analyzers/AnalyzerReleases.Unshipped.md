@@ -12,6 +12,11 @@ BDN1310  |  Usage   | Error    | [ParamsSource]/[ArgumentsSource] source method 
 BDN1311  |  Usage   | Error    | [ParamsSource]/[ArgumentsSource] source must not yield a ref struct
 BDN1312  |  Usage   | Warning  | [ParamsSource]/[ArgumentsSource] source may yield a ref struct
 BDN1504  |  Usage   | Error    | [ArgumentsSource] must return a generic enumerable or async enumerable
+BDN1505  |  Usage   | Error    | [ArgumentsSource] must yield an argument list for a multi-argument benchmark
+BDN1506  |  Usage   | Warning  | [ArgumentsSource] must match the benchmark's parameters for every type argument
+BDN1507  |  Usage   | Error    | [ArgumentsSource] must yield what the benchmark's parameters take
+BDN1508  |  Usage   | Info     | [ArgumentsSource] should yield a ValueTuple rather than object[]
+BDN1509  |  Usage   | Info     | [ArgumentsSource] should yield the parameter's own type rather than object
 BDN1600  |  Usage   | Error    | Fields or properties annotated with [BenchmarkCancellation] must be of type CancellationToken
 BDN1601  |  Usage   | Error    | Fields annotated with [BenchmarkCancellation] must be public
 BDN1602  |  Usage   | Error    | Properties annotated with [BenchmarkCancellation] must be public

@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public void DisplayResults(ILogger logger)
         {
-            if (!benchmarkToEtlFile.Any())
+            if (benchmarkToEtlFile.Count == 0)
                 return;
 
             logger.WriteLineInfo($"Exported {benchmarkToEtlFile.Count} trace file(s). Example:");
@@ -103,7 +103,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
                 .Select(counter => HardwareCounters.FromCounter(counter, config.IntervalSelectors.TryGetValue(counter, out var selector) ? selector : GetInterval))
                 .ToArray();
 
-            if (counters.Any()) // we need to enable the counters before starting the kernel session
+            if (counters.Length != 0) // we need to enable the counters before starting the kernel session
                 HardwareCounters.Enable(counters);
 
             try

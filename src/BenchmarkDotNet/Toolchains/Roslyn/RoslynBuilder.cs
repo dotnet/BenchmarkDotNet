@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
 
             var (result, missingReferences) = Build(artifactsPaths, buildPartition, syntaxTree, compilationOptions, references, cancellationToken);
 
-            if (result.IsBuildSuccess || !missingReferences.Any())
+            if (result.IsBuildSuccess || missingReferences.Length == 0)
                 return result;
 
             var withMissingReferences = references.Union(missingReferences.Select(assemblyMetadata => assemblyMetadata.GetReference()));

@@ -78,7 +78,7 @@ namespace BenchmarkDotNet.Code
         {
             string benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location)!;
 
-            if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.IndexOf("LINQPAD", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (benchmarkDotNetLocation != null && benchmarkDotNetLocation.Contains("LINQPAD", StringComparison.OrdinalIgnoreCase))
             {
                 /* "LINQPad normally puts the compiled query into a different folder than the referenced assemblies
                  * - this allows for optimizations to reduce file I/O, which is important in the scratchpad scenario"
@@ -247,7 +247,7 @@ namespace BenchmarkDotNet.Code
 
         private static string[] GetFieldsContainerFields(BenchmarkCase benchmarkCase, string[] extraFields)
             => benchmarkCase.Descriptor.WorkloadMethod.GetParameters()
-                .Select((parameter, index) => $"public {GetFieldType(parameter.ParameterType, benchmarkCase.Parameters.GetArgument(parameter.Name!)).GetCorrectCSharpTypeName()} {RunnableConstants.ArgFieldPrefix}{index};")
+                .Select((parameter, index) => $"public {benchmarkCase.Parameters.GetArgument(parameter.Name!).ParameterValue.SourceType.GetCorrectCSharpTypeName()} {RunnableConstants.ArgFieldPrefix}{index};")
                 .Concat(extraFields)
                 .ToArray();
 
@@ -326,7 +326,7 @@ namespace BenchmarkDotNet.Code
             var factory = benchmarkCase.Job.ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!;
             var factoryType = factory.GetType();
 
-            if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && !ctor.GetParameters().Any()))
+            if (!factoryType.GetTypeInfo().DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0))
             {
                 throw new NotSupportedException("Custom factory must have a public parameterless constructor");
             }
@@ -516,15 +516,6 @@ namespace BenchmarkDotNet.Code
             @switch.AppendLine("}");
 
             return @switch.ToString();
-        }
-
-        private static Type GetFieldType(Type argumentType, ParameterInstance argument)
-        {
-            // #774 we can't store ByRefLike in a field, so we store what the value is cast to (which is later converted back to the ByRefLike when we load the arguments).
-            if (argumentType.WithoutRefModifier().IsByRefLike() && argument.Value is { } value)
-                return value.GetType();
-
-            return argumentType;
         }
     }
 

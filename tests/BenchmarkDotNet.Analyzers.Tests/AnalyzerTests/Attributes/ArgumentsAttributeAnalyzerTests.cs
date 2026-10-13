@@ -1914,4 +1914,375 @@ public class ArgumentsAttributeAnalyzerTests
             await RunAsync();
         }
     }
+
+    public class MustYieldArgumentList : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public MustYieldArgumentList() : base(ArgumentsAttributeAnalyzer.MustYieldArgumentListRule) { }
+
+        [Fact]
+        public async Task AnElementThatIsNeitherObjectArrayNorTuple_ShouldReportError()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<int[]> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a, int b) { }
+                }
+                """;
+
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "int[]", 2, "Run");
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task AMatchingTuple_ShouldNotReportError()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<(int, string)> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(int a, string b) { }
+                }
+                """;
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+    }
+
+    public class MustYieldWhatParametersTake : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public MustYieldWhatParametersTake() : base(ArgumentsAttributeAnalyzer.MustYieldWhatParametersTakeRule) { }
+
+        [Fact]
+        public async Task AnObjectArrayForOneParameterOfAnotherType_ShouldReportError()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<object[]> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a) { }
+                }
+                """;
+
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "object[]", "int", "");
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        // Each item of a tuple is judged against the parameter in its position - the same question the single
+        // parameter is asked - so the position is named to say which one did not fit.
+        [Fact]
+        public async Task ATupleItemThatDoesNotMatchItsParameter_ShouldReportError()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<(int, string)> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a, long b) { }
+                }
+                """;
+
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "string", "long", " for argument 2");
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        // No operator declares string -> ReadOnlySpan<char> on every target: the one on string arrived in .NET
+        // Core 2.1, so a benchmark built for .NET Framework has none. Both toolchains reach it through
+        // MemoryExtensions.AsSpan, so the rule admits it wherever the benchmark is being written.
+        [Fact]
+        public async Task AStringForAReadOnlySpanOfCharParameter_ShouldNotReportError()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<string> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(ReadOnlySpan<char> a) { }
+                }
+                """;
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        // Only that pair: a ReadOnlySpan of anything else is not reachable from a string.
+        [Fact]
+        public async Task AStringForAReadOnlySpanOfByteParameter_ShouldReportError()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<string> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(ReadOnlySpan<byte> a) { }
+                }
+                """;
+
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Error, "Values", "string", "System.ReadOnlySpan<byte>", "");
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        // A by-ref-like parameter is reached through a conversion operator, and an explicit one serves as well as
+        // an implicit one because the generated code writes the cast itself.
+        [Fact]
+        public async Task AByRefLikeParameterTheElementConvertsTo_ShouldNotReportError()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<byte[]> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(ReadOnlySpan<byte> a) { }
+                }
+                """;
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+    }
+
+    public class MustMatchParametersForEveryTypeArgument : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public MustMatchParametersForEveryTypeArgument() : base(ArgumentsAttributeAnalyzer.MustMatchParametersForEveryTypeArgumentRule) { }
+
+        // A warning rather than an error: what the type parameter becomes is supplied by a [GenericTypeArguments]
+        // this deliberately does not read, so the mismatch cannot be proved here. Discovery judges the substituted
+        // types and reports an error on those.
+        [Fact]
+        public async Task AnOpenElementAgainstAConcreteParameter_ShouldReportWarning()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass<T>
+                {
+                    public static IEnumerable<T> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a) { }
+                }
+                """;
+
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Warning, "Values", "T", "int");
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        [Fact]
+        public async Task AnOpenElementMatchingAnOpenParameter_ShouldNotReportWarning()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass<T>
+                {
+                    public static IEnumerable<T> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(T a) { }
+                }
+                """;
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+    }
+
+    public class ShouldYieldValueTuple : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public ShouldYieldValueTuple() : base(ArgumentsAttributeAnalyzer.ShouldYieldValueTupleRule) { }
+
+        // object[] stays supported, so this only suggests the shape that writes the types down.
+        [Fact]
+        public async Task AnObjectArrayForSeveralParameters_ShouldReportInfo()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<object[]> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a, string b) { }
+                }
+                """;
+
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Info, "Values", "(int, string)");
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+    }
+
+    public class ShouldYieldParameterType : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public ShouldYieldParameterType() : base(ArgumentsAttributeAnalyzer.ShouldYieldParameterTypeRule) { }
+
+        [Fact]
+        public async Task AnObjectForOneParameter_ShouldReportInfo()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<object> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource({|#0:nameof(Values)|})]
+                    public void Run(int a) { }
+                }
+                """;
+
+            AddExpectedDiagnostic(0, DiagnosticSeverity.Info, "Values", "int");
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+
+        // Nothing to suggest where the parameter is object already.
+        [Fact]
+        public async Task AnObjectForAnObjectParameter_ShouldNotReportInfo()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<object> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(object a) { }
+                }
+                """;
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+    }
+
+    // No source can yield a ref struct, so object is all there is to say and there is nothing to suggest.
+    public class ObjectForAByRefLikeParameter : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public ObjectForAByRefLikeParameter() : base(ArgumentsAttributeAnalyzer.ShouldYieldParameterTypeRule) { }
+
+        [Fact]
+        public async Task AnObjectForAByRefLikeParameter_ShouldNotReportInfo()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<object> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(ReadOnlySpan<byte> a) { }
+                }
+                """;
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+    }
+
+    // A ValueTuple cannot hold a ref struct either, so object[] is the shape that feeds such a benchmark.
+    public class ObjectArrayForAByRefLikeParameter : AnalyzerTestFixture<ArgumentsAttributeAnalyzer>
+    {
+        public ObjectArrayForAByRefLikeParameter() : base(ArgumentsAttributeAnalyzer.ShouldYieldValueTupleRule) { }
+
+        [Fact]
+        public async Task AnObjectArrayWhereAParameterIsByRefLike_ShouldNotReportInfo()
+        {
+            TestCode = /* lang=c#-test */ """
+                using System;
+                using System.Collections.Generic;
+                using BenchmarkDotNet.Attributes;
+
+                public class BenchmarkClass
+                {
+                    public static IEnumerable<object[]> Values() => null;
+
+                    [Benchmark]
+                    [ArgumentsSource(nameof(Values))]
+                    public void Run(ReadOnlySpan<byte> a, int b) { }
+                }
+                """;
+
+            DisableCompilerDiagnostics();
+
+            await RunAsync();
+        }
+    }
+
 }

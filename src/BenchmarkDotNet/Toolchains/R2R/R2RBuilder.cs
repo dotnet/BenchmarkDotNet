@@ -21,8 +21,6 @@ namespace BenchmarkDotNet.Toolchains.R2R
             base.AddProjectContent(project, buildPartition, artifactsPaths, projectFile);
 
             project.Add(new XElement("PropertyGroup",
-                new XComment(" Shorten obj path to work around https://github.com/dotnet/runtime/issues/103625. "),
-                new XElement("IntermediateOutputPath", "$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'o'))"),
                 new XElement("SelfContained", "true"),
                 new XElement("RuntimeIdentifier", RuntimeInformation.GetPortableRuntimeIdentifier()),
                 new XElement("PublishReadyToRun", "true"),
@@ -53,8 +51,5 @@ namespace BenchmarkDotNet.Toolchains.R2R
         protected override bool PublishesOutput => true;
 
         protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
-
-        protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, Settings.TargetFrameworkMoniker, RuntimeInformation.GetPortableRuntimeIdentifier(), "publish");
     }
 }

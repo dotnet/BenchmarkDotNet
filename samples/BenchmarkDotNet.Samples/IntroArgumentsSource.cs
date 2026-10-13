@@ -9,12 +9,13 @@ namespace BenchmarkDotNet.Samples
         [ArgumentsSource(nameof(Numbers))]
         public double ManyArguments(double x, double y) => Math.Pow(x, y);
 
-        public IEnumerable<object[]> Numbers() // for multiple arguments it's an IEnumerable of array of objects (object[])
+        // For several arguments the source yields one element per case holding all of them: a ValueTuple naming each parameter's type.
+        public IEnumerable<(double x, double y)> Numbers()
         {
-            yield return new object[] { 1.0, 1.0 };
-            yield return new object[] { 2.0, 2.0 };
-            yield return new object[] { 4.0, 4.0 };
-            yield return new object[] { 10.0, 10.0 };
+            yield return (1.0, 1.0);
+            yield return (2.0, 2.0);
+            yield return (4.0, 4.0);
+            yield return (10.0, 10.0);
         }
 
         [Benchmark]
@@ -29,17 +30,17 @@ namespace BenchmarkDotNet.Samples
         // asynchronously without resorting to blocking sync-over-async in the source. It may take an optional
         // [EnumeratorCancellation] CancellationToken, which receives the benchmark's cancellation token while
         // the values are enumerated.
-        public static async IAsyncEnumerable<object[]> NumbersAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public static async IAsyncEnumerable<(double x, double y)> NumbersAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             await Task.Delay(10, cancellationToken);
-            yield return new object[] { 1.0, 1.0 };
-            yield return new object[] { 2.0, 2.0 };
+            yield return (1.0, 1.0);
+            yield return (2.0, 2.0);
         }
     }
 
     public static class BenchmarkArguments
     {
-        public static IEnumerable<object> TimeSpans() // for single argument it's an IEnumerable of objects (object)
+        public static IEnumerable<TimeSpan> TimeSpans() // For single argument it's an IEnumerable of the parameter's type.
         {
             yield return TimeSpan.FromMilliseconds(10);
             yield return TimeSpan.FromMilliseconds(100);

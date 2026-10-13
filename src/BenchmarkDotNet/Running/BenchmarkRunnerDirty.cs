@@ -2,7 +2,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using System.Reflection;
@@ -100,7 +99,7 @@ namespace BenchmarkDotNet.Running
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, config, args, cancellationToken)).ConfigureAwait(false);
+                return await RunWithDirtyAssemblyResolveHelper(type, config, args, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -109,7 +108,7 @@ namespace BenchmarkDotNet.Running
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(types, config, args, cancellationToken)).ConfigureAwait(false);
+                return await RunWithDirtyAssemblyResolveHelper(types, config, args, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -118,7 +117,7 @@ namespace BenchmarkDotNet.Running
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(type, methods, config, cancellationToken)).ConfigureAwait(false);
+                return await RunWithDirtyAssemblyResolveHelper(type, methods, config, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -127,7 +126,7 @@ namespace BenchmarkDotNet.Running
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(assembly, config, args, cancellationToken)).ConfigureAwait(false);
+                return await RunWithDirtyAssemblyResolveHelper(assembly, config, args, cancellationToken).ConfigureAwait(false);
             }
         }
         [PublicAPI]
@@ -143,7 +142,7 @@ namespace BenchmarkDotNet.Running
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
-                return await RunWithExceptionHandling(() => RunWithDirtyAssemblyResolveHelper(benchmarkRunInfos, cancellationToken)).ConfigureAwait(false);
+                return await RunWithDirtyAssemblyResolveHelper(benchmarkRunInfos, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -191,31 +190,5 @@ namespace BenchmarkDotNet.Running
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static ValueTask<Summary[]> RunWithDirtyAssemblyResolveHelper(BenchmarkRunInfo[] benchmarkRunInfos, CancellationToken cancellationToken)
             => BenchmarkRunnerClean.Run(benchmarkRunInfos, cancellationToken);
-
-        private static async ValueTask<Summary> RunWithExceptionHandling(Func<ValueTask<Summary>> run)
-        {
-            try
-            {
-                return await run().ConfigureAwait(false);
-            }
-            catch (InvalidBenchmarkDeclarationException e)
-            {
-                ConsoleLogger.Default.WriteLineError(e.Message);
-                return Summary.ValidationFailed(e.Message, string.Empty, string.Empty);
-            }
-        }
-
-        private static async ValueTask<Summary[]> RunWithExceptionHandling(Func<ValueTask<Summary[]>> run)
-        {
-            try
-            {
-                return await run().ConfigureAwait(false);
-            }
-            catch (InvalidBenchmarkDeclarationException e)
-            {
-                ConsoleLogger.Default.WriteLineError(e.Message);
-                return [Summary.ValidationFailed(e.Message, string.Empty, string.Empty)];
-            }
-        }
     }
 }

@@ -13,7 +13,6 @@ public sealed class CsProjMonoCoreToolchain : CsProjNetToolchain
     public static readonly CsProjMonoCoreToolchain Mono90 = new(MonoCoreRuntime.Net90, MonoCoreSettings.Default);
     public static readonly CsProjMonoCoreToolchain Mono10_0 = new(MonoCoreRuntime.Net10_0, MonoCoreSettings.Default);
     public static readonly CsProjMonoCoreToolchain Mono11_0 = new(MonoCoreRuntime.Net11_0, MonoCoreSettings.Default);
-    public static readonly CsProjMonoCoreToolchain Mono12_0 = new(MonoCoreRuntime.Net12_0, MonoCoreSettings.Default);
 
     private CsProjMonoCoreToolchain(MonoCoreRuntime runtime, MonoCoreSettings settings)
         : this(runtime, settings, Resolve(settings, runtime)) { }
@@ -44,7 +43,6 @@ public sealed class CsProjMonoCoreToolchain : CsProjNetToolchain
             9 => Mono90,
             10 => Mono10_0,
             11 => Mono11_0,
-            12 => Mono12_0,
             _ => new CsProjMonoCoreToolchain(runtime, settings),
         };
     }

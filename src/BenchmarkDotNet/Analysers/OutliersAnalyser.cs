@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Analysers
             var actualOutliers = statistics.GetActualOutliers(outlierMode);
 
             var cultureInfo = summary.GetCultureInfo();
-            if (allOutliers.Any())
+            if (allOutliers.Length != 0)
                 yield return CreateHint(GetMessage(actualOutliers, allOutliers, statistics.LowerOutliers, statistics.UpperOutliers, cultureInfo), report);
         }
 
@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Analysers
 
             var rangeMessages = new List<string?> { GetRangeMessage(lowerOutliers), GetRangeMessage(upperOutliers) };
             rangeMessages.RemoveAll(string.IsNullOrEmpty);
-            string rangeMessage = rangeMessages.Any()
+            string rangeMessage = rangeMessages.Count != 0
                 ? " (" + string.Join(", ", rangeMessages) + ")"
                 : string.Empty;
 

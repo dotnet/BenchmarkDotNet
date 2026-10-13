@@ -95,9 +95,15 @@ namespace BenchmarkDotNet.Diagnosers
             switch (signal)
             {
                 case HostSignal.AfterAll when (Config.RunInHost || isInProcess) && ShouldUseClrMdDisassembler(benchmark):
-                    results.Add(benchmark, ClrMdDisassembler.AttachAndDisassemble(
-                        BuildClrMdArgs(parameters.BenchmarkCase, $"{RunnableConstants.EmittedTypePrefix}{parameters.BenchmarkId.Value}", parameters.ProcessId))
-                    );
+                    await ThreadPoolHelper.Switch(cancellationToken);
+
+                    var clrMdArgs = BuildClrMdArgs(parameters.BenchmarkCase, $"{RunnableConstants.EmittedTypePrefix}{parameters.BenchmarkId.Value}", parameters.ProcessId);
+                    if (parameters.InProcessRunnableType is { } runnableType)
+                    {
+                        clrMdArgs.TypeName = runnableType.FullName!;
+                        clrMdArgs.TypeHandle = runnableType.TypeHandle.Value;
+                    }
+                    results.Add(benchmark, ClrMdDisassembler.AttachAndDisassemble(clrMdArgs));
                     break;
                 case HostSignal.SeparateLogic when ShouldUseMonoDisassembler(benchmark):
                     var result = await monoDisassembler.Disassemble(benchmark, cancellationToken).ConfigureAwait(false);
@@ -118,12 +124,6 @@ namespace BenchmarkDotNet.Diagnosers
             if (!(currentPlatform is Platform.X64 or Platform.X86 or Platform.Arm64))
             {
                 yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} does not support {currentPlatform}");
-                yield break;
-            }
-
-            if (currentPlatform == Platform.Arm64 && OsDetector.IsWindows())
-            {
-                yield return new ValidationError(true, $"{nameof(DisassemblyDiagnoser)} does not support Arm on Windows");
                 yield break;
             }
 
@@ -214,7 +214,22 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private static long SumNativeCodeSize(DisassemblyResult disassembly)
-            => disassembly.Methods.Sum(method => method.Maps.Sum(map => map.SourceCodes.OfType<Asm>().Sum(asm => asm.InstructionLength)));
+        {
+            long total = 0;
+
+            foreach (var method in disassembly.Methods)
+            {
+                foreach (var map in method.Maps)
+                {
+                    foreach (var asm in map.SourceCodes.OfType<Asm>())
+                    {
+                        total += asm.InstructionLength;
+                    }
+                }
+            }
+
+            return total;
+        }
 
         InProcessDiagnoserHandlerData IInProcessDiagnoser.GetHandlerData(BenchmarkCase benchmarkCase)
         {
@@ -276,6 +291,7 @@ namespace BenchmarkDotNet.Diagnosers
             var clrMdArgs = _clrMdArgs;
             clrMdArgs.ProcessId = Process.GetCurrentProcess().Id;
             clrMdArgs.TypeName = args.BenchmarkInstance.GetType().FullName!;
+            clrMdArgs.TypeHandle = args.BenchmarkInstance.GetType().TypeHandle.Value;
             _result = DisassemblyDiagnoser.GetClrMdDisassembler().AttachAndDisassemble(clrMdArgs);
             return new();
         }

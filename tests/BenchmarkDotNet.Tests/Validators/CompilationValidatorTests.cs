@@ -75,7 +75,7 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             var validationErrors = await CompilationValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(type)).ToArrayAsync();
 
-            Assert.Equal(hasErrors, validationErrors.Any());
+            Assert.Equal(hasErrors, validationErrors.Length != 0);
         }
 
         [Theory]
@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Tests.Validators
         {
             var validationErrors = await CompilationValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(type)).ToArrayAsync();
 
-            Assert.Equal(hasErrors, validationErrors.Any());
+            Assert.Equal(hasErrors, validationErrors.Length != 0);
         }
 
         [Theory]
@@ -108,7 +108,7 @@ namespace BenchmarkDotNet.Tests.Validators
             var validationErrors = await CompilationValidator.FailOnError.ValidateAsync(BenchmarkConverter.TypeToBenchmarks(constructed)).ToArrayAsync();
 
             // Assert
-            Assert.Equal(hasErrors, validationErrors.Any());
+            Assert.Equal(hasErrors, validationErrors.Length != 0);
         }
 
         private static Delegate BuildDummyMethod<T>(string name)

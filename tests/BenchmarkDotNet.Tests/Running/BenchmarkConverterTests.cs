@@ -236,21 +236,17 @@ namespace BenchmarkDotNet.Tests.Running
             [Benchmark] public void C() { }
         }
 
-        [Fact]
-        public void ThrowsWhenSetupAndCleanupMethodsAreNonPublic()
+        [Theory]
+        [InlineData(typeof(PrivateGlobalSetup))]
+        [InlineData(typeof(PrivateGlobalCleanup))]
+        [InlineData(typeof(PrivateIterationSetup))]
+        [InlineData(typeof(PrivateIterationCleanup))]
+        public void ReportsSetupAndCleanupMethodsThatAreNonPublic(Type type)
         {
-            var types = new[]
-            {
-                typeof(PrivateGlobalSetup),
-                typeof(PrivateGlobalCleanup),
-                typeof(PrivateIterationSetup),
-                typeof(PrivateIterationCleanup)
-            };
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(type);
 
-            foreach (var type in types)
-            {
-                Assert.Throws<InvalidBenchmarkDeclarationException>(() => BenchmarkConverter.TypeToBenchmarks(type));
-            }
+            Assert.Contains("method X has incorrect access modifiers", Assert.Single(runInfo.DeclarationErrors).Message);
+            Assert.NotEmpty(runInfo.BenchmarksCases);
         }
 
         public class PrivateGlobalSetup
@@ -275,6 +271,154 @@ namespace BenchmarkDotNet.Tests.Running
         {
             [IterationCleanup] private void X() { }
             [Benchmark] public void A() { }
+        }
+
+        [Fact]
+        public void EveryBadDeclarationInATypeIsReported()
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(SeveralBadDeclarations));
+
+            Assert.Equal(
+                [
+                    "Benchmark method Generic is generic.\nGeneric Benchmark methods are not supported.",
+                    "Benchmark method NonPublic has incorrect access modifiers.\nMethod must be public.",
+                    "Benchmark method TakesAnArgument has incorrect signature.\nMethod shouldn't have any arguments.",
+                    "GlobalSetup method Setup has incorrect access modifiers.\nMethod must be public."
+                ],
+                runInfo.DeclarationErrors.Select(error => error.Message).OrderBy(message => message));
+
+            Assert.All(runInfo.DeclarationErrors, error => Assert.True(error.IsCritical));
+            Assert.Equal(nameof(SeveralBadDeclarations.Fine), Assert.Single(runInfo.BenchmarksCases).Descriptor.WorkloadMethod.Name);
+        }
+
+#pragma warning disable BDN1103, BDN1104, BDN1400
+        public class SeveralBadDeclarations
+        {
+            [GlobalSetup] private void Setup() { }
+
+            [Benchmark] private void NonPublic() { }
+            [Benchmark] public void Generic<T>() { }
+            [Benchmark] public void TakesAnArgument(int x) { }
+            [Benchmark] public void Fine() { }
+        }
+#pragma warning restore BDN1103, BDN1104, BDN1400
+
+        [Fact]
+        public void AParameterMemberThatCannotBeReadLeavesTheOthersRanging()
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(OneUnreadableParameterMember));
+
+            Assert.Contains("has no public, accessible method/property called Missing", Assert.Single(runInfo.DeclarationErrors).Message);
+            Assert.Equal([1, 2], runInfo.BenchmarksCases.Select(benchmark => benchmark.Parameters["Good"]));
+        }
+
+        public class OneUnreadableParameterMember
+        {
+            [Params(1, 2)] public int Good { get; set; }
+            [ParamsSource("Missing")] public int Bad { get; set; }
+
+            [Benchmark] public void Run() { }
+        }
+
+        [Fact]
+        public void AnOpenGenericTypeIsReportedWithoutCases()
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(OpenGeneric<>));
+
+            Assert.Contains("use BenchmarkSwitcher for it", Assert.Single(runInfo.DeclarationErrors).Message);
+            Assert.Empty(runInfo.BenchmarksCases);
+            Assert.False(runInfo.ContainsBenchmarkDeclarations);
+        }
+
+        public class OpenGeneric<T>
+        {
+            [Benchmark] public void Run() { }
+        }
+
+        [Fact]
+        public void EveryRefusedArgumentOfAMethodIsReported()
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(SeveralRefusedArguments));
+
+            Assert.Equal(
+                [
+                    "[Arguments] on Run provides null for the Int32 parameter 'a', which is a value type - null is not one of its values.",
+                    "[Arguments] on Run provides null for the Int64 parameter 'b', which is a value type - null is not one of its values.",
+                    "Benchmark Run has invalid number of defined arguments provided with [Arguments]! 3 instead of 2."
+                ],
+                runInfo.DeclarationErrors.Select(error => error.Message).OrderBy(message => message));
+        }
+
+#pragma warning disable BDN1501, BDN1502
+        public class SeveralRefusedArguments
+        {
+            [Benchmark]
+            [Arguments(null, null)]
+            [Arguments(1, 2, 3)]
+            public void Run(int a, long b) { }
+        }
+#pragma warning restore BDN1501, BDN1502
+
+        [Fact]
+        public void TheSameRefusalIsReportedOnce()
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(TwoRefusedParamsValues));
+
+            Assert.Contains("[Params] provides null for the Int32 member 'Value'", Assert.Single(runInfo.DeclarationErrors).Message);
+            Assert.Equal([1], runInfo.BenchmarksCases.Select(benchmark => benchmark.Parameters["Value"]));
+        }
+
+#pragma warning disable BDN1301
+        public class TwoRefusedParamsValues
+        {
+            [Params(null, 1, null)] public int Value { get; set; }
+
+            [Benchmark] public void Run() { }
+        }
+#pragma warning restore BDN1301
+
+        [Fact]
+        public void ACaseFromAnotherTypeIsRefused()
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(WithMutator));
+            var foreign = BenchmarkConverter.TypeToBenchmarks(typeof(Derived)).BenchmarksCases;
+
+            var exception = Assert.Throws<ArgumentException>(() => runInfo.WithBenchmarks(foreign));
+
+            Assert.Contains("Derived.Test is not declared by WithMutator", exception.Message);
+        }
+
+        [Fact]
+        public void AMethodFromAnotherTypeIsRefused()
+        {
+            var own = typeof(WithMutator).GetMethod(nameof(WithMutator.Method))!;
+            var foreign = typeof(WithIterationCleanupOnly).GetMethod(nameof(WithIterationCleanupOnly.Cleanup))!;
+
+            Assert.Contains("WithIterationCleanupOnly.Cleanup is not declared by WithMutator",
+                Assert.Throws<ArgumentException>(() => new Descriptor(typeof(WithMutator), foreign)).Message);
+
+            Assert.Contains("WithIterationCleanupOnly.Cleanup is not declared by WithMutator",
+                Assert.Throws<ArgumentException>(() => new Descriptor(typeof(WithMutator), own, iterationCleanupMethod: foreign)).Message);
+        }
+
+        [Fact]
+        public void AnInheritedMethodIsAccepted()
+        {
+            var inherited = typeof(Base).GetMethod(nameof(Base.Test))!;
+
+            Assert.Equal(typeof(Derived), new Descriptor(typeof(Derived), inherited).Type);
+        }
+
+        [Fact]
+        public void NarrowingAReadingKeepsWhatItLearned()
+        {
+            var runInfo = BenchmarkConverter.TypeToBenchmarks(typeof(OneUnreadableParameterMember));
+
+            var narrowed = runInfo.WithBenchmarks([.. runInfo.BenchmarksCases.Take(1)]);
+
+            Assert.Equal(runInfo.DeclarationErrors, narrowed.DeclarationErrors);
+            Assert.Equal(runInfo.Type, narrowed.Type);
+            Assert.Single(narrowed.BenchmarksCases);
         }
     }
 }

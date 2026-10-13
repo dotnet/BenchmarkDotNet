@@ -27,6 +27,6 @@ namespace BenchmarkDotNet.Toolchains
             }
         }
 
-        public override string ToString() => Runtime.Version == null ? name : $"{name} {Runtime.Version}";
+        public override string ToString() => name;
     }
 }

@@ -23,7 +23,7 @@ internal sealed class CsProjNativeAotBuilder : CsProjBuilder
     private readonly NativeAotSettings settings;
 
     internal CsProjNativeAotBuilder(NativeAotSettings settings)
-        : base(settings with { PackagesPath = GetPackagesDirectoryPath(settings.UseTempFolderForRestore, settings.PackagesPath) })
+        : base(settings)
     {
         this.settings = settings;
         BenchmarkRunCallType = Code.CodeGenBenchmarkRunCallType.Direct;
@@ -31,28 +31,7 @@ internal sealed class CsProjNativeAotBuilder : CsProjBuilder
 
     protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
 
-    protected override string GetBuildArtifactsDirectoryPath(BuildPartition buildPartition, string programName)
-        => settings.UseTempFolderForRestore
-            ? Path.Combine(Path.GetTempPath(), programName) // store everything in temp to avoid collisions with IDE
-            : base.GetBuildArtifactsDirectoryPath(buildPartition, programName);
-
-    protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-        => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, Settings.TargetFrameworkMoniker, settings.RuntimeIdentifier, "publish");
-
     protected override bool PublishesOutput => true;
-
-    // We always want to have a new directory for NuGet packages restore.
-    // Some of the packages are going to contain source code, so they can not be in the subfolder of current solution
-    // otherwise they would be compiled too (new .csproj include all .cs files from subfolders by default).
-    private static DirectoryInfo? GetPackagesDirectoryPath(bool useTempFolderForRestore, DirectoryInfo? packagesRestorePath)
-        => packagesRestorePath is null && useTempFolderForRestore
-               ? new DirectoryInfo(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()))
-               : null;
-
-    protected override string[] GetArtifactsToCleanup(ArtifactsPaths artifactsPaths)
-        => settings.UseTempFolderForRestore && artifactsPaths.PackagesDirectoryName.IsNotBlank()
-            ? base.GetArtifactsToCleanup(artifactsPaths).Concat([artifactsPaths.PackagesDirectoryName]).ToArray()
-            : base.GetArtifactsToCleanup(artifactsPaths);
 
     protected override async ValueTask GenerateNuGetConfigAsync(ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
     {
@@ -64,17 +43,14 @@ internal sealed class CsProjNativeAotBuilder : CsProjBuilder
         if (!settings.UseNuGetClearTag && feeds is [{ Value: DefaultNuGetFeed }])
             return;
 
-        string content = $"""
-        <?xml version="1.0" encoding="utf-8"?>
-        <configuration>
-          <packageSources>
-            {(settings.UseNuGetClearTag ? "<clear/>" : string.Empty)}
-            {string.Join(Environment.NewLine + "    ", feeds.Select(feed => $"<add key=\"{feed.Key}\" value=\"{feed.Value}\" />"))}
-          </packageSources>
-        </configuration>
-        """;
+        var configuration = new XElement("configuration",
+            new XElement("packageSources",
+                settings.UseNuGetClearTag ? new XElement("clear") : null,
+                feeds.Select(feed => new XElement("add",
+                    new XAttribute("key", feed.Key),
+                    new XAttribute("value", feed.Value)))));
 
-        await File.WriteAllTextAsync(artifactsPaths.NuGetConfigPath, content, cancellationToken).ConfigureAwait(false);
+        await SaveXmlAsync(new XDocument(configuration), artifactsPaths.NuGetConfigPath, cancellationToken).ConfigureAwait(false);
     }
 
     // The ILCompiler is restored either from a NuGet feed, or from a local runtime build (which also needs the dotnet nightly feed).
@@ -104,8 +80,6 @@ internal sealed class CsProjNativeAotBuilder : CsProjBuilder
             new XElement("StackTraceSupport", settings.GenerateStackTraceData),
             new XComment(" workaround for 'This runtime may not be supported by .NET Core.' error "),
             new XElement("EnsureNETCoreAppRuntime", "false"),
-            new XComment(" Shorten obj path to work around https://github.com/dotnet/runtime/issues/103625. "),
-            new XElement("IntermediateOutputPath", "$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'o'))"),
             GetInstructionSetSettings(buildPartition)));
 
         if (settings.IlCompilerVersion.IsNotBlank())
@@ -154,28 +128,24 @@ internal sealed class CsProjNativeAotBuilder : CsProjBuilder
     /// </summary>
     private ValueTask GenerateReflectionFileAsync(ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
     {
-        const string content = """
-        <Directives>
-            <Application>
-                <Assembly Name="System.Runtime">
-                    <Type Name="System.GC" Dynamic="Required All" />
-                </Assembly>
-                <Assembly Name="System.Threading.ThreadPool">
-                    <Type Name="System.Threading.ThreadPool" Dynamic="Required All" />
-                </Assembly>
-                <Assembly Name="System.Threading">
-                    <Type Name="System.Threading.Monitor" Dynamic="Required All" />
-                </Assembly>
-            </Application>
-        </Directives>
-
-        """;
+        var directives = new XElement("Directives",
+            new XElement("Application",
+                RequiredType("System.Runtime", "System.GC"),
+                RequiredType("System.Threading.ThreadPool", "System.Threading.ThreadPool"),
+                RequiredType("System.Threading", "System.Threading.Monitor")));
 
         string directoryName = Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!;
         if (directoryName == null)
             throw new InvalidOperationException($"Can't get directory of projectFilePath ('{artifactsPaths.ProjectFilePath}')");
 
-        return new(File.WriteAllTextAsync(Path.Combine(directoryName, GeneratedRdXmlFileName), content, cancellationToken));
+        return SaveXmlAsync(new XDocument(directives), Path.Combine(directoryName, GeneratedRdXmlFileName), cancellationToken);
+
+        static XElement RequiredType(string assemblyName, string typeName)
+            => new("Assembly",
+                new XAttribute("Name", assemblyName),
+                new XElement("Type",
+                    new XAttribute("Name", typeName),
+                    new XAttribute("Dynamic", "Required All")));
     }
 
     private string GetCurrentInstructionSet(Platform platform)

@@ -25,7 +25,8 @@ namespace BenchmarkDotNet.Running
             Resolver = resolver;
             RepresentativeBenchmarkCase = benchmarks[0].BenchmarkCase;
             Benchmarks = benchmarks;
-            ProgramName = GetProgramName(RepresentativeBenchmarkCase, Interlocked.Increment(ref s_partitionCounter));
+            Id = Interlocked.Increment(ref s_partitionCounter);
+            ProgramName = GetProgramName(RepresentativeBenchmarkCase, Id);
             LogBuildOutput = benchmarks[0].Config.Options.IsSet(ConfigOptions.LogBuildOutput);
             GenerateMSBuildBinLog = benchmarks[0].Config.Options.IsSet(ConfigOptions.GenerateMSBuildBinLog);
         }
@@ -39,6 +40,11 @@ namespace BenchmarkDotNet.Running
         }
 
         public BenchmarkBuildInfo[] Benchmarks { get; }
+
+        /// <summary>
+        /// Unique within the process, and part of <see cref="ProgramName"/>.
+        /// </summary>
+        internal int Id { get; }
 
         public string ProgramName { get; }
 

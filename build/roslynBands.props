@@ -10,11 +10,10 @@
     <OutputPath>bin\$(Configuration)\roslyn$(MccVersion)\cs</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <!-- We multi-target for different compiler versions. https://github.com/dotnet/roslyn/discussions/81256#discussioncomment-14975130, https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md#versioning -->
-    <!-- C# 7.3/Roslyn 2.8 is our baseline (min version we support) -->
-    <!-- ITypeSymbol.IsRefLikeType -->
-    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MccVersion)', '3.0'))">$(DefineConstants);CODE_ANALYSIS_3_0</DefineConstants>
-    <!-- C# 9 -->
-    <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MccVersion)', '3.8'))">$(DefineConstants);CODE_ANALYSIS_3_8</DefineConstants>
+    <!-- Roslyn 4.0 (VS 2022 RTM, .NET SDK 6) is the lowest band: picking a version-specific analyzer folder at all
+         requires that tooling, so a lower band could only ever be selected by a compiler that cannot select. The
+         lowest band is the fallback for every supported compiler below the next one up, so it needs no successor
+         below it. Older hosts are handed no analyzer at all - see BenchmarkDotNet.Annotations.targets. -->
     <!-- C# 11 -->
     <DefineConstants Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(MccVersion)', '4.4'))">$(DefineConstants);CODE_ANALYSIS_4_4</DefineConstants>
     <!-- C# 12 -->

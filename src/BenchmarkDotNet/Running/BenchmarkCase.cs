@@ -10,7 +10,7 @@ using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 namespace BenchmarkDotNet.Running
 {
-    public class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable, IAsyncDisposable
+    public sealed class BenchmarkCase : IComparable<BenchmarkCase>, IDisposable, IAsyncDisposable
     {
         public Descriptor Descriptor { get; }
         public Job Job { get; }

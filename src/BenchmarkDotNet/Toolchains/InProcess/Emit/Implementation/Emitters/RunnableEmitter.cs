@@ -4,6 +4,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
@@ -11,6 +12,9 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+#if NET9_0_OR_GREATER
+using System.Runtime.Loader;
+#endif
 using System.Security;
 using static BenchmarkDotNet.Code.RunnableConstants;
 using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableReflectionHelpers;
@@ -26,7 +30,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         /// <summary>
         /// Maps action args to fields that store arg values.
         /// </summary>
-        private record struct ArgFieldInfo(FieldInfo Field, Type ArgLocalsType, MethodInfo? OpImplicitMethod);
+        private record struct ArgFieldInfo(FieldInfo Field, Type ArgLocalsType, MethodInfo? OpConversionMethod);
 
         private readonly BuildPartition buildPartition;
         private readonly ModuleBuilder moduleBuilder;
@@ -90,13 +94,24 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 runnableEmitter.EmitRunnableCore();
             }
 
-            if (saveToDisk)
-            {
-                assemblyBuilder.Save(assemblyFileName);
-                logger.WriteLineInfo($"{assemblyFileName} assembly saved to {assemblyResultPath}");
-            }
+            if (!saveToDisk)
+                return assemblyBuilder;
 
+#if NET9_0_OR_GREATER
+            // A persisted assembly can't run, so the saved image is loaded back next to the benchmarks.
+            using var stream = new MemoryStream();
+            ((PersistedAssemblyBuilder)assemblyBuilder).Save(stream);
+            File.WriteAllBytes(assemblyResultPath, stream.ToArray());
+            logger.WriteLineInfo($"{assemblyFileName} assembly saved to {assemblyResultPath}");
+
+            stream.Position = 0;
+            var benchmarksAssembly = buildPartition.RepresentativeBenchmarkCase.Descriptor.Type.Assembly;
+            return (AssemblyLoadContext.GetLoadContext(benchmarksAssembly) ?? AssemblyLoadContext.Default).LoadFromStream(stream);
+#else
+            assemblyBuilder.Save(assemblyFileName);
+            logger.WriteLineInfo($"{assemblyFileName} assembly saved to {assemblyResultPath}");
             return assemblyBuilder;
+#endif
         }
 
         private static bool ShouldSaveToDisk(IConfig config)
@@ -104,7 +119,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             if (!BenchmarkDotNetInfo.Instance.IsRelease)
             {
                 // we never want to do that in our official NuGet.org package, it's a hack
-                return config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles) && Portability.RuntimeInformation.IsFullFramework;
+                return config.Options.IsSet(ConfigOptions.KeepBenchmarkFiles);
             }
 
             return false;
@@ -118,6 +133,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
         private static AssemblyBuilder DefineAssemblyBuilder(string assemblyResultPath, bool saveToDisk)
         {
             var assemblyName = new AssemblyName { Name = Path.GetFileNameWithoutExtension(assemblyResultPath) };
+
+#if NET9_0_OR_GREATER
+            if (saveToDisk)
+            {
+                var persistedAssemblyBuilder = new PersistedAssemblyBuilder(assemblyName, typeof(object).Assembly);
+                DefineAssemblyAttributes(persistedAssemblyBuilder);
+                return persistedAssemblyBuilder;
+            }
+#endif
 
             var assemblyMode = saveToDisk
                 ? (AssemblyBuilderAccess)3 // https://apisof.net/catalog/System.Reflection.Emit.AssemblyBuilderAccess.RunAndSave
@@ -173,9 +197,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             var moduleName = Path.GetFileNameWithoutExtension(moduleFileName)
                ?? throw new ArgumentNullException(nameof(moduleFileName));
 
+#if NET9_0_OR_GREATER
+            var moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
+#else
             var moduleBuilder = saveToDisk
                 ? assemblyBuilder.DefineDynamicModule(moduleName, moduleFileName)
                 : assemblyBuilder.DefineDynamicModule(moduleName);
+#endif
 
             // [module:UnverifiableCodeAttribute()]
             var attributeCtor = typeof(UnverifiableCodeAttribute)
@@ -296,13 +324,14 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                         argFieldType = argLocalsType.GetElementType()
                             ?? throw new InvalidOperationException($"Bug: cannot get field type from {argLocalsType}");
                     }
-                    else if (parameterType.IsByRefLike() && argValue.Value != null)
+                    else if (parameterType.IsByRefLike() && argValue.ParameterValue.SourceType is var passedArgType && passedArgType != parameterType)
                     {
                         argLocalsType = parameterType;
 
-                        // Use conversion on load; store passed value
-                        var passedArgType = argValue.Value.GetType();
-                        opConversion = GetImplicitConversionOpFromTo(passedArgType, argLocalsType)
+                        // Use conversion on load; store the passed value as the type its declaration names, which is
+                        // the one the conversion was found for - the value may be of a type derived from it, or be
+                        // null and name nothing at all.
+                        opConversion = GetConversionOpFromTo(passedArgType, argLocalsType)
                             ?? throw new InvalidOperationException($"Bug: No conversion from {passedArgType} to {argLocalsType}.");
                         argFieldType = passedArgType;
                     }
@@ -412,8 +441,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 else
                     ilBuilder.Emit(OpCodes.Ldfld, argFieldInfo.Field);
 
-                if (argFieldInfo.OpImplicitMethod != null)
-                    ilBuilder.Emit(OpCodes.Call, argFieldInfo.OpImplicitMethod);
+                if (argFieldInfo.OpConversionMethod != null)
+                    ilBuilder.Emit(OpCodes.Call, argFieldInfo.OpConversionMethod);
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
     <!-- Avoid ID conflicts with the package project. -->
     <PackageId>BenchmarkDotNet.Analyzers</PackageId>
   </PropertyGroup>
@@ -8,8 +9,9 @@
   <PropertyGroup>
     <!-- Formatting in AnalyzerReleases.Unshipped.md -->
     <NoWarn>$(NoWarn);RS2007</NoWarn>
-    <!-- Suppress false positives due to a bug in v3.8.0. -->
-    <NoWarn Condition="'$(MccVersion)' == '3.8'">$(NoWarn);RS2002</NoWarn>
+    <!-- A HashSet built with SymbolEqualityComparer.Default is what RS1024 asks for, but the rule as shipped in
+         Microsoft.CodeAnalysis.Analyzers 3.3.2 (bundled with 4.0.0) reports it anyway. -->
+    <NoWarn Condition="'$(MccVersion)' == '4.0'">$(NoWarn);RS1024</NoWarn>
   </PropertyGroup>
   <ItemGroup>
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(MccPackageVersion)" />
@@ -30,11 +32,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>BenchmarkDotNetAnalyzerResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>BenchmarkDotNet.Analyzers.Tests,PublicKey=00240000048000009400000006020000002400005253413100040000010001002970bbdfca4d129fc74b4845b239973f1b183684f0d7db5e1de7e085917e3656cf94884803cb800d85d5aae5838fb3f8fd1f2829e8208c4f087afcfe970bce44037ba30a66749cd5514b410ca8a35e9c7d6eb86975853c834c9ad25051537f9a05a0c540c5d84f2c7b32ab01619d84367fd424797ba3242f08b0e6ae75f66dad</_Parameter1>
-    </AssemblyAttribute>
   </ItemGroup>
   <Import Project="..\..\build\common.targets" />
 </Project>

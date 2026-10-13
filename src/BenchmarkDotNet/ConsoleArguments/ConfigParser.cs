@@ -344,7 +344,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             foreach (var counterName in options.HardwareCounters)
                 if (!Enum.TryParse(counterName, ignoreCase: true, out HardwareCounter _))
                 {
-                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join("+", Enum.GetNames(typeof(HardwareCounter)))}.");
+                    logger.WriteLineError($"The provided hardware counter \"{counterName}\" is invalid. Available options are: {string.Join("+", Enum.GetNames<HardwareCounter>())}.");
                     return false;
                 }
 
@@ -542,7 +542,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 yield return Attributes.InProcessAttribute.GetJob(baseJob, Attributes.InProcessToolchainType.Auto, true);
             }
-            // --cli and --packages configure a toolchain without selecting one, so with no --runtimes or --corerun to
+            // --cli, --packages and --freshPackages configure a toolchain without selecting one, so with no --runtimes or --corerun to
             // attach them to they are ignored. Creating a job for the host runtime instead would either add a run
             // nobody asked for or override the one the benchmark declares.
             else

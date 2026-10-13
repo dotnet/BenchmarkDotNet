@@ -1242,5 +1242,95 @@ namespace BenchmarkDotNet.Analyzers {
                 return ResourceManager.GetString("General_Job_RuntimeAndToolchainBothSet_Description", resourceCulture);
             }
         }
+        internal static string Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_Title {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_Title", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_MessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_Description {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_MustYieldArgumentList_Description", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_Title {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_Title", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_MessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_Description {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument_Description", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_Title {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_Title", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_MessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_Description {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake_Description", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_Title {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_Title", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_MessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_Description {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple_Description", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_Title {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_Title", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_MessageFormat {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_MessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_Description {
+            get {
+                return ResourceManager.GetString("Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_Description", resourceCulture);
+            }
+        }
+
     }
 }

@@ -81,10 +81,10 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
         private void OnPmcEvent(PMCCounterProfTraceData data)
         {
             // if given process did not emit Benchmarking events before, we don't care about it
-            if (!processIdToData.ContainsKey(data.ProcessID))
+            if (!processIdToData.TryGetValue(data.ProcessID, out ProcessMetrics? value))
                 return;
 
-            processIdToData[data.ProcessID].HandleNewSample(data.TimeStampRelativeMSec, data.InstructionPointer, data.ProfileSource);
+            value.HandleNewSample(data.TimeStampRelativeMSec, data.InstructionPointer, data.ProfileSource);
         }
     }
 
@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         private readonly List<(double timeStamp, ulong instructionPointer, int profileSource)> samples = [];
 
-        public bool HasBenchmarkEvents => overheadTimestamps.Any() || workloadTimestamps.Any();
+        public bool HasBenchmarkEvents => overheadTimestamps.Count != 0 || workloadTimestamps.Count != 0;
 
         public void HandleIterationEvent(double timeStamp, IterationMode iterationMode, long totalOperations)
         {

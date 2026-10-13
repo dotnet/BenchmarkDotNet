@@ -42,6 +42,11 @@ public static class DiagnosticIds
     public const string Attributes_ArgumentsAttribute_MustHaveMatchingValueType = "BDN1502";
     public const string Attributes_ArgumentsAttribute_RequiresParameters = "BDN1503";
     public const string Attributes_ArgumentsSourceAttribute_MustReturnEnumerable = "BDN1504";
+    public const string Attributes_ArgumentsSourceAttribute_MustYieldArgumentList = "BDN1505";
+    public const string Attributes_ArgumentsSourceAttribute_MustMatchParametersForEveryTypeArgument = "BDN1506";
+    public const string Attributes_ArgumentsSourceAttribute_MustYieldWhatParametersTake = "BDN1507";
+    public const string Attributes_ArgumentsSourceAttribute_ShouldYieldValueTuple = "BDN1508";
+    public const string Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType = "BDN1509";
     public const string Attributes_BenchmarkCancellationAttribute_MustBeCancellationTokenType = "BDN1600";
     public const string Attributes_BenchmarkCancellationAttribute_FieldMustBePublic = "BDN1601";
     public const string Attributes_BenchmarkCancellationAttribute_PropertyMustBePublic = "BDN1602";

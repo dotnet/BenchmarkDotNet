@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Portability;
@@ -14,7 +13,6 @@ public sealed record NativeAotSettings : DotNetCliSettings
 
     public string RuntimeIdentifier { get; init; } = RuntimeInformation.GetPortableRuntimeIdentifier();
     public bool UseNuGetClearTag { get; init; }
-    public bool UseTempFolderForRestore { get; init; }
     public bool GenerateStackTraceData { get; init; } = true;
     public string OptimizationPreference { get; init; } = "Speed";
     public string InstructionSet { get; init; } = "";
@@ -38,7 +36,7 @@ public sealed record NativeAotSettings : DotNetCliSettings
             // Restore the ILCompiler from a local runtime build (the generator also adds the dotnet nightly feed).
             LocalIlcPackages = ilcPackages;
             IlCompilerVersion = LocalBuildIlCompilerVersion;
-            UseTempFolderForRestore = true;
+            UseFreshPackages = true;
         }
         else if (options.ILCompilerVersion.IsNotBlank())
         {
@@ -74,7 +72,7 @@ public sealed record NativeAotSettings : DotNetCliSettings
             LocalIlcPackages = ilcPackages,
             NuGetFeedUrl = null,
             IlCompilerVersion = LocalBuildIlCompilerVersion,
-            UseTempFolderForRestore = true,
+            UseFreshPackages = true,
         };
     }
 
@@ -84,7 +82,6 @@ public sealed record NativeAotSettings : DotNetCliSettings
         base.FillSettings(settings);
         settings[nameof(RuntimeIdentifier)] = RuntimeIdentifier;
         settings[nameof(UseNuGetClearTag)] = UseNuGetClearTag;
-        settings[nameof(UseTempFolderForRestore)] = UseTempFolderForRestore;
         settings[nameof(GenerateStackTraceData)] = GenerateStackTraceData;
         settings[nameof(OptimizationPreference)] = OptimizationPreference;
         settings[nameof(InstructionSet)] = InstructionSet;
@@ -101,7 +98,6 @@ public sealed record NativeAotSettings : DotNetCliSettings
 
         return RuntimeIdentifier == other.RuntimeIdentifier
             && UseNuGetClearTag == other.UseNuGetClearTag
-            && UseTempFolderForRestore == other.UseTempFolderForRestore
             && GenerateStackTraceData == other.GenerateStackTraceData
             && OptimizationPreference == other.OptimizationPreference
             && InstructionSet == other.InstructionSet
@@ -116,7 +112,6 @@ public sealed record NativeAotSettings : DotNetCliSettings
         hashCode.Add(base.GetHashCode());
         hashCode.Add(RuntimeIdentifier);
         hashCode.Add(UseNuGetClearTag);
-        hashCode.Add(UseTempFolderForRestore);
         hashCode.Add(GenerateStackTraceData);
         hashCode.Add(OptimizationPreference);
         hashCode.Add(InstructionSet);

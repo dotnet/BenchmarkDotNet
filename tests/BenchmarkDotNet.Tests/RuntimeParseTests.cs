@@ -17,9 +17,9 @@ public class RuntimeParseTests
     [InlineData("net10.0", typeof(CoreRuntime), 10, 0)]
     [InlineData(RuntimeMoniker.Net12_0, typeof(CoreRuntime), 12, 0)]
     [InlineData(RuntimeMoniker.NativeAot12_0, typeof(NativeAotRuntime), 12, 0)]
-    [InlineData(RuntimeMoniker.Mono12_0, typeof(MonoCoreRuntime), 12, 0)]
-    [InlineData(RuntimeMoniker.MonoWasm12_0, typeof(MonoWasmRuntime), 12, 0)]
-    [InlineData(RuntimeMoniker.MonoWasmAot12_0, typeof(MonoWasmAotRuntime), 12, 0)]
+    [InlineData("mono12.0", typeof(MonoCoreRuntime), 12, 0)]
+    [InlineData("monowasm12.0", typeof(MonoWasmRuntime), 12, 0)]
+    [InlineData("monowasmAot12.0", typeof(MonoWasmAotRuntime), 12, 0)]
     [InlineData(RuntimeMoniker.R2R12_0, typeof(R2RRuntime), 12, 0)]
     [InlineData("corewasm12.0", typeof(CoreWasmRuntime), 12, 0)]
     [InlineData("netcoreapp3.1", typeof(CoreRuntime), 3, 1)]
@@ -265,17 +265,11 @@ public class RuntimeParseTests
     {
         Assert.Same(CoreRuntime.Core12_0, Runtime.Parse(RuntimeMoniker.Net12_0));
         Assert.Same(NativeAotRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.NativeAot12_0));
-        Assert.Same(MonoCoreRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.Mono12_0));
-        Assert.Same(MonoWasmRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.MonoWasm12_0));
-        Assert.Same(MonoWasmAotRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.MonoWasmAot12_0));
         Assert.Same(R2RRuntime.Net12_0, Runtime.Parse(RuntimeMoniker.R2R12_0));
         Assert.Same(CoreRuntime.Core12_0, CoreRuntime.Latest);
 
         Assert.Same(CsProjCoreToolchain.NetCoreApp12_0, CsProjCoreToolchain.From(CoreRuntime.Core12_0, NetCoreAppSettings.Default));
         Assert.Same(CsProjNativeAotToolchain.Net12_0, CsProjNativeAotToolchain.From(NativeAotRuntime.Net12_0, NativeAotSettings.Default));
-        Assert.Same(CsProjMonoCoreToolchain.Mono12_0, CsProjMonoCoreToolchain.From(MonoCoreRuntime.Net12_0, MonoCoreSettings.Default));
-        Assert.Same(CsProjMonoWasmToolchain.Net12_0, CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net12_0, WasmSettings.Default));
-        Assert.Same(CsProjMonoWasmAotToolchain.Net12_0, CsProjMonoWasmAotToolchain.From(MonoWasmAotRuntime.Net12_0, WasmSettings.Default));
         Assert.Same(CsProjR2RToolchain.R2R12_0, CsProjR2RToolchain.From(R2RRuntime.Net12_0, R2RSettings.Default));
     }
 

@@ -96,6 +96,20 @@ public abstract class BuilderBase : IBuilder
     protected virtual string GetCodeFileExtension() => ".notcs";
 
     /// <summary>
+    /// returns a path to the file the generated boilerplate code is written to
+    /// </summary>
+    [PublicAPI]
+    protected virtual string GetProgramCodePath(string buildArtifactsDirectoryPath, string programName)
+        => Path.Combine(buildArtifactsDirectoryPath, $"{programName}{GetCodeFileExtension()}");
+
+    /// <summary>
+    /// returns a path to the script that reproduces the build
+    /// </summary>
+    [PublicAPI]
+    protected virtual string GetBuildScriptFilePath(string buildArtifactsDirectoryPath, string programName)
+        => Path.Combine(buildArtifactsDirectoryPath, $"{programName}{OsDetector.ScriptFileExtension}");
+
+    /// <summary>
     /// returns a path to the auto-generated .csproj file
     /// </summary>
     [PublicAPI]
@@ -158,11 +172,17 @@ public abstract class BuilderBase : IBuilder
             cancellationToken)
             .ConfigureAwait(false);
 
+    /// <summary>
+    /// returns the name of the program the build produces, which names its executable
+    /// </summary>
+    [PublicAPI]
+    protected virtual string GetProgramName(BuildPartition buildPartition) => buildPartition.ProgramName;
+
     protected virtual string GetExecutablePath(string binariesDirectoryPath, string programName) => Path.Combine(binariesDirectoryPath, $"{programName}{GetExecutableExtension()}");
 
     private ArtifactsPaths GetArtifactsPaths(BuildPartition buildPartition, string rootArtifactsFolderPath)
     {
-        string programName = buildPartition.ProgramName;
+        string programName = GetProgramName(buildPartition);
         string buildArtifactsDirectoryPath = GetBuildArtifactsDirectoryPath(buildPartition, programName);
         string binariesDirectoryPath = GetBinariesDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration);
 
@@ -173,11 +193,11 @@ public abstract class BuilderBase : IBuilder
             buildArtifactsDirectoryPath: buildArtifactsDirectoryPath,
             binariesDirectoryPath: binariesDirectoryPath,
             publishDirectoryPath: GetPublishDirectoryPath(buildArtifactsDirectoryPath, buildPartition.BuildConfiguration),
-            programCodePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{GetCodeFileExtension()}"),
+            programCodePath: GetProgramCodePath(buildArtifactsDirectoryPath, programName),
             appConfigPath: $"{executablePath}.config",
             nuGetConfigPath: Path.Combine(buildArtifactsDirectoryPath, "NuGet.config"),
             projectFilePath: GetProjectFilePath(buildArtifactsDirectoryPath),
-            buildScriptFilePath: Path.Combine(buildArtifactsDirectoryPath, $"{programName}{OsDetector.ScriptFileExtension}"),
+            buildScriptFilePath: GetBuildScriptFilePath(buildArtifactsDirectoryPath, programName),
             executablePath: executablePath,
             programName: programName,
             packagesDirectoryName: GetPackagesDirectoryPath(buildArtifactsDirectoryPath));

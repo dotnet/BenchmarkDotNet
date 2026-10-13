@@ -120,8 +120,8 @@ partial class RunnableEmitter
                 else
                     ilBuilder.Emit(OpCodes.Ldfld, argFieldInfo.Field);
 
-                if (argFieldInfo.OpImplicitMethod != null)
-                    ilBuilder.Emit(OpCodes.Call, argFieldInfo.OpImplicitMethod);
+                if (argFieldInfo.OpConversionMethod != null)
+                    ilBuilder.Emit(OpCodes.Call, argFieldInfo.OpConversionMethod);
 
                 ilBuilder.EmitStloc(argLocals[i]);
             }

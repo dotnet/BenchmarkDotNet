@@ -1,5 +1,5 @@
 name: publish-preview
-run-name: Publish preview nupkg 0.16.0-${{ inputs.suffix }}
+run-name: Publish preview ${{ inputs.suffix }}
 
 on:
   workflow_dispatch:
@@ -7,24 +7,22 @@ on:
       suffix:
         description: 'Prerelease suffix (produces <VersionPrefix>-<suffix>, e.g. preview.1)'
         required: true
-        default: 'preview.1'
-
-env:
-  DOTNET_VERSION: "8.0.410"
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     environment: deploy # Only maintainers can execute this workflow (gates the NuGet.org push)
     if: ${{ github.repository == 'dotnet/BenchmarkDotNet' }}
+    permissions:
+      contents: write
+      discussions: write
     steps:
       - name: Checkout sources
         uses: actions/checkout@v7
 
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Read current version
+        id: version
+        run: echo "VERSION=$(grep -v '^$' build/versions.txt | tail -n 1)-${{ inputs.suffix }}" >> $GITHUB_OUTPUT
 
       - name: Pack
         run: ./build.cmd pack /p:VersionSuffix=${{ inputs.suffix }} /p:WeaverVersionSuffix=\"\"
@@ -36,4 +34,20 @@ jobs:
           path: artifacts/*.nupkg
 
       - name: Publish to NuGet
-        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: ./.dotnet/dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Tag release
+        run: |
+          git tag v${{ steps.version.outputs.VERSION }}
+          git push origin v${{ steps.version.outputs.VERSION }}
+
+      - name: Release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          name: v${{ steps.version.outputs.VERSION }}
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          prerelease: true
+          generate_release_notes: true
+          body: |
+            NuGet: https://www.nuget.org/packages/BenchmarkDotNet/${{ steps.version.outputs.VERSION }}
+          discussion_category_name: Announcements

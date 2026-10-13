@@ -13,7 +13,6 @@ public sealed class MonoWasmRuntime : WasmRuntime
     public static readonly MonoWasmRuntime Net90 = new(new(9, 0));
     public static readonly MonoWasmRuntime Net10_0 = new(new(10, 0));
     public static readonly MonoWasmRuntime Net11_0 = new(new(11, 0));
-    public static readonly MonoWasmRuntime Net12_0 = new(new(12, 0));
 
     private MonoWasmRuntime(Version version) : base(version) { }
 
@@ -27,7 +26,6 @@ public sealed class MonoWasmRuntime : WasmRuntime
             9 => Net90,
             10 => Net10_0,
             11 => Net11_0,
-            12 => Net12_0,
             _ => new(version),
         };
 

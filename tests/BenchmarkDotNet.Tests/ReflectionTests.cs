@@ -178,17 +178,24 @@ namespace BenchmarkDotNet.Tests
 
         [FactEnvSpecific("The implicit cast operator is available only in .NET Core 2.1+ (See https://github.com/dotnet/corefx/issues/30121 for more)",
             EnvRequirement.DotNetCoreOnly)]
-        public void StringCanBeUsedAsReadOnlySpanOfCharArgument() => Assert.True(typeof(ReadOnlySpan<char>).IsStackOnlyWithImplicitCast("a string"));
+        public void StringCanBeUsedAsReadOnlySpanOfCharArgument() => Assert.True(typeof(ReadOnlySpan<char>).TakesByConversion(typeof(string)));
 
+        // The operator is looked for on both types, so each side is covered: Span declares its own, and the
+        // class below declares one to a ref struct that does not know about it.
         [Fact]
-        public void StackOnlyTypesWithImplicitCastOperatorAreSupportedAsArguments()
+        public void StackOnlyTypesWithACastOperatorAreSupportedAsArguments()
         {
-            Assert.True(typeof(Span<byte>).IsStackOnlyWithImplicitCast(new byte[] { 1, 2, 3 }));
-            Assert.True(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<byte>() { Array = [] }));
+            Assert.True(typeof(Span<byte>).TakesByConversion(typeof(byte[])));
+            Assert.True(typeof(StackOnlyStruct<byte>).TakesByConversion(typeof(WithImplicitCastToStackOnlyStruct<byte>)));
 
-            Assert.False(typeof(StackOnlyStruct<byte>).IsStackOnlyWithImplicitCast(new WithImplicitCastToStackOnlyStruct<bool>() { Array = [] })); // different T
+            // An explicit operator serves as well as an implicit one - the generated code writes the cast itself.
+            Assert.True(typeof(StackOnlyStruct<byte>).TakesByConversion(typeof(WithExplicitCastToStackOnlyStruct<byte>)));
 
-            Assert.False(typeof(List<byte>).IsStackOnlyWithImplicitCast(new byte[] { 1, 3, 3 }));
+            // Matched on exactly these types, so a near miss is a miss: nothing here converts a
+            // WithImplicitCastToStackOnlyStruct<bool> to a StackOnlyStruct<byte>.
+            Assert.False(typeof(StackOnlyStruct<byte>).TakesByConversion(typeof(WithImplicitCastToStackOnlyStruct<bool>)));
+
+            Assert.False(typeof(List<byte>).TakesByConversion(typeof(byte[])));
         }
 
         public ref struct StackOnlyStruct<T>
@@ -201,6 +208,14 @@ namespace BenchmarkDotNet.Tests
             public required T[] Array;
 
             public static implicit operator StackOnlyStruct<T>(WithImplicitCastToStackOnlyStruct<T> instance)
+                => new StackOnlyStruct<T> { Span = instance.Array };
+        }
+
+        public class WithExplicitCastToStackOnlyStruct<T>
+        {
+            public required T[] Array;
+
+            public static explicit operator StackOnlyStruct<T>(WithExplicitCastToStackOnlyStruct<T> instance)
                 => new StackOnlyStruct<T> { Span = instance.Array };
         }
         // The declared-type and cross-kind assertions below all fail without their part of the lookup. The

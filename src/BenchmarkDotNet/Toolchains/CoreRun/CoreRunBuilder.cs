@@ -65,9 +65,6 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
             }
         }
 
-        protected override string GetBinariesDirectoryPath(string buildArtifactsDirectoryPath, string configuration)
-            => Path.Combine(buildArtifactsDirectoryPath, "bin", configuration, Settings.TargetFrameworkMoniker, "publish");
-
         protected override void CopyAllRequiredFiles(ArtifactsPaths artifactsPaths)
         {
             if (NeedsCopy)

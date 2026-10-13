@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
@@ -410,9 +411,9 @@ public class JitListenerTests
         var measurements = stage.GetMeasurementList();
         while (stage.GetShouldRunIteration(measurements, out var data))
         {
-            data.setupAction().GetAwaiter().GetResult();
-            data.workloadAction(data.invokeCount / data.unrollFactor, null!).GetAwaiter().GetResult();
-            data.cleanupAction().GetAwaiter().GetResult();
+            data.setupAction().GetResult();
+            data.workloadAction(data.invokeCount / data.unrollFactor, null!).GetResult();
+            data.cleanupAction().GetResult();
             // A zero-time measurement keeps the stage out of its "long-running benchmark" early-exit
             // (iterationTime / 0 == Infinity, and Infinity < 1.5 is false).
             measurements.Add(new Measurement(1, data.mode, data.stage, data.index, data.invokeCount, 0d));

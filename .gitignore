@@ -42,6 +42,7 @@ docs/apihtml
 *.iml
 
 **/BenchmarkDotNet.Artifacts/*
+.bdn/
 **/project.lock.json
 tests/output/*
 .vs/restore.dg

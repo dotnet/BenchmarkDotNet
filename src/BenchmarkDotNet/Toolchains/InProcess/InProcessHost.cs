@@ -17,8 +17,9 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         private readonly IDiagnoser diagnoser;
         private readonly DiagnoserActionParameters? diagnoserActionParameters;
         private readonly List<string> inProcessDiagnoserLines = [];
+        private readonly List<string> prefixedLines = [];
 
-        public InProcessHost(BenchmarkCase benchmarkCase, ILogger logger, IDiagnoser diagnoser, CancellationToken cancellationToken)
+        public InProcessHost(BenchmarkCase benchmarkCase, BenchmarkId benchmarkId, Type? runnableType, ILogger logger, IDiagnoser diagnoser, CancellationToken cancellationToken)
         {
             this.logger = logger;
             this.diagnoser = diagnoser;
@@ -29,10 +30,15 @@ namespace BenchmarkDotNet.Toolchains.InProcess
                 diagnoserActionParameters = new DiagnoserActionParameters(
                     Process.GetCurrentProcess(),
                     benchmarkCase,
-                    default);
+                    benchmarkId)
+                {
+                    InProcessRunnableType = runnableType
+                };
         }
 
         public RunResults RunResults { get; private set; }
+
+        internal IReadOnlyList<string> PrefixedLines => prefixedLines;
 
         public IConfig Config { get; set; }
 
@@ -48,9 +54,13 @@ namespace BenchmarkDotNet.Toolchains.InProcess
         public void WriteLine(string message)
         {
             logger.WriteLine(message);
-            if (message.StartsWith(CompositeInProcessDiagnoser.HeaderKey)) // Captures both header and results
+            if (message.StartsWith(CompositeInProcessDiagnoser.HeaderKey, StringComparison.Ordinal)) // Captures both header and results
             {
                 inProcessDiagnoserLines.Add(message);
+            }
+            else if (message.StartsWith("//", StringComparison.Ordinal))
+            {
+                prefixedLines.Add(message);
             }
         }
 

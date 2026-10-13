@@ -91,14 +91,14 @@ internal sealed class CSharpParameterRenderer
         switch (value)
         {
             case ParameterValue.Constant constant:
-                return SourceCodeHelper.ToSourceCode(constant.Value, constant.Type);
+                return SourceCodeHelper.ToSourceCode(constant.Value, constant.SourceType);
 
             case ParameterValue.FromSource fromSource:
             {
                 // The value can't be embedded, so the child process re-obtains it by enumerating the source.
                 // GetParameterAsync returns the source's element type, so an element index binds directly.
-                string cast = $"({fromSource.TargetType.GetCorrectCSharpTypeName()})";
-                string elementIndex = fromSource.ElementIndex is { } index ? $"[{index}]" : string.Empty;
+                string cast = $"({fromSource.SourceType.GetCorrectCSharpTypeName()})";
+                string elementIndex = fromSource.ElementIndex is { } index ? ElementAccess(fromSource.Read, index) : string.Empty;
 
                 string source = StatementLocal(fromSource.Read) is { } local ? local : $"({Extraction(fromSource.Read)})";
 
@@ -109,6 +109,17 @@ internal sealed class CSharpParameterRenderer
                 throw new NotSupportedException($"{value.GetType().Name} is not a supported {nameof(ParameterValue)}.");
         }
     }
+
+    // How the argument is taken out of the row, which follows the shape the element is declared as: an object[] is
+    // indexed, a ValueTuple is read by field - through SmartParamBuilder.TupleItemPath, the same walk discovery
+    // makes, so past the seventh item the two agree about which Rest an index reaches through.
+    private static string ElementAccess(SourceRead read, int index)
+        => read.Source.GetSourceReturnType().TryGetSourceElementType(out var elementType)
+            && elementType.IsGenericType
+            && elementType.GetGenericTypeDefinition() is { Namespace: "System" } definition
+            && definition.Name.StartsWith("ValueTuple`", StringComparison.Ordinal)
+                ? "." + string.Join(".", SmartParamBuilder.TupleItemPath(index))
+                : $"[{index}]";
 
     // The generated code declares its locals with explicit, fully qualified types, as the template does.
     private static string ElementTypeName(SourceRead read)

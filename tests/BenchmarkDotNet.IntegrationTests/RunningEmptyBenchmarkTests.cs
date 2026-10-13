@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summary = BenchmarkRunner.Run(typeof(EmptyBenchmark), config, args);
+            var summary = BenchmarkRunner.Run<EmptyBenchmark>(config, args);
 
             if (args == null)
             {
@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             GetConfigWithLogger(out var logger, out var config);
 
-            var summaries = BenchmarkRunner.Run(typeof(NotEmptyBenchmark), config, args);
+            var summaries = BenchmarkRunner.Run<NotEmptyBenchmark>(config, args);
             Assert.False(summaries.HasCriticalValidationErrors);
             Assert.DoesNotContain(summaries.ValidationErrors, validationError => validationError.Message == GetValidationErrorForType(typeof(NotEmptyBenchmark)));
             Assert.DoesNotContain(GetValidationErrorForType(typeof(NotEmptyBenchmark)), logger.GetLog());

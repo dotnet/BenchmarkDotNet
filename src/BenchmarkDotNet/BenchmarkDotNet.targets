@@ -25,6 +25,16 @@
                                     Condition="'%(RuntimeTargetsCopyLocalItems.NuGetPackageId)' == 'Gee.External.Capstone' AND '%(RuntimeTargetsCopyLocalItems.RuntimeIdentifier)' != '$(BenchmarkDotNetTargetPlatform)'" />
     </ItemGroup>
 
+    <!--
+      The SDK copies `runtimes/{RuntimeIdentifier}` assets only for .NETCoreApp.
+      Copy the native capstone for .NET Framework too, where the Arm64 disassembler loads it from that folder itself.
+    -->
+    <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'">
+      <RuntimeTargetsCopyLocalItems Condition="'%(RuntimeTargetsCopyLocalItems.NuGetPackageId)' == 'Gee.External.Capstone'">
+        <CopyLocal>true</CopyLocal>
+      </RuntimeTargetsCopyLocalItems>
+    </ItemGroup>
+
     <!-- Remove unnecessary satellite assemblies. -->
     <ItemGroup>
       <ResourceCopyLocalItems

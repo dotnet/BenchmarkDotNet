@@ -19,15 +19,16 @@ namespace BenchmarkDotNet.Reports
         /// </summary>
         public int GetPrecision(SummaryStyle summaryStyle, IStatisticColumn column, IStatisticColumn? parentColumn = null)
         {
-            if (!precision.ContainsKey(column.Id))
-            {
-                var values = column.GetAllValues(summary, summaryStyle);
-                precision[column.Id] = parentColumn != null
-                    ? CalcPrecision(values, GetPrecision(summaryStyle, parentColumn))
-                    : CalcPrecision(values);
-            }
+            if (precision.TryGetValue(column.Id, out int value))
+                return value;
 
-            return precision[column.Id];
+            var values = column.GetAllValues(summary, summaryStyle);
+            value = parentColumn != null
+                ? CalcPrecision(values, GetPrecision(summaryStyle, parentColumn))
+                : CalcPrecision(values);
+            precision[column.Id] = value;
+
+            return value;
         }
 
         internal static int CalcPrecision(IList<double> values)

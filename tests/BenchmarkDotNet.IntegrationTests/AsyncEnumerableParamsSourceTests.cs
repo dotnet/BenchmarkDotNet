@@ -39,7 +39,7 @@ public class AsyncEnumerableParamsSourceTests(ITestOutputHelper output) : Benchm
         IConfig config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
         if (!toolchain.IsInProcess)
         {
-            // Show the relevant codegen excerpt in test results (the *.notcs is not part of the logs)
+            // Show the relevant codegen excerpt in test results (the generated program is not part of the logs)
             Output.WriteLine("// Benchmarks and CodeGenerator.GetParamsContent()");
             BenchmarkRunInfo runInfo = BenchmarkConverter.TypeToBenchmarks(type, config);
             foreach (BenchmarkCase benchmarkCase in runInfo.BenchmarksCases)

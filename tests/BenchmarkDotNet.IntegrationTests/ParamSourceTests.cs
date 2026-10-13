@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.IntegrationTests
             IConfig config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
             if (!toolchain.IsInProcess)
             {
-                // Show the relevant codegen excerpt in test results (the *.notcs is not part of the logs)
+                // Show the relevant codegen excerpt in test results (the generated program is not part of the logs)
                 Output.WriteLine("// Benchmarks and CodeGenerator.GetParamsContent()");
                 BenchmarkRunInfo runInfo = BenchmarkConverter.TypeToBenchmarks(type, config);
                 foreach (BenchmarkCase benchmarkCase in runInfo.BenchmarksCases)
@@ -300,19 +300,9 @@ namespace BenchmarkDotNet.IntegrationTests
             public int Benchmark() => ParamsTarget?.Data ?? 0;
         }
 
-        [Fact]
-        public void SourceWithExplicitCastToTarget_DefaultToolchain_Succeeds() => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), Job.Default.GetToolchain());
-
-        [Fact]
-        public void SourceWithExplicitCastToTarget_InProcessToolchain_Throws()
-        {
-            // op_Explicit is currently not supported by InProcessEmitToolchain
-            // See TryChangeType() in Toolchains/InProcess.Emit.Implementation/Runnable/RunnableReflectionHelpers.cs
-            // If that changes, this test and the one above should be merged into:
-            //   [Theory, MemberData(nameof(GetToolchains))]
-            //   public void SourceWithExplicitCastToTarget_Succeeds(IToolchain toolchain) => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), toolchain);
-            Assert.ThrowsAny<Exception>(() => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), InProcessEmitToolchain.Default));
-        }
+        [Theory, MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+        public void SourceWithExplicitCastToTarget_Succeeds(IToolchain toolchain)
+            => CanExecuteWithExtraInfo(typeof(SourceWithExplicitCastToTarget), toolchain);
 
         public abstract class OverridePropertyBase
         {

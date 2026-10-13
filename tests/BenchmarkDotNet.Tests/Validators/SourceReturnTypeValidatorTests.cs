@@ -285,10 +285,9 @@ public class SourceReturnTypeValidatorTests
         // A base type's static member is a parameter like any other, so discovery reads it - and reaches this
         // source, which is not enumerable, before the validator gets a turn. Binding it at all is the point:
         // unbound, it would yield neither a parameter nor a diagnostic.
-        var exception = Assert.Throws<InvalidBenchmarkDeclarationException>(
-            () => BenchmarkConverter.TypeToBenchmarks(typeof(InheritsABadStaticParamsSource)));
+        var error = Assert.Single(BenchmarkConverter.TypeToBenchmarks(typeof(InheritsABadStaticParamsSource)).DeclarationErrors);
 
-        Assert.Contains(nameof(BadStaticParamsSourceOnABase.NotASource), exception.Message);
+        Assert.Contains(nameof(BadStaticParamsSourceOnABase.NotASource), error.Message);
     }
 
     public class BadStaticParamsSourceOnABase

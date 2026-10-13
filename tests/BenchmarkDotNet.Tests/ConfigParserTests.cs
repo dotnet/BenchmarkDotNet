@@ -400,10 +400,10 @@ namespace BenchmarkDotNet.Tests
         [Theory]
         [InlineData(RuntimeMoniker.Net12_0, typeof(CsProjCoreToolchain))]
         [InlineData(RuntimeMoniker.NativeAot12_0, typeof(CsProjNativeAotToolchain))]
-        [InlineData(RuntimeMoniker.Mono12_0, typeof(CsProjMonoCoreToolchain))]
+        [InlineData("mono12.0", typeof(CsProjMonoCoreToolchain))]
         [InlineData(RuntimeMoniker.R2R12_0, typeof(CsProjR2RToolchain))]
-        [InlineData(RuntimeMoniker.MonoWasm12_0, typeof(CsProjMonoWasmToolchain))]
-        [InlineData(RuntimeMoniker.MonoWasmAot12_0, typeof(CsProjMonoWasmAotToolchain))]
+        [InlineData("monowasm12.0", typeof(CsProjMonoWasmToolchain))]
+        [InlineData("monowasmaot12.0", typeof(CsProjMonoWasmAotToolchain))]
         [InlineData("corewasm12.0", typeof(CsProjCoreWasmToolchain))]
         public void Net12RuntimesResolveToTheirToolchains(string moniker, Type expectedToolchain)
         {
@@ -587,6 +587,18 @@ namespace BenchmarkDotNet.Tests
             var toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
             Assert.NotNull(toolchain);
             Assert.Equal(fakeRestoreDirectory, ((DotNetCliBuilder)toolchain.Builder).Settings.PackagesPath?.FullName);
+        }
+
+        [Fact]
+        public void FreshPackagesParsedCorrectly()
+        {
+            var config = ConfigParser.Parse(["-r", "netcoreapp3.1", "--freshPackages"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            Assert.Single(config.GetJobs());
+            var toolchain = config.GetJobs().Single().GetToolchain() as CsProjCoreToolchain;
+            Assert.NotNull(toolchain);
+            Assert.True(((DotNetCliBuilder)toolchain.Builder).Settings.UseFreshPackages);
         }
 
         [Fact]

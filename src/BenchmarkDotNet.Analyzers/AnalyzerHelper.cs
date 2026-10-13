@@ -148,23 +148,14 @@ internal static class AnalyzerHelper
             return true;
         }
 #endif
-        return IsRefLikeType(type);
+        return type.IsRefLikeType;
     }
-
-    // ref structs are C# 7.2, but no public symbol carries IsRefLikeType until Roslyn 3.0; the oldest band reads
-    // the internal property behind it instead.
-    private static bool IsRefLikeType(ITypeSymbol type)
-#if CODE_ANALYSIS_3_0
-        => type.IsRefLikeType;
-#else
-        => RefLikeTypePolyfill.IsRefLikeType(type);
-#endif
 
     /// <summary>
     /// Names which of the two <see cref="MayBeRefLike"/> found, so a message reads the same from either source analyzer.
     /// </summary>
     public static string ByRefLikeClause(ITypeSymbol type)
-        => IsRefLikeType(type) ? "is a ref struct" : "admits a ref struct";
+        => type.IsRefLikeType ? "is a ref struct" : "admits a ref struct";
 
     /// <summary>
     /// Which of the two rules applies. A ref struct is one the compiler can see, so the source cannot work; a
@@ -172,7 +163,7 @@ internal static class AnalyzerHelper
     /// perfectly well - so the two are separate ids, configurable apart.
     /// </summary>
     public static DiagnosticDescriptor ByRefLikeRule(ITypeSymbol type)
-        => IsRefLikeType(type) ? SourceElementMustNotBeByRefLikeRule : SourceElementMayBeByRefLikeRule;
+        => type.IsRefLikeType ? SourceElementMustNotBeByRefLikeRule : SourceElementMayBeByRefLikeRule;
 
     /// <summary>
     /// Whether <paramref name="type"/> is <paramref name="baseType"/> or derives from it. BenchmarkDotNet resolves

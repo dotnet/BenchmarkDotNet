@@ -19,8 +19,8 @@ public class JobIdGeneratorTests
 
     public static TheoryData<string, Job> GetTheoryData() => new TheoryData<string, Job>()
     {
-        {"Job-GUNERI", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp90) },
-        {"Job-HQSRPM", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0) },
+        {"Job-XKQDZR", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp90) },
+        {"Job-CFYQDH", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0) },
         {"Job-GVKUBM", Job.Default.WithRuntime(CoreRuntime.Core10_0) },
     };
 }
