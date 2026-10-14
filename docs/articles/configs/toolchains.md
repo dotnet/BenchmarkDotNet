@@ -326,7 +326,7 @@ You can do that from command line:
 dotnet run -c Release -f net7.0 --runtimes nativeaot7.0 --ilcPackages D:\projects\runtime\artifacts\packages\Release\Shipping\
 ```
 
-To compare two local builds (for example, before and after your changes), pass multiple paths. One job is created per path and the first one becomes the baseline:
+To compare two local builds (for example, before and after your changes), pass multiple paths. One job is created per path (`NativeAOT 7.0-1`, `NativeAOT 7.0-2`, ...) and the first one becomes the baseline. If `--packages` is also given, each job restores into its own subfolder of it, as all local builds share the same ILCompiler version:
 
 ```cmd
 dotnet run -c Release -f net7.0 --runtimes nativeaot7.0 --ilcPackages D:\projects\runtime_base\artifacts\packages\Release\Shipping\ D:\projects\runtime\artifacts\packages\Release\Shipping\

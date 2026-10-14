@@ -451,10 +451,10 @@ namespace BenchmarkDotNet.Tests
                 var jobs = config.GetJobs().ToArray();
                 Assert.Equal(2, jobs.Length);
                 var baseline = Assert.Single(jobs, job => job.Meta.Baseline);
-                Assert.Equal("NativeAOT 10.0-runtime_base", baseline.Id);
+                Assert.Equal("NativeAOT 10.0-1", baseline.Id);
                 Assert.Equal(before.FullName, ((NativeAotSettings)((CsProjNativeAotToolchain)baseline.GetToolchain()).Settings).LocalIlcPackages?.FullName);
                 var other = Assert.Single(jobs, job => !job.Meta.Baseline);
-                Assert.Equal("NativeAOT 10.0-runtime", other.Id);
+                Assert.Equal("NativeAOT 10.0-2", other.Id);
                 Assert.Equal(after.FullName, ((NativeAotSettings)((CsProjNativeAotToolchain)other.GetToolchain()).Settings).LocalIlcPackages?.FullName);
             }
             finally
@@ -474,17 +474,61 @@ namespace BenchmarkDotNet.Tests
             Assert.False(isSuccess);
         }
 
-        [Theory]
-        [InlineData(new[] { "runtime/artifacts/Shipping", "runtime_base/artifacts/Shipping" }, new[] { "runtime", "runtime_base" })]
-        [InlineData(new[] { "a/before/x/Shipping", "a/after/y/Shipping" }, new[] { "before-x", "after-y" })]
-        [InlineData(new[] { "a/Shipping", "a/b/Shipping" }, new[] { "Shipping", "b" })]
-        [InlineData(new[] { "a/Shipping", "a/Shipping" }, new[] { "1", "2" })]
-        public void IlcPackagesDisplayNamesKeepOnlyTheDistinguishingDirectories(string[] relativePaths, string[] expected)
+        [Fact]
+        public void MultipleIlcPackagesPathsGetSeparateRestoreFoldersWhenPackagesPathIsSet()
         {
-            var root = Path.GetTempPath();
-            var paths = relativePaths.Select(path => new DirectoryInfo(Path.Combine(root, path))).ToArray();
+            var root = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+            try
+            {
+                var before = root.CreateSubdirectory("before");
+                var after = root.CreateSubdirectory("after");
+                var packages = Path.Combine(root.FullName, "packages");
 
-            Assert.Equal(expected, ConfigParser.GetIlcPackagesDisplayNames(paths));
+                var config = ConfigParser.Parse(["-r", "nativeaot10.0", "--packages", packages, "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output)).config;
+
+                Assert.NotNull(config);
+                var restorePaths = config.GetJobs()
+                    .Select(job => ((NativeAotSettings)((CsProjNativeAotToolchain)job.GetToolchain()).Settings).PackagesPath?.FullName)
+                    .ToArray();
+                Assert.Equal(2, restorePaths.Length);
+                Assert.All(restorePaths, path => Assert.StartsWith(packages, path));
+                Assert.Equal(2, restorePaths.Distinct().Count());
+            }
+            finally
+            {
+                root.Delete(recursive: true);
+            }
+        }
+
+        [Theory]
+        [InlineData(new object[] { new[] { "-r", "net10.0" } })]
+        [InlineData(new object[] { new string[0] })] // no runtime given at all
+        public void MultipleIlcPackagesPathsWithoutNativeAotRuntimeAreRejected(string[] runtimeArgs)
+        {
+            var root = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+            try
+            {
+                var before = root.CreateSubdirectory("before");
+                var after = root.CreateSubdirectory("after");
+
+                var (isSuccess, _, _) = ConfigParser.Parse([.. runtimeArgs, "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output));
+
+                Assert.False(isSuccess);
+            }
+            finally
+            {
+                root.Delete(recursive: true);
+            }
+        }
+
+        [Fact]
+        public void DuplicateIlcPackagesPathsAreRejected()
+        {
+            var existing = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory!;
+
+            var (isSuccess, _, _) = ConfigParser.Parse(["-r", "nativeaot10.0", "--ilcPackages", existing.FullName, existing.FullName + Path.DirectorySeparatorChar], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
         }
 
         [Theory]

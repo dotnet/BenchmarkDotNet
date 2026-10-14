@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -335,6 +336,25 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
+            if (options.IlcPackages.Count > 1)
+            {
+                if (!options.Runtimes.Any(runtime => Runtime.TryParse(runtime, out var parsed) && parsed is NativeAotRuntime))
+                {
+                    logger.WriteLineError($"Multiple {nameof(options.IlcPackages)} paths require a NativeAOT runtime, e.g. \"--runtimes nativeaot10.0\".");
+                    return false;
+                }
+
+                var pathComparer = OsDetector.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+                var duplicate = options.IlcPackages
+                    .GroupBy(path => Path.GetFullPath(path.FullName).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), pathComparer)
+                    .FirstOrDefault(group => group.Count() > 1);
+                if (duplicate != null)
+                {
+                    logger.WriteLineError($"The provided {nameof(options.IlcPackages)} \"{duplicate.Key}\" is given more than once.");
+                    return false;
+                }
+            }
+
             if (options.HardwareCounters.Count() > 3)
             {
                 logger.WriteLineError("You can't use more than 3 HardwareCounters at the same time.");
@@ -577,13 +597,21 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static IEnumerable<Job> CreateJobsForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
         {
-            // multiple --ilcPackages create one NativeAOT job per local build, the same way multiple --coreRun paths do
+            // multiple --ilcPackages create one NativeAOT job per local build, the same way multiple --coreRun paths do.
+            // The jobs are told apart by index; the Settings column shows each job's LocalIlcPackages path.
             if (options.IlcPackages.Count > 1 && Runtime.Parse(runtimeId) is NativeAotRuntime aot)
             {
-                var names = GetIlcPackagesDisplayNames(options.IlcPackages);
                 for (int i = 0; i < options.IlcPackages.Count; i++)
-                    yield return baseJob.WithId($"{aot}-{names[i]}")
-                        .WithToolchain(CsProjNativeAotToolchain.From(aot, new(options, options.IlcPackages[i])));
+                {
+                    var settings = new NativeAotSettings(options, options.IlcPackages[i]);
+                    // every local build has the same ILCompiler version, so with a shared --packages folder the first
+                    // restore would be reused by all the jobs; give each job its own folder instead
+                    if (settings.PackagesPath != null)
+                        settings = settings with { PackagesPath = new DirectoryInfo(Path.Combine(settings.PackagesPath.FullName, $"ilc{i + 1}")) };
+
+                    yield return baseJob.WithId($"{aot}-{i + 1}")
+                        .WithToolchain(CsProjNativeAotToolchain.From(aot, settings));
+                }
             }
             else
             {
@@ -720,48 +748,6 @@ namespace BenchmarkDotNet.ConsoleArguments
             var lastCommonDirectorySeparatorIndex = coreRunPath.FullName.LastIndexOf(Path.DirectorySeparatorChar, commonLongestPrefixIndex - 1);
 
             return coreRunPath.FullName.Substring(lastCommonDirectorySeparatorIndex);
-        }
-
-        /// <summary>
-        /// the names become part of the job id, which ends up in the generated project's file name, so we keep only the
-        /// directories that tell the paths apart and join them without directory separators
-        ///
-        /// for following paths:
-        ///  D:\projects\runtime\artifacts\packages\Release\Shipping
-        ///  D:\projects\runtime_base\artifacts\packages\Release\Shipping
-        ///
-        /// we get:
-        ///
-        /// runtime
-        /// runtime_base
-        /// </summary>
-        internal static string[] GetIlcPackagesDisplayNames(IReadOnlyList<DirectoryInfo> paths)
-        {
-            char[] separators = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
-            var segments = paths
-                .Select(path => path.FullName.Split(separators, StringSplitOptions.RemoveEmptyEntries))
-                .ToArray();
-            int minLength = segments.Min(s => s.Length);
-
-            int commonPrefix = 0;
-            while (commonPrefix < minLength && segments.All(s => s[commonPrefix] == segments[0][commonPrefix]))
-                commonPrefix++;
-
-            int commonSuffix = 0;
-            while (commonPrefix + commonSuffix < minLength
-                && segments.All(s => s[s.Length - 1 - commonSuffix] == segments[0][segments[0].Length - 1 - commonSuffix]))
-                commonSuffix++;
-
-            var names = segments
-                .Select(s => string.Join("-", s.Skip(commonPrefix).Take(s.Length - commonPrefix - commonSuffix)))
-                .Select((name, index) => name.IsBlank() ? segments[index].LastOrDefault() ?? "" : name) // a path that contains another
-                .Select(name => name.AsValidFileName())
-                .ToArray();
-
-            // the same directory given twice (or differing only by casing on Windows) can't be told apart by name
-            return names.All(name => name.IsNotBlank()) && names.Distinct(StringComparer.OrdinalIgnoreCase).Count() == names.Length
-                ? names
-                : names.Select((_, index) => (index + 1).ToString()).ToArray();
         }
     }
 }
