@@ -28,6 +28,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!-- TODO: Remove this item after `Microsoft.CodeAnalysis.CSharp.Analyzer.Testing` package dependencies are updated -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
   </ItemGroup>
   <ItemGroup>
     <!-- Analyzers and CodeFixers are included via Directory.Build.props, but we need them as regular references for testing -->
