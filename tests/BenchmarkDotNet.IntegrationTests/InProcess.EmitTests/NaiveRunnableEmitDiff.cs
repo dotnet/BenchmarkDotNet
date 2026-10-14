@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes.CompilerServices;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Loggers;
 using Mono.Cecil;
@@ -23,6 +23,8 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             "System.Runtime.CompilerServices.NullableAttribute",
             "System.Runtime.CompilerServices.NullableContextAttribute",
             "System.Runtime.CompilerServices.NullablePublicOnlyAttribute",
+            // Following attributes need to be ignored when running tests on xunit.v3
+            "gen.SelfRegisteredExtensions",
         ];
 
         private static readonly HashSet<string> IgnoredAttributeTypeNames =
@@ -43,6 +45,11 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             "System.Runtime.CompilerServices.NullableAttribute",
             "System.Runtime.CompilerServices.NullableContextAttribute",
             "System.Runtime.CompilerServices.NullablePublicOnlyAttribute",
+            // Following attributes need to be ignored when running tests on xunit.v3
+            typeof(ExtensionAttribute).FullName!,
+            "Xunit.Runner.Common.RegisterConsoleResultWriterAttribute",
+            "Xunit.Runner.Common.RegisterResultWriterAttribute",
+            "Xunit.Runner.Common.RegisterRunnerReporterAttribute",
         ];
 
         private static readonly HashSet<string> IgnoredRunnableMethodNames =
