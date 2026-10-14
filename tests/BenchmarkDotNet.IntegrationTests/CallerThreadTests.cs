@@ -19,12 +19,12 @@ namespace BenchmarkDotNet.IntegrationTests;
 
 public class CallerThreadTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
-    public static TheoryData<IToolchain> GetToolchains() =>
+    public static TheoryData<IToolchain> GetToolchains() => new(
     [
         InProcessEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
         InProcessNoEmitToolchain.From(new() { ExecuteOnSeparateThread = false }),
         Job.Default.GetToolchain()
-    ];
+    ]);
 
     [Theory]
     [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]

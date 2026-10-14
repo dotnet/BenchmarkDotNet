@@ -57,7 +57,9 @@ jobs:
         if: always()
         with:
           name: test-windows-core-trx-${{ github.run_id }}-${{ matrix.os }}
-          path: "**/*.trx"
+          path: |
+            **/*.trx
+            **/log_*.diag
 
   test-windows-full:
     strategy:
@@ -100,7 +102,9 @@ jobs:
         if: always()
         with:
           name: test-windows-full-trx-${{ github.run_id }}-${{ matrix.os }}
-          path: "**/*.trx"
+          path: |
+            **/*.trx
+            **/log_*.diag
 
   test-linux:
     strategy:
@@ -136,7 +140,9 @@ jobs:
         if: always()
         with:
           name: test-linux-trx-${{ github.run_id }}-${{ matrix.os }}
-          path: "**/*.trx"
+          path: |
+            **/*.trx
+            **/log_*.diag
 
   test-macos:
     name: test-macos (${{ matrix.os.arch }})
@@ -154,6 +160,10 @@ jobs:
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.pull_request.draft != true }}
         uses: ./.github/actions/setup-additional-tools
+      # createdump's task_for_pid makes authd evaluate system.privilege.taskport, which prompts for a password on these
+      # headless runners and blocks forever; pre-authorizing it lets in-process disassembly dump its own process.
+      - name: Allow task_for_pid without a password prompt
+        run: sudo security authorizationdb write system.privilege.taskport allow
       # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
@@ -177,7 +187,9 @@ jobs:
         if: always()
         with:
           name: test-macos(${{ matrix.os.arch }})-trx-${{ github.run_id }}
-          path: "**/*.trx"
+          path: |
+            **/*.trx
+            **/log_*.diag
 
   test-pack:
     runs-on: ubuntu-latest

@@ -66,6 +66,12 @@ jobs:
       - uses: ./.github/actions/add-windowsdefender-exclusions
         if: runner.os == 'Windows'
 
+      # createdump's task_for_pid makes authd evaluate system.privilege.taskport, which prompts for a password on these
+      # headless runners and blocks forever; pre-authorizing it lets in-process disassembly dump its own process.
+      - name: Allow task_for_pid without a password prompt
+        if: runner.os == 'macOS'
+        run: sudo security authorizationdb write system.privilege.taskport allow
+
       # Setup
       - name: Create `artifacts` directory
         run: |
@@ -89,12 +95,13 @@ jobs:
         run: |
           $PSNativeCommandUseErrorActionPreference = $true
           $iterationCount = ${{ inputs.iteration_count }}
+          
+          Write-Host ("OSArchitecture" + [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)
 
           foreach($i in 1..$iterationCount) {
             Write-Output ('##[group]Executing Iteration: {0}/${{ inputs.iteration_count }}' -f $i)
 
-            dotnet test -c Release --framework ${{ inputs.framework }} --filter ${{ inputs.filter }} -tl:off --no-build --logger "console;verbosity=normal"
-
+            dotnet test -c Release --framework ${{ inputs.framework }} --no-build --filter "${{ inputs.filter }}" --no-ansi --progress off --output Detailed
             Write-Output '##[endgroup]'
           }
 

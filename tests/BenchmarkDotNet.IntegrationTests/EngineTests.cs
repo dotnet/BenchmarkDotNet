@@ -73,12 +73,12 @@ namespace BenchmarkDotNet.IntegrationTests
             public void Foo() => Thread.Sleep(10);
         }
 
-        public static TheoryData<IToolchain> GetToolchains() =>
+        public static TheoryData<IToolchain> GetToolchains() => new(
         [
             InProcessEmitToolchain.Default,
             InProcessNoEmitToolchain.Default,
             Job.Default.GetToolchain()
-        ];
+        ]);
 
         // https://github.com/dotnet/BenchmarkDotNet/issues/1120
         [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]

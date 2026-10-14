@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             var config = CreateConfig();
 
-            var summary = BenchmarkRunner.Run<ExceptionCount>(config);
+            var summary = BenchmarkRunner.Run<ExceptionCount>(config, cancellationToken: TestContext.Current.CancellationToken);
 
             AssertStats(summary, new Dictionary<string, (string metricName, double expectedValue)>
             {
