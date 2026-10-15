@@ -103,12 +103,13 @@ namespace BenchmarkDotNet.Validators
         // source: https://stackoverflow.com/a/19562316
         private static IEnumerable<string> GetCsharpKeywords()
         {
-            var memberInfos = typeof(SyntaxKind).GetMembers(BindingFlags.Public | BindingFlags.Static);
+            // The names of the enum's members, without reflecting over its fields (which a Native AOT application may not keep).
+            var names = Enum.GetNames(typeof(SyntaxKind));
 
-            return from memberInfo in memberInfos
-                   where memberInfo.Name.EndsWith("Keyword")
-                   orderby memberInfo.Name
-                   select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword", StringComparison.Ordinal)).ToLower();
+            return from name in names
+                   where name.EndsWith("Keyword")
+                   orderby name
+                   select name.Substring(startIndex: 0, length: name.IndexOf("Keyword", StringComparison.Ordinal)).ToLower();
         }
 
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<BenchmarkCase>
