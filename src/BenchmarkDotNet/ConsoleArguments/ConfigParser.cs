@@ -344,6 +344,13 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
+                // all local builds have the same ILCompiler version, so with a shared folder every job would reuse the first restore
+                if (options.RestorePath != null)
+                {
+                    logger.WriteLineError($"Multiple {nameof(options.IlcPackages)} paths can't be combined with --packages, as every local build would be restored only once into the same folder. Remove --packages; each build is restored into its own folder, like with --freshPackages.");
+                    return false;
+                }
+
                 var pathComparer = OsDetector.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
                 var duplicate = options.IlcPackages
                     .GroupBy(path => Path.GetFullPath(path.FullName).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), pathComparer)
@@ -602,16 +609,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.IlcPackages.Count > 1 && Runtime.Parse(runtimeId) is NativeAotRuntime aot)
             {
                 for (int i = 0; i < options.IlcPackages.Count; i++)
-                {
-                    var settings = new NativeAotSettings(options, options.IlcPackages[i]);
-                    // every local build has the same ILCompiler version, so with a shared --packages folder the first
-                    // restore would be reused by all the jobs; give each job its own folder instead
-                    if (settings.PackagesPath != null)
-                        settings = settings with { PackagesPath = new DirectoryInfo(Path.Combine(settings.PackagesPath.FullName, $"ilc{i + 1}")) };
-
                     yield return baseJob.WithId($"{aot}-{i + 1}")
-                        .WithToolchain(CsProjNativeAotToolchain.From(aot, settings));
-                }
+                        .WithToolchain(CsProjNativeAotToolchain.From(aot, new(options, options.IlcPackages[i])));
             }
             else
             {

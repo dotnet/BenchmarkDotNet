@@ -475,7 +475,7 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
-        public void MultipleIlcPackagesPathsGetSeparateRestoreFoldersWhenPackagesPathIsSet()
+        public void MultipleIlcPackagesPathsWithPackagesPathAreRejected()
         {
             var root = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
             try
@@ -484,15 +484,46 @@ namespace BenchmarkDotNet.Tests
                 var after = root.CreateSubdirectory("after");
                 var packages = Path.Combine(root.FullName, "packages");
 
-                var config = ConfigParser.Parse(["-r", "nativeaot10.0", "--packages", packages, "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output)).config;
+                var (isSuccess, _, _) = ConfigParser.Parse(["-r", "nativeaot10.0", "--packages", packages, "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output));
+
+                Assert.False(isSuccess);
+            }
+            finally
+            {
+                root.Delete(recursive: true);
+            }
+        }
+
+        [Fact]
+        public void SingleIlcPackagesPathCanBeCombinedWithPackagesPath()
+        {
+            var existing = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory!;
+            var packages = Path.Combine(existing.FullName, "packages");
+
+            var config = ConfigParser.Parse(["-r", "nativeaot10.0", "--packages", packages, "--ilcPackages", existing.FullName], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            var settings = (NativeAotSettings)((CsProjNativeAotToolchain)Assert.Single(config.GetJobs()).GetToolchain()).Settings;
+            Assert.Equal(packages, settings.PackagesPath?.FullName);
+        }
+
+        [Fact]
+        public void MultipleIlcPackagesPathsAreMultipliedAcrossNativeAotRuntimes()
+        {
+            var root = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+            try
+            {
+                var before = root.CreateSubdirectory("before");
+                var after = root.CreateSubdirectory("after");
+
+                var config = ConfigParser.Parse(["-r", "net10.0", "nativeaot10.0", "nativeaot11.0", "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output)).config;
 
                 Assert.NotNull(config);
-                var restorePaths = config.GetJobs()
-                    .Select(job => ((NativeAotSettings)((CsProjNativeAotToolchain)job.GetToolchain()).Settings).PackagesPath?.FullName)
-                    .ToArray();
-                Assert.Equal(2, restorePaths.Length);
-                Assert.All(restorePaths, path => Assert.StartsWith(packages, path));
-                Assert.Equal(2, restorePaths.Distinct().Count());
+                var jobs = config.GetJobs().ToArray();
+                Assert.Equal(["NativeAOT 10.0-1", "NativeAOT 10.0-2", "NativeAOT 11.0-1", "NativeAOT 11.0-2"],
+                    jobs.Where(job => job.GetToolchain() is CsProjNativeAotToolchain).Select(job => job.Id).OrderBy(id => id));
+                // the baseline is the first job, so here it's the net10.0 one and not a NativeAOT one
+                Assert.IsNotType<CsProjNativeAotToolchain>(Assert.Single(jobs, job => job.Meta.Baseline).GetToolchain());
             }
             finally
             {
