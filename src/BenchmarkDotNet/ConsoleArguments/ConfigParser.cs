@@ -264,6 +264,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
         }
 
+        // CommandLineParser builds the options by reflection, so a trimmed (Native AOT) application must keep their members,
+        // and the constructors it converts path arguments with.
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(CommandLineOptions))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(FileInfo))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(DirectoryInfo))]
         private static Parser CreateParser(ILogger logger)
             => new Parser(settings =>
             {

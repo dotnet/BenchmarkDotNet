@@ -32,7 +32,8 @@ namespace BenchmarkDotNet.Validators
         internal static string TrimmedBenchmarksHint(string assemblyName)
             => " BenchmarkDotNet is running inside a Native AOT application, where the trimmer removes benchmark methods that are only found through reflection. "
             + RunWithJitHint
-            + $" To run in-process anyway, keep the methods with `<TrimmerRootAssembly Include=\"{assemblyName}\" />` in the project file.";
+            + " To run in-process anyway, pass the type to `BenchmarkRunner.Run<T>()` or `BenchmarkRunner.Run(typeof(T))`, which keep its members,"
+            + $" or keep the methods with `<TrimmerRootAssembly Include=\"{assemblyName}\" />` in the project file.";
 
         public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
@@ -61,12 +62,12 @@ namespace BenchmarkDotNet.Validators
 
                 if (toolchain is InProcessNoEmitToolchain { BenchmarkActionFactory: null })
                 {
-                    var method = GetMethodsInvokedByAction(benchmark.Descriptor).FirstOrDefault(m => RequiresGenericAction(m.ReturnType));
+                    var method = GetMethodsInvokedByAction(benchmark.Descriptor).FirstOrDefault(m => !IsSupportedReturnType(m.ReturnType));
                     if (method != null)
                     {
                         yield return new ValidationError(true,
                             $"BenchmarkDotNet is running inside a Native AOT application, where {nameof(InProcessNoEmitToolchain)} cannot invoke '{method.Name}' because it returns {method.ReturnType.GetDisplayName()}"
-                            + " (only void, Task and ValueTask are supported there). "
+                            + " (supported there: void, Task, ValueTask, Task<T>, reference types, and built-in value types such as int or double, also inside ValueTask<T> and IAsyncEnumerable<T>). "
                             + $"{RunWithJitHint} Alternatively, provide {nameof(InProcessNoEmitSettings)}.{nameof(InProcessNoEmitSettings.BenchmarkActionFactory)}.",
                             benchmark);
                     }
@@ -85,13 +86,14 @@ namespace BenchmarkDotNet.Validators
             }
         }
 
-        // The other return types are invoked through a closed generic action (BenchmarkAction<T>, BenchmarkActionTask<T>, ...)
-        // that BenchmarkActionFactory builds with MakeGenericType and Activator.CreateInstance. In a Native AOT application
-        // that fails for reference and value types alike: the constructors are trimmed, and value types also lack native code.
-        private static bool RequiresGenericAction(Type returnType)
-            => returnType != typeof(void)
-            && returnType != typeof(void*)
-            && returnType != typeof(Task)
-            && returnType != typeof(ValueTask);
+        // Other return types need a generic action that BenchmarkActionFactory builds with MakeGenericType and
+        // Activator.CreateInstance, which fails in a Native AOT application (the constructors are trimmed, and value
+        // types also lack native code), unless AotBenchmarkActions has a closed instantiation for it.
+        private static bool IsSupportedReturnType(Type returnType)
+            => returnType == typeof(void)
+            || returnType == typeof(void*)
+            || returnType == typeof(Task)
+            || returnType == typeof(ValueTask)
+            || AotBenchmarkActions.IsSupported(returnType);
     }
 }

@@ -193,7 +193,7 @@ Example: `dotnet run -c Release -- --coreRun "C:\Projects\corefx\bin\testhost\ne
 
 BenchmarkDotNet supports [NativeAOT](https://github.com/dotnet/runtime/tree/main/src/coreclr/nativeaot)! However, you might want to know how it works to get a better understanding of the results that you get.
 
-As every AOT solution, NativeAOT has some [limitations](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/limitations.md) like limited reflection support or lack of dynamic assembly loading. Because of that, the host process (what you run from command line) is never an AOT process, but just a regular .NET process. This process (called Host process) uses reflection to read benchmarks metadata (find all `[Benchmark]` methods etc), generates a new project that references the benchmarks and compiles it using ILCompiler. Such compilation produces a native executable, which is later started by the Host process. This process (called Benchmark or Child process) performs the actual benchmarking and reports the results back to the Host process. By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the NativeAOT benchmark according to [this instructions](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/compiling.md).
+As every AOT solution, NativeAOT has some [limitations](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/limitations.md) like limited reflection support or lack of dynamic assembly loading. Because of that, the host process (what you run from command line) is normally not an AOT process, but just a regular .NET process (for the alternative, see [Running BenchmarkDotNet inside a NativeAOT application](#running-benchmarkdotnet-inside-a-nativeaot-application)). This process (called Host process) uses reflection to read benchmarks metadata (find all `[Benchmark]` methods etc), generates a new project that references the benchmarks and compiles it using ILCompiler. Such compilation produces a native executable, which is later started by the Host process. This process (called Benchmark or Child process) performs the actual benchmarking and reports the results back to the Host process. By default BenchmarkDotNet uses the latest version of `Microsoft.DotNet.ILCompiler` to build the NativeAOT benchmark according to [this instructions](https://github.com/dotnet/runtime/blob/main/src/coreclr/nativeaot/docs/compiling.md).
 
 This is why you need to:
 - install [pre-requisites](https://docs.microsoft.com/en-us/dotnet/core/deploying/native-aot/#prerequisites) required by NativeAOT compiler
@@ -255,6 +255,14 @@ If a given benchmark is not supported by NativeAOT (e.g. it relies on runtime co
 ```cs
 config.AddFilter(new SimpleFilter(benchmark => benchmark.GetRuntime() is not NativeAotRuntime));
 ```
+
+### Running BenchmarkDotNet inside a NativeAOT application
+
+The approach above, a regular host process that builds a NativeAOT benchmark process, is the recommended one. When the application that runs BenchmarkDotNet is itself published with `PublishAot=true`, BenchmarkDotNet cannot generate and build projects, so it runs the benchmarks in-process with `InProcessNoEmitToolchain` (an explicitly configured out-of-process toolchain is reported as a validation error). The results then include the overhead of invoking the benchmark through a delegate. In such an application:
+
+- Run the benchmarks with `BenchmarkRunner.Run<T>()` or `BenchmarkRunner.Run(typeof(T))`, which keep the members of the benchmark type from being trimmed. `BenchmarkSwitcher.FromAssembly` and `BenchmarkRunner.Run(Assembly)` find the types by reflection, so keep them with `<TrimmerRootAssembly Include="YourAssembly" />` in the project file.
+- Benchmarks (and setup/cleanup methods) can return `void`, `Task`, `ValueTask`, `Task<T>`, reference types, and built-in value types such as `int`, `double` or `Guid`, also inside `ValueTask<T>` and `IAsyncEnumerable<T>`. Other value types and `ref` returns are reported as validation errors; to support them, provide your own `InProcessNoEmitSettings.BenchmarkActionFactory`.
+- `[Arguments]` are not supported by the in-process toolchains.
 
 ### Generated files
 

@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Exporters.Json
             {
                 { "Title", summary.Title },
                 { "HostEnvironmentInfo", GetDataToSerialize(summary.HostEnvironmentInfo) },
-                { "Benchmarks", summary.Reports.Select(GetDataToSerialize) }
+                { "Benchmarks", summary.Reports.Select(GetDataToSerialize).ToArray() }
             };
         }
 
@@ -86,12 +86,12 @@ namespace BenchmarkDotNet.Exporters.Json
             // We show MemoryDiagnoser's results only if it is being used
             if (report.BenchmarkCase.Config.HasMemoryDiagnoser())
             {
-                benchmark.Add("Memory", new
+                benchmark.Add("Memory", new JsonMemoryData
                 {
-                    report.GcStats.Gen0Collections,
-                    report.GcStats.Gen1Collections,
-                    report.GcStats.Gen2Collections,
-                    report.GcStats.TotalOperations,
+                    Gen0Collections = report.GcStats.Gen0Collections,
+                    Gen1Collections = report.GcStats.Gen1Collections,
+                    Gen2Collections = report.GcStats.Gen2Collections,
+                    TotalOperations = report.GcStats.TotalOperations,
                     BytesAllocatedPerOperation = report.GcStats.GetBytesAllocatedPerOperation(report.BenchmarkCase)
                 });
             }
@@ -100,19 +100,19 @@ namespace BenchmarkDotNet.Exporters.Json
             {
                 // We construct Measurements manually, so that we can have the IterationMode enum as text, rather than an integer
                 benchmark.Add("Measurements",
-                    report.AllMeasurements.Select(m => new
+                    report.AllMeasurements.Select(m => new JsonMeasurementData
                     {
                         IterationMode = m.IterationMode.ToString(),
                         IterationStage = m.IterationStage.ToString(),
-                        m.LaunchIndex,
-                        m.IterationIndex,
-                        m.Operations,
-                        m.Nanoseconds
-                    }));
+                        LaunchIndex = m.LaunchIndex,
+                        IterationIndex = m.IterationIndex,
+                        Operations = m.Operations,
+                        Nanoseconds = m.Nanoseconds
+                    }).ToArray());
 
                 if (report.Metrics.Any())
                 {
-                    benchmark.Add("Metrics", report.Metrics.Values);
+                    benchmark.Add("Metrics", report.Metrics.Values.ToArray());
                 }
             }
 

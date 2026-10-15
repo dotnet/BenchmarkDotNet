@@ -50,6 +50,13 @@ internal static class BenchmarkActionFactory
                 ? new BenchmarkActionBlockingValueTask(resultInstance, targetMethod, unrollFactor)
                 : new BenchmarkActionValueTask(resultInstance, targetMethod, unrollFactor);
 
+        // Without dynamic code the generic actions below can only be created for instantiations compiled ahead of time.
+        if (AotBenchmarkActions.IsRequired
+            && AotBenchmarkActions.TryCreate(resultInstance, targetMethod, resultType, unrollFactor, consumeTasksSynchronously, out var aotAction))
+        {
+            return aotAction;
+        }
+
         if (resultType.GetTypeInfo().IsGenericType)
         {
             var genericType = resultType.GetGenericTypeDefinition();

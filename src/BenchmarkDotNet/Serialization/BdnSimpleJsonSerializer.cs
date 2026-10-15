@@ -10,22 +10,7 @@ namespace BenchmarkDotNet.Serialization;
 /// </summary>
 internal static class BdnSimpleJsonSerializer
 {
-    private static readonly JsonSerializerOptions DefaultOptions = new()
-    {
-        Converters =
-        {
-            new SimpleJsonFloatConverter(),
-            new SimpleJsonDoubleConverter(),
-        },
-        // Disable escaping non ASCII chars. https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/character-encoding#serialize-all-characters
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        TypeInfoResolverChain =
-        {
-            // Use Reflection based serialization/deserialization. Because Summary object contains anonymous type.
-            new DefaultJsonTypeInfoResolver(),
-        },
-        RespectNullableAnnotations = true,
-    };
+    private static readonly JsonSerializerOptions DefaultOptions = CreateOptions(reflectionFallback: JsonSerializer.IsReflectionEnabledByDefault);
 
     private static readonly JsonSerializerOptions IndentedOptions = new(DefaultOptions)
     {
@@ -39,6 +24,25 @@ internal static class BdnSimpleJsonSerializer
         else
             return JsonSerializer.Serialize(item, DefaultOptions);
     }
+
+    /// <summary>
+    /// The source-generated metadata covers what JsonExporterBase exports, so it works without reflection (Native AOT).
+    /// With <paramref name="reflectionFallback"/>, reflection serializes anything else, such as what a derived exporter adds.
+    /// </summary>
+    internal static JsonSerializerOptions CreateOptions(bool reflectionFallback) => new()
+    {
+        Converters =
+        {
+            new SimpleJsonFloatConverter(),
+            new SimpleJsonDoubleConverter(),
+        },
+        // Disable escaping non ASCII chars. https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/character-encoding#serialize-all-characters
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        TypeInfoResolver = reflectionFallback
+            ? JsonTypeInfoResolver.Combine(BdnSimpleJsonSerializerContext.Default, new DefaultJsonTypeInfoResolver())
+            : BdnSimpleJsonSerializerContext.Default,
+        RespectNullableAnnotations = true,
+    };
 
     /// <summary>
     /// Custom JsonConverter for float that write Nan/PositiveInfinite/NegativeInfinite as empty string.

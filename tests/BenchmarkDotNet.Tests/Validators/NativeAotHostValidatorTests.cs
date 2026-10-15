@@ -27,9 +27,9 @@ namespace BenchmarkDotNet.Tests.Validators
         [Fact]
         public async Task NotNativeAotHost_NoErrors()
         {
-            Assert.Empty(await Validate<ReturnsInt>(toolchain: null, isNativeAotHost: false));
-            Assert.Empty(await Validate<ReturnsInt>(InProcessEmitToolchain.Default, isNativeAotHost: false));
-            Assert.Empty(await Validate<ReturnsInt>(NoEmit, isNativeAotHost: false));
+            Assert.Empty(await Validate<ReturnsUnsupportedValues>(toolchain: null, isNativeAotHost: false));
+            Assert.Empty(await Validate<ReturnsUnsupportedValues>(InProcessEmitToolchain.Default, isNativeAotHost: false));
+            Assert.Empty(await Validate<ReturnsUnsupportedValues>(NoEmit, isNativeAotHost: false));
         }
 
         [Fact]
@@ -58,39 +58,39 @@ namespace BenchmarkDotNet.Tests.Validators
         }
 
         [Fact]
-        public async Task NoEmit_ValueReturned_ErrorPerBenchmark()
+        public async Task NoEmit_ReturnTypesWithClosedActions_NoErrors()
         {
-            var errors = await Validate<ReturnsValues>(NoEmit);
-            Assert.Equal(4, errors.Length);
+            Assert.Empty(await Validate<ReturnsSupportedValues>(NoEmit));
+        }
+
+        [Fact]
+        public async Task NoEmit_ReturnTypesWithoutClosedActions_ErrorPerBenchmark()
+        {
+            var errors = await Validate<ReturnsUnsupportedValues>(NoEmit);
+            Assert.Equal(3, errors.Length);
             Assert.All(errors, error => Assert.True(error.IsCritical));
-            Assert.Contains(errors, error => error.Message.Contains("'Int' because it returns Int32"));
-            Assert.Contains(errors, error => error.Message.Contains("'String' because it returns String"));
-            Assert.Contains(errors, error => error.Message.Contains("'TaskOfInt' because it returns Task<Int32>"));
+            Assert.Contains(errors, error => error.Message.Contains("'Struct' because it returns CustomStruct"));
+            Assert.Contains(errors, error => error.Message.Contains("'ValueTaskOfString' because it returns ValueTask<String>"));
             Assert.Contains(errors, error => error.Message.Contains("'RefInt' because it returns Int32&"));
         }
 
         [Fact]
-        public async Task NoEmit_SetupReturningValue_Error()
+        public async Task NoEmit_SetupReturningUnsupportedType_Error()
         {
-            var error = Assert.Single(await Validate<SetupReturnsValueTaskOfInt>(NoEmit));
-            Assert.Contains("'Setup' because it returns ValueTask<Int32>", error.Message);
+            var error = Assert.Single(await Validate<SetupReturnsValueTaskOfString>(NoEmit));
+            Assert.Contains("'Setup' because it returns ValueTask<String>", error.Message);
         }
 
         [Fact]
         public async Task NoEmit_CustomActionFactory_NoErrors()
         {
             var toolchain = InProcessNoEmitToolchain.From(new InProcessNoEmitSettings { BenchmarkActionFactory = new NoActionFactory() });
-            Assert.Empty(await Validate<ReturnsValues>(toolchain));
+            Assert.Empty(await Validate<ReturnsUnsupportedValues>(toolchain));
         }
 
         public class ReturnsVoid
         {
             [Benchmark] public void Void() { }
-        }
-
-        public class ReturnsInt
-        {
-            [Benchmark] public int Int() => 1;
         }
 
         public class ReturnsTaskOrValueTask
@@ -99,20 +99,37 @@ namespace BenchmarkDotNet.Tests.Validators
             [Benchmark] public ValueTask ValueTask() => default;
         }
 
-        public class ReturnsValues
+        public class ReturnsSupportedValues
+        {
+            [Benchmark] public int Int() => 1;
+            [Benchmark] public double Double() => 1;
+            [Benchmark] public string String() => "";
+            [Benchmark] public int[] Array() => [];
+            [Benchmark] public Task<int> TaskOfInt() => Task.FromResult(1);
+            [Benchmark] public Task<CustomStruct> TaskOfStruct() => Task.FromResult(default(CustomStruct));
+            [Benchmark] public ValueTask<long> ValueTaskOfLong() => new(1);
+            [Benchmark] public IAsyncEnumerable<int> AsyncEnumerableOfInt() => AsyncEnumerable.Empty<int>();
+            [Benchmark] public IAsyncEnumerable<string> AsyncEnumerableOfString() => AsyncEnumerable.Empty<string>();
+        }
+
+        public class ReturnsUnsupportedValues
         {
             private int field;
 
-            [Benchmark] public int Int() => 1;
-            [Benchmark] public string String() => "";
-            [Benchmark] public Task<int> TaskOfInt() => Task.FromResult(1);
+            [Benchmark] public CustomStruct Struct() => default;
+            [Benchmark] public ValueTask<string> ValueTaskOfString() => new("");
             [Benchmark] public ref int RefInt() => ref field;
         }
 
-        public class SetupReturnsValueTaskOfInt
+        public class SetupReturnsValueTaskOfString
         {
-            [GlobalSetup] public ValueTask<int> Setup() => new(1);
+            [GlobalSetup] public ValueTask<string> Setup() => new("");
             [Benchmark] public void Void() { }
+        }
+
+        public struct CustomStruct
+        {
+            public long Value;
         }
 
         private class NoActionFactory : IBenchmarkActionFactory

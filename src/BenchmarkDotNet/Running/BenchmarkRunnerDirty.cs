@@ -4,6 +4,7 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -15,7 +16,7 @@ namespace BenchmarkDotNet.Running
     public static class BenchmarkRunner
     {
         [PublicAPI]
-        public static Summary Run<T>(
+        public static Summary Run<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(
             IConfig? config = null,
             string[]? args = null,
             CancellationToken cancellationToken = default)
@@ -27,7 +28,7 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI]
         public static Summary Run(
-            Type type,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type,
             IConfig? config = null,
             string[]? args = null,
             CancellationToken cancellationToken = default)
@@ -51,7 +52,7 @@ namespace BenchmarkDotNet.Running
 
         [PublicAPI]
         public static Summary Run(
-            Type type,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type,
             MethodInfo[] methods,
             IConfig? config = null,
             CancellationToken cancellationToken = default)
@@ -91,11 +92,11 @@ namespace BenchmarkDotNet.Running
                 RunAsync(benchmarkRunInfos, cancellationToken));
         }
         [PublicAPI]
-        public static ValueTask<Summary> RunAsync<T>(IConfig? config = null, string[]? args = null, CancellationToken cancellationToken = default)
+        public static ValueTask<Summary> RunAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(IConfig? config = null, string[]? args = null, CancellationToken cancellationToken = default)
             => RunAsync(typeof(T), config, args, cancellationToken);
 
         [PublicAPI]
-        public static async ValueTask<Summary> RunAsync(Type type, IConfig? config = null, string[]? args = null, CancellationToken cancellationToken = default)
+        public static async ValueTask<Summary> RunAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, IConfig? config = null, string[]? args = null, CancellationToken cancellationToken = default)
         {
             using (DirtyAssemblyResolveHelper.Create())
             {
@@ -113,7 +114,7 @@ namespace BenchmarkDotNet.Running
         }
 
         [PublicAPI]
-        public static async ValueTask<Summary> RunAsync(Type type, MethodInfo[] methods, IConfig? config = null, CancellationToken cancellationToken = default)
+        public static async ValueTask<Summary> RunAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, MethodInfo[] methods, IConfig? config = null, CancellationToken cancellationToken = default)
         {
             using (DirtyAssemblyResolveHelper.Create())
             {

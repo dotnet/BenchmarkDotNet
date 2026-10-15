@@ -39,10 +39,10 @@ namespace BenchmarkDotNet.Running
             if (Job.Infrastructure.TryGetToolchain(out var toolchain))
                 return toolchain;
 
-            // On mobile OSes BDN can't spawn a child process to build/run out of process, so benchmarks must run
-            // in-process regardless of the runtime (Mono, CoreCLR, NativeAOT): emit IL when dynamic code is
-            // available, fall back to reflection-only when it isn't (e.g. iOS AOT).
-            if (OsDetector.IsMobile())
+            // On mobile OSes BDN can't spawn a child process to build/run out of process, and inside a Native AOT
+            // application it can't generate and build a project, so benchmarks must run in-process: emit IL when
+            // dynamic code is available, fall back to reflection-only when it isn't (e.g. iOS AOT, Native AOT).
+            if (OsDetector.IsMobile() || RuntimeInformation.IsNativeAOT)
                 return RuntimeInformation.IsAot ? InProcessNoEmitToolchain.Default : InProcessEmitToolchain.Default;
 
             return GetRuntime().GetDefaultToolchain(this);

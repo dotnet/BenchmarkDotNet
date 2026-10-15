@@ -10,6 +10,7 @@ using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Validators;
 using System.Collections;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Running
@@ -18,13 +19,13 @@ namespace BenchmarkDotNet.Running
     {
         private const BindingFlags AllMethodsFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-        public static BenchmarkRunInfo TypeToBenchmarks(Type type, IConfig? config = null)
+        public static BenchmarkRunInfo TypeToBenchmarks([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, IConfig? config = null)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(TypeToBenchmarksAsync(type, config));
         }
 
-        public static ValueTask<BenchmarkRunInfo> TypeToBenchmarksAsync(Type type, IConfig? config = null, CancellationToken cancellationToken = default)
+        public static ValueTask<BenchmarkRunInfo> TypeToBenchmarksAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, IConfig? config = null, CancellationToken cancellationToken = default)
         {
             // Nothing of an open generic type can be read - BenchmarkSwitcher is what substitutes the type arguments -
             // so this is the one declaration error that leaves behind no cases to report it alongside.
@@ -37,13 +38,13 @@ namespace BenchmarkDotNet.Running
             return MethodsToBenchmarksWithFullConfig(type, benchmarkMethods, config, cancellationToken);
         }
 
-        public static BenchmarkRunInfo MethodsToBenchmarks(Type containingType, MethodInfo[] benchmarkMethods, IConfig? config = null)
+        public static BenchmarkRunInfo MethodsToBenchmarks([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type containingType, MethodInfo[] benchmarkMethods, IConfig? config = null)
         {
             using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
             return context.ExecuteUntilComplete(MethodsToBenchmarksAsync(containingType, benchmarkMethods, config));
         }
 
-        public static ValueTask<BenchmarkRunInfo> MethodsToBenchmarksAsync(Type containingType, MethodInfo[] benchmarkMethods, IConfig? config = null, CancellationToken cancellationToken = default)
+        public static ValueTask<BenchmarkRunInfo> MethodsToBenchmarksAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type containingType, MethodInfo[] benchmarkMethods, IConfig? config = null, CancellationToken cancellationToken = default)
             => MethodsToBenchmarksWithFullConfig(containingType, GetOrderedBenchmarkMethods(benchmarkMethods), config, cancellationToken);
 
         private static MethodInfo[] GetOrderedBenchmarkMethods(MethodInfo[] methods)
