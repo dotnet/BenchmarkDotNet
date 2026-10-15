@@ -3,6 +3,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Validators;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Running
@@ -22,14 +23,14 @@ namespace BenchmarkDotNet.Running
                 {
                     foreach (var type in types)
                     {
-                        logger.WriteLineError($"No [Benchmark] attribute found on '{type.Name}' benchmark case.");
+                        logger.WriteLineError($"No [Benchmark] attribute found on '{type.Name}' benchmark case.{GetNativeAotHint(type.Assembly)}");
                     }
                 }
                 else if (assemblies.Any())
                 {
                     foreach (var assembly in assemblies)
                     {
-                        logger.WriteLineError($"No [Benchmark] attribute found on '{assembly.GetName().Name}' assembly.");
+                        logger.WriteLineError($"No [Benchmark] attribute found on '{assembly.GetName().Name}' assembly.{GetNativeAotHint(assembly)}");
                     }
                 }
                 else
@@ -60,6 +61,9 @@ namespace BenchmarkDotNet.Running
 
             return (true, validRunnableTypes);
         }
+
+        private static string GetNativeAotHint(Assembly assembly)
+            => NativeAotHostValidator.IsNativeAotHost ? NativeAotHostValidator.TrimmedBenchmarksHint(assembly.GetName().Name!) : "";
 
         public static BenchmarkRunInfo[] Filter(IConfig effectiveConfig, IEnumerable<Type> types)
         {

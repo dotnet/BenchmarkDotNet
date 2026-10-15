@@ -60,6 +60,8 @@ public sealed class InProcessNoEmitToolchain : IToolchain
 
     public bool IsInProcess => true;
 
+    internal IBenchmarkActionFactory? BenchmarkActionFactory => settings.BenchmarkActionFactory;
+
     public override string ToString() => GetType().Name;
 
     public override bool Equals(object? obj)

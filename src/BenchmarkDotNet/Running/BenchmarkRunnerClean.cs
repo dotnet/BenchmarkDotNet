@@ -711,7 +711,10 @@ namespace BenchmarkDotNet.Running
                 if (!benchmarkRunInfo.ContainsBenchmarkDeclarations)
                 {
                     if (benchmarkRunInfo.DeclarationErrors.Length == 0)
-                        validationErrors.Add(new ValidationError(true, $"No [Benchmark] attribute found on '{benchmarkRunInfo.Type.Name}' benchmark case."));
+                    {
+                        string hint = NativeAotHostValidator.IsNativeAotHost ? NativeAotHostValidator.TrimmedBenchmarksHint(benchmarkRunInfo.Type.Assembly.GetName().Name!) : "";
+                        validationErrors.Add(new ValidationError(true, $"No [Benchmark] attribute found on '{benchmarkRunInfo.Type.Name}' benchmark case.{hint}"));
+                    }
 
                     continue;
                 }

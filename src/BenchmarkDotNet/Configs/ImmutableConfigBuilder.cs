@@ -31,7 +31,8 @@ namespace BenchmarkDotNet.Configs
             ParamsValidator.FailOnError,
             RequiredMemberValidator.FailOnError,
             SourceReturnTypeValidator.FailOnError,
-            BenchmarkCancellationValidator.FailOnError
+            BenchmarkCancellationValidator.FailOnError,
+            NativeAotHostValidator.FailOnError
         };
 
         /// <summary>
