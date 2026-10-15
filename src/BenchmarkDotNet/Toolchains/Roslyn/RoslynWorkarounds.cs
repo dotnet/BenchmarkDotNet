@@ -1,10 +1,14 @@
+using BenchmarkDotNet.Helpers;
 using Microsoft.CodeAnalysis.CSharp;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Toolchains.Roslyn
 {
     internal static class RoslynWorkarounds
     {
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = AotJustifications.HostOnly)]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.HostOnly)]
         internal static CSharpCompilationOptions WithIgnoreCorLibraryDuplicatedTypes(this CSharpCompilationOptions compilationOptions)
         {
             // this prevents from

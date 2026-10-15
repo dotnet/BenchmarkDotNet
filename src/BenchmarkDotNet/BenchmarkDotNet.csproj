@@ -13,6 +13,10 @@
     <!-- needed for docfx xref resolver -->
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
+  <!-- Trim and Native AOT analysis: BenchmarkDotNet runs in-process inside Native AOT applications. -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
   </ItemGroup>

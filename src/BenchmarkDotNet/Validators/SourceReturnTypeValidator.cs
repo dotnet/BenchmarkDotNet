@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Extensions;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Validators;
@@ -16,20 +17,19 @@ public class SourceReturnTypeValidator : IValidator
 
     public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input)
     {
-        var fromParams = input.Benchmarks
-            .Select(benchmark => benchmark.Descriptor.Type)
-            .Distinct()
-            .SelectMany(ValidateParamsSources);
+        var fromParams = input
+            .DistinctBenchmarkTypes()
+            .SelectMany(descriptor => ValidateParamsSources(descriptor.Type));
 
         var fromArguments = input.Benchmarks
-            .Select(benchmark => (benchmark.Descriptor.Type, benchmark.Descriptor.WorkloadMethod))
-            .Distinct()
+            .GroupBy(benchmark => (benchmark.Descriptor.Type, benchmark.Descriptor.WorkloadMethod))
+            .Select(group => group.First().Descriptor)
             .SelectMany(descriptor => ValidateArgumentsSource(descriptor.Type, descriptor.WorkloadMethod));
 
         return fromParams.Concat(fromArguments).ToAsyncEnumerable();
     }
 
-    private IEnumerable<ValidationError> ValidateParamsSources(Type type)
+    private IEnumerable<ValidationError> ValidateParamsSources([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type)
     {
         foreach (var member in type.GetTypeMembersWithGivenAttribute<ParamsSourceAttribute>(ReflectionExtensions.ParameterMemberFlags))
         {
@@ -40,7 +40,7 @@ public class SourceReturnTypeValidator : IValidator
         }
     }
 
-    private IEnumerable<ValidationError> ValidateArgumentsSource(Type type, MethodInfo benchmark)
+    private IEnumerable<ValidationError> ValidateArgumentsSource([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, MethodInfo benchmark)
     {
         if (benchmark.ResolveAttribute<ArgumentsSourceAttribute>() is { } attribute
             && Validate(attribute.Type ?? type, attribute.Name, nameof(ArgumentsSourceAttribute), $"{type.Name}.{benchmark.Name}") is { } error)
@@ -49,7 +49,7 @@ public class SourceReturnTypeValidator : IValidator
         }
     }
 
-    private ValidationError? Validate(Type sourceType, string sourceName, string attributeName, string owner)
+    private ValidationError? Validate([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type sourceType, string sourceName, string attributeName, string owner)
     {
         var source = sourceType.FindSourceMember(sourceName);
         if (source == null)

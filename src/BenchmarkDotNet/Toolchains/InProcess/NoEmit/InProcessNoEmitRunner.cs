@@ -18,6 +18,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
     /// </summary>
     internal class InProcessNoEmitRunner
     {
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = "Runnable is kept by the [DynamicDependency] on Run.")]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = "Runnable is kept by the [DynamicDependency] on Run.")]
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Runnable))]
         public static async ValueTask<int> Run(IHost host, ExecuteParameters parameters, IBenchmarkActionFactory? benchmarkActionFactory)
         {
@@ -141,7 +143,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
                 bool consumeTasksSynchronously = benchmarkCase.Job.ResolveValue(RunMode.ConsumeTasksSynchronouslyCharacteristic, EnvironmentResolver.Instance);
 
                 // DONTTOUCH: these should be allocated together
-                var instance = Activator.CreateInstance(benchmarkCase.Descriptor.Type)!;
+                var instance = BenchmarkInstanceFactory.CreateInstance(benchmarkCase.Descriptor.Type);
                 var workloadAction = BenchmarkActionFactory.CreateWorkload(benchmarkActionFactory, target, instance, unrollFactor, consumeTasksSynchronously);
                 var overheadAction = BenchmarkActionFactory.CreateOverhead(benchmarkActionFactory, target, instance, unrollFactor);
                 var globalSetupAction = BenchmarkActionFactory.CreateGlobalSetup(benchmarkActionFactory, target, instance);

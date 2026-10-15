@@ -45,6 +45,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             writer.WriteEndDocument();
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2080", Justification = "XmlExporter writes the public properties of the summary's types; in a trimmed application, those that are kept.")]
         private void WriteRoot(object source, string elementName)
         {
             writer.WriteStartElement(elementName);
@@ -87,6 +88,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             }
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = "XmlExporter writes the public properties of the summary's types; in a trimmed application, those that are kept.")]
         private void WriteComplexProperty(object? source, PropertyInfo propertyInfo)
         {
             writer.WriteStartElement(propertyInfo.Name);
@@ -132,6 +134,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             writer.WriteEndElement();
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = "XmlExporter writes the public properties of the summary's types; in a trimmed application, those that are kept.")]
         private void WriteComplexItem(object item, string itemName)
         {
             writer.WriteStartElement(itemName);

@@ -1,9 +1,15 @@
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
+[UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = AotJustifications.EmitToolchain)]
+[UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2060", Justification = AotJustifications.EmitToolchain)]
+[UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.EmitToolchain)]
+[UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = AotJustifications.EmitToolchain)]
 partial class RunnableEmitter
 {
     // MethodImplAttributes.Async was added in .Net 10.

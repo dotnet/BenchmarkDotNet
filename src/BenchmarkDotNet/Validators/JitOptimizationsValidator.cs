@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Extensions;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Validators
@@ -12,6 +13,8 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors { get; }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026",
+            Justification = "Only debug builds of referenced assemblies are reported; one trimmed away was not built at all, and Native AOT throws NotSupportedException, handled below.")]
         public async IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters validationParameters)
         {
             foreach (var group in validationParameters.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type.GetTypeInfo().Assembly))

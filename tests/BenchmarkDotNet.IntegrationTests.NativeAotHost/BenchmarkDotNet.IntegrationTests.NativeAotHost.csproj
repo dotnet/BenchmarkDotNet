@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <!-- Runs BenchmarkDotNet inside a Native AOT application: `dotnet publish -c Release -r <rid>`, then run the
+       executable, which exits with a non-zero code unless every benchmark ran (see Program.cs). -->
+  <PropertyGroup>
+    <AssemblyTitle>BenchmarkDotNet.IntegrationTests.NativeAotHost</AssemblyTitle>
+    <AssemblyName>BenchmarkDotNet.IntegrationTests.NativeAotHost</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- Dependencies of BenchmarkDotNet (CommandLineParser, TraceEvent, ...) report trim/AOT warnings when published;
+         this project checks what runs, not their warnings. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CA1822;CA1050</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
+  </ItemGroup>
+  <!-- BenchmarkDotNet.Annotations.targets does this for package consumers: the source generator only runs for a project
+       published with Native AOT or trimming. -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="PublishAot" />
+    <CompilerVisibleProperty Include="PublishTrimmed" />
+  </ItemGroup>
+  <Import Project="..\..\build\common.targets" />
+</Project>

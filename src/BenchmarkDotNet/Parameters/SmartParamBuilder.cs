@@ -277,6 +277,7 @@ namespace BenchmarkDotNet.Parameters
         // ValueTuple`8 is the nesting one: seven items and a TRest holding the remainder.
         private const int TupleRestArity = 8;
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.HostOnly)]
         private static object? TupleItem(object row, string[] path)
         {
             object? current = row;

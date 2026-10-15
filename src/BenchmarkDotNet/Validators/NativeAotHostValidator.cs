@@ -67,7 +67,8 @@ namespace BenchmarkDotNet.Validators
                     {
                         yield return new ValidationError(true,
                             $"BenchmarkDotNet is running inside a Native AOT application, where {nameof(InProcessNoEmitToolchain)} cannot invoke '{method.Name}' because it returns {method.ReturnType.GetDisplayName()}"
-                            + " (supported there: void, Task, ValueTask, Task<T>, reference types, and built-in value types such as int or double, also inside ValueTask<T> and IAsyncEnumerable<T>). "
+                            + ". BenchmarkDotNet's source generator registers the return types of benchmarks in a project that sets PublishAot or PublishTrimmed;"
+                            + " a type it cannot reference (not public, or a ref struct) stays unsupported. "
                             + $"{RunWithJitHint} Alternatively, provide {nameof(InProcessNoEmitSettings)}.{nameof(InProcessNoEmitSettings.BenchmarkActionFactory)}.",
                             benchmark);
                     }

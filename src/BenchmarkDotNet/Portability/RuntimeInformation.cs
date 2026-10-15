@@ -282,8 +282,8 @@ namespace BenchmarkDotNet.Portability
                 if (output.IsBlank())
                     return [];
 
-                var results = JsonSerializer.Deserialize<JsonElement[]>(output)!;
-                return results.Select(node =>
+                using var document = JsonDocument.Parse(output!);
+                return document.RootElement.EnumerateArray().Select(node =>
                 {
                     string name = node.GetProperty("displayName").GetString()!;
                     string path = node.GetProperty("pathToSignedProductExe").GetString()!;

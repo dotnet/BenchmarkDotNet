@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Extensions;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Validators
@@ -11,10 +12,9 @@ namespace BenchmarkDotNet.Validators
 
         public bool TreatsWarningsAsErrors => true;
 
-        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input) => input.Benchmarks
-            .Select(benchmark => benchmark.Descriptor.Type)
-            .Distinct()
-            .SelectMany(ValidateAsync)
+        public IAsyncEnumerable<ValidationError> ValidateAsync(ValidationParameters input) => input
+            .DistinctBenchmarkTypes()
+            .SelectMany(descriptor => ValidateAsync(descriptor.Type))
             .ToAsyncEnumerable();
 
         private static bool IsStatic(MemberInfo member) => member switch
@@ -24,7 +24,7 @@ namespace BenchmarkDotNet.Validators
             _ => false
         };
 
-        private IEnumerable<ValidationError> ValidateAsync(Type type)
+        private IEnumerable<ValidationError> ValidateAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type)
         {
             foreach (var memberInfo in type.GetMembers(ReflectionExtensions.ParameterMemberFlags))
             {

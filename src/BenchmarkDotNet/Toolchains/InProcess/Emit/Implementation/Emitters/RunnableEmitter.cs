@@ -9,6 +9,7 @@ using BenchmarkDotNet.Properties;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -25,6 +26,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
     /// A helper type that emits code that matches BenchmarkType.txt template.
     /// IMPORTANT: this type IS NOT thread safe.
     /// </summary>
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = AotJustifications.EmitToolchain)]
+    [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = AotJustifications.EmitToolchain)]
     internal abstract partial class RunnableEmitter
     {
         /// <summary>

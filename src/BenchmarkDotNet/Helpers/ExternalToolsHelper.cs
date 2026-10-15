@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Detectors;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Helpers
 {
@@ -11,7 +12,7 @@ namespace BenchmarkDotNet.Helpers
         public static readonly Lazy<Dictionary<string, string>> MacSystemProfilerData =
             LazyParse(OsDetector.IsMacOS, "system_profiler", "SPSoftwareDataType", s => SectionsHelper.ParseSection(s, ':'));
 
-        private static Lazy<T> LazyParse<T>(Func<bool> isAvailable, string fileName, string arguments, Func<string?, T> parseFunc)
+        private static Lazy<T> LazyParse<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] T>(Func<bool> isAvailable, string fileName, string arguments, Func<string?, T> parseFunc)
         {
             return new Lazy<T>(() =>
             {

@@ -14,6 +14,7 @@ namespace BenchmarkDotNet.Disassemblers
 {
     internal sealed class MonoDisassembler
     {
+        [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = AotJustifications.HostOnly)]
         internal async Task<DisassemblyResult> Disassemble(BenchmarkCase benchmarkCase, CancellationToken cancellationToken)
         {
             Debug.Assert(!RuntimeInformation.IsMono, "Must never be called for Non-Mono benchmarks");

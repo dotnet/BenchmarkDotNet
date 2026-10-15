@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using BenchmarkDotNet.Portability;
 
@@ -89,6 +90,7 @@ namespace BenchmarkDotNet.Parameters
             return string.CompareOrdinal(x?.ToString(), y?.ToString());
         }
 
+        [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = "Guarded by RuntimeInformation.IsAot.")]
         private static bool TryFallbackStructuralCompareTo(object x, object y, out int comparison)
         {
             // Check for multi-dimensional array and ITuple and re-try for each element recursively.

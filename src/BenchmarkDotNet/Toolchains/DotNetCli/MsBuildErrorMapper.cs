@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Toolchains.Results;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -128,7 +129,10 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         // benchmark is compiled against (see BenchmarkDotNetReferences - shared with the Roslyn toolchain so they stay in
         // sync). Used to recognize when a missing type reported by the compiler means the benchmark project didn't
         // reference BenchmarkDotNet. Built once, only used on failure.
-        private static readonly Lazy<HashSet<string>> BenchmarkDotNetEcosystemNames = new(() =>
+        private static readonly Lazy<HashSet<string>> BenchmarkDotNetEcosystemNames = new(GetBenchmarkDotNetEcosystemNames);
+
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = AotJustifications.HostOnly)]
+        private static HashSet<string> GetBenchmarkDotNetEcosystemNames()
         {
             var names = new HashSet<string>(StringComparer.Ordinal);
             foreach (var assembly in BenchmarkDotNetReferences.Assemblies)
@@ -162,7 +166,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             }
 
             return names;
-        });
+        }
 
         // e.g. ".NETFramework,Version=v4.7.2" or ".NETCoreApp,Version=v8.0"
         private static readonly Regex FrameworkMonikerRegex = new(

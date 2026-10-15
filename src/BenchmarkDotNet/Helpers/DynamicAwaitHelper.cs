@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Extensions;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Runtime.CompilerServices;
@@ -38,6 +39,7 @@ internal static class DynamicAwaitHelper
         }
     }
 
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.ReturnTypeShape)]
     internal static async IAsyncEnumerable<object?> EnumerateBenchmarkAsync(object asyncEnumerable, AsyncEnumerableInfo asyncEnumerableInfo)
     {
         var enumerator = Unwrapped(() => asyncEnumerableInfo.GetAsyncEnumeratorMethod.Invoke(asyncEnumerable, GetDefaultArgs(asyncEnumerableInfo.GetAsyncEnumeratorMethod)))!;
@@ -166,6 +168,8 @@ internal static class DynamicAwaitHelper
         public void UnsafeOnCompleted(Action continuation)
             => OnCompletedCore(typeof(ICriticalNotifyCompletion), nameof(ICriticalNotifyCompletion.UnsafeOnCompleted), continuation);
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.ReturnTypeShape)]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2067", Justification = AotJustifications.ReturnTypeShape)]
         private void OnCompletedCore(Type interfaceType, string methodName, Action continuation)
         {
             // ICriticalNotifyCompletion is optional in the awaiter pattern, but DynamicAwaiter declares it, so a

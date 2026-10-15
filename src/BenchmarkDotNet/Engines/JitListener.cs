@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Reflection;
 using BenchmarkDotNet.Attributes.CompilerServices;
@@ -502,6 +503,7 @@ internal sealed class JitListener : EventListener
     // yields 0 and we simply stop comparing ModuleID (JitListener_ResolvesModuleId catches it); a wrong non-zero value
     // stops the method matching, which costs the optimization but cannot corrupt a measurement (the canonicalized
     // JitStage_Generic* tests catch it).
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = "Listens to JIT events, which a Native AOT application does not raise.")]
     internal static ulong GetModuleId(Module module)
     {
         try

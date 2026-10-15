@@ -38,6 +38,7 @@ namespace BenchmarkDotNet.Characteristics
         public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(this CharacteristicObject obj) =>
             GetThisTypeCharacteristics(obj.GetType());
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2111", Justification = "The cache calls it with the annotated characteristicObjectType it is given.")]
         public static IReadOnlyList<Characteristic> GetThisTypeCharacteristics(
             [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicObjectType)
         {
@@ -74,6 +75,7 @@ namespace BenchmarkDotNet.Characteristics
         public static IReadOnlyList<Characteristic> GetAllCharacteristics(this CharacteristicObject obj) =>
             GetAllCharacteristics(obj.GetType());
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2111", Justification = "The cache calls it with the annotated characteristicObjectType it is given.")]
         public static IReadOnlyList<Characteristic> GetAllCharacteristics(
             [DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] Type characteristicObjectType)
         {

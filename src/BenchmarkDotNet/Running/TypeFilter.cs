@@ -4,12 +4,15 @@ using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Validators;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Running
 {
     public static class TypeFilter
     {
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2067", Justification = AotJustifications.DiscoveredBenchmarkTypes)]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2072", Justification = AotJustifications.DiscoveredBenchmarkTypes)]
         public static (bool allTypesValid, IReadOnlyList<Type> runnable) GetTypesWithRunnableBenchmarks(IEnumerable<Type> types, IEnumerable<Assembly> assemblies, ILogger logger)
         {
             var validRunnableTypes = new List<Type>();
@@ -71,6 +74,7 @@ namespace BenchmarkDotNet.Running
             return context.ExecuteUntilComplete(FilterAsync(effectiveConfig, types, CancellationToken.None));
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2072", Justification = AotJustifications.DiscoveredBenchmarkTypes)]
         public static async ValueTask<BenchmarkRunInfo[]> FilterAsync(IConfig effectiveConfig, IEnumerable<Type> types, CancellationToken cancellationToken)
         {
             var result = new List<BenchmarkRunInfo>();

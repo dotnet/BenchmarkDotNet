@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -17,18 +18,16 @@ internal static class BdnSimpleJsonSerializer
         WriteIndented = true,
     };
 
+    // Resolving the metadata from the options, rather than letting JsonSerializer do it, needs no reflection.
     public static string Serialize<T>(T item, bool indentJson = false)
-    {
-        if (indentJson)
-            return JsonSerializer.Serialize(item, IndentedOptions);
-        else
-            return JsonSerializer.Serialize(item, DefaultOptions);
-    }
+        => JsonSerializer.Serialize(item, (JsonTypeInfo<T>)(indentJson ? IndentedOptions : DefaultOptions).GetTypeInfo(typeof(T)));
 
     /// <summary>
     /// The source-generated metadata covers what JsonExporterBase exports, so it works without reflection (Native AOT).
     /// With <paramref name="reflectionFallback"/>, reflection serializes anything else, such as what a derived exporter adds.
     /// </summary>
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = "Reflection is only used where JsonSerializer.IsReflectionEnabledByDefault, which a trimmed or Native AOT application is not.")]
+    [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = "Reflection is only used where JsonSerializer.IsReflectionEnabledByDefault, which a trimmed or Native AOT application is not.")]
     internal static JsonSerializerOptions CreateOptions(bool reflectionFallback) => new()
     {
         Converters =

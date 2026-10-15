@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Validators
 
             foreach (var groupByType in input.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type))
             {
-                var allMethods = groupByType.Key.GetAllMethods().ToArray();
+                var allMethods = groupByType.First().Descriptor.Type.GetAllMethods().ToArray();
 
                 validationErrors.AddRange(ValidateAttributes<GlobalSetupAttribute>(groupByType.Key.Name, allMethods));
                 validationErrors.AddRange(ValidateAttributes<GlobalCleanupAttribute>(groupByType.Key.Name, allMethods));

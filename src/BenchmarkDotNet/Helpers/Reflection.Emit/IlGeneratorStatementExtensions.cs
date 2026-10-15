@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 
 namespace BenchmarkDotNet.Helpers.Reflection.Emit
 {
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.EmitToolchain)]
     internal static class IlGeneratorStatementExtensions
     {
         public static void EmitCallBaseParameterlessCtor(this ILGenerator ilGenerator, ConstructorBuilder constructorBuilder)

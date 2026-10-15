@@ -49,6 +49,14 @@ The recommended order of solving build issues:
 3. Implement your own `IToolchain` and generate and build all the right things in your way (you can use existing Builders and Generators and just override some methods to change specific behaviour).
 4. Report a bug in BenchmarkDotNet repository.
 
+## Running inside a Native AOT application
+
+When the application that runs BenchmarkDotNet is published with `PublishAot=true`, it runs the benchmarks in-process (see [Running BenchmarkDotNet inside a NativeAOT application](xref:docs.toolchains#running-benchmarkdotnet-inside-a-nativeaot-application)). The errors you may see there and what to do:
+
+* `No [Benchmark] attribute found on '...' benchmark case. BenchmarkDotNet is running inside a Native AOT application, where the trimmer removes benchmark methods...`: the benchmark type was trimmed. Set `PublishAot` in the project that defines the benchmarks, so that BenchmarkDotNet's source generator keeps them, or pass the type to `BenchmarkRunner.Run<T>()`, or add `<TrimmerRootAssembly Include="YourAssembly" />`.
+* `... so the CsProjNativeAot toolchain cannot generate and build a project ...`: the job names an out-of-process toolchain or runtime (`--runtimes nativeaot10.0`, `Job.WithRuntime(...)`), which a Native AOT application cannot build. Remove it to run in-process, or run the host with the JIT (`dotnet run -c Release`) to benchmark a NativeAOT build out of process, which gives the more accurate results.
+* `... InProcessNoEmitToolchain cannot invoke '...' because it returns ...`: the result type needs code generated ahead of time that the source generator could not provide (the type is not accessible from the project, or is a `ref struct`), or the benchmarks are in a project that doesn't set `PublishAot`. Make the type accessible, return a supported type, or provide `InProcessNoEmitSettings.BenchmarkActionFactory`.
+
 ## Debugging Benchmarks
 
 ## In the same process

@@ -148,7 +148,7 @@ namespace BenchmarkDotNet.Running
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static async ValueTask<Summary> RunWithDirtyAssemblyResolveHelper(Type type, IConfig? config, string[]? args, CancellationToken cancellationToken)
+        private static async ValueTask<Summary> RunWithDirtyAssemblyResolveHelper([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, IConfig? config, string[]? args, CancellationToken cancellationToken)
         {
             var summaries = args == null
                 ? await BenchmarkRunnerClean.Run([await BenchmarkConverter.TypeToBenchmarksAsync(type, config, cancellationToken).ConfigureAwait()], cancellationToken).ConfigureAwait(false)
@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Running
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static async ValueTask<Summary> RunWithDirtyAssemblyResolveHelper(Type type, MethodInfo[] methods, IConfig? config, CancellationToken cancellationToken)
+        private static async ValueTask<Summary> RunWithDirtyAssemblyResolveHelper([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, MethodInfo[] methods, IConfig? config, CancellationToken cancellationToken)
         {
             var summaries = await BenchmarkRunnerClean.Run([await BenchmarkConverter.MethodsToBenchmarksAsync(type, methods, config, cancellationToken).ConfigureAwait()], cancellationToken).ConfigureAwait(false);
 
@@ -180,6 +180,7 @@ namespace BenchmarkDotNet.Running
                 : (await new BenchmarkSwitcher(types).RunWithDirtyAssemblyResolveHelper(args, config, false, cancellationToken).ConfigureAwait(false)).ToArray();
 
         // Convert types sequentially (not concurrently) because reading params/arguments sources runs user code.
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2072", Justification = AotJustifications.DiscoveredBenchmarkTypes)]
         private static async ValueTask<BenchmarkRunInfo[]> TypesToBenchmarksAsync(IEnumerable<Type> types, IConfig? config, CancellationToken cancellationToken)
         {
             var runInfos = new List<BenchmarkRunInfo>();

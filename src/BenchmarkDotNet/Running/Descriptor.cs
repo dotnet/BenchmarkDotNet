@@ -1,12 +1,14 @@
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Running
 {
     public class Descriptor : IEquatable<Descriptor>
     {
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
         public Type Type { get; }
         public MethodInfo WorkloadMethod { get; }
         public MethodInfo? GlobalSetupMethod { get; }
@@ -26,7 +28,7 @@ namespace BenchmarkDotNet.Running
         public string DisplayInfo => TypeInfo + "." + WorkloadMethodDisplayInfo;
 
         public Descriptor(
-            Type type,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type,
             MethodInfo workloadMethod,
             MethodInfo? globalSetupMethod = null,
             MethodInfo? globalCleanupMethod = null,

@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Loggers
 {
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = "Only used inside LINQPad, which runs on the JIT.")]
     public sealed class LinqPadLogger : ILogger
     {
         private const string DefaultColor = "";

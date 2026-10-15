@@ -1,9 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace BenchmarkDotNet.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class ArgumentsSourceAttribute : PriorityAttribute
     {
         public string Name { get; }
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
         public Type? Type { get; }
 
         public ArgumentsSourceAttribute(string name)
@@ -12,7 +15,7 @@ namespace BenchmarkDotNet.Attributes
             Type = null;
         }
 
-        public ArgumentsSourceAttribute(Type type, string name)
+        public ArgumentsSourceAttribute([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, string name)
         {
             Name = name;
             Type = type;

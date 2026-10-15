@@ -1,5 +1,7 @@
-﻿using BenchmarkDotNet.Helpers.Reflection.Emit;
+﻿using BenchmarkDotNet.Helpers;
+using BenchmarkDotNet.Helpers.Reflection.Emit;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -7,6 +9,10 @@ using static BenchmarkDotNet.Code.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
+[UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2060", Justification = AotJustifications.EmitToolchain)]
+[UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.EmitToolchain)]
+[UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.EmitToolchain)]
+[UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = AotJustifications.EmitToolchain)]
 partial class RunnableEmitter
 {
     private record struct AsyncStateMachineFields(FieldInfo StateField, FieldInfo BuilderField, FieldInfo? ThisField);

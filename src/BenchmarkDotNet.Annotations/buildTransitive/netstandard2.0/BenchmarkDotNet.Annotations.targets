@@ -6,6 +6,12 @@
     </Reference>
   </ItemGroup>
 
+  <!-- NativeAotRegistrationGenerator only generates code for a project published with Native AOT or trimming. -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="PublishAot" />
+    <CompilerVisibleProperty Include="PublishTrimmed" />
+  </ItemGroup>
+
   <!-- The weaving logic is shared with BenchmarkDotNet.Weaver.targets. See the common file for details. -->
   <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Weaver.Common.targets" />
 

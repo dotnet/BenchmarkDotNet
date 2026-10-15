@@ -4,6 +4,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using BenchmarkDotNet.Toolchains.Parameters;
 using BenchmarkDotNet.Validators;
@@ -12,6 +13,8 @@ using static BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation.RunnableRe
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit;
 
+[UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = AotJustifications.EmitToolchain)]
+[UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.EmitToolchain)]
 internal static class InProcessEmitRunner
 {
     public static async ValueTask<int> Run(IHost host, ExecuteParameters parameters)

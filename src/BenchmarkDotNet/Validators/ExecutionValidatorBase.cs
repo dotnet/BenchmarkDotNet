@@ -20,7 +20,7 @@ public abstract class ExecutionValidatorBase : IValidator
 
     protected abstract IAsyncEnumerable<ValidationError> ValidateAsyncCore(ValidationParameters validationParameters, CancellationToken cancellationToken = default);
 
-    protected bool TryCreateBenchmarkTypeInstance(Type type, List<ValidationError> errors, CancellationToken cancellationToken, [NotNullWhen(true)] out object? instance)
+    protected bool TryCreateBenchmarkTypeInstance([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, List<ValidationError> errors, CancellationToken cancellationToken, [NotNullWhen(true)] out object? instance)
     {
         try
         {

@@ -1,9 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -13,6 +15,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
 partial class RunnableEmitter
 {
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2055", Justification = AotJustifications.EmitToolchain)]
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.EmitToolchain)]
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.EmitToolchain)]
+    [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = AotJustifications.EmitToolchain)]
     private abstract class AsyncCoreEmitterBase(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark) : RunnableEmitter(buildPartition, moduleBuilder, benchmark)
     {
         protected FieldInfo workloadValueTaskSourceField = null!;

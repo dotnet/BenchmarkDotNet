@@ -6,6 +6,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -74,6 +75,7 @@ namespace BenchmarkDotNet.Code
                 items.Add(value);
         }
 
+        [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = AotJustifications.HostOnly)]
         private static (bool, string) GetShadowCopySettings()
         {
             string benchmarkDotNetLocation = Path.GetDirectoryName(typeof(CodeGenerator).GetTypeInfo().Assembly.Location)!;
@@ -321,6 +323,7 @@ namespace BenchmarkDotNet.Code
                 renderer.RenderStatementReads().Concat(staticParams).Concat(argumentFields));
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.HostOnly)]
         private static string GetEngineFactoryTypeName(BenchmarkCase benchmarkCase)
         {
             var factory = benchmarkCase.Job.ResolveValue(InfrastructureMode.EngineFactoryCharacteristic, InfrastructureResolver.Instance)!;

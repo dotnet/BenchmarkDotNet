@@ -4,6 +4,7 @@
 
 // file copied from https://github.com/dotnet/runtime/blob/bf2e135c12cbd34aeba2fa4a31d0e84184041a17/src/libraries/Common/tests/System/IO/PathFeatures.cs
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -52,6 +53,8 @@ namespace BenchmarkDotNet.Extensions
             return HasLegacyIoBehavior("BlockLongPaths");
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = ".NET Framework only: on CoreLib the method returns before this.")]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = ".NET Framework only: on CoreLib the method returns before this.")]
         private static bool HasLegacyIoBehavior(string propertyName)
         {
             // Core doesn't have legacy behaviors

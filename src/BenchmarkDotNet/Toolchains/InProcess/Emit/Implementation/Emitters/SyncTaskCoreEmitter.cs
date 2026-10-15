@@ -3,6 +3,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using static BenchmarkDotNet.Code.RunnableConstants;
@@ -14,6 +15,8 @@ partial class RunnableEmitter
     // Used when Job.Run.ConsumeTasksSynchronously is enabled for (Value)Task(<T>)-returning workloads.
     // Emits the same shape as SyncCoreEmitter but routes the workload return value through AwaitHelper.GetResult
     // so the iteration loop stays synchronous, matching the pre-async-refactor behavior so historical results stay comparable.
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = AotJustifications.EmitToolchain)]
+    [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = AotJustifications.EmitToolchain)]
     private sealed class SyncTaskCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark) : RunnableEmitter(buildPartition, moduleBuilder, benchmark)
     {
         protected override void EmitExtraGlobalCleanup(ILGenerator ilBuilder, LocalBuilder? thisLocal) { }

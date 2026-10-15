@@ -3,6 +3,7 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
 using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Validators
@@ -10,6 +11,8 @@ namespace BenchmarkDotNet.Validators
     [UsedImplicitly]
     public static class BenchmarkProcessValidator
     {
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075",
+            Justification = "The generated runnable derives from the benchmark type and calls its [Benchmark] methods directly, so they are kept.")]
         public static IEnumerable<ValidationError> Validate(Job job, object benchmarkInstance)
         {
             foreach (var validationError in BenchmarkEnvironmentInfo.Validate(job))

@@ -80,6 +80,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         /// exporter(s); any other value is treated as an assembly-qualified type name of a custom <see cref="IExporter"/>
         /// with a public parameterless constructor. Used by both validation and config creation so the two can't drift.
         /// </summary>
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2057", Justification = "A custom exporter named on the command line can only be found if the application keeps its type; otherwise the user gets the invalid exporter error.")]
         private static bool TryResolveExporters(string name, [NotNullWhen(true)] out IExporter[]? exporters, [NotNullWhen(false)] out string? error)
         {
             if (AvailableExporters.TryGetValue(name, out var builtIn))

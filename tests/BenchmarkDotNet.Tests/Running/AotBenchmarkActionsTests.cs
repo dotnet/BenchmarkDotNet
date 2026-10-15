@@ -1,3 +1,4 @@
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using Perfolizer.Horology;
@@ -14,7 +15,17 @@ namespace BenchmarkDotNet.Tests.Running
         public static TheoryData<string> SupportedMethods => new(
             nameof(Target.Int), nameof(Target.Double), nameof(Target.String), nameof(Target.Array), nameof(Target.StaticString),
             nameof(Target.TaskOfInt), nameof(Target.TaskOfString), nameof(Target.TaskOfStruct),
-            nameof(Target.ValueTaskOfLong), nameof(Target.AsyncEnumerableOfInt), nameof(Target.AsyncEnumerableOfString));
+            nameof(Target.ValueTaskOfLong), nameof(Target.AsyncEnumerableOfInt), nameof(Target.AsyncEnumerableOfString),
+            nameof(Target.RefInt), nameof(Target.RefReadonlyInt),
+            nameof(Target.RegisteredStruct), nameof(Target.ValueTaskOfRegisteredClass), nameof(Target.RefRegisteredClass),
+            nameof(Target.RefReadonlyRegisteredStruct), nameof(Target.AsyncEnumerableOfRegisteredStruct));
+
+        static AotBenchmarkActionsTests()
+        {
+            // What the source generator emits for a project published with Native AOT.
+            NativeAotRegistration.RegisterResultType<RegisteredStruct>();
+            NativeAotRegistration.RegisterResultType<RegisteredClass>();
+        }
 
         [Theory]
         [MemberData(nameof(SupportedMethods))]
@@ -50,9 +61,9 @@ namespace BenchmarkDotNet.Tests.Running
         }
 
         [Theory]
-        [InlineData(nameof(Target.Struct))]
-        [InlineData(nameof(Target.ValueTaskOfString))]
-        [InlineData(nameof(Target.RefInt))]
+        [InlineData(nameof(Target.UnregisteredStruct))]
+        [InlineData(nameof(Target.ValueTaskOfUnregisteredClass))]
+        [InlineData(nameof(Target.RefUnregisteredClass))]
         [InlineData(nameof(Target.Void))]
         public void UnsupportedReturnType_NotCreated(string methodName)
         {
@@ -66,10 +77,31 @@ namespace BenchmarkDotNet.Tests.Running
             public long Value;
         }
 
+        public struct RegisteredStruct
+        {
+            public long Value;
+        }
+
+        public struct UnregisteredStruct
+        {
+            public long Value;
+        }
+
+        public class RegisteredClass
+        {
+        }
+
+        public class UnregisteredClass
+        {
+        }
+
         public class Target
         {
             public static int Counter;
             private int field;
+            private RegisteredClass registeredClass = new();
+            private RegisteredStruct registeredStruct;
+            private UnregisteredClass unregisteredClass = new();
 
             public int Int() => ++Counter;
             public double Double() => ++Counter;
@@ -83,9 +115,17 @@ namespace BenchmarkDotNet.Tests.Running
             public async IAsyncEnumerable<int> AsyncEnumerableOfInt() { await Task.Yield(); yield return ++Counter; }
             public async IAsyncEnumerable<string> AsyncEnumerableOfString() { await Task.Yield(); yield return (++Counter).ToString(); }
 
-            public CustomStruct Struct() => default;
-            public ValueTask<string> ValueTaskOfString() => new("");
-            public ref int RefInt() => ref field;
+            public ref int RefInt() { ++Counter; return ref field; }
+            public ref readonly int RefReadonlyInt() { ++Counter; return ref field; }
+            public RegisteredStruct RegisteredStruct() => new() { Value = ++Counter };
+            public ValueTask<RegisteredClass> ValueTaskOfRegisteredClass() { ++Counter; return new(registeredClass); }
+            public ref RegisteredClass RefRegisteredClass() { ++Counter; return ref registeredClass; }
+            public ref readonly RegisteredStruct RefReadonlyRegisteredStruct() { ++Counter; return ref registeredStruct; }
+            public async IAsyncEnumerable<RegisteredStruct> AsyncEnumerableOfRegisteredStruct() { await Task.Yield(); yield return new() { Value = ++Counter }; }
+
+            public UnregisteredStruct UnregisteredStruct() => default;
+            public ValueTask<UnregisteredClass> ValueTaskOfUnregisteredClass() => new(new UnregisteredClass());
+            public ref UnregisteredClass RefUnregisteredClass() => ref unregisteredClass;
             public void Void() { }
         }
     }

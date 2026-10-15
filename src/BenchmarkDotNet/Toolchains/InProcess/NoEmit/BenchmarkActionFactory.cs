@@ -1,5 +1,7 @@
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Running;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -7,6 +9,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 internal static class BenchmarkActionFactory
 {
+    [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = AotJustifications.DynamicCodeOnly)]
     private static IBenchmarkAction CreateCore(IBenchmarkActionFactory? factory, object instance, MethodInfo targetMethod, int unrollFactor, bool consumeTasksSynchronously = false)
     {
         if (factory?.TryCreate(instance, targetMethod, unrollFactor, out var benchmarkAction) == true)
@@ -21,6 +24,13 @@ internal static class BenchmarkActionFactory
 
         if (resultType == typeof(void*))
             return new BenchmarkActionVoidPointer(resultInstance, targetMethod, unrollFactor);
+
+        // Without dynamic code the generic actions below can only be created for instantiations compiled ahead of time.
+        if (AotBenchmarkActions.IsRequired
+            && AotBenchmarkActions.TryCreate(resultInstance, targetMethod, resultType, unrollFactor, consumeTasksSynchronously, out var aotAction))
+        {
+            return aotAction;
+        }
 
         if (resultType.IsByRef)
         {
@@ -49,13 +59,6 @@ internal static class BenchmarkActionFactory
             return consumeTasksSynchronously
                 ? new BenchmarkActionBlockingValueTask(resultInstance, targetMethod, unrollFactor)
                 : new BenchmarkActionValueTask(resultInstance, targetMethod, unrollFactor);
-
-        // Without dynamic code the generic actions below can only be created for instantiations compiled ahead of time.
-        if (AotBenchmarkActions.IsRequired
-            && AotBenchmarkActions.TryCreate(resultInstance, targetMethod, resultType, unrollFactor, consumeTasksSynchronously, out var aotAction))
-        {
-            return aotAction;
-        }
 
         if (resultType.GetTypeInfo().IsGenericType)
         {
@@ -135,6 +138,16 @@ internal static class BenchmarkActionFactory
     }
 
     /// <summary>Helper to enforce .ctor signature.</summary>
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2067", Justification = "actionType is one of the BenchmarkAction types instantiated in CreateCore, whose public constructors are kept by [DynamicDependency].")]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BenchmarkAction<>))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BenchmarkActionByRef<>))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BenchmarkActionByRefReadonly<>))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BenchmarkActionTask<>))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BenchmarkActionBlockingTask<>))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BenchmarkActionValueTask<>))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BenchmarkActionBlockingValueTask<>))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BenchmarkActionAsyncEnumerable<>))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(BenchmarkActionConfiguredCancelableAsyncEnumerable<>))]
     private static BenchmarkActionBase Create(Type actionType, object? instance, MethodInfo method, int unrollFactor) =>
         (BenchmarkActionBase)Activator.CreateInstance(actionType, instance, method, unrollFactor)!;
 

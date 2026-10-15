@@ -320,6 +320,8 @@ namespace BenchmarkDotNet.Environments
                     _ => new(version),
                 };
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = "TargetPlatformAttribute is kept wherever it is applied; without it the assembly simply has no target platform.")]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = "TargetPlatformAttribute is kept wherever it is applied; without it the assembly simply has no target platform.")]
         private static bool TryGetTargetPlatform(Assembly? assembly, [NotNullWhen(true)] out string? platform)
         {
             platform = null;

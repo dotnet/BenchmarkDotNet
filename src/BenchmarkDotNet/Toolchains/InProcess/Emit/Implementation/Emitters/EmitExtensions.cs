@@ -1,3 +1,5 @@
+using BenchmarkDotNet.Helpers;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.ExceptionServices;
@@ -8,6 +10,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
     /// this class is a set of hack extensions that allow us to target .NET Standard 2.0 only and keep some .NET Framework-specific logic
     /// do not copy, it's a set of dirty hacks
     /// </summary>
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2090", Justification = AotJustifications.EmitToolchain)]
     internal static class EmitExtensions
     {
         internal static void Save(this AssemblyBuilder assemblyBuilder, string assemblyFileName)

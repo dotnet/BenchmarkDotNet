@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Configs;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Attributes
 {
@@ -7,6 +8,6 @@ namespace BenchmarkDotNet.Attributes
     {
         public IConfig Config { get; }
 
-        public ConfigAttribute(Type type) => Config = (IConfig)Activator.CreateInstance(type)!;
+        public ConfigAttribute([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type type) => Config = (IConfig)Activator.CreateInstance(type)!;
     }
 }

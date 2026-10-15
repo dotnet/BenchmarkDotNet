@@ -5,6 +5,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Helpers.Reflection.Emit;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -14,6 +15,8 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 
 partial class RunnableEmitter
 {
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2060", Justification = AotJustifications.EmitToolchain)]
+    [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = AotJustifications.EmitToolchain)]
     private sealed class AsyncCoreEmitter(BuildPartition buildPartition, ModuleBuilder moduleBuilder, BenchmarkBuildInfo benchmark, AwaitableInfo awaitableInfo) : AsyncCoreEmitterBase(buildPartition, moduleBuilder, benchmark)
     {
         private static readonly MethodInfo KeepAliveWithoutBoxingInMethod = typeof(DeadCodeEliminationHelper)

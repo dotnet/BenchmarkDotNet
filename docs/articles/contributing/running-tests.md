@@ -14,6 +14,17 @@ dotnet test -c Release -f net8.0 BenchmarkDotNet.slnx
 
 You should be able to run all of tests from your IDE as well.
 
+## Native AOT host test
+
+`tests/BenchmarkDotNet.IntegrationTests.NativeAotHost` runs BenchmarkDotNet inside an application published with Native AOT. It is not a test project: publish it and run the executable, which exits with a non-zero code unless every benchmark in it ran (CI does this in the `test-native-aot-host` job of `run-tests.yaml`).
+
+```cmd
+dotnet publish tests/BenchmarkDotNet.IntegrationTests.NativeAotHost -c Release -r linux-x64 -o artifacts/native-aot-host
+artifacts/native-aot-host/BenchmarkDotNet.IntegrationTests.NativeAotHost
+```
+
+Use the runtime identifier of your machine (`win-x64`, `osx-arm64`, ...), and install the [Native AOT prerequisites](https://learn.microsoft.com/dotnet/core/deploying/native-aot/#prerequisites) first.
+
 ## Verify Tests
 
 For some unit tests (e.g. for exporter tests) BenchmarkDotNet uses [Verify](https://github.com/VerifyTests/Verify).

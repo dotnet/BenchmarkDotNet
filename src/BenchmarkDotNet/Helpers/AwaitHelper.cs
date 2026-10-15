@@ -2,6 +2,7 @@ using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Engines;
 using JetBrains.Annotations;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -79,6 +80,8 @@ public static class AwaitHelper
         return awaiter.GetResult();
     }
 
+    [RequiresDynamicCode("Instantiates GetResult for the task's result type; only used to emit code.")]
+    [RequiresUnreferencedCode("Reads the awaiter of the task type by reflection; only used to emit code.")]
     internal static MethodInfo? GetGetResultMethod(Type taskType)
     {
         if (!taskType.IsGenericType)

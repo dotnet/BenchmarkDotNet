@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
@@ -8,6 +9,7 @@ using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -35,6 +37,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             artifactsPaths.ExecutablePath
         ];
 
+        [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = AotJustifications.HostOnly)]
         protected override async ValueTask GenerateBuildScriptAsync(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
         {
             string prefix = OsDetector.IsWindows() ? "" : "#!/bin/bash\n";
@@ -60,6 +63,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             ).ConfigureAwait(false);
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = AotJustifications.HostOnly)]
         internal static IEnumerable<Assembly> GetAllReferences(BenchmarkBuildInfo buildInfo)
             => buildInfo.BenchmarkCase.Descriptor.Type.GetTypeInfo().Assembly
                 .GetReferencedAssemblies()
@@ -89,6 +93,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             }
         }
 
+        [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = AotJustifications.HostOnly)]
         private async ValueTask<BuildResult> Build(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, CancellationToken cancellationToken)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(
@@ -199,6 +204,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
             ];
         }
 
+        [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = AotJustifications.HostOnly)]
         private static AssemblyMetadata[] GetMissingReferences(Diagnostic[] compilationErrors)
             => compilationErrors
                     .Where(diagnostic => diagnostic.Id == MissingReferenceError)

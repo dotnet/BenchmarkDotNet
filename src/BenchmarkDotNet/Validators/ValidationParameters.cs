@@ -9,6 +9,13 @@ namespace BenchmarkDotNet.Validators
 
         public ImmutableConfig Config { get; }
 
+        /// <summary>
+        /// One descriptor per benchmark type: validators read the type from <see cref="Descriptor.Type"/>, whose annotation tells
+        /// the trimmer to keep its members, which a <see cref="Type"/> passed through LINQ would lose.
+        /// </summary>
+        internal IEnumerable<Descriptor> DistinctBenchmarkTypes()
+            => Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type).Select(group => group.First().Descriptor);
+
         public ValidationParameters(IReadOnlyList<BenchmarkCase> benchmarks, ImmutableConfig config)
         {
             Benchmarks = benchmarks;

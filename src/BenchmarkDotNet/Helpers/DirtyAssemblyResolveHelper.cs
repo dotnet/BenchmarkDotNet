@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 // THIS TYPE MUST NOT HAVE ANY DEPENDENCIES TO BENCHMARKDOTNET, VALUE TUPLE, IMMUTABLE TYPES OR ANYTHING COMPLEX!!
@@ -27,6 +28,7 @@ internal class DirtyAssemblyResolveHelper : IDisposable
     /// "the handler is invoked whenever the runtime fails to bind to an assembly by name."
     /// </summary>
     /// <returns>not null when we find it manually, null when can't help</returns>
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = "Only handles assemblies that fail to resolve; a Native AOT application loads no assemblies.")]
     private Assembly? HelpTheFrameworkToResolveTheAssembly(object? sender, ResolveEventArgs args)
     {
         var fullName = new AssemblyName(args.Name);

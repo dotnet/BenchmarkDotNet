@@ -6,6 +6,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using static BenchmarkDotNet.Code.RunnableConstants;
@@ -315,6 +316,7 @@ namespace BenchmarkDotNet.Code
         protected override string GetExtraGlobalCleanupImpl()
             => $"this.{FieldsContainerName}.{WorkloadValueTaskSourceFieldName}.Complete();";
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.HostOnly)]
         protected bool TryGetAsyncMethodBuilderAttribute(out string asyncMethodBuilderAttribute)
         {
             asyncMethodBuilderAttribute = string.Empty;
@@ -352,6 +354,8 @@ namespace BenchmarkDotNet.Code
             return typeof(Task);
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.HostOnly)]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.HostOnly)]
         protected static string GetFinalReturn(Type workloadCoreReturnType)
         {
             var finalReturnType = workloadCoreReturnType

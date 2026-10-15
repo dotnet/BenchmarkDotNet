@@ -8,6 +8,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using JetBrains.Annotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Running
@@ -84,6 +85,7 @@ namespace BenchmarkDotNet.Running
 
         public override string ToString() => RepresentativeBenchmarkCase.Job.DisplayInfo;
 
+        [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = AotJustifications.AssemblyLocation)]
         private static string GetResolvedAssemblyLocation(Assembly assembly)
         {
             // A shadow copy is run from a cache directory that holds the assembly alone, so everything we

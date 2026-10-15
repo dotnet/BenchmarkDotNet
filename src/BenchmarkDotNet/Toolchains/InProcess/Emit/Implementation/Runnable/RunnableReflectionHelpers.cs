@@ -1,12 +1,17 @@
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
 using Perfolizer.Horology;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using static BenchmarkDotNet.Code.RunnableConstants;
 
 namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 {
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.EmitToolchain)]
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2072", Justification = AotJustifications.EmitToolchain)]
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.EmitToolchain)]
     internal static class RunnableReflectionHelpers
     {
         public const BindingFlags BindingFlagsNonPublicInstance = BindingFlags.NonPublic | BindingFlags.Instance;

@@ -1,9 +1,14 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace BenchmarkDotNet.Serialization;
 
+// It only carries DisassemblyDiagnoser's data, and DisassemblyDiagnoser rejects NativeAOT runtimes and InProcessNoEmitToolchain,
+// so it never runs in a Native AOT application, where JsonStringEnumConverter would need code generated at run time.
+[UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = "Only used by DisassemblyDiagnoser, which never runs in a Native AOT application.")]
+[UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = "The serialized types are all in BdnJsonSerializerContext.")]
 internal static class BdnJsonSerializer
 {
     private static readonly JsonSerializerOptions DefaultOptions = new()

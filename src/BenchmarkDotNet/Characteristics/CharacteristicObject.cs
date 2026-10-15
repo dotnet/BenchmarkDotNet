@@ -13,7 +13,8 @@ namespace BenchmarkDotNet.Characteristics
 
         internal const DynamicallyAccessedMemberTypes CharacteristicMemberTypes =
             DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicProperties
-            | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields;
+            | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields
+            | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor; // UnfreezeCopy and ApplyCore create instances of GetType()
 
         protected static string ResolveId(CharacteristicObject obj, string? actual)
         {
@@ -333,6 +334,7 @@ namespace BenchmarkDotNet.Characteristics
                 other,
                 GetCharacteristicsToApply(other));
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2072", Justification = "characteristicObject is a CharacteristicObject, whose annotation keeps the parameterless constructor of its runtime type.")]
         private CharacteristicObject ApplyCore(
             CharacteristicObject? other,
             IEnumerable<Characteristic> characteristicsToApply)

@@ -1,5 +1,7 @@
 using BenchmarkDotNet.Characteristics;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Jobs;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.Running
 {
@@ -16,6 +18,7 @@ namespace BenchmarkDotNet.Running
         {
             internal static readonly IEqualityComparer<BenchmarkCase> Instance = new BenchmarkRuntimePropertiesComparer();
 
+            [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = AotJustifications.AssemblyLocation)]
             public bool Equals(BenchmarkCase? x, BenchmarkCase? y)
             {
                 if (ReferenceEquals(x, y))
@@ -52,6 +55,7 @@ namespace BenchmarkDotNet.Running
                 return true;
             }
 
+            [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = AotJustifications.AssemblyLocation)]
             public int GetHashCode(BenchmarkCase obj)
             {
                 var hashCode = new HashCode();

@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.Running
                 .Select(pair => pair.method)
                 .ToArray();
 
-        private static async ValueTask<BenchmarkRunInfo> MethodsToBenchmarksWithFullConfig(Type type, MethodInfo[] benchmarkMethods, IConfig? config, CancellationToken cancellationToken)
+        private static async ValueTask<BenchmarkRunInfo> MethodsToBenchmarksWithFullConfig([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, MethodInfo[] benchmarkMethods, IConfig? config, CancellationToken cancellationToken)
         {
             var allMethods = type.GetMethods(AllMethodsFlags); // benchmarkMethods can be filtered, without Setups, look #564
             var configPerType = GetFullTypeConfig(type, config);
@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.Running
             return new BenchmarkRunInfo(orderedBenchmarks, type, configPerType, containsBenchmarkDeclarations, compositeInProcessDiagnoser, [.. declarationErrors.Distinct()]);
         }
 
-        private static BenchmarkRunInfo EmptyRunInfo(Type type, IConfig? config, string error)
+        private static BenchmarkRunInfo EmptyRunInfo([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, IConfig? config, string error)
         {
             var configPerType = GetFullTypeConfig(type, config);
 
@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Running
 
         private static Descriptor[] GetTargets(
             MethodInfo[] targetMethods,
-            Type type,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type,
             Tuple<MethodInfo, TargetedAttribute>[] globalSetupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] globalCleanupMethods,
             Tuple<MethodInfo, TargetedAttribute>[] iterationSetupMethods,
@@ -182,7 +182,7 @@ namespace BenchmarkDotNet.Running
         }
 
         private static Descriptor CreateDescriptor(
-            Type type,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type,
             MethodInfo? globalSetupMethod,
             MethodInfo methodInfo,
             MethodInfo? globalCleanupMethod,
@@ -208,7 +208,7 @@ namespace BenchmarkDotNet.Running
             return target;
         }
 
-        private static async ValueTask<IReadOnlyList<ParameterInstances>> GetParameterInstancesAsync(Type type, SummaryStyle summaryStyle, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
+        private static async ValueTask<IReadOnlyList<ParameterInstances>> GetParameterInstancesAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type, SummaryStyle summaryStyle, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
         {
             List<ParameterValues> GetValues<TAttribute>(Func<TAttribute, ParameterDefinition, IReadOnlyList<ParameterValue>> getValidValues) where TAttribute : PriorityAttribute
                 => [.. type.GetTypeMembersWithGivenAttribute<TAttribute>(ReflectionExtensions.ParameterMemberFlags)
@@ -276,7 +276,7 @@ namespace BenchmarkDotNet.Running
             return new ParameterInstance(definition, new ParameterValue.Constant(value, sourceType), summaryStyle);
         }
 
-        private static async ValueTask<IReadOnlyList<ParameterInstances>> GetArgumentsInstancesAsync(MethodInfo benchmark, Type benchmarkType, SummaryStyle summaryStyle, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
+        private static async ValueTask<IReadOnlyList<ParameterInstances>> GetArgumentsInstancesAsync(MethodInfo benchmark, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type benchmarkType, SummaryStyle summaryStyle, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
         {
             int priority = benchmark.GetCustomAttributes<PriorityAttribute>().Sum(attribute => attribute.Priority);
 
@@ -362,7 +362,7 @@ namespace BenchmarkDotNet.Running
                 .Where(value => !SmartParamBuilder.RefusesNull(origin, definition, value, declarationErrors))
                 .Select(value => new ParameterValue.Constant(value, definition.ParameterType))];
 
-        private static async ValueTask<(MemberInfo source, object?[] values)?> GetValidValuesForParamsSourceAsync(Type sourceType, string sourceName, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
+        private static async ValueTask<(MemberInfo source, object?[] values)?> GetValidValuesForParamsSourceAsync([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type sourceType, string sourceName, List<ValidationError> declarationErrors, CancellationToken cancellationToken)
         {
             var source = sourceType.FindSourceMember(sourceName);
 
@@ -375,15 +375,15 @@ namespace BenchmarkDotNet.Running
             // A source method may have parameters as long as they are all optional (e.g. an async iterator with an
             // [EnumeratorCancellation] CancellationToken); we invoke it with their default values.
             object? sourceValue = source is MethodInfo method
-                ? method.Invoke(method.IsStatic ? null : Activator.CreateInstance(sourceType), GetDefaultArguments(method))
-                : ((PropertyInfo) source).GetValue(((PropertyInfo) source).GetMethod!.IsStatic ? null : Activator.CreateInstance(sourceType)!);
+                ? method.Invoke(method.IsStatic ? null : BenchmarkInstanceFactory.CreateInstance(sourceType), GetDefaultArguments(method))
+                : ((PropertyInfo) source).GetValue(((PropertyInfo) source).GetMethod!.IsStatic ? null : BenchmarkInstanceFactory.CreateInstance(sourceType));
 
             return await ToArrayAsync(sourceValue, source, sourceType, declarationErrors, cancellationToken).ConfigureAwait() is { } values
                 ? (source, values)
                 : null;
         }
 
-        private static ValidationError NoSourceMemberFound(Type sourceType, string sourceName)
+        private static ValidationError NoSourceMemberFound([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type sourceType, string sourceName)
         {
             var namedMethods = sourceType.GetAllMethods().Where(method => method.Name == sourceName && method.IsPublic).ToArray();
 
@@ -465,6 +465,8 @@ namespace BenchmarkDotNet.Running
             return null;
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2067",
+            Justification = "[ParamsAllValues] supports bool and enums (handled above, also nullable); ParamsAllValuesValidator reports any other type.")]
         private static object?[] GetAllValidValues(Type parameterType)
         {
             if (parameterType == typeof(bool))
@@ -473,9 +475,14 @@ namespace BenchmarkDotNet.Running
             if (parameterType.GetTypeInfo().IsEnum)
             {
                 if (parameterType.GetTypeInfo().IsDefined(typeof(FlagsAttribute)))
-                    return [Activator.CreateInstance(parameterType)];
+                    return [Enum.ToObject(parameterType, 0)];
 
+#if NET8_0_OR_GREATER
+                // Unlike Enum.GetValues, this needs no array of the enum type, which a Native AOT application cannot always create.
+                return [.. Enum.GetValuesAsUnderlyingType(parameterType).Cast<object>().Select(value => Enum.ToObject(parameterType, value))];
+#else
                 return [.. Enum.GetValues(parameterType).Cast<object>()];
+#endif
             }
 
             var nullableUnderlyingType = Nullable.GetUnderlyingType(parameterType);

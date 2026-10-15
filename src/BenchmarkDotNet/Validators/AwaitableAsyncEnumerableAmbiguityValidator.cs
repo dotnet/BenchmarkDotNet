@@ -18,7 +18,7 @@ public class AwaitableAsyncEnumerableAmbiguityValidator : IValidator
 
         foreach (var groupByType in input.Benchmarks.GroupBy(benchmark => benchmark.Descriptor.Type))
         {
-            var allMethods = groupByType.Key.GetAllMethods().ToArray();
+            var allMethods = groupByType.First().Descriptor.Type.GetAllMethods().ToArray();
 
             CollectErrors<BenchmarkAttribute>(groupByType.Key.Name, allMethods, validationErrors);
             CollectErrors<GlobalSetupAttribute>(groupByType.Key.Name, allMethods, validationErrors);

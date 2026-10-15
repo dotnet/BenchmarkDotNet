@@ -260,9 +260,28 @@ config.AddFilter(new SimpleFilter(benchmark => benchmark.GetRuntime() is not Nat
 
 The approach above, a regular host process that builds a NativeAOT benchmark process, is the recommended one. When the application that runs BenchmarkDotNet is itself published with `PublishAot=true`, BenchmarkDotNet cannot generate and build projects, so it runs the benchmarks in-process with `InProcessNoEmitToolchain` (an explicitly configured out-of-process toolchain is reported as a validation error). The results then include the overhead of invoking the benchmark through a delegate. In such an application:
 
-- Run the benchmarks with `BenchmarkRunner.Run<T>()` or `BenchmarkRunner.Run(typeof(T))`, which keep the members of the benchmark type from being trimmed. `BenchmarkSwitcher.FromAssembly` and `BenchmarkRunner.Run(Assembly)` find the types by reflection, so keep them with `<TrimmerRootAssembly Include="YourAssembly" />` in the project file.
-- Benchmarks (and setup/cleanup methods) can return `void`, `Task`, `ValueTask`, `Task<T>`, reference types, and built-in value types such as `int`, `double` or `Guid`, also inside `ValueTask<T>` and `IAsyncEnumerable<T>`. Other value types and `ref` returns are reported as validation errors; to support them, provide your own `InProcessNoEmitSettings.BenchmarkActionFactory`.
+- When the project sets `PublishAot` (or `PublishTrimmed`), BenchmarkDotNet's source generator adds a module initializer that keeps every benchmark type from being trimmed (so `BenchmarkSwitcher.FromAssembly` finds them), constructs the generic ones closed by `[GenericTypeArguments]`, and registers the result types that need generated code: custom structs, `ref` returns, `ValueTask<T>` and `IAsyncEnumerable<T>` of a struct. It covers the benchmark types and result types the project itself can reference; a private nested type, or a `ref struct` result, is reported as a validation error.
+- Without the generator (for example, benchmarks in a project that doesn't set `PublishAot`, used from one that does), `BenchmarkRunner.Run<T>()` and `BenchmarkRunner.Run(typeof(T))` still keep the members of the benchmark type, and benchmarks returning `void`, `Task`, `ValueTask`, `Task<T>`, reference types and built-in value types such as `int` or `Guid` run. Keep other types with `<TrimmerRootAssembly Include="YourAssembly" />`, or provide your own `InProcessNoEmitSettings.BenchmarkActionFactory`.
 - `[Arguments]` are not supported by the in-process toolchains.
+- `NativeAotHostValidator` reports anything that cannot run before the benchmarks start; see [Running inside a Native AOT application](../guides/troubleshooting.md#running-inside-a-native-aot-application) for its messages and what to do.
+
+A minimal application:
+
+```xml
+<PropertyGroup>
+  <OutputType>Exe</OutputType>
+  <TargetFramework>net10.0</TargetFramework>
+  <PublishAot>true</PublishAot>
+</PropertyGroup>
+```
+
+```cs
+public class Program
+{
+    // Publish with `dotnet publish -c Release -r linux-x64` and run the executable.
+    public static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+}
+```
 
 ### Generated files
 

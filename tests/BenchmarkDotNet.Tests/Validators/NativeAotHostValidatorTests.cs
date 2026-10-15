@@ -71,7 +71,7 @@ namespace BenchmarkDotNet.Tests.Validators
             Assert.All(errors, error => Assert.True(error.IsCritical));
             Assert.Contains(errors, error => error.Message.Contains("'Struct' because it returns CustomStruct"));
             Assert.Contains(errors, error => error.Message.Contains("'ValueTaskOfString' because it returns ValueTask<String>"));
-            Assert.Contains(errors, error => error.Message.Contains("'RefInt' because it returns Int32&"));
+            Assert.Contains(errors, error => error.Message.Contains("'RefStruct' because it returns CustomStruct&"));
         }
 
         [Fact]
@@ -110,15 +110,18 @@ namespace BenchmarkDotNet.Tests.Validators
             [Benchmark] public ValueTask<long> ValueTaskOfLong() => new(1);
             [Benchmark] public IAsyncEnumerable<int> AsyncEnumerableOfInt() => AsyncEnumerable.Empty<int>();
             [Benchmark] public IAsyncEnumerable<string> AsyncEnumerableOfString() => AsyncEnumerable.Empty<string>();
+            [Benchmark] public ref int RefInt() => ref field;
+
+            private int field;
         }
 
         public class ReturnsUnsupportedValues
         {
-            private int field;
+            private CustomStruct field;
 
             [Benchmark] public CustomStruct Struct() => default;
             [Benchmark] public ValueTask<string> ValueTaskOfString() => new("");
-            [Benchmark] public ref int RefInt() => ref field;
+            [Benchmark] public ref CustomStruct RefStruct() => ref field;
         }
 
         public class SetupReturnsValueTaskOfString

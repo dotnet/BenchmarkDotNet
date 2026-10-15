@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Helpers;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -152,7 +153,7 @@ namespace BenchmarkDotNet.Extensions
             return $"{mainName}<{args}>";
         }
 
-        internal static IEnumerable<MethodInfo> GetAllMethods(this Type type)
+        internal static IEnumerable<MethodInfo> GetAllMethods([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] this Type type)
         {
             var typeInfo = type.GetTypeInfo();
             while (typeInfo != null)
@@ -163,7 +164,7 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        internal static IEnumerable<FieldInfo> GetAllFields(this Type type)
+        internal static IEnumerable<FieldInfo> GetAllFields([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] this Type type)
         {
             var typeInfo = type.GetTypeInfo();
             while (typeInfo != null)
@@ -174,7 +175,7 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
-        internal static IEnumerable<PropertyInfo> GetAllProperties(this Type type)
+        internal static IEnumerable<PropertyInfo> GetAllProperties([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] this Type type)
         {
             var typeInfo = type.GetTypeInfo();
             while (typeInfo != null)
@@ -185,6 +186,8 @@ namespace BenchmarkDotNet.Extensions
             }
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = AotJustifications.DiscoveredBenchmarkTypes)]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2067", Justification = AotJustifications.DiscoveredBenchmarkTypes)]
         internal static Type[] GetRunnableBenchmarks(this Assembly assembly)
             => assembly
                 .GetTypes()
@@ -193,7 +196,7 @@ namespace BenchmarkDotNet.Extensions
                 .ThenBy(t => t.Name)
                 .ToArray();
 
-        internal static bool ContainsRunnableBenchmarks(this Type type)
+        internal static bool ContainsRunnableBenchmarks([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] this Type type)
         {
             var typeInfo = type.GetTypeInfo();
 
@@ -203,14 +206,14 @@ namespace BenchmarkDotNet.Extensions
             return typeInfo.GetBenchmarks().Any();
         }
 
-        private static MethodInfo[] GetBenchmarks(this TypeInfo typeInfo)
+        private static MethodInfo[] GetBenchmarks([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] this TypeInfo typeInfo)
             => typeInfo
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static) // we allow for Static now to produce a nice Validator warning later
                 .Where(method => method.GetCustomAttributes(true).OfType<BenchmarkAttribute>().Any())
                 .ToArray();
 
         internal static (string Name, TAttribute Attribute, bool IsStatic, Type ParameterType, MemberInfo Member)[]
-            GetTypeMembersWithGivenAttribute<TAttribute>(this Type type, BindingFlags reflectionFlags)
+            GetTypeMembersWithGivenAttribute<TAttribute>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] this Type type, BindingFlags reflectionFlags)
             where TAttribute : Attribute
         {
             var fields = type
@@ -307,6 +310,7 @@ namespace BenchmarkDotNet.Extensions
         //
         // C# gathers operators from both types and their base classes. Reflection withholds a base's statics
         // without FlattenHierarchy, so without it an operator inherited from a base is invisible.
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = "Conversion operators of argument types are only looked up for [Arguments], which the in-process toolchains (the only ones in a Native AOT application) do not support.")]
         private static bool DeclaresConversion(Type declaringType, Type targetType, Type sourceType, string operatorName)
             => declaringType.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
                 .Any(method => method.Name == operatorName
@@ -314,7 +318,7 @@ namespace BenchmarkDotNet.Extensions
                     && method.GetParameters() is { Length: 1 } parameters
                     && parameters[0].ParameterType == sourceType);
 
-        private static bool IsRunnableGenericType(TypeInfo typeInfo)
+        private static bool IsRunnableGenericType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TypeInfo typeInfo)
             => // if it is an open generic - there must be GenericBenchmark attributes
                 (!typeInfo.IsGenericTypeDefinition || typeInfo.GenericTypeArguments.Any() || typeInfo.GetCustomAttributes(true).OfType<GenericTypeArgumentsAttribute>().Any())
                     && typeInfo.DeclaredConstructors.Any(ctor => ctor.IsPublic && ctor.GetParameters().Length == 0); // we need public parameterless ctor to create it
@@ -329,6 +333,8 @@ namespace BenchmarkDotNet.Extensions
             => type.IsByRefLike;
 #endif
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.ReturnTypeShape)]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.ReturnTypeShape)]
         internal static bool IsAwaitable(this Type type, [NotNullWhen(true)] out AwaitableInfo? info)
         {
             // This does not handle await extension.
@@ -356,6 +362,8 @@ namespace BenchmarkDotNet.Extensions
             return true;
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.ReturnTypeShape)]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = AotJustifications.ReturnTypeShape)]
         internal static bool IsAsyncEnumerable(this Type type, [NotNullWhen(true)] out AsyncEnumerableInfo? info)
         {
             // 1. Pattern first, as `await foreach` binds: a public instance GetAsyncEnumerator with all-optional parameters,
@@ -413,6 +421,7 @@ namespace BenchmarkDotNet.Extensions
         // interface and wants it bound in preference to any pattern method the concrete type may also declare.
         // Every member is the interface's own, so invoking them dispatches to the implementation whether it is
         // implicit or explicit.
+        [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = "Constructs an interface the return type already implements, so its native code exists.")]
         internal static AsyncEnumerableInfo GetAsyncEnumerableInterfaceInfo(Type elementType)
         {
             var interfaceType = typeof(IAsyncEnumerable<>).MakeGenericType(elementType);
@@ -433,6 +442,7 @@ namespace BenchmarkDotNet.Extensions
 
         // Whether the type is, or implements, IAsyncEnumerable<T>. [ParamsSource]/[ArgumentsSource] async sources
         // must use the interface (not just the await-foreach pattern), so callers reject pattern-only types.
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.ReturnTypeShape)]
         internal static bool IsIAsyncEnumerable(this Type type, [NotNullWhen(true)] out Type? elementType)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
@@ -459,6 +469,7 @@ namespace BenchmarkDotNet.Extensions
         internal static int CountSourceShapes(this Type type)
             => type.CountInstantiations(typeof(IEnumerable<>)) + type.CountInstantiations(typeof(IAsyncEnumerable<>));
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.ReturnTypeShape)]
         private static int CountInstantiations(this Type type, Type interfaceDefinition)
         {
             var found = new HashSet<Type>();
@@ -474,6 +485,7 @@ namespace BenchmarkDotNet.Extensions
 
         // The element type a source declares, which is the type the generated extraction call returns and therefore
         // the type the generated code indexes into. Only an unambiguous shape has one - see CountSourceShapes.
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2070", Justification = AotJustifications.ReturnTypeShape)]
         internal static bool TryGetSourceElementType(this Type sourceReturnType, [NotNullWhen(true)] out Type? elementType)
         {
             if (sourceReturnType.CountSourceShapes() == 1)
@@ -498,7 +510,7 @@ namespace BenchmarkDotNet.Extensions
         // whatever this returns and SourceReturnTypeValidator reports on the same member, so the two cannot judge
         // different members of the same name. A generic method definition is passed over rather than matched, so a
         // property of that name serves the name instead of an unusable method.
-        internal static MemberInfo? FindSourceMember(this Type sourceType, string sourceName)
+        internal static MemberInfo? FindSourceMember([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] this Type sourceType, string sourceName)
             => (MemberInfo?) sourceType.GetAllMethods()
                     .FirstOrDefault(method => method.Name == sourceName && method.IsPublic
                         && !method.IsGenericMethodDefinition
@@ -522,7 +534,7 @@ namespace BenchmarkDotNet.Extensions
         /// kinds: a field can hide a property, and looking for one kind first would find the base member of that
         /// kind and never reach the derived member that is the parameter.
         /// </summary>
-        internal static MemberInfo? GetParameterMember(this Type type, string name, Type parameterType, BindingFlags flags)
+        internal static MemberInfo? GetParameterMember([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] this Type type, string name, Type parameterType, BindingFlags flags)
         {
             MemberInfo? found = null;
             foreach (var member in type.GetMembers(flags))
@@ -550,7 +562,8 @@ namespace BenchmarkDotNet.Extensions
         // The member as `contextType`'s generic definition names it - on that definition, or on the base in its
         // hierarchy that declares it. The base is read as the derived type writes it, `Base<T>` carrying the derived
         // type's own T, so inherited and locally declared members share type parameters. Null when it is elsewhere.
-        internal static MemberInfo? GetDeclaredMemberIn(this MemberInfo member, Type contextType)
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = "The base types and generic definitions of an annotated type keep their members too.")]
+        internal static MemberInfo? GetDeclaredMemberIn(this MemberInfo member, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type contextType)
         {
             if (member.DeclaringType is not { } declaringType)
                 return null;

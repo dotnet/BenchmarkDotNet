@@ -16,6 +16,9 @@
   </ItemGroup>
   <!-- Settings for PolySharp -->
   <PropertyGroup>
+    <!-- PolySharp marks its attributes [Conditional("MULTI_TARGETING_SUPPORT_ATTRIBUTES")]; defining it keeps [DynamicallyAccessedMembers]
+         in the metadata, so the trimmer keeps what the attributes' Type arguments name ([GenericTypeArguments], [ParamsSource], ...). -->
+    <DefineConstants>$(DefineConstants);MULTI_TARGETING_SUPPORT_ATTRIBUTES</DefineConstants>
     <PolySharpIncludeGeneratedTypes>
       System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute,
       System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes,

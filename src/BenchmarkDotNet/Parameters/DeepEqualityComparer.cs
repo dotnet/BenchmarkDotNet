@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using BenchmarkDotNet.Portability;
 
@@ -99,6 +100,7 @@ internal class DeepEqualityComparer : IEqualityComparer
         return x.Equals(y);
     }
 
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = "Compares [Params] and [Arguments] values through interfaces their runtime types implement, which are kept with the types.")]
     private static bool ImplementsSet(object obj)
         => obj.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISet<>));
 
@@ -135,6 +137,7 @@ internal class DeepEqualityComparer : IEqualityComparer
         return true;
     }
 
+    [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2075", Justification = "Compares [Params] and [Arguments] values through interfaces their runtime types implement, which are kept with the types.")]
     private static bool TryEquatable(object x, object y)
     {
         var yType = y.GetType();
@@ -149,6 +152,7 @@ internal class DeepEqualityComparer : IEqualityComparer
         return (bool?) method?.Invoke(x, [y]) ?? false;
     }
 
+    [UnconditionalSuppressMessage(category: "AOT", checkId: "IL3050", Justification = "Guarded by RuntimeInformation.IsAot.")]
     private static bool TryFallbackStructuralEquals(object x, object y, out bool equals)
     {
         // Check for multi-dimensional array and ITuple and re-try for each element recursively.

@@ -2,6 +2,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace BenchmarkDotNet.Diagnosers
@@ -47,6 +48,7 @@ namespace BenchmarkDotNet.Diagnosers
                 yield return windowsDiagnoser;
         }
 
+        [UnconditionalSuppressMessage(category: "SingleFile", checkId: "IL3000", Justification = "Only part of an error message.")]
         private static IDiagnoser[] LoadWindowsDiagnosers()
         {
             try
@@ -89,6 +91,8 @@ namespace BenchmarkDotNet.Diagnosers
             }
         }
 
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2026", Justification = "Loads the optional BenchmarkDotNet.Diagnostics.* assemblies deployed next to the application, whose diagnosers are public; a Native AOT application cannot load assemblies, so it finds none.")]
+        [UnconditionalSuppressMessage(category: "Trimming", checkId: "IL2072", Justification = "Loads the optional BenchmarkDotNet.Diagnostics.* assemblies deployed next to the application, whose diagnosers are public; a Native AOT application cannot load assemblies, so it finds none.")]
         private static IDiagnoser CreateDiagnoser(Assembly loadedAssembly, string typeName)
             => (IDiagnoser)Activator.CreateInstance(loadedAssembly.GetType(typeName)!)!;
     }

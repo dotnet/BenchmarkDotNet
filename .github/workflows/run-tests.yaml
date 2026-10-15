@@ -179,6 +179,19 @@ jobs:
           name: test-macos(${{ matrix.os.arch }})-trx-${{ github.run_id }}
           path: "**/*.trx"
 
+  # Runs BenchmarkDotNet inside an application published with Native AOT; the executable exits with a non-zero code
+  # unless every benchmark in tests/BenchmarkDotNet.IntegrationTests.NativeAotHost ran.
+  test-native-aot-host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run task 'build'
+        run: ./build.cmd build
+      - name: Publish the Native AOT host test
+        run: ./.dotnet/dotnet publish tests/BenchmarkDotNet.IntegrationTests.NativeAotHost -c Release -r linux-x64 -o artifacts/native-aot-host
+      - name: Run the Native AOT host test
+        run: ./artifacts/native-aot-host/BenchmarkDotNet.IntegrationTests.NativeAotHost
+
   test-pack:
     runs-on: ubuntu-latest
     steps:
