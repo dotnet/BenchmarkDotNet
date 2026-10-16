@@ -56,26 +56,32 @@ internal struct Arm64RegisterValueAccumulator
             case State.ExpectingAdd:
                 if (TryHandleExpectingAdd(instruction))
                     return;
-                break;
+
+                goto default;
 
             case State.LookingForPossibleLdr:
                 if (TryHandleLdrFromTrackedRegister(instruction))
                     return;
 
-                if (TryHandleBranchOrRestart(instruction))
+                // Try handle MOVZ/ADRP for new constand load.
+                if (TryHandleLookingForPattern(instruction))
                     return;
 
-                // Finally check if the current instruction modified the register that was accumulating the constant
-                // and reset the state machine in case it did.
-                foreach (Arm64Register reg in instruction.Details.AllWrittenRegisters)
+                goto default;
+
+            default:
+                if (TryHandleConditionalInstruction(instruction))
+                    return;
+
+                // Reset accumulated state if instruction overwriting the accumulated register.
+                if (IsTrackedRegisterOverwritten(instruction))
                 {
-                    // Some unexpected instruction overwriting the accumulated register
-                    if (reg.Id == _registerId)
-                    {
-                        _state = State.LookingForPattern;
-                    }
+                    Reset();
+
+                    // Reprocess current instruction.
+                    TryHandleLookingForPattern(instruction);
                 }
-                break;
+                return;
         }
     }
 
@@ -88,7 +94,15 @@ internal struct Arm64RegisterValueAccumulator
             if (Value == 0)
                 return false;
 
-            return _state == State.ExpectingMovk || _state == State.LookingForPossibleLdr;
+            switch (_state)
+            {
+                case State.ExpectingMovk:
+                case State.LookingForPossibleLdr:
+                case State.ExpectingAdd:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 
@@ -269,36 +283,46 @@ internal struct Arm64RegisterValueAccumulator
         }
     }
 
-    private bool TryHandleBranchOrRestart(Arm64Instruction instruction)
+    private bool TryHandleConditionalInstruction(Arm64Instruction instruction)
     {
-        Arm64InstructionDetail details = instruction.Details;
-
-        if (instruction.Id == Arm64InstructionId.ARM64_INS_CBZ ||
-            instruction.Id == Arm64InstructionId.ARM64_INS_CBNZ ||
-            instruction.Id == Arm64InstructionId.ARM64_INS_B && details.ConditionCode != Arm64ConditionCode.Invalid)
-        {
-            // ignore conditional branches
+        if (instruction.IsConditionalBranch())
             return true;
-        }
 
-        if (details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE) ||
-            details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_CALL) ||
-            details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_JUMP))
+        if (instruction.IsUnconditionalControlFlow())
         {
-            // We've encountered an unconditional jump or call, the accumulated registers value is not valid anymore
-            _state = State.LookingForPattern;
-            return true;
-        }
-
-        if (instruction.Id == Arm64InstructionId.ARM64_INS_MOVZ)
-        {
-            // Another constant loading is starting: restart matching from LookingForPattern.
-            _state = State.LookingForPattern;
-            TryStartMovzSequence(instruction);
+            Reset();
             return true;
         }
 
         return false;
+    }
+
+    private bool IsTrackedRegisterOverwritten(Arm64Instruction instruction)
+    {
+        try
+        {
+            // Finally check if the current instruction modified the register that was accumulating the constant
+            // and reset the state machine in case it did.
+            var details = instruction.Details;
+            if (details is null)
+                return true; // Conservative: unknown writes invalidate tracking (avoid false HasValue).
+
+            foreach (Arm64Register writtenRegister in details.AllWrittenRegisters)
+            {
+                if (writtenRegister.Id != _registerId)
+                    continue;
+
+                return true;
+            }
+
+            return false;
+        }
+        catch (Exception ex) when (IsDecodingException(ex) || ex is NullReferenceException)
+        {
+            // Conservative: on decoding failure assume overwritten so a stale value
+            // is not reported as a false-positive ReferencedAddress.
+            return true;
+        }
     }
 
     /// <summary>
