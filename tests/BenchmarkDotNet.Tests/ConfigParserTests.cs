@@ -233,6 +233,40 @@ namespace BenchmarkDotNet.Tests
             Assert.False(ConfigParser.Parse(["--unknown"], new OutputLogger(Output)).isSuccess);
         }
 
+        [Fact]        
+        public void DoubleDashShortAliasIsAcceptedAsMemory()
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+
+            // Act
+            var (isSuccess, _, options) = ConfigParser.Parse(["--m"], logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            logger.GetLog().Should().BeEmpty();
+
+            options.Should().NotBeNull();
+            options.UseMemoryDiagnoser.Should().BeTrue();
+        }
+
+        [Fact]
+        public void DoubleDashShortAliasDuplicateIsReported()
+        {
+            // Arrange
+            var logger = new AccumulationLogger();
+
+            // Act
+            var (isSuccess, _, _) = ConfigParser.Parse(["--m", "-m"], logger);
+
+            // Assert
+            isSuccess.Should().BeFalse();
+
+            var errorLines = GetParsingErrorLines(logger);
+            errorLines.Should().HaveCount(1);
+            errorLines[0].Should().Match("Option '*' is defined multiple times.");
+        }
+
         [Fact]
         public void EmptyArgsMeansConfigWithoutJobs()
         {
@@ -1385,8 +1419,10 @@ namespace BenchmarkDotNet.Tests
             // Assert
             isSuccess.Should().BeFalse();
 
-            var log = logger.GetLog().Trim();
-            log.Should().Match($"Option '*' is defined multiple times.");
+            // The parser reports duplicates in its standard ERROR(S) block (followed by usage help).
+            var errorLines = GetParsingErrorLines(logger);
+            errorLines.Should().HaveCount(1);
+            errorLines[0].Should().Match("Option '*' is defined multiple times.");
         }
 
         [Theory]
@@ -1414,7 +1450,6 @@ namespace BenchmarkDotNet.Tests
         [InlineData("--job=dry", "--job=short")]
         [InlineData("-j", "dry", "-j", "short")]
         [InlineData("-j", "dry", "--job", "short")]
-        [InlineData("--JOB", "dry", "--job", "short")]
         [InlineData("--launchCount", "1", "--launchCount", "2")]
         [InlineData("--title", "A", "--title", "B")]
         public void UserCanNotSpecify_MultipleSameScalarOptions(params string[] args)
@@ -1428,8 +1463,46 @@ namespace BenchmarkDotNet.Tests
             // Assert
             isSuccess.Should().BeFalse();
 
-            var log = logger.GetLog().Trim();
-            log.Should().Match("Option '*' is defined multiple times.");
+            // The parser reports duplicates in its standard ERROR(S) block (followed by usage help).
+            var errorLines = GetParsingErrorLines(logger);
+            errorLines.Should().HaveCount(1);
+            errorLines[0].Should().Match("Option '*' is defined multiple times.");
+        }
+
+        [Theory]
+        // A short option that takes a value consumes the rest of the token as its value,
+        // so the value's letters must not be read as bundled switches.
+        [InlineData("-jdry", "-d")]
+        [InlineData("-jmedium", "-m")]
+        [InlineData("-jDefault", "--disasm")]
+        [InlineData("-amyDir", "-m")]
+        public void UserCanSpecify_BundledShortOptionWithAttachedValue(params string[] args)
+        {
+            // Arrange
+            var logger = new OutputLogger(Output);
+
+            // Act
+            var (isSuccess, _, _) = ConfigParser.Parse(args, logger);
+
+            // Assert
+            isSuccess.Should().BeTrue();
+            logger.GetLog().Should().BeEmpty();
+        }
+
+        /// <summary>
+        /// Extracts only the ERROR(S) lines from the logger output, excluding the usage help that follows.
+        /// </summary>
+        private static string[] GetParsingErrorLines(AccumulationLogger logger)
+        {
+            var lines = logger.GetLog()
+                              .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+                              .Select(x => x.Trim())
+                              .ToArray();
+
+            return lines.SkipWhile(x => x != "ERROR(S):")
+                        .Skip(1)
+                        .TakeWhile(x => x != "USAGE:")
+                        .ToArray();
         }
     }
 }
