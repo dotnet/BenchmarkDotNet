@@ -499,7 +499,7 @@ namespace BenchmarkDotNet.Extensions
         // different members of the same name. A generic method definition is passed over rather than matched, so a
         // property of that name serves the name instead of an unusable method.
         internal static MemberInfo? FindSourceMember(this Type sourceType, string sourceName)
-            => (MemberInfo?) sourceType.GetAllMethods()
+            => (MemberInfo?)sourceType.GetAllMethods()
                     .FirstOrDefault(method => method.Name == sourceName && method.IsPublic
                         && !method.IsGenericMethodDefinition
                         && method.GetParameters().All(parameter => parameter.IsOptional))
@@ -571,7 +571,7 @@ namespace BenchmarkDotNet.Extensions
 
         // The type a source member hands back, which is what the generated code infers the element type from.
         internal static Type GetSourceReturnType(this MemberInfo source)
-            => source is PropertyInfo property ? property.GetMethod!.ReturnType : ((MethodInfo) source).ReturnType;
+            => source is PropertyInfo property ? property.GetMethod!.ReturnType : ((MethodInfo)source).ReturnType;
 
         internal static Attribute? GetAsyncMethodBuilderAttribute(this MemberInfo memberInfo)
             // AsyncMethodBuilderAttribute can come from any assembly, so we need to use reflection by name instead of searching for the exact type.

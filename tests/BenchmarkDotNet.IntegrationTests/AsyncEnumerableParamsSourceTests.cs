@@ -188,7 +188,7 @@ public class AsyncEnumerableParamsSourceTests(ITestOutputHelper output) : Benchm
     // still ambient inside it. Reading a source must not capture it: marshaling belongs to the caller, which applies
     // it with ConfigureAwait on the enumerable. The reflection path used for value-type elements handed the
     // continuation to the user's raw awaiter, which captured the context and posted to it.
-// Both element kinds, because they are read through different machinery: a value-type element goes through
+    // Both element kinds, because they are read through different machinery: a value-type element goes through
     // the reflection loop, a reference-type one through the covariance cast, which had no guard here at all.
     [Theory]
     [InlineData(typeof(ValueTypeAsyncParamsSource))]

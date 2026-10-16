@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation;
 partial class RunnableEmitter
 {
     // MethodImplAttributes.Async was added in .Net 10.
-    private const MethodImplAttributes AsyncMethodImplAttribute = (MethodImplAttributes) 8192;
+    private const MethodImplAttributes AsyncMethodImplAttribute = (MethodImplAttributes)8192;
 
     // Looked up at runtime because the frameworks BenchmarkDotNet targets either lack it or mark it experimental.
     private static readonly Lazy<Type> AsyncHelpersType = new(() =>

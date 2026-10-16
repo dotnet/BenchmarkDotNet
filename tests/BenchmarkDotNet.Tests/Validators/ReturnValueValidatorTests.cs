@@ -337,7 +337,7 @@ namespace BenchmarkDotNet.Tests.Validators
 
             return validationErrors;
         }
-    
+
         [Fact]
         public async Task ARefStructCurrentIsLeftOutOfTheComparisonRatherThanRefused()
         {
@@ -417,5 +417,5 @@ namespace BenchmarkDotNet.Tests.Validators
                 public ValueTask<bool> MoveNextAsync() => new(index++ < 2);
             }
         }
-}
+    }
 }

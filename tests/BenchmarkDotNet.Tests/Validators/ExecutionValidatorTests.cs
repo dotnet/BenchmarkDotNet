@@ -707,7 +707,7 @@ namespace BenchmarkDotNet.Tests.Validators
                 throw new Exception("This iterator throws");
             }
         }
-    
+
         // An argument is passed to the benchmark method, so there is no member of that name to assign it to.
         // Reporting one is a validation error against a benchmark that runs perfectly well.
         [Fact]
@@ -727,5 +727,5 @@ namespace BenchmarkDotNet.Tests.Validators
             [Arguments(1)]
             public int Bench(int value) => value + Parameter;
         }
-}
+    }
 }

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes.CompilerServices;
+using BenchmarkDotNet.Attributes.CompilerServices;
 using BenchmarkDotNet.Code;
 using BenchmarkDotNet.Loggers;
 using Mono.Cecil;

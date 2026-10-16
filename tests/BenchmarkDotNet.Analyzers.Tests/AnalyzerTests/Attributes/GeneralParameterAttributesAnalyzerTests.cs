@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Analyzers;
+using BenchmarkDotNet.Analyzers;
 using BenchmarkDotNet.Analyzers.Attributes;
 using BenchmarkDotNet.Analyzers.Tests.Fixtures;
 using Microsoft.CodeAnalysis;
