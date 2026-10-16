@@ -109,6 +109,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                     CommandLineOptions.HardwareCountersOption,
                     CommandLineOptions.CliPathOption,
                     CommandLineOptions.RestorePathOption,
+                    CommandLineOptions.UseFreshPackagesOption,
                     CommandLineOptions.CoreRunPathsOption,
                     CommandLineOptions.MonoPathOption,
                     CommandLineOptions.ILCompilerVersionOption,
@@ -207,6 +208,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 ["--counters"] = "--counters",
                 ["--cli"] = "--cli",
                 ["--packages"] = "--packages",
+                ["--freshPackages"] = "--freshPackages",
                 ["--coreRun"] = "--coreRun",
                 ["--monoPath"] = "--monoPath",
                 ["--clrVersion"] = "--clrVersion",
@@ -598,6 +600,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 RestorePath = parseResult.GetValue(CommandLineOptions.RestorePathOption) != null
                     ? new DirectoryInfo(parseResult.GetValue(CommandLineOptions.RestorePathOption)!.FullName)
                     : null,
+                UseFreshPackages = parseResult.GetValue(CommandLineOptions.UseFreshPackagesOption),
                 CoreRunPaths = parseResult.GetValue(CommandLineOptions.CoreRunPathsOption) ?? [],
                 MonoPath = parseResult.GetValue(CommandLineOptions.MonoPathOption),
                 ILCompilerVersion = parseResult.GetValue(CommandLineOptions.ILCompilerVersionOption) ?? "",
@@ -673,6 +676,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.Join) result.Add("--join");
             if (options.KeepBenchmarkFiles) result.Add("--keepFiles");
             if (options.DontOverwriteResults) result.Add("--noOverwrite");
+            if (options.UseFreshPackages) result.Add("--freshPackages");
             if (options.DisplayAllStatistics) result.Add("--allStats");
             if (options.RunOncePerIteration) result.Add("--runOncePerIteration");
             if (options.PrintInformation) result.Add("--info");

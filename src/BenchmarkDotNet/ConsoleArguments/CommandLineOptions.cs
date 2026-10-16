@@ -190,6 +190,12 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "The directory to restore packages to (optional).",
         };
 
+        public bool UseFreshPackages { get; set; }
+        public static readonly Option<bool> UseFreshPackagesOption = new("--freshPackages")
+        {
+            Description = "Restores packages into an empty folder for every build instead of the NuGet global packages folder, so that a package rebuilt locally without changing its version is picked up. Ignored when --packages is set.",
+        };
+
         public IReadOnlyList<FileInfo> CoreRunPaths { get; set; } = [];
         public static readonly Option<FileInfo[]> CoreRunPathsOption = new("--coreRun")
         {

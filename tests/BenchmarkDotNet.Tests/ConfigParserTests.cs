@@ -1264,6 +1264,7 @@ namespace BenchmarkDotNet.Tests
                   --counters <counters>                                                               Hardware Counters
                   --cli <cli>                                                                         Path to dotnet cli (optional).
                   --packages <packages>                                                               The directory to restore packages to (optional).
+                  --freshPackages                                                                     Restores packages into an empty folder for every build instead of the NuGet global packages folder, so that a package rebuilt locally without changing its version is picked up. Ignored when --packages is set.
                   --coreRun <coreRun>                                                                 Path(s) to CoreRun (optional).
                   --monoPath <monoPath>                                                               Optional path to Mono which should be used for running benchmarks.
                   --ilCompilerVersion <ilCompilerVersion>                                             Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: "7.0.0-preview.3.22123.2"
