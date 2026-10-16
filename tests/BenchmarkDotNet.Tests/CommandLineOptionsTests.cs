@@ -27,7 +27,7 @@ public class CommandLineOptionsTests
             .ToArray();
 
         // Act
-        var multiValueOptionNames = CommandLineOptions.MultiValueOptionNames;
+        var multiValueOptionNames = CommandLineOptions.MultiValueOptions.ToArray();
 
         // Assert
         // Validate MultiValueOptionNames definitions are consistent with the property types.

@@ -8,6 +8,7 @@ using CommandLine;
 using CommandLine.Text;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.OutlierDetection;
+using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BenchmarkDotNet.ConsoleArguments
@@ -275,15 +276,13 @@ namespace BenchmarkDotNet.ConsoleArguments
 
         private static string Escape(string input) => UserInteractionHelper.EscapeCommandExample(input);
 
-        /// <summary>
-        /// Canonical long names of multi value options (can be specified multiple times)
-         /// </summary>
-        internal static IReadOnlyCollection<string> MultiValueOptionNames => MultiValueOptions;
-
         internal static bool IsMultiValueOption(string longName) => MultiValueOptions.Contains(longName);
 
-        private static readonly HashSet<string> MultiValueOptions =
-            new(StringComparer.OrdinalIgnoreCase)
+        /// <summary>
+        /// Canonical long names of multi value options (can be specified multiple times)
+        /// </summary>
+        internal static readonly IReadOnlyCollection<string> MultiValueOptions =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "runtimes",
                 "exporters",
@@ -295,8 +294,9 @@ namespace BenchmarkDotNet.ConsoleArguments
                 "attribute",
                 "counters",
                 "coreRun",
+                "ilcPackages",
                 "envVars",
-                "disasmFilter"
+                "disasmFilter",
             };
     }
 }
