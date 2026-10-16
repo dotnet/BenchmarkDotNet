@@ -407,7 +407,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         };
 
         public string WasmJavaScriptEngine { get; set; } = "";
-        public static readonly Option<string> WasmJavascriptEngineOption = new("--wasmEngine")
+        public static readonly Option<string> WasmJavaScriptEngineOption = new("--wasmEngine")
         {
             DefaultValueFactory = _ => "v8",
             Description = "Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain.",
