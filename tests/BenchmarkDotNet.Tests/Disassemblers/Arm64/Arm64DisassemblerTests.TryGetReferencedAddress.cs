@@ -13,7 +13,7 @@ public partial class Arm64DisassemblerTests
 {
     private Arm64RegisterValueAccumulator CreateValueAccumulator(
         IClrRuntime clrRuntime,
-        long initialValue,
+        ulong initialValue,
         Arm64RegisterId registerId = Arm64RegisterId.ARM64_REG_X0,
         Arm64RegisterValueAccumulator.State state = Arm64RegisterValueAccumulator.State.ExpectingMovk)
     {
