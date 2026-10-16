@@ -181,6 +181,19 @@ namespace BenchmarkDotNet.ConsoleArguments
                 ["-i"] = "--inProcess",
                 ["-a"] = "--artifacts",
 
+                // Single-character names with double-dash prefix (It's accepted by CommandLineParser)
+                ["--j"] = "--job",
+                ["--r"] = "--runtimes",
+                ["--e"] = "--exporters",
+                ["--m"] = "--memory",
+                ["--t"] = "--threading",
+                ["--d"] = "--disasm",
+                ["--p"] = "--profiler",
+                ["--f"] = "--filter",
+                ["--h"] = "--hide",
+                ["--i"] = "--inProcess",
+                ["--a"] = "--artifacts",
+
                 // Names
                 ["--job"] = "--job",
                 ["--runtimes"] = "--runtimes",
