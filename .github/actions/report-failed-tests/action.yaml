@@ -1,0 +1,47 @@
+name: Report failed tests
+description: |
+  Report failed tests to GitHub Job Summaries.
+
+inputs:
+  name:
+    description: Unique name of report
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # Find trx files with failed tests
+    - name: Find failed tests
+      id: find-failed-tests
+      shell: pwsh
+      run: |
+        $hasFailedTests = $false
+        $trxFiles = Get-ChildItem -Path . -Recurse -Filter *.trx -File -ErrorAction SilentlyContinue
+        foreach ($trxFile in $trxFiles) {
+          try {
+            [xml]$trx = Get-Content -Path $trxFile.FullName -Raw
+            if ([int]$trx.TestRun.ResultSummary.Counters.failed -gt 0) {
+              $hasFailedTests = $true
+              break
+            }
+          } catch {
+            # Failed to parse TRX files.
+            $hasFailedTests = $true
+            break
+          }
+        }
+
+        if ($hasFailedTests) {
+          Write-Output "has-failed-tests=true" >> $env:GITHUB_OUTPUT
+        }
+
+    # Report failed tests with unique name
+    - name: Report failed tests
+      uses: dorny/test-reporter@d1b5dff021aa968b288b02285a8bf47471c5928a # v3.2.0
+      if: steps.find-failed-tests.outputs.has-failed-tests == 'true'
+      with:
+        name: ${{ inputs.name }}
+        path: "**/*.trx"
+        reporter: dotnet-trx
+        list-suites: 'failed'
+        list-files: 'failed'
