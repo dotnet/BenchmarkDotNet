@@ -50,6 +50,9 @@ internal struct Arm64RegisterValueAccumulator
                 if (TryHandleExpectingMovk(instruction))
                     return;
 
+                // MOVK instructions are expected to be placed after MOVZ instruction. 
+                // If other instruction found on ExpectingMovk state.
+                // Then state is transitioned to LookingForPossibleLdr.
                 _state = State.LookingForPossibleLdr;
                 goto case State.LookingForPossibleLdr;
 
@@ -89,7 +92,7 @@ internal struct Arm64RegisterValueAccumulator
     {
         get
         {
-            // Value == 0 means invalid (negative combined clamps to 0, LDR resets on 0),
+            // Value == 0 means invalid(negative combined clamps to 0, LDR resets on 0),
             // So it is excluded to avoid a useless address lookup in the disassembler.
             if (Value == 0)
                 return false;
@@ -142,55 +145,15 @@ internal struct Arm64RegisterValueAccumulator
         }
     }
 
-    private bool TryStartMovzSequence(Arm64Instruction instruction)
-    {
-        try
-        {
-            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _))
-                return false;
-
-            if (!instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
-                return false;
-
-            _registerId = instruction.GetRegisterId(0);
-            _addressValue = instruction.GetUnsignedShiftedImmediateValue(1);
-            _addressOffset = 0;
-            _state = State.ExpectingMovk;
-            return true;
-        }
-        catch (Exception ex) when (IsDecodingException(ex))
-        {
-            return false;
-        }
-    }
-
-    private bool TryStartAdrpSequence(Arm64Instruction instruction)
-    {
-        try
-        {
-            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _))
-                return false;
-
-            if (!instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
-                return false;
-
-            _registerId = instruction.GetRegisterId(0);
-            _addressOffset = instruction.GetShiftedImmediateValue(1);
-            _addressValue = 0;
-            _state = State.ExpectingAdd;
-            return true;
-        }
-        catch (Exception ex) when (IsDecodingException(ex))
-        {
-            return false;
-        }
-    }
-
     private bool TryHandleExpectingMovk(Arm64Instruction instruction)
     {
         try
         {
             if (instruction.Id != Arm64InstructionId.ARM64_INS_MOVK)
+                return false;
+
+            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _)
+             || !instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
                 return false;
 
             if (instruction.GetRegisterId(0) != _registerId)
@@ -214,11 +177,21 @@ internal struct Arm64RegisterValueAccumulator
         }
     }
 
+    /// <summary>
+    /// Handle following expecting ADD instruction that source/target registers match value tracked register.
+    ///   ADD Xd|SP, Xn|SP, #imm, {shift}
+    ///   ADD Wd|SP, Wn|SP, #imm, {shift}
+    /// If condition is not matched. skip processing. and wait succeeding ADD instruction.
+    /// </summary>
     private bool TryHandleExpectingAdd(Arm64Instruction instruction)
     {
         try
         {
             if (instruction.Id != Arm64InstructionId.ARM64_INS_ADD)
+                return false;
+
+            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _)
+                || !instruction.TryGetOperand(1, Arm64OperandType.Register, out _))
                 return false;
 
             if (instruction.GetRegisterId(0) != _registerId)
@@ -241,6 +214,59 @@ internal struct Arm64RegisterValueAccumulator
         }
     }
 
+    /// <summary>
+    /// Only decoding failures (missing/mistyped operands, unexpected shift/instruction)
+    /// are treated as "not matched". Anything else (e.g. OOM) must propagate.
+    /// </summary>
+    private static bool IsDecodingException(Exception ex)
+        => ex is ArgumentOutOfRangeException
+            or ArgumentException
+            or NotSupportedException
+            or InvalidOperationException
+            or UnreachableException;
+
+    private bool TryStartMovzSequence(Arm64Instruction instruction)
+    {
+        if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _))
+            return false;
+
+        if (!instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
+            return false;
+
+        try
+        {
+            _registerId = instruction.GetRegisterId(0);
+            _addressValue = instruction.GetUnsignedShiftedImmediateValue(1);
+            _addressOffset = 0;
+            _state = State.ExpectingMovk;
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
+    private bool TryStartAdrpSequence(Arm64Instruction instruction)
+    {
+        if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _)
+            || !instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
+            return false;
+
+        try
+        {
+            _registerId = instruction.GetRegisterId(0);
+            _addressOffset = instruction.GetShiftedImmediateValue(1);
+            _addressValue = 0;
+            _state = State.ExpectingAdd;
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
     private bool TryHandleLdrFromTrackedRegister(Arm64Instruction instruction)
     {
         try
@@ -248,33 +274,36 @@ internal struct Arm64RegisterValueAccumulator
             if (!instruction.IsLdrFromTrackedRegister(_registerId))
                 return false;
 
-            // Simulate the LDR instruction.
-            // Use combined Value: after ADRP+ADD the effective address is _addressValue + _addressOffset.
-            // Use the Try-pattern so an unreadable address drops tracking instead of aborting disassembly.
+            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _))
+                return false;
+
+            // Address 0 is never valid to dereference (e.g. `movz x0, #0` or clamped negative ADRP+ADD).
             if (Value == 0)
             {
-                _state = State.LookingForPattern;
+                Reset();
                 return true;
             }
 
+            // Simulate the LDR instruction.
+            // Use combined Value: after ADRP+ADD the effective address is _addressValue + _addressOffset.
+            // Use the Try-pattern so an unreadable address drops tracking instead of aborting disassembly.
             if (!_runtime.DataTarget.DataReader.ReadPointer(Value, out ulong dereferenced))
             {
-                _state = State.LookingForPattern;
+                Reset();
                 return true;
             }
 
             _addressValue = dereferenced;
             _addressOffset = 0;
+
             if (_addressValue == 0)
             {
-                _state = State.LookingForPattern;
-            }
-            else
-            {
-                // The LDR might have loaded the result in another register
-                _registerId = instruction.GetRegisterId(0);
+                Reset();
+                return true;
             }
 
+            // The LDR might have loaded the result in another register
+            _registerId = instruction.GetRegisterId(0);
             return true;
         }
         catch (Exception ex) when (IsDecodingException(ex))
@@ -324,15 +353,4 @@ internal struct Arm64RegisterValueAccumulator
             return true;
         }
     }
-
-    /// <summary>
-    /// Only decoding failures (missing/mistyped operands, unexpected shift/instruction)
-    /// are treated as "not matched". Anything else (e.g. OOM) must propagate.
-    /// </summary>
-    private static bool IsDecodingException(Exception ex)
-        => ex is ArgumentOutOfRangeException
-            or ArgumentException
-            or NotSupportedException
-            or InvalidOperationException
-            or UnreachableException;
 }
