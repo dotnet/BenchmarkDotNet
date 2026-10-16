@@ -1,10 +1,8 @@
 // TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
 #if NET
-using Argon;
-using AsmArm64;
 using AwesomeAssertions;
 using Gee.External.Capstone.Arm64;
-using System.Net;
+using System.Reflection;
 using static AsmArm64.Arm64RegisterX;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
@@ -158,6 +156,30 @@ public partial class Arm64RegisterValueAccumulatorTests
 
         // Assert
         accumulator.HasValue.Should().BeFalse(); // When LDR load zero. Accumulated state is expected to be resetted.
+    }
+
+    [Fact]
+    public void MovzThenLdr_UnreadableAddress_ShouldNotHaveValue()
+    {
+        // Arrange
+        using var clrRuntime = new MockMemory()
+           .AddFalsePointer(MovzOffset)
+           .ToMockClrRuntime();
+        var accumulator = CreateValueAccumulator(clrRuntime);
+        var instructions = new[]
+        {
+            Arm64TestInstructions.Movz(X0, MovzOffset),      // movz x0, #0x1000
+            Arm64TestInstructions.Ldr(X1, baseRegister: X0), // ldr x1, [x0]
+        };
+        PrintInstructions(instructions);
+
+        // Act
+        accumulator.Feed(instructions[0]);
+        accumulator.Feed(instructions[1]); // No readable pointer is registered, so ReadPointer fails.
+
+        // Assert
+        accumulator.HasValue.Should().BeFalse(); // Unreadable address drops tracking instead of aborting disassembly.
+        accumulator.Value.Should().Be(0UL);
     }
 }
 #endif

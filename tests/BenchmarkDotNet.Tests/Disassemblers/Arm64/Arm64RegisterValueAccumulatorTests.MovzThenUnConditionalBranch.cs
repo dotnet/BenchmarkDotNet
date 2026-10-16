@@ -59,7 +59,7 @@ public partial class Arm64RegisterValueAccumulatorTests
         details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE).Should().BeTrue();
     }
 
-    [Fact(Skip = "Capstone 4.0.2 don't grouping RET instruction as JUMP group.")]
+    [Fact]
     public void MovzThenRet_ShouldResetValue()
     {
         // Arrange
@@ -80,7 +80,7 @@ public partial class Arm64RegisterValueAccumulatorTests
         // accumulator.RegisterId.Should().Be(Arm64RegisterId.Invalid);
     }
 
-    [Fact(Skip = "Capstone 4.0.2 don't grouping DRPS instruction as JUMP group.")]
+    [Fact]
     public void MovzThenDrps_ShouldResetValue()
     {
         // Arrange

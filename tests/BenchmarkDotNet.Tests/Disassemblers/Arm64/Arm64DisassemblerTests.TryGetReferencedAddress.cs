@@ -73,6 +73,30 @@ public partial class Arm64DisassemblerTests
     }
 
     [Fact]
+    public void TryGetReferencedAddress_WithAdrpThenBr_ResolvesPageAddress()
+    {
+        // Arrange
+        using var clrRuntime = CreateMockClrRuntime();
+        var accumulator = new Arm64RegisterValueAccumulator();
+        accumulator.Init(clrRuntime);
+        accumulator.Feed(Arm64TestInstructions.Adrp(X0, 0x2000)); // adrp x0, #0x2000
+        var rawInstruction = Arm64InstructionFactory.BR(X0);
+
+        // Act
+        var result = Arm64DisassemblerHelper.TryGetReferencedAddress(
+            rawInstruction.ToCapstoneArm64Instruction(),
+            accumulator,
+            pointerSize: 0, // This parameter is not used.
+            out ulong referencedAddress,
+            out bool isReferencedAddressIndirect);
+
+        // Assert
+        result.Should().BeTrue();
+        referencedAddress.Should().Be(0x2000); // no ADD between ADRP and BR, so the page address itself must resolve.
+        isReferencedAddressIndirect.Should().BeTrue();
+    }
+
+    [Fact]
     public void TryGetReferencedAddress_With_BranchRelative()
     {
         // Arrange
