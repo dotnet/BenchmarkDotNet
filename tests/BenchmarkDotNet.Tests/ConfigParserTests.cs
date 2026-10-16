@@ -1311,6 +1311,62 @@ namespace BenchmarkDotNet.Tests
                   --resume                                                                            Continue the execution if the last run was stopped.
                   -?, --help                                                                          Show help and usage information
                   --version                                                                           Show version information
+
+                Examples:
+
+                  Use Job.ShortRun for running the benchmarks
+                    --job short
+
+                  Run benchmarks in process
+                    --inProcess
+
+                  Run benchmarks for .NET 4.7.2, .NET 8.0 and Mono. .NET 4.7.2 will be baseline because it was first.
+                    --runtimes net472 net8.0 Mono
+
+                  Run benchmarks for .NET Core 3.1, .NET 6.0 and .NET 8.0. .NET Core 3.1 will be baseline because it was first.
+                    --runtimes netcoreapp3.1 net6.0 net8.0
+
+                  Use MemoryDiagnoser to get GC stats
+                    --memory
+
+                  Use DisassemblyDiagnoser to get disassembly
+                    --disasm
+
+                  Use HardwareCountersDiagnoser to get hardware counter info
+                    --counters CacheMisses InstructionRetired
+
+                  Run all benchmarks exactly once
+                    --filter * --job Dry
+
+                  Run all benchmarks from System.Memory namespace
+                    --filter System.Memory*
+
+                  Run all benchmarks from ClassA and ClassB using type names
+                    --filter ClassA ClassB
+
+                  Run all benchmarks from ClassA and ClassB using patterns
+                    --filter *.ClassA.* *.ClassB.*
+
+                  Run all benchmarks called `BenchmarkName` and show the results in single summary
+                    --filter *.BenchmarkName --join
+
+                  Run selected benchmarks once per iteration
+                    --runOncePerIteration
+
+                  Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations
+                    --warmupCount 1 --iterationCount 5 --invocationCount 100
+
+                  Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations
+                    --iterationTime 250 --minIterationCount 9 --maxIterationCount 15
+
+                  Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET 6.0 (base) vs .NET 8.0 (diff). .NET Core 6.0 will be baseline because it was provided as first.
+                    --filter * --runtimes net6.0 net8.0 --statisticalTest 5%
+
+                  Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'
+                    --envVars ENV_VAR_KEY_1:value_1 ENV_VAR_KEY_2:value_2
+
+                  Hide Mean and Ratio columns (use double quotes for multi-word columns: "Alloc Ratio")
+                    --hide Mean Ratio
                 """,
                 o => o.IgnoringNewlineStyle());
         }

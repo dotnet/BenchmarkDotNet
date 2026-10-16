@@ -387,8 +387,17 @@ namespace BenchmarkDotNet.ConsoleArguments
 
             if (args.Any(a =>
                 a.Equals("--help", StringComparison.OrdinalIgnoreCase)
-             || a.Equals("--version", StringComparison.OrdinalIgnoreCase)
              || a == "-?"))
+            {
+                using var invariantUICultureScope = Helpers.CultureInfoHelper.CreateInvariantUICultureScope();
+                using var writer = new StringWriter();
+                parseResult.Invoke(new InvocationConfiguration { Output = writer });
+                logger.Write(writer.ToString());
+                WriteExamples(logger);
+                return (true, default, default);
+            }
+
+            if (args.Any(a => a.Equals("--version", StringComparison.OrdinalIgnoreCase)))
             {
                 using var invariantUICultureScope = Helpers.CultureInfoHelper.CreateInvariantUICultureScope();
                 using var writer = new StringWriter();
@@ -868,6 +877,45 @@ namespace BenchmarkDotNet.ConsoleArguments
             { result.Add("--coreRun"); result.AddRange(options.CoreRunPaths.Select(p => p.FullName)); }
 
             return result.ToArray();
+        }
+
+        /// <summary>
+        /// Usage examples shown at the end of <c>--help</c> output.
+        /// </summary>
+        internal static IEnumerable<(string Description, CommandLineOptions Options)> GetExamples()
+        {
+            yield return ("Use Job.ShortRun for running the benchmarks", new CommandLineOptions { BaseJob = "short" });
+            yield return ("Run benchmarks in process", new CommandLineOptions { RunInProcess = true });
+            yield return ("Run benchmarks for .NET 4.7.2, .NET 8.0 and Mono. .NET 4.7.2 will be baseline because it was first.", new CommandLineOptions { Runtimes = ["net472", "net8.0", "Mono"] });
+            yield return ("Run benchmarks for .NET Core 3.1, .NET 6.0 and .NET 8.0. .NET Core 3.1 will be baseline because it was first.", new CommandLineOptions { Runtimes = ["netcoreapp3.1", "net6.0", "net8.0"] });
+            yield return ("Use MemoryDiagnoser to get GC stats", new CommandLineOptions { UseMemoryDiagnoser = true });
+            yield return ("Use DisassemblyDiagnoser to get disassembly", new CommandLineOptions { UseDisassemblyDiagnoser = true });
+            yield return ("Use HardwareCountersDiagnoser to get hardware counter info", new CommandLineOptions { HardwareCounters = [nameof(HardwareCounter.CacheMisses), nameof(HardwareCounter.InstructionRetired)] });
+            yield return ("Run all benchmarks exactly once", new CommandLineOptions { BaseJob = "Dry", Filters = ["*"] });
+            yield return ("Run all benchmarks from System.Memory namespace", new CommandLineOptions { Filters = ["System.Memory*"] });
+            yield return ("Run all benchmarks from ClassA and ClassB using type names", new CommandLineOptions { Filters = ["ClassA", "ClassB"] });
+            yield return ("Run all benchmarks from ClassA and ClassB using patterns", new CommandLineOptions { Filters = ["*.ClassA.*", "*.ClassB.*"] });
+            yield return ("Run all benchmarks called `BenchmarkName` and show the results in single summary", new CommandLineOptions { Join = true, Filters = ["*.BenchmarkName"] });
+            yield return ("Run selected benchmarks once per iteration", new CommandLineOptions { RunOncePerIteration = true });
+            yield return ("Run selected benchmarks 100 times per iteration. Perform single warmup iteration and 5 actual workload iterations", new CommandLineOptions { InvocationCount = 100, WarmupIterationCount = 1, IterationCount = 5 });
+            yield return ("Run selected benchmarks 250ms per iteration. Perform from 9 to 15 iterations", new CommandLineOptions { IterationTimeInMilliseconds = 250, MinIterationCount = 9, MaxIterationCount = 15 });
+            yield return ("Run MannWhitney test with relative ratio of 5% for all benchmarks for .NET 6.0 (base) vs .NET 8.0 (diff). .NET Core 6.0 will be baseline because it was provided as first.",
+                new CommandLineOptions { Filters = ["*"], Runtimes = ["net6.0", "net8.0"], StatisticalTestThreshold = "5%" });
+            yield return ("Run benchmarks using environment variables 'ENV_VAR_KEY_1' with value 'value_1' and 'ENV_VAR_KEY_2' with value 'value_2'",
+                new CommandLineOptions { EnvironmentVariables = ["ENV_VAR_KEY_1:value_1", "ENV_VAR_KEY_2:value_2"] });
+            yield return ("Hide Mean and Ratio columns (use double quotes for multi-word columns: \"Alloc Ratio\")", new CommandLineOptions { HiddenColumns = ["Mean", "Ratio"] });
+        }
+
+        private static void WriteExamples(ILogger logger)
+        {
+            logger.WriteLine("Examples:");
+            logger.WriteLine();
+            foreach (var (description, options) in GetExamples())
+            {
+                logger.WriteLine($"  {description}");
+                logger.WriteLine($"    {string.Join(" ", SerializeToArgs(options))}");
+                logger.WriteLine();
+            }
         }
 
         private static bool Validate(CommandLineOptions options, ILogger logger)
