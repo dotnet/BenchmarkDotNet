@@ -67,7 +67,7 @@ namespace BenchmarkDotNet.Toolchains.Roslyn
                 .Append(buildInfo.BenchmarkCase.Descriptor.Type.GetTypeInfo().Assembly) // This assembly does not have to have a reference to BenchmarkDotNet (e.g. custom framework for benchmarking that internally uses BenchmarkDotNet)
                 .Concat(BenchmarkDotNetReferences.Assemblies) // BenchmarkDotNet + Perfolizer
                 .Concat(BenchmarkDotNetReferences.Types.Select(type => type.GetTypeInfo().Assembly)) // TaskExtensions (ValueTask)
-                // In-process diagnoser handlers
+                                                                                                     // In-process diagnoser handlers
                 .Concat(buildInfo.CompositeInProcessDiagnoser.GetHandlerData(buildInfo.BenchmarkCase)
                     .Select(handlerData => handlerData.HandlerType?.GetTypeInfo().Assembly)
                     .WhereNotNull())

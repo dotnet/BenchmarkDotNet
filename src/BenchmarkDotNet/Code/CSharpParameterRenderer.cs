@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Parameters;
 using BenchmarkDotNet.Running;
@@ -94,16 +94,16 @@ internal sealed class CSharpParameterRenderer
                 return SourceCodeHelper.ToSourceCode(constant.Value, constant.SourceType);
 
             case ParameterValue.FromSource fromSource:
-            {
-                // The value can't be embedded, so the child process re-obtains it by enumerating the source.
-                // GetParameterAsync returns the source's element type, so an element index binds directly.
-                string cast = $"({fromSource.SourceType.GetCorrectCSharpTypeName()})";
-                string elementIndex = fromSource.ElementIndex is { } index ? ElementAccess(fromSource.Read, index) : string.Empty;
+                {
+                    // The value can't be embedded, so the child process re-obtains it by enumerating the source.
+                    // GetParameterAsync returns the source's element type, so an element index binds directly.
+                    string cast = $"({fromSource.SourceType.GetCorrectCSharpTypeName()})";
+                    string elementIndex = fromSource.ElementIndex is { } index ? ElementAccess(fromSource.Read, index) : string.Empty;
 
-                string source = StatementLocal(fromSource.Read) is { } local ? local : $"({Extraction(fromSource.Read)})";
+                    string source = StatementLocal(fromSource.Read) is { } local ? local : $"({Extraction(fromSource.Read)})";
 
-                return $"{cast}{source}{elementIndex}";
-            }
+                    return $"{cast}{source}{elementIndex}";
+                }
 
             default:
                 throw new NotSupportedException($"{value.GetType().Name} is not a supported {nameof(ParameterValue)}.");
@@ -184,8 +184,8 @@ internal sealed class CSharpParameterRenderer
     private static string InvocationPostfix(MemberInfo source) => source is PropertyInfo ? string.Empty : "()";
 
     private static bool IsStatic(MemberInfo source)
-        => source is PropertyInfo property ? property.GetMethod!.IsStatic : ((MethodInfo) source).IsStatic;
+        => source is PropertyInfo property ? property.GetMethod!.IsStatic : ((MethodInfo)source).IsStatic;
 
     private static Type ReturnType(MemberInfo source)
-        => source is PropertyInfo property ? property.GetMethod!.ReturnType : ((MethodInfo) source).ReturnType;
+        => source is PropertyInfo property ? property.GetMethod!.ReturnType : ((MethodInfo)source).ReturnType;
 }

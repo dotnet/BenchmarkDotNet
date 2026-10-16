@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             if (startInfo.Environment.Keys.Count > 0)
             {
                 command.Logger.WriteLineInfo("// Environment Variables:");
-                foreach (var entry in startInfo.Environment.OrderBy(x=>x.Key))
+                foreach (var entry in startInfo.Environment.OrderBy(x => x.Key))
                 {
                     command.Logger.WriteLine($"\t[{entry.Key}] = \"{entry.Value}\"");
                 }

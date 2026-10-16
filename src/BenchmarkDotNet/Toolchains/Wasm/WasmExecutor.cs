@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.Toolchains.Wasm
             }
             finally
             {
-                if (!probeProcess.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                if (!probeProcess.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                 {
                     probeProcess.KillTree();
                 }
@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.Toolchains.Wasm
 
                 if (isFileBasedIpc)
                 {
-                    ((FileStdOutListener) processListener.Listener).AttachProcessOutputReader(processOutputReader);
+                    ((FileStdOutListener)processListener.Listener).AttachProcessOutputReader(processOutputReader);
                 }
 
                 await diagnoser.HandleAsync(HostSignal.BeforeProcessStart, new DiagnoserActionParameters(processListener.Process, benchmarkCase, benchmarkId), cancellationToken).ConfigureAwait();
@@ -218,7 +218,7 @@ namespace BenchmarkDotNet.Toolchains.Wasm
                         .WaitAsync(TimeSpan.FromMinutes(settings.ProcessTimeoutMinutes)).ConfigureAwait(false);
 #pragma warning restore CA2016 // Forward the 'CancellationToken' parameter to methods
 
-                    if (!process.WaitForExit(milliseconds: (int) ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
+                    if (!process.WaitForExit(milliseconds: (int)ExecuteParameters.ProcessExitTimeout.TotalMilliseconds))
                     {
                         logger.WriteLineInfo($"// The benchmarking process did not quit within {ExecuteParameters.ProcessExitTimeout.TotalSeconds} seconds, it's going to get force killed now.");
                     }

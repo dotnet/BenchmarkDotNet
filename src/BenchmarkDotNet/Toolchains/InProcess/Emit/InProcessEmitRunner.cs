@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
@@ -63,7 +63,7 @@ internal static class InProcessEmitRunner
         // generated member by name on a type the benchmark also contributes members to.
         var constructorArguments = new object?[1];
         var instance = runnableType.GetConstructors().Single().Invoke(constructorArguments);
-        var trickTheJit = (Action) constructorArguments[0]!;
+        var trickTheJit = (Action)constructorArguments[0]!;
         FillMembers(instance, benchmarkCase, host.CancellationToken);
 
         host.WriteLine();

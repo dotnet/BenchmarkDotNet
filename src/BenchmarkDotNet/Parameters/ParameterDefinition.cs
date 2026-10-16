@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Parameters
+namespace BenchmarkDotNet.Parameters
 {
     /// <summary>
     /// What a benchmark parameter is, independently of any value it takes: a member the runnable assigns, or a

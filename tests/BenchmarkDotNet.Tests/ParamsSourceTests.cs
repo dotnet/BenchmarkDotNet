@@ -576,7 +576,7 @@ namespace BenchmarkDotNet.Tests
 
             public static IEnumerable<object> Values() { yield return "not an enum"; }
 
-            [Benchmark] public int Run() => (int) Value;
+            [Benchmark] public int Run() => (int)Value;
         }
 
         public class ErasedEnumSource
@@ -586,7 +586,7 @@ namespace BenchmarkDotNet.Tests
 
             public static IEnumerable<object> Values() { yield return 2; }
 
-            [Benchmark] public int Run() => (int) Value;
+            [Benchmark] public int Run() => (int)Value;
         }
 
         public static class ArgumentListSource

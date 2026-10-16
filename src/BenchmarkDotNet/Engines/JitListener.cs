@@ -512,7 +512,7 @@ internal sealed class JitListener : EventListener
             {
                 return 0;
             }
-            return (ulong) ((IntPtr) field.GetValue(module)!).ToInt64();
+            return (ulong)((IntPtr)field.GetValue(module)!).ToInt64();
         }
         catch
         {
@@ -563,7 +563,7 @@ internal sealed class JitListener : EventListener
             }
             else
             {
-                methodId = (ulong) method.MethodHandle.Value.ToInt64();
+                methodId = (ulong)method.MethodHandle.Value.ToInt64();
             }
         }
 

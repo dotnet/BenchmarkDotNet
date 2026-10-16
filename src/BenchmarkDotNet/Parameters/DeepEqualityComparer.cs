@@ -64,12 +64,12 @@ internal class DeepEqualityComparer : IEqualityComparer
 
         if (x is IDictionary xDict) // Dictionary iteration order is not stable, so compare via sorted keys.
         {
-            return DictionariesEqual(xDict, (IDictionary) y);
+            return DictionariesEqual(xDict, (IDictionary)y);
         }
 
         if (ImplementsSet(x)) // Set iteration order is not stable, so compare via sorted elements.
         {
-            return SetsEqual((IEnumerable) x, (IEnumerable) y);
+            return SetsEqual((IEnumerable)x, (IEnumerable)y);
         }
 
         if (x is IStructuralEquatable xStructuralEquatable)
@@ -93,7 +93,7 @@ internal class DeepEqualityComparer : IEqualityComparer
 
         if (x is IEnumerable xEnumerable) // General collection equality support
         {
-            return EnumerablesEqual(xEnumerable, (IEnumerable) y);
+            return EnumerablesEqual(xEnumerable, (IEnumerable)y);
         }
 
         return x.Equals(y);
@@ -146,7 +146,7 @@ internal class DeepEqualityComparer : IEqualityComparer
             return false;
 
         var method = equatableInterface.GetMethod(nameof(IEquatable<object>.Equals), BindingFlags.Public | BindingFlags.Instance);
-        return (bool?) method?.Invoke(x, [y]) ?? false;
+        return (bool?)method?.Invoke(x, [y]) ?? false;
     }
 
     private static bool TryFallbackStructuralEquals(object x, object y, out bool equals)
@@ -154,7 +154,7 @@ internal class DeepEqualityComparer : IEqualityComparer
         // Check for multi-dimensional array and ITuple and re-try for each element recursively.
         if (x is Array xArr)
         {
-            Array yArr = (Array) y;
+            Array yArr = (Array)y;
             if (xArr.Rank != yArr.Rank)
             {
                 equals = false;
@@ -176,7 +176,7 @@ internal class DeepEqualityComparer : IEqualityComparer
                 string methodName = xArr.Rank == 2
                     ? nameof(TwoDArraysEqual)
                     : nameof(ThreeDArraysEqual);
-                equals = (bool) typeof(DeepEqualityComparer)
+                equals = (bool)typeof(DeepEqualityComparer)
                     .GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static)!
                     .MakeGenericMethod(xArr.GetType().GetElementType()!, yArr.GetType().GetElementType()!)
                     .Invoke(null, [xArr, yArr])!;
@@ -212,7 +212,7 @@ internal class DeepEqualityComparer : IEqualityComparer
 
         if (x is IEnumerable xEnumerable) // General collection equality support
         {
-            equals = EnumerablesEqual(xEnumerable, (IEnumerable) y);
+            equals = EnumerablesEqual(xEnumerable, (IEnumerable)y);
             return true;
         }
 

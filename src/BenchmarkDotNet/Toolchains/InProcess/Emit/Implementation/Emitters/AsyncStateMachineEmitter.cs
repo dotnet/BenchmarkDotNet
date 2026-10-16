@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Helpers.Reflection.Emit;
+using BenchmarkDotNet.Helpers.Reflection.Emit;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
