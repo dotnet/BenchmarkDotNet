@@ -1137,7 +1137,7 @@ namespace BenchmarkDotNet.Tests
                 options.ListBenchmarkCaseMode.Should().Be(ListBenchmarkCaseMode.Disabled);
                 options.DisassemblerRecursiveDepth.Should().Be(1);
                 options.WasmJavaScriptEngine.Should().Be("v8");
-                options.WasmJavaScriptEngineArguments.Should().Be("--expose_wasm");
+                options.WasmJavaScriptEngineArguments.Should().BeEmpty();
                 options.WasmProcessTimeoutMinutes.Should().Be(10);
             }
 
@@ -1300,7 +1300,7 @@ namespace BenchmarkDotNet.Tests
                   --memoryRandomization                                                               Specifies whether Engine should allocate some random-sized memory between iterations.
                   --jitTieringMode <Auto|Force|Skip>                                                  Controls the behavior of the JIT stage when tiering is enabled. Auto/Force/Skip. [default: Auto]
                   --wasmEngine <wasmEngine>                                                           Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain. [default: v8]
-                  --wasmArgs <wasmArgs>                                                               Arguments for the javascript engine used by Wasm toolchain. [default: --expose_wasm]
+                  --wasmArgs <wasmArgs>                                                               Arguments for the javascript engine used by Wasm toolchain.
                   --wasmMainJsTemplate <wasmMainJsTemplate>                                           Path to main.mjs template.
                   --customRuntimePack <customRuntimePack>                                             Path to a custom runtime pack. Only used for ReadyToRun (R2R) currently.
                   --AOTCompilerPath <AOTCompilerPath>                                                 Path to the crossgen2 compiler, used for ReadyToRun (R2R) benchmarks.

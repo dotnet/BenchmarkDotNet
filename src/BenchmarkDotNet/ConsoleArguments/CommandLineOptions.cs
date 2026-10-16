@@ -406,7 +406,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "Controls the behavior of the JIT stage when tiering is enabled. Auto/Force/Skip.",
         };
 
-        public string WasmJavaScriptEngine { get; set; } = "";
+        public string WasmJavaScriptEngine { get; set; } = "v8";
         public static readonly Option<string> WasmJavaScriptEngineOption = new("--wasmEngine")
         {
             DefaultValueFactory = _ => "v8",
@@ -416,7 +416,6 @@ namespace BenchmarkDotNet.ConsoleArguments
         public string WasmJavaScriptEngineArguments { get; set; } = "";
         public static readonly Option<string> WasmJavaScriptEngineArgumentsOption = new("--wasmArgs")
         {
-            DefaultValueFactory = _ => "--expose_wasm",
             Description = "Arguments for the javascript engine used by Wasm toolchain.",
         };
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.ConsoleArguments;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 
 namespace BenchmarkDotNet.Toolchains.Wasm;
@@ -27,8 +28,10 @@ public sealed record WasmSettings : DotNetCliSettings
 
     internal WasmSettings(CommandLineOptions options) : base(options)
     {
-        JavaScriptEngine = options.WasmJavaScriptEngine ?? JavaScriptEngine;
-        JavaScriptEngineArguments = options.WasmJavaScriptEngineArguments ?? JavaScriptEngineArguments;
+        if (options.WasmJavaScriptEngine.IsNotBlank())
+            JavaScriptEngine = options.WasmJavaScriptEngine;
+        if (options.WasmJavaScriptEngineArguments.IsNotBlank())
+            JavaScriptEngineArguments = options.WasmJavaScriptEngineArguments;
         ProcessTimeoutMinutes = options.WasmProcessTimeoutMinutes;
         MainJsTemplate = options.WasmMainJsTemplate;
     }

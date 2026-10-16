@@ -852,7 +852,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.WasmJavaScriptEngine.IsNotBlank() && options.WasmJavaScriptEngine != "v8")
             { result.Add("--wasmEngine"); result.Add(options.WasmJavaScriptEngine); }
 
-            if (options.WasmJavaScriptEngineArguments.IsNotBlank() && options.WasmJavaScriptEngineArguments != "--expose_wasm")
+            if (options.WasmJavaScriptEngineArguments.IsNotBlank())
             { result.Add("--wasmArgs"); result.Add(options.WasmJavaScriptEngineArguments); }
 
             if (options.WasmMainJsTemplate != null)
