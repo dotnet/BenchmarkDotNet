@@ -17,7 +17,6 @@ internal struct Arm64RegisterValueAccumulator
     private State _state;
     private ulong _addressValue;
     private long _addressOffset;
-    private int _expectedMovkShift;
     private Arm64RegisterId _registerId;
     private IClrRuntime _runtime;
 
@@ -29,12 +28,10 @@ internal struct Arm64RegisterValueAccumulator
 
     internal void Reset(
         State state = State.LookingForPattern,
-        int expectedMovkShift = 0,
         ulong value = 0,
         Arm64RegisterId registerId = Arm64RegisterId.Invalid)
     {
         _state = state;
-        _expectedMovkShift = expectedMovkShift;
         _addressValue = value;
         _addressOffset = 0;
         _registerId = registerId;
@@ -142,10 +139,9 @@ internal struct Arm64RegisterValueAccumulator
                 return false;
 
             _registerId = instruction.GetRegisterId(0);
-            _addressValue = (ulong)instruction.GetRawImmediateValue(1);
+            _addressValue = instruction.GetUnsignedShiftedImmediateValue(1);
             _addressOffset = 0;
             _state = State.ExpectingMovk;
-            _expectedMovkShift = 16;
             return true;
         }
         catch (Exception ex) when (IsDecodingException(ex))
@@ -186,13 +182,16 @@ internal struct Arm64RegisterValueAccumulator
             if (instruction.GetRegisterId(0) != _registerId)
                 return false;
 
-            Arm64InstructionDetail details = instruction.Details;
-            if (details.Operands[1].ShiftOperation != Arm64ShiftOperation.ARM64_SFT_LSL
-                || details.Operands[1].ShiftValue != _expectedMovkShift)
+            // Note: MOVK instruction accept only LSL shift operation.
+            var shiftAmount = instruction.GetShiftAmount(1);
+            if (shiftAmount is not (0 or 16 or 32 or 48))
                 return false;
 
-            _addressValue = _addressValue | (ulong)instruction.GetRawImmediateValue(1) << details.Operands[1].ShiftValue;
-            _expectedMovkShift += 16;
+            var shiftedImmediateValue = instruction.GetUnsignedShiftedImmediateValue(1);
+            const ulong mask = 0xFFFF;
+            _addressValue &= ~(mask << shiftAmount); // Clear 16-bits of MOVK target
+            _addressValue |= shiftedImmediateValue;  // Set shifted immediate value
+
             return true;
         }
         catch (Exception ex) when (IsDecodingException(ex))
@@ -217,7 +216,8 @@ internal struct Arm64RegisterValueAccumulator
             if (!instruction.TryGetOperand(2, Arm64OperandType.Immediate, out _))
                 return false;
 
-            _addressValue = _addressValue | (ulong)instruction.GetRawImmediateValue(2);
+            var shiftedImmediateValue = instruction.GetUnsignedShiftedImmediateValue(2);
+            _addressValue += shiftedImmediateValue;
             _state = State.LookingForPossibleLdr;
             return true;
         }
