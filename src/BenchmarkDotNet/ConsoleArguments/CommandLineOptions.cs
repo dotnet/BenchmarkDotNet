@@ -218,7 +218,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public DirectoryInfo? IlcPackages { get; set; }
         public static readonly Option<DirectoryInfo> IlcPackagesOption = new("--ilcPackages")
         {
-            Description = "Optional path to shipping packages produced by local dotnet/runtime build.",
+            Description = @"Optional path to shipping packages produced by local dotnet/runtime build. Example: 'D:\projects\runtime\artifacts\packages\Release\Shipping\'",
         };
 
         public int? LaunchCount { get; set; }
@@ -315,7 +315,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public static readonly Option<ListBenchmarkCaseMode> ListBenchmarkCaseModeOption = new("--list")
         {
             DefaultValueFactory = _ => ListBenchmarkCaseMode.Disabled,
-            Description = "Prints all of the available benchmark names. Flat/Json/Tree",
+            Description = "Prints all of the available benchmark names. Flat/Tree/JSON",
         };
 
         public int DisassemblerRecursiveDepth { get; set; }
@@ -371,7 +371,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public string StatisticalTestThreshold { get; set; } = "";
         public static readonly Option<string> StatisticalTestThresholdOption = new("--statisticalTest")
         {
-            Description = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s. Bare numbers imply ns (e.g. 0.02 -> 0.02ns)",
+            Description = "Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s. Bare numbers imply ns (e.g. 0.02 -> 0.02ns).",
         };
 
         public bool DisableLogFile { get; set; }
@@ -396,7 +396,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         public bool MemoryRandomization { get; set; }
         public static readonly Option<bool> MemoryRandomizationOption = new("--memoryRandomization")
         {
-            Description = "Specifies whether Engine should allocate some random-sized memory between iterations.",
+            Description = "Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.",
         };
 
         public JitTieringMode JitTieringMode { get; set; }

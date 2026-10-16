@@ -1268,7 +1268,7 @@ namespace BenchmarkDotNet.Tests
                   --coreRun <coreRun>                                                                 Path(s) to CoreRun (optional).
                   --monoPath <monoPath>                                                               Optional path to Mono which should be used for running benchmarks.
                   --ilCompilerVersion <ilCompilerVersion>                                             Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: "7.0.0-preview.3.22123.2"
-                  --ilcPackages <ilcPackages>                                                         Optional path to shipping packages produced by local dotnet/runtime build.
+                  --ilcPackages <ilcPackages>                                                         Optional path to shipping packages produced by local dotnet/runtime build. Example: 'D:\projects\runtime\artifacts\packages\Release\Shipping\'
                   --launchCount <launchCount>                                                         How many times we should launch process with target benchmark. The default is 1.
                   --warmupCount <warmupCount>                                                         How many warmup iterations should be performed. If you set it, the minWarmupCount and maxWarmupCount are ignored. By default calculated by the heuristic.
                   --minWarmupCount <minWarmupCount>                                                   Minimum count of warmup iterations that should be performed. The default is 6.
@@ -1284,7 +1284,7 @@ namespace BenchmarkDotNet.Tests
                   --runOncePerIteration                                                               Run the benchmark exactly once per iteration.
                   --info                                                                              Print environment information.
                   --apples                                                                            Runs apples-to-apples comparison for specified Jobs.
-                  --list <Disabled|Flat|Json|Tree>                                                    Prints all of the available benchmark names. Flat/Json/Tree [default: Disabled]
+                  --list <Disabled|Flat|Json|Tree>                                                    Prints all of the available benchmark names. Flat/Tree/JSON [default: Disabled]
                   --disasmDepth <disasmDepth>                                                         Sets the recursive depth for the disassembler. [default: 1]
                   --disasmFilter <disasmFilter>                                                       Glob patterns applied to full method signatures by the disassembler.
                   --disasmDiff                                                                        Generates diff reports for the disassembler.
@@ -1293,11 +1293,11 @@ namespace BenchmarkDotNet.Tests
                   --buildTimeout <buildTimeout>                                                       Build timeout in seconds.
                   --wakeLock <Display|None|System>                                                    Prevents the system from entering sleep or turning off the display. None/System/Display.
                   --stopOnFirstError                                                                  Stop on first error.
-                  --statisticalTest <statisticalTest>                                                 Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s. Bare numbers imply ns (e.g. 0.02 -> 0.02ns)
+                  --statisticalTest <statisticalTest>                                                 Threshold for Mann–Whitney U Test. Examples: 5%, 10ms, 100ns, 1s. Bare numbers imply ns (e.g. 0.02 -> 0.02ns).
                   --disableLogFile                                                                    Disables the logfile.
                   --maxWidth <maxWidth>                                                               Max parameter column width, the default is 20.
                   --envVars <envVars>                                                                 Colon separated environment variables (key:value)
-                  --memoryRandomization                                                               Specifies whether Engine should allocate some random-sized memory between iterations.
+                  --memoryRandomization                                                               Specifies whether Engine should allocate some random-sized memory between iterations. It makes [GlobalCleanup] and [GlobalSetup] methods to be executed after every iteration.
                   --jitTieringMode <Auto|Force|Skip>                                                  Controls the behavior of the JIT stage when tiering is enabled. Auto/Force/Skip. [default: Auto]
                   --wasmEngine <wasmEngine>                                                           Specifies the executable (in PATH) or full path to a java script engine used to run the benchmarks, used by Wasm toolchain. [default: v8]
                   --wasmArgs <wasmArgs>                                                               Arguments for the javascript engine used by Wasm toolchain.
