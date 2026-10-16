@@ -49,7 +49,7 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
     }
 
-    [Fact(Skip = "Current value accumulator expecting sequencial 0/16/32/48 shfit for MOVK.")]
+    [Fact]
     public void MovzThenMovk_WithSameShiftValue_ShouldHasAccumulatedValue()
     {
         // Arrange
@@ -66,7 +66,7 @@ public partial class Arm64RegisterValueAccumulatorTests
     }
 
     [Fact]
-    public void MovzThenMovk_WithUnexpectedShift_ShouldResetValue()
+    public void MovzThenMovk_WithSkippedShift_ShouldAccumulateValue()
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
@@ -78,10 +78,12 @@ public partial class Arm64RegisterValueAccumulatorTests
 
         // Act
         accumulator.Feed(instructions[0]);
-        accumulator.Feed(instructions[1]); // Reset accumulated value, because _expectedMovkShift is not matched.
+        accumulator.Feed(instructions[1]); // Each MOVK clears and sets its own 16-bit lane, so order does not matter.
 
         // Assert
-        accumulator.HasValue.Should().BeFalse();
+        accumulator.HasValue.Should().BeTrue();
+        accumulator.Value.Should().Be(0x5678_0000_1234UL);
+        accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
     }
 
     [Fact]
