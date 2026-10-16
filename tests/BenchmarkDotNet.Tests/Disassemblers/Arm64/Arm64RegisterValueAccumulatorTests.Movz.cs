@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 // MOVZ tests.
 public partial class Arm64RegisterValueAccumulatorTests
 {
-    [Fact(Skip = "On current implementation, shifted immediate value is not supported.")]
+    [Fact]
     public void Movz_WithShiftedImmediateValue_ShouldStartNewValue()
     {
         // Arrange
@@ -31,6 +31,25 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.HasValue.Should().BeTrue();
         accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
         accumulator.Value.Should().Be(0x3333_0000_0000);
+    }
+
+    [Fact]
+    public void Movz_ZeroImmediate_ShouldNotHaveValue()
+    {
+        // Arrange
+        var accumulator = CreateValueAccumulator();
+        var instructions = new[]
+        {
+            Arm64TestInstructions.Movz(X0, 0x0), // movz x0, #0x0
+        };
+        PrintInstructions(instructions);
+
+        // Act
+        accumulator.Feed(instructions[0]);
+
+        // Assert: address 0 is never valid, so it is excluded from HasValue.
+        accumulator.HasValue.Should().BeFalse();
+        accumulator.Value.Should().Be(0UL);
     }
 }
 #endif

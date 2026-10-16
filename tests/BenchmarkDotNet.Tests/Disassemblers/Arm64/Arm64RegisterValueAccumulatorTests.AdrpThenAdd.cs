@@ -74,7 +74,7 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.HasValue.Should().BeFalse();
     }
 
-    [Fact(Skip = "Shifted value is not supported on current implementation.")]
+    [Fact]
     public void AdrpThenAdd_WithShiftedImm_ShouldCalculateAddress()
     {
         // Arrange
@@ -118,7 +118,7 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
     }
 
-    [Fact(Skip = "On current implementation, `State.ExpectingAdd` don't reset value when unexpected instruction passed.")]
+    [Fact]
     public void AdrpThenOther_ThenAdd_ShouldResetValue()
     {
         // Arrange
