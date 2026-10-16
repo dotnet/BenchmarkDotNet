@@ -15,7 +15,8 @@ internal struct Arm64RegisterValueAccumulator
     }
 
     private State _state;
-    private long _value;
+    private ulong _addressValue;
+    private long _addressOffset;
     private int _expectedMovkShift;
     private Arm64RegisterId _registerId;
     private IClrRuntime _runtime;
@@ -29,12 +30,13 @@ internal struct Arm64RegisterValueAccumulator
     internal void Reset(
         State state = State.LookingForPattern,
         int expectedMovkShift = 0,
-        long value = 0,
+        ulong value = 0,
         Arm64RegisterId registerId = Arm64RegisterId.Invalid)
     {
         _state = state;
         _expectedMovkShift = expectedMovkShift;
-        _value = value;
+        _addressValue = value;
+        _addressOffset = 0;
         _registerId = registerId;
     }
 
@@ -80,9 +82,39 @@ internal struct Arm64RegisterValueAccumulator
         }
     }
 
-    public bool HasValue => _state == State.ExpectingMovk || _state == State.LookingForPossibleLdr;
+    public bool HasValue
+    {
+        get
+        {
+            // Value == 0 means invalid (negative combined clamps to 0, LDR resets on 0),
+            // So it is excluded to avoid a useless address lookup in the disassembler.
+            if (Value == 0)
+                return false;
 
-    public long Value => _value;
+            return _state == State.ExpectingMovk || _state == State.LookingForPossibleLdr;
+        }
+    }
+
+    /// <summary>
+    /// Gets accumulated address value.
+    /// Address arithmetic wraps modulo 2^64, like hardware.
+    /// A negative combined value is invalid as a real address, so 0 is returned
+    /// (0 is already treated as invalid: LDR resets on 0, disassembler filters it).
+    /// </summary>
+    public ulong Value
+    {
+        get
+        {
+            if (_addressOffset < 0)
+            {
+                // Magnitude of the negative offset, safe even for long.MinValue.
+                ulong magnitude = unchecked((ulong)(-(_addressOffset + 1)) + 1);
+                if (_addressValue < magnitude)
+                    return 0;
+            }
+            return unchecked(_addressValue + (ulong)_addressOffset);
+        }
+    }
 
     public Arm64RegisterId RegisterId => _registerId;
 
@@ -110,7 +142,8 @@ internal struct Arm64RegisterValueAccumulator
                 return false;
 
             _registerId = instruction.GetRegisterId(0);
-            _value = instruction.GetRawImmediateValue(1);
+            _addressValue = (ulong)instruction.GetRawImmediateValue(1);
+            _addressOffset = 0;
             _state = State.ExpectingMovk;
             _expectedMovkShift = 16;
             return true;
@@ -132,7 +165,8 @@ internal struct Arm64RegisterValueAccumulator
                 return false;
 
             _registerId = instruction.GetRegisterId(0);
-            _value = instruction.GetRawImmediateValue(1);
+            _addressOffset = instruction.GetShiftedImmediateValue(1);
+            _addressValue = 0;
             _state = State.ExpectingAdd;
             return true;
         }
@@ -157,7 +191,7 @@ internal struct Arm64RegisterValueAccumulator
                 || details.Operands[1].ShiftValue != _expectedMovkShift)
                 return false;
 
-            _value = _value | (instruction.GetRawImmediateValue(1) << details.Operands[1].ShiftValue);
+            _addressValue = _addressValue | (ulong)instruction.GetRawImmediateValue(1) << details.Operands[1].ShiftValue;
             _expectedMovkShift += 16;
             return true;
         }
@@ -183,7 +217,7 @@ internal struct Arm64RegisterValueAccumulator
             if (!instruction.TryGetOperand(2, Arm64OperandType.Immediate, out _))
                 return false;
 
-            _value = _value | instruction.GetRawImmediateValue(2);
+            _addressValue = _addressValue | (ulong)instruction.GetRawImmediateValue(2);
             _state = State.LookingForPossibleLdr;
             return true;
         }
@@ -201,9 +235,23 @@ internal struct Arm64RegisterValueAccumulator
                 return false;
 
             // Simulate the LDR instruction.
-            long newValue = (long)_runtime.DataTarget.DataReader.ReadPointer((ulong)_value);
-            _value = newValue;
-            if (_value == 0)
+            // Use combined Value: after ADRP+ADD the effective address is _addressValue + _addressOffset.
+            // Use the Try-pattern so an unreadable address drops tracking instead of aborting disassembly.
+            if (Value == 0)
+            {
+                _state = State.LookingForPattern;
+                return true;
+            }
+
+            if (!_runtime.DataTarget.DataReader.ReadPointer(Value, out ulong dereferenced))
+            {
+                _state = State.LookingForPattern;
+                return true;
+            }
+
+            _addressValue = dereferenced;
+            _addressOffset = 0;
+            if (_addressValue == 0)
             {
                 _state = State.LookingForPattern;
             }
