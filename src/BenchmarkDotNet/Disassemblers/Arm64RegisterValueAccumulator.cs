@@ -1,5 +1,6 @@
 using Gee.External.Capstone.Arm64;
 using Microsoft.Diagnostics.Runtime.Interfaces;
+using System.Diagnostics;
 
 namespace BenchmarkDotNet.Disassemblers;
 
@@ -14,7 +15,7 @@ internal struct Arm64RegisterValueAccumulator
     }
 
     private State _state;
-    private long _value; // TODO: Change address value type to ulong (address with offset value)
+    private long _value;
     private int _expectedMovkShift;
     private Arm64RegisterId _registerId;
     private IClrRuntime _runtime;
@@ -44,46 +45,41 @@ internal struct Arm64RegisterValueAccumulator
             case State.LookingForPattern:
                 if (TryHandleLookingForPattern(instruction))
                     return;
-
-                // TODO: Check register overwrite.
-                // goto default;
                 break;
 
             case State.ExpectingMovk:
                 if (TryHandleExpectingMovk(instruction))
                     return;
 
-                // If we didn't find a expecting MOVK instruction, we might be looking for a possible LDR
                 _state = State.LookingForPossibleLdr;
                 goto case State.LookingForPossibleLdr;
 
             case State.ExpectingAdd:
                 if (TryHandleExpectingAdd(instruction))
                     return;
-
-                // TODO: Check register overwrite.
-                // goto default;
                 break;
 
             case State.LookingForPossibleLdr:
                 if (TryHandleLdrFromTrackedRegister(instruction))
                     return;
 
-                if (TryHandleConditionalInstruction(instruction))
+                if (TryHandleBranchOrRestart(instruction))
                     return;
 
-                if (TryHandleAnotherMovzInstruction(instruction))
-                    return;
-
-                goto default;
-
-            default:
-                ResetIfTrackedRegisterIsOverwritten(instruction);
+                // Finally check if the current instruction modified the register that was accumulating the constant
+                // and reset the state machine in case it did.
+                foreach (Arm64Register reg in instruction.Details.AllWrittenRegisters)
+                {
+                    // Some unexpected instruction overwriting the accumulated register
+                    if (reg.Id == _registerId)
+                    {
+                        _state = State.LookingForPattern;
+                    }
+                }
                 break;
         }
     }
 
-    // TODO: Include ExpectingAdd check. (ADRP instruction without ADD)
     public bool HasValue => _state == State.ExpectingMovk || _state == State.LookingForPossibleLdr;
 
     public long Value => _value;
@@ -95,111 +91,162 @@ internal struct Arm64RegisterValueAccumulator
         switch (instruction.Id)
         {
             case Arm64InstructionId.ARM64_INS_MOVZ:
-                StartMovzSequence(instruction);
-                return true;
+                return TryStartMovzSequence(instruction);
             case Arm64InstructionId.ARM64_INS_ADRP:
-                StartAdrpSequence(instruction);
-                return true;
+                return TryStartAdrpSequence(instruction);
             default:
                 return false;
         }
     }
 
+    private bool TryStartMovzSequence(Arm64Instruction instruction)
+    {
+        try
+        {
+            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _))
+                return false;
+
+            if (!instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
+                return false;
+
+            _registerId = instruction.GetRegisterId(0);
+            _value = instruction.GetRawImmediateValue(1);
+            _state = State.ExpectingMovk;
+            _expectedMovkShift = 16;
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
+    private bool TryStartAdrpSequence(Arm64Instruction instruction)
+    {
+        try
+        {
+            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _))
+                return false;
+
+            if (!instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
+                return false;
+
+            _registerId = instruction.GetRegisterId(0);
+            _value = instruction.GetRawImmediateValue(1);
+            _state = State.ExpectingAdd;
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
     private bool TryHandleExpectingMovk(Arm64Instruction instruction)
     {
-        if (instruction.Id != Arm64InstructionId.ARM64_INS_MOVK)
-            return false;
+        try
+        {
+            if (instruction.Id != Arm64InstructionId.ARM64_INS_MOVK)
+                return false;
 
-        if (instruction.GetRegisterId(0) != _registerId)
-            return false;
+            if (instruction.GetRegisterId(0) != _registerId)
+                return false;
 
-        // TODO: Remove this condition because MOVK accept only LSL.
-        var details = instruction.Details;
-        if (instruction.GetShiftOperation(1) != Arm64ShiftOperation.ARM64_SFT_LSL)
-            return false;
+            Arm64InstructionDetail details = instruction.Details;
+            if (details.Operands[1].ShiftOperation != Arm64ShiftOperation.ARM64_SFT_LSL
+                || details.Operands[1].ShiftValue != _expectedMovkShift)
+                return false;
 
-        if (instruction.GetShiftAmount(1) != _expectedMovkShift)
+            _value = _value | (instruction.GetRawImmediateValue(1) << details.Operands[1].ShiftValue);
+            _expectedMovkShift += 16;
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
             return false;
-
-        // TODO: Clear existing 16-bits values before setting MOVK immediate value.
-        _value |= instruction.GetShiftedImmediateValue(1);
-        _expectedMovkShift += 16;
-        return true;
+        }
     }
 
-    /// <summary>
-    /// Handle following expecting ADD instruction that source/target registers match value tracked register.
-    ///   ADD Xd|SP, Xn|SP, #imm, {shift}
-    ///   ADD Wd|SP, Wn|SP, #imm, {shift}
-    /// If condition is not matched. skip processing. and wait succeeding ADD instruction. 
-    /// </summary>
     private bool TryHandleExpectingAdd(Arm64Instruction instruction)
     {
-        if (instruction.Id != Arm64InstructionId.ARM64_INS_ADD)
+        try
+        {
+            if (instruction.Id != Arm64InstructionId.ARM64_INS_ADD)
+                return false;
+
+            if (instruction.GetRegisterId(0) != _registerId)
+                return false;
+
+            if (instruction.GetRegisterId(1) != _registerId)
+                return false;
+
+            if (!instruction.TryGetOperand(2, Arm64OperandType.Immediate, out _))
+                return false;
+
+            _value = _value | instruction.GetRawImmediateValue(2);
+            _state = State.LookingForPossibleLdr;
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
             return false;
-
-        if (instruction.GetRegisterId(0) != _registerId)
-            return false;
-
-        if (instruction.GetRegisterId(1) != _registerId)
-            return false;
-
-        if (!instruction.TryGetOperand(2, Arm64OperandType.Immediate, out var operand))
-            return false;
-
-        // TODO: Replace to use shifted immediate value.
-        _value += operand.Immediate;
-        _state = State.LookingForPossibleLdr;
-        return true;
-    }
-
-    private void StartMovzSequence(Arm64Instruction instruction)
-    {
-        _registerId = instruction.GetRegisterId(0);
-        _value = instruction.GetRawImmediateValue(1); // TODO: Replace to shifted immediate value.
-        _expectedMovkShift = 16;
-        _state = State.ExpectingMovk;
-    }
-
-    private void StartAdrpSequence(Arm64Instruction instruction)
-    {
-        _registerId = instruction.GetRegisterId(0);
-        _value = instruction.GetRawImmediateValue(1);// TODO: Replace to shifted immediate value.
-        _state = State.ExpectingAdd;
+        }
     }
 
     private bool TryHandleLdrFromTrackedRegister(Arm64Instruction instruction)
     {
-        if (!instruction.IsLdrFromTrackedRegister(_registerId))
-            return false;
-
-        // Simulate the LDR instruction.
-        var newValue = (long)_runtime.DataTarget.DataReader.ReadPointer((ulong)_value);
-        _value = newValue;
-        if (_value == 0)
+        try
         {
-            // TODO: Call Reset() to clear internal state.
+            if (!instruction.IsLdrFromTrackedRegister(_registerId))
+                return false;
+
+            // Simulate the LDR instruction.
+            long newValue = (long)_runtime.DataTarget.DataReader.ReadPointer((ulong)_value);
+            _value = newValue;
+            if (_value == 0)
+            {
+                _state = State.LookingForPattern;
+            }
+            else
+            {
+                // The LDR might have loaded the result in another register
+                _registerId = instruction.GetRegisterId(0);
+            }
+
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
+    private bool TryHandleBranchOrRestart(Arm64Instruction instruction)
+    {
+        Arm64InstructionDetail details = instruction.Details;
+
+        if (instruction.Id == Arm64InstructionId.ARM64_INS_CBZ ||
+            instruction.Id == Arm64InstructionId.ARM64_INS_CBNZ ||
+            instruction.Id == Arm64InstructionId.ARM64_INS_B && details.ConditionCode != Arm64ConditionCode.Invalid)
+        {
+            // ignore conditional branches
+            return true;
+        }
+
+        if (details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE) ||
+            details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_CALL) ||
+            details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_JUMP))
+        {
+            // We've encountered an unconditional jump or call, the accumulated registers value is not valid anymore
             _state = State.LookingForPattern;
             return true;
         }
 
-        // The LDR might have loaded the result in another register
-        _registerId = instruction.GetRegisterId(0);
-        return true;
-    }
-
-    private bool TryHandleConditionalInstruction(Arm64Instruction instruction)
-    {
-        // TODO: Replace to AsmArm64 based IsConditionalBranch implementation
-        if (IsConditionalBranch(instruction))
-            return true;
-
-        // TODO: Replace to AsmArm64 based IsUnconditionalControlFlow implementation
-        if (IsUnconditionalControlFlow(instruction))
+        if (instruction.Id == Arm64InstructionId.ARM64_INS_MOVZ)
         {
-            // We've encountered an unconditional jump or call, the accumulated registers value is not valid anymore
-            Reset();
+            // Another constant loading is starting: restart matching from LookingForPattern.
             _state = State.LookingForPattern;
+            TryStartMovzSequence(instruction);
             return true;
         }
 
@@ -207,47 +254,13 @@ internal struct Arm64RegisterValueAccumulator
     }
 
     /// <summary>
-    /// Handle MOVZ instruction that load value from tracked register to another register.
+    /// Only decoding failures (missing/mistyped operands, unexpected shift/instruction)
+    /// are treated as "not matched". Anything else (e.g. OOM) must propagate.
     /// </summary>
-    private bool TryHandleAnotherMovzInstruction(Arm64Instruction instruction)
-    {
-        if (instruction.Id != Arm64InstructionId.ARM64_INS_MOVZ)
-            return false;
-
-        // Another constant loading is starting, reprocess it as a new pattern.
-        _state = State.LookingForPattern;
-        return TryHandleLookingForPattern(instruction);
-    }
-
-    // TODO: Remove this method and replace to AsmArm64 based implementation.
-    private static bool IsConditionalBranch(Arm64Instruction instruction)
-    {
-        return instruction.Id == Arm64InstructionId.ARM64_INS_CBZ
-            || instruction.Id == Arm64InstructionId.ARM64_INS_CBNZ
-            || (instruction.Id == Arm64InstructionId.ARM64_INS_B && instruction.Details.ConditionCode != Arm64ConditionCode.Invalid);
-    }
-
-    // TODO: Remove this method and replace to AsmArm64 based implementation.
-    private static bool IsUnconditionalControlFlow(Arm64Instruction instruction)
-    {
-        var details = instruction.Details;
-        return details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE)
-            || details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_CALL)
-            || details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_JUMP);
-    }
-
-    private void ResetIfTrackedRegisterIsOverwritten(Arm64Instruction instruction)
-    {
-        // Finally check if the current instruction modified the register that was accumulating the constant
-        // and reset the state machine in case it did.
-        foreach (Arm64Register writtenRegister in instruction.Details.AllWrittenRegisters)
-        {
-            if (writtenRegister.Id != _registerId)
-                continue;
-
-            // Some unexpected instruction overwriting the accumulated register
-            // TODO: Use Reset() to clear internal state.
-            _state = State.LookingForPattern;
-        }
-    }
+    private static bool IsDecodingException(Exception ex)
+        => ex is ArgumentOutOfRangeException
+            or ArgumentException
+            or NotSupportedException
+            or InvalidOperationException
+            or UnreachableException;
 }
