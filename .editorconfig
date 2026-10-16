@@ -7,7 +7,7 @@ end_of_line = lf
 indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
-insert_final_newline = unset
+insert_final_newline = true
 
 # JSON files
 [*.json]
@@ -27,6 +27,15 @@ end_of_line = crlf
 
 # Markdown files
 [*.md]
+trim_trailing_whitespace = false
+
+# Verify settings
+[*.{received,verified}.txt]
+charset = utf-8-bom
+indent_size = unset
+indent_style = unset
+insert_final_newline = false
+tab_width = unset
 trim_trailing_whitespace = false
 
 # C# files
