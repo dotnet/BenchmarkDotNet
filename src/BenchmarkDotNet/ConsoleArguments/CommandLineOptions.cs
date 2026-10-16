@@ -15,7 +15,7 @@ namespace BenchmarkDotNet.ConsoleArguments
         private const int DefaultDisassemblerRecursiveDepth = 1;
         private bool useDisassemblyDiagnoser;
 
-        public string BaseJob { get; set; } = "";
+        public string BaseJob { get; set; } = "Default";
         public static readonly Option<string> BaseJobOption = new("--job", "-j")
         {
             DefaultValueFactory = _ => "Default",
@@ -100,7 +100,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "Valid path to accessible directory",
         };
 
-        public OutlierMode Outliers { get; set; }
+        public OutlierMode Outliers { get; set; } = OutlierMode.RemoveUpper;
         public static readonly Option<OutlierMode> OutliersOption = new("--outliers")
         {
             DefaultValueFactory = _ => OutlierMode.RemoveUpper,
@@ -318,7 +318,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "Prints all of the available benchmark names. Flat/Tree/JSON",
         };
 
-        public int DisassemblerRecursiveDepth { get; set; }
+        public int DisassemblerRecursiveDepth { get; set; } = DefaultDisassemblerRecursiveDepth;
         public static readonly Option<int> DisassemblerDepthOption = new("--disasmDepth")
         {
             DefaultValueFactory = _ => DefaultDisassemblerRecursiveDepth,
@@ -437,7 +437,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "Path to the crossgen2 compiler, used for ReadyToRun (R2R) benchmarks.",
         };
 
-        public int WasmProcessTimeoutMinutes { get; set; }
+        public int WasmProcessTimeoutMinutes { get; set; } = 10;
         public static readonly Option<int> WasmProcessTimeoutMinutesOption = new("--wasmProcessTimeout")
         {
             DefaultValueFactory = _ => 10,
