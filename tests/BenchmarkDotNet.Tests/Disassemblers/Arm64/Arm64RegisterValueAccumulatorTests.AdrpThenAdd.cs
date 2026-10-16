@@ -32,7 +32,7 @@ public partial class Arm64RegisterValueAccumulatorTests
     }
 
     [Fact]
-    public void AdrpThenAdd_WithNegativeOffset_ShouldCalculateAddress()
+    public void AdrpThenAdd_WithNegativeOffset_ShouldClampToZero()
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
@@ -48,8 +48,9 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.Feed(instructions[1]);
 
         // Assert
-        accumulator.HasValue.Should().BeTrue();
-        accumulator.Value.Should().Be(-0x1000 + 0x100);
+        // A negative combined value is invalid as a real address, so it is clamped to 0.
+        accumulator.HasValue.Should().BeFalse();
+        accumulator.Value.Should().Be(0UL);
     }
 
     [Fact]
