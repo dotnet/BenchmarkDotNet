@@ -45,15 +45,13 @@ public partial class Arm64RegisterValueAccumulatorTests
         };
         PrintInstructions(instructions);
 
-        // Act        
+        // Act
         accumulator.Feed(instructions[0]);
         accumulator.Feed(instructions[1]);
 
         // Assert
-        // TBZ is a conditional branch that does not overwrite the tracked register,
-        // so tracking continues (unlike unconditional control flow which resets).
         accumulator.HasValue.Should().BeTrue();
-        accumulator.Value.Should().Be(0x1000UL);
+        accumulator.Value.Should().Be(0x1000UL); // TBZ is a conditional branch that does not overwrite the tracked register,
         accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
 
         var details = instructions[1].Details;
