@@ -25,7 +25,11 @@ internal static class Arm64InstructionExtensions
             if ((uint)index >= (uint)operands.Length)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            return operands[index].Register.Id;
+            var operand = operands[index];
+            if (operand.Type != CapstoneArm64OperandType.Register)
+                throw new ArgumentException($"Operand at index {index} is not a register (actual: {operand.Type}).");
+
+            return operand.Register.Id;
         }
 
         public Arm64ShiftOperation GetShiftOperation(int index)
@@ -48,10 +52,10 @@ internal static class Arm64InstructionExtensions
                         case Arm64ShiftOperation.ARM64_SFT_LSL:
                             return shiftOperation;
 
+                        // Capstone represents `LSL #0` as ARM64_SFT_INVALID.
+                        // So handle ARM64_SFT_INVALID as `LSL` for these instructions. (Other shift operation is not used currently)
                         case Arm64ShiftOperation.Invalid:
-                            if (operand.ShiftValue == 0)
-                                return Arm64ShiftOperation.ARM64_SFT_LSL; // Capstone represents LSL #0 as ARM64_SFT_INVALID.
-                            goto default;
+                            return Arm64ShiftOperation.ARM64_SFT_LSL;
 
                         // Currently used instructions don't accept other shift operations.
                         default:
@@ -88,7 +92,18 @@ internal static class Arm64InstructionExtensions
             return operands[index].Immediate;
         }
 
+        /// <summary>
+        /// Gets shifted immediate value as signed value (e.g. ADRP page offset can be negative).
+        /// </summary>
         public long GetShiftedImmediateValue(int index)
+            => unchecked((long)instruction.GetUnsignedShiftedImmediateValue(index));
+
+        /// <summary>
+        /// Gets shifted immediate value as unsigned value (e.g. MOVZ/MOVK/ADD address construction).
+        /// Shift is performed in ulong to avoid signed overflow
+        /// (e.g. <c>movz x0, #0xFFFF, lsl #48</c> exceeds long.MaxValue)
+        /// </summary>
+        public ulong GetUnsignedShiftedImmediateValue(int index)
         {
             var operands = instruction.Details.Operands;
             if ((uint)index >= (uint)operands.Length)
@@ -101,7 +116,7 @@ internal static class Arm64InstructionExtensions
             {
                 case Arm64ShiftOperation.ARM64_SFT_LSL:
                     var shiftAmount = instruction.GetShiftAmount(index);
-                    return operand.Immediate << shiftAmount;
+                    return unchecked((ulong)operand.Immediate << shiftAmount);
                 default:
                     throw new NotSupportedException($"Unexpected shift operation({shiftOperation}) is specified on instruction({instruction.Id})");
             }
