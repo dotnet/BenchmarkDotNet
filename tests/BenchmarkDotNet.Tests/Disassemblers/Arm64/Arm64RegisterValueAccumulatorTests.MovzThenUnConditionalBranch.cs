@@ -34,7 +34,7 @@ public partial class Arm64RegisterValueAccumulatorTests
 
 
     [Fact]
-    public void MovzThenTbz_ShouldResetValue()
+    public void MovzThenTbz_ShouldKeepValue()
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
@@ -50,10 +50,11 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.Feed(instructions[1]);
 
         // Assert
-        accumulator.HasValue.Should().BeFalse();
-
-        // TODO: Current accumulator don't reset registerId.
-        // accumulator.RegisterId.Should().Be(Arm64RegisterId.Invalid);
+        // TBZ is a conditional branch that does not overwrite the tracked register,
+        // so tracking continues (unlike unconditional control flow which resets).
+        accumulator.HasValue.Should().BeTrue();
+        accumulator.Value.Should().Be(0x1000UL);
+        accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
 
         var details = instructions[1].Details;
         details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_JUMP).Should().BeTrue();
