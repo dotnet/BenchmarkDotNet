@@ -436,6 +436,132 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal("12.0.0-dev", ((NativeAotSettings)toolchain.Settings).IlCompilerVersion);
         }
 
+        [Fact]
+        public void UserCanSpecifyMultipleIlcPackagesPaths()
+        {
+            var root = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+            try
+            {
+                var before = root.CreateSubdirectory(Path.Combine("runtime_base", "Shipping"));
+                var after = root.CreateSubdirectory(Path.Combine("runtime", "Shipping"));
+
+                var config = ConfigParser.Parse(["-r", "nativeaot10.0", "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output)).config;
+
+                Assert.NotNull(config);
+                var jobs = config.GetJobs().ToArray();
+                Assert.Equal(2, jobs.Length);
+                var baseline = Assert.Single(jobs, job => job.Meta.Baseline);
+                Assert.Equal("NativeAOT 10.0-1", baseline.Id);
+                Assert.Equal(before.FullName, ((NativeAotSettings)((CsProjNativeAotToolchain)baseline.GetToolchain()).Settings).LocalIlcPackages?.FullName);
+                var other = Assert.Single(jobs, job => !job.Meta.Baseline);
+                Assert.Equal("NativeAOT 10.0-2", other.Id);
+                Assert.Equal(after.FullName, ((NativeAotSettings)((CsProjNativeAotToolchain)other.GetToolchain()).Settings).LocalIlcPackages?.FullName);
+            }
+            finally
+            {
+                root.Delete(recursive: true);
+            }
+        }
+
+        [Fact]
+        public void NonExistingIlcPackagesPathIsRejected()
+        {
+            var existing = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory!;
+            var missing = Path.Combine(existing.FullName, Guid.NewGuid().ToString());
+
+            var (isSuccess, _, _) = ConfigParser.Parse(["-r", "nativeaot10.0", "--ilcPackages", existing.FullName, missing], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
+        }
+
+        [Fact]
+        public void MultipleIlcPackagesPathsWithPackagesPathAreRejected()
+        {
+            var root = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+            try
+            {
+                var before = root.CreateSubdirectory("before");
+                var after = root.CreateSubdirectory("after");
+                var packages = Path.Combine(root.FullName, "packages");
+
+                var (isSuccess, _, _) = ConfigParser.Parse(["-r", "nativeaot10.0", "--packages", packages, "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output));
+
+                Assert.False(isSuccess);
+            }
+            finally
+            {
+                root.Delete(recursive: true);
+            }
+        }
+
+        [Fact]
+        public void SingleIlcPackagesPathCanBeCombinedWithPackagesPath()
+        {
+            var existing = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory!;
+            var packages = Path.Combine(existing.FullName, "packages");
+
+            var config = ConfigParser.Parse(["-r", "nativeaot10.0", "--packages", packages, "--ilcPackages", existing.FullName], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            var settings = (NativeAotSettings)((CsProjNativeAotToolchain)Assert.Single(config.GetJobs()).GetToolchain()).Settings;
+            Assert.Equal(packages, settings.PackagesPath?.FullName);
+        }
+
+        [Fact]
+        public void MultipleIlcPackagesPathsAreMultipliedAcrossNativeAotRuntimes()
+        {
+            var root = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+            try
+            {
+                var before = root.CreateSubdirectory("before");
+                var after = root.CreateSubdirectory("after");
+
+                var config = ConfigParser.Parse(["-r", "net10.0", "nativeaot10.0", "nativeaot11.0", "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output)).config;
+
+                Assert.NotNull(config);
+                var jobs = config.GetJobs().ToArray();
+                Assert.Equal(["NativeAOT 10.0-1", "NativeAOT 10.0-2", "NativeAOT 11.0-1", "NativeAOT 11.0-2"],
+                    jobs.Where(job => job.GetToolchain() is CsProjNativeAotToolchain).Select(job => job.Id).OrderBy(id => id));
+                // the baseline is the first job, so here it's the net10.0 one and not a NativeAOT one
+                Assert.IsNotType<CsProjNativeAotToolchain>(Assert.Single(jobs, job => job.Meta.Baseline).GetToolchain());
+            }
+            finally
+            {
+                root.Delete(recursive: true);
+            }
+        }
+
+        [Theory]
+        [InlineData(new object[] { new[] { "-r", "net10.0" } })]
+        [InlineData(new object[] { new string[0] })] // no runtime given at all
+        public void MultipleIlcPackagesPathsWithoutNativeAotRuntimeAreRejected(string[] runtimeArgs)
+        {
+            var root = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+            try
+            {
+                var before = root.CreateSubdirectory("before");
+                var after = root.CreateSubdirectory("after");
+
+                var (isSuccess, _, _) = ConfigParser.Parse([.. runtimeArgs, "--ilcPackages", before.FullName, after.FullName], new OutputLogger(Output));
+
+                Assert.False(isSuccess);
+            }
+            finally
+            {
+                root.Delete(recursive: true);
+            }
+        }
+
+        [Fact]
+        public void DuplicateIlcPackagesPathsAreRejected()
+        {
+            var existing = new FileInfo(typeof(ConfigParserTests).Assembly.Location).Directory!;
+
+            var (isSuccess, _, _) = ConfigParser.Parse(["-r", "nativeaot10.0", "--ilcPackages", existing.FullName, existing.FullName + Path.DirectorySeparatorChar], new OutputLogger(Output));
+
+            Assert.False(isSuccess);
+        }
+
         [Theory]
         [InlineData("netcoreapp2.0", true)]
         [InlineData("netcoreapp2.1", true)]

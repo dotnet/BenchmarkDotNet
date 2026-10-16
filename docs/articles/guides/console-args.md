@@ -286,7 +286,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `--coreRun`                 Path(s) to CoreRun (optional).
 * `--monoPath`                Optional path to Mono which should be used for running benchmarks.
 * `--ilCompilerVersion`       Optional version of Microsoft.DotNet.ILCompiler which should be used to run with NativeAOT. Example: "7.0.0-preview.3.22123.2"
-* `--ilcPackages`             Optional path to shipping packages produced by local dotnet/runtime build. Example: 'D:\projects\runtime\artifacts\packages\Release\Shipping\'
+* `--ilcPackages`             Optional path(s) to shipping packages produced by local dotnet/runtime build. Multiple paths create one NativeAOT job per path, so the builds can be compared. Example: 'D:\projects\runtime\artifacts\packages\Release\Shipping\'
 * `--launchCount`             How many times we should launch process with target benchmark. The default is 1.
 * `--warmupCount`             How many warmup iterations should be performed. If you set it, the minWarmupCount and maxWarmupCount are ignored. By default calculated by the heuristic.
 * `--minWarmupCount`          Minimum count of warmup iterations that should be performed. The default is 6.

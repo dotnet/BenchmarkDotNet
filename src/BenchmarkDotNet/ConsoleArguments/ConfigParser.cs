@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -328,10 +329,37 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            if (options.IlcPackages.IsNotNullButDoesNotExist())
+            foreach (var ilcPackages in options.IlcPackages)
+                if (ilcPackages.IsNotNullButDoesNotExist())
+                {
+                    logger.WriteLineError($"The provided {nameof(options.IlcPackages)} \"{ilcPackages}\" does NOT exist.");
+                    return false;
+                }
+
+            if (options.IlcPackages.Count > 1)
             {
-                logger.WriteLineError($"The provided {nameof(options.IlcPackages)} \"{options.IlcPackages}\" does NOT exist.");
-                return false;
+                if (!options.Runtimes.Any(runtime => Runtime.TryParse(runtime, out var parsed) && parsed is NativeAotRuntime))
+                {
+                    logger.WriteLineError($"Multiple {nameof(options.IlcPackages)} paths require a NativeAOT runtime, e.g. \"--runtimes nativeaot10.0\".");
+                    return false;
+                }
+
+                // all local builds have the same ILCompiler version, so with a shared folder every job would reuse the first restore
+                if (options.RestorePath != null)
+                {
+                    logger.WriteLineError($"Multiple {nameof(options.IlcPackages)} paths can't be combined with --packages, as every local build would be restored only once into the same folder. Remove --packages; each build is restored into its own folder, like with --freshPackages.");
+                    return false;
+                }
+
+                var pathComparer = OsDetector.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+                var duplicate = options.IlcPackages
+                    .GroupBy(path => Path.GetFullPath(path.FullName).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), pathComparer)
+                    .FirstOrDefault(group => group.Count() > 1);
+                if (duplicate != null)
+                {
+                    logger.WriteLineError($"The provided {nameof(options.IlcPackages)} \"{duplicate.Key}\" is given more than once.");
+                    return false;
+                }
             }
 
             if (options.HardwareCounters.Count() > 3)
@@ -559,16 +587,34 @@ namespace BenchmarkDotNet.ConsoleArguments
                         yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
 
                     foreach (string runtime in options.Runtimes) // known runtimes
-                        yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+                        foreach (var job in CreateJobsForGivenRuntime(baseJob, runtime, options))
+                            yield return job;
                 }
                 else
                 {
                     foreach (string runtime in options.Runtimes) // known runtimes
-                        yield return CreateJobForGivenRuntime(baseJob, runtime, options);
+                        foreach (var job in CreateJobsForGivenRuntime(baseJob, runtime, options))
+                            yield return job;
 
                     foreach (var coreRunPath in options.CoreRunPaths)
                         yield return CreateCoreRunJob(baseJob, options, coreRunPath); // local dotnet/runtime builds
                 }
+            }
+        }
+
+        private static IEnumerable<Job> CreateJobsForGivenRuntime(Job baseJob, string runtimeId, CommandLineOptions options)
+        {
+            // multiple --ilcPackages create one NativeAOT job per local build, the same way multiple --coreRun paths do.
+            // The jobs are told apart by index; the Settings column shows each job's LocalIlcPackages path.
+            if (options.IlcPackages.Count > 1 && Runtime.Parse(runtimeId) is NativeAotRuntime aot)
+            {
+                for (int i = 0; i < options.IlcPackages.Count; i++)
+                    yield return baseJob.WithId($"{aot}-{i + 1}")
+                        .WithToolchain(CsProjNativeAotToolchain.From(aot, new(options, options.IlcPackages[i])));
+            }
+            else
+            {
+                yield return CreateJobForGivenRuntime(baseJob, runtimeId, options);
             }
         }
 
@@ -580,7 +626,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 CoreRuntime core => baseJob.WithId(core.ToString())
                     .WithToolchain(CsProjCoreToolchain.From(core, new(options))),
                 NativeAotRuntime aot => baseJob.WithId(aot.ToString())
-                    .WithToolchain(CsProjNativeAotToolchain.From(aot, new(options))),
+                    .WithToolchain(CsProjNativeAotToolchain.From(aot, new(options, options.IlcPackages.SingleOrDefault()))),
                 R2RRuntime r2r => baseJob.WithId(r2r.ToString())
                     .WithToolchain(CsProjR2RToolchain.From(r2r, new(options))),
                 MonoWasmRuntime wasm => baseJob.WithId(wasm.ToString())
