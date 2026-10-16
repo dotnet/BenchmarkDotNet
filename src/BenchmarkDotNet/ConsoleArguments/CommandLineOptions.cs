@@ -451,8 +451,8 @@ namespace BenchmarkDotNet.ConsoleArguments
             Description = "Specifying would not forcefully induce any GCs.",
         };
 
-        public bool EvaluateOverhead { get; set; }
-        public static readonly Option<bool> EvaluateOverheadOption = new("--evaluateOverhead")
+        public bool? EvaluateOverhead { get; set; }
+        public static readonly Option<bool?> EvaluateOverheadOption = new("--evaluateOverhead")
         {
             Description = "Specifies whether to run and evaluate overhead iterations.",
         };

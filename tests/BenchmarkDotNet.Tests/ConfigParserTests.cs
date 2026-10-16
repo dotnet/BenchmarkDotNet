@@ -1202,7 +1202,7 @@ namespace BenchmarkDotNet.Tests
                 options.CustomRuntimePack.Should().BeNull();
                 options.AOTCompilerPath.Should().BeNull();
                 options.NoForcedGCs.Should().BeFalse();
-                options.EvaluateOverhead.Should().BeFalse();
+                options.EvaluateOverhead.Should().BeNull();
                 options.ConsumeTasksSynchronously.Should().BeFalse();
                 options.Resume.Should().BeFalse();
             }

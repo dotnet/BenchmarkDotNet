@@ -688,7 +688,11 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (options.MemoryRandomization) result.Add("--memoryRandomization");
             if (options.DisassemblerDiff) result.Add("--disasmDiff");
             if (options.NoForcedGCs) result.Add("--noForcedGCs");
-            if (options.EvaluateOverhead) result.Add("--evaluateOverhead");
+            if (options.EvaluateOverhead is bool evaluateOverhead)
+            {
+                result.Add("--evaluateOverhead");
+                result.Add(evaluateOverhead.ToString().ToLowerInvariant());
+            }
             if (options.ConsumeTasksSynchronously) result.Add("--consumeTasksSynchronously");
             if (options.Resume) result.Add("--resume");
 
@@ -1107,8 +1111,8 @@ namespace BenchmarkDotNet.ConsoleArguments
                 baseJob = baseJob.WithJitTieringMode(options.JitTieringMode);
             if (options.NoForcedGCs)
                 baseJob = baseJob.WithGcForce(false);
-            if (options.EvaluateOverhead)
-                baseJob = baseJob.WithEvaluateOverhead(true);
+            if (options.EvaluateOverhead is bool evaluateOverhead)
+                baseJob = baseJob.WithEvaluateOverhead(evaluateOverhead);
             if (options.ConsumeTasksSynchronously)
                 baseJob = baseJob.WithConsumeTasksSynchronously(true);
 
