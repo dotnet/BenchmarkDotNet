@@ -1,3 +1,4 @@
+using AwesomeAssertions;
 using BenchmarkDotNet.Environments;
 
 namespace BenchmarkDotNet.Tests.Environments;
