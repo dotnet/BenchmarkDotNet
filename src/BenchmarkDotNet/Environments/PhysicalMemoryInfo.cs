@@ -1,9 +1,7 @@
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using System;
-using System.Diagnostics;
-using System.IO;
+using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
@@ -20,24 +18,30 @@ namespace BenchmarkDotNet.Environments
         public long? AvailablePhysicalBytes { get; }
         public long? FrequencyMts { get; }
         public string? MemoryType { get; }
-        public byte? CasLatency { get; }
 
-        public PhysicalMemoryInfo(long totalPhysicalBytes, long? availablePhysicalBytes = null, long? frequencyMts = null, string? memoryType = null, byte? casLatency = null)
+        public PhysicalMemoryInfo(long totalPhysicalBytes, long? availablePhysicalBytes = null)
+            : this(totalPhysicalBytes, availablePhysicalBytes, frequencyMts: null, memoryType: null)
+        {
+        }
+
+        public PhysicalMemoryInfo(long totalPhysicalBytes, long? availablePhysicalBytes, long? frequencyMts, string? memoryType)
         {
             TotalPhysicalBytes = totalPhysicalBytes;
             AvailablePhysicalBytes = availablePhysicalBytes;
             FrequencyMts = frequencyMts;
             MemoryType = memoryType;
-            CasLatency = casLatency;
         }
 
         public string ToFormattedString()
         {
             double totalGb = TotalPhysicalBytes / (1024.0 * 1024.0 * 1024.0);
             var sb = new StringBuilder();
-            sb.Append($"{Math.Round(totalGb, 2)} GB Total");
+            sb.Append($"{Math.Round(totalGb, 2)} GB");
 
-            if (MemoryType.IsNotBlank() || FrequencyMts.HasValue || CasLatency.HasValue)
+            if (AvailablePhysicalBytes.HasValue)
+                sb.Append(" Total");
+
+            if (MemoryType.IsNotBlank() || FrequencyMts.HasValue)
             {
                 sb.Append(" (");
                 if (MemoryType.IsNotBlank())
@@ -47,12 +51,6 @@ namespace BenchmarkDotNet.Environments
                     if (MemoryType.IsNotBlank())
                         sb.Append('-');
                     sb.Append($"{FrequencyMts}MT/s");
-                }
-                if (CasLatency.HasValue)
-                {
-                    if (MemoryType.IsNotBlank() || FrequencyMts.HasValue)
-                        sb.Append('-');
-                    sb.Append($"CAS{CasLatency}");
                 }
                 sb.Append(')');
             }
@@ -69,6 +67,8 @@ namespace BenchmarkDotNet.Environments
 
     public static class SystemMemory
     {
+        private static readonly TimeSpan SystemProfilerTimeout = TimeSpan.FromSeconds(5);
+
         public static PhysicalMemoryInfo? GetPhysicalMemory()
         {
             try
@@ -96,8 +96,8 @@ namespace BenchmarkDotNet.Environments
             var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
             if (PInvoke.GlobalMemoryStatusEx(ref memStatus))
             {
-                var (freq, type, cas) = GetLinuxOrWindowsMemoryDetails();
-                return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys, freq, type, cas);
+                var (speed, type) = GetWindowsMemoryDetails();
+                return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys, speed, type);
             }
 
             return null;
@@ -129,35 +129,47 @@ namespace BenchmarkDotNet.Environments
 
                 if (total > 0)
                 {
-                    var (freq, type, cas) = GetLinuxOrWindowsMemoryDetails();
-                    return new PhysicalMemoryInfo(total, available, freq, type, cas);
+                    var (speed, type) = GetLinuxMemoryDetails();
+                    return new PhysicalMemoryInfo(total, available, speed, type);
                 }
             }
             return null;
         }
 
-        private static (long? FrequencyMts, string? MemoryType, byte? CasLatency) GetLinuxOrWindowsMemoryDetails()
+        private static (long? SpeedMts, string? MemoryType) GetLinuxMemoryDetails()
         {
+            // The raw SMBIOS table is readable only by root on most distros.
             try
             {
-                if (OsDetector.IsWindows7OrLater())
+                const string dmiTablePath = "/sys/firmware/dmi/tables/DMI";
+                if (File.Exists(dmiTablePath))
                 {
-                    return GetWindowsSmbiosMemoryDetails();
+                    var details = ParseSmbiosMemoryDevices(File.ReadAllBytes(dmiTablePath));
+                    if (details.SpeedMts.HasValue || details.MemoryType != null)
+                        return details;
                 }
+            }
+            catch
+            {
+                // Fall back to EDAC
+            }
 
-                // Try reading /sys/devices/system/edac/mc/ on Linux
-                if (Directory.Exists("/sys/devices/system/edac/mc"))
+            // EDAC is world-readable but usually only present on ECC systems, and it does not expose the speed.
+            try
+            {
+                const string edacPath = "/sys/devices/system/edac/mc";
+                if (Directory.Exists(edacPath))
                 {
-                    foreach (var mcDir in Directory.GetDirectories("/sys/devices/system/edac/mc", "mc*"))
+                    foreach (var mcDir in Directory.GetDirectories(edacPath, "mc*"))
                     {
                         foreach (var dimmDir in Directory.GetDirectories(mcDir, "dimm*"))
                         {
                             string typePath = Path.Combine(dimmDir, "dimm_mem_type");
                             if (File.Exists(typePath))
                             {
-                                string memType = File.ReadAllText(typePath).Trim();
-                                if (!string.IsNullOrEmpty(memType))
-                                    return (null, memType, null);
+                                string? memType = NormalizeEdacMemoryType(File.ReadAllText(typePath).Trim());
+                                if (memType != null)
+                                    return (null, memType);
                             }
                         }
                     }
@@ -168,11 +180,23 @@ namespace BenchmarkDotNet.Environments
                 // Ignore fallback failures
             }
 
-            return (null, null, null);
+            return (null, null);
+        }
+
+        /// <summary>
+        /// Maps a kernel EDAC memory type name (e.g. "Registered-DDR4", "Low-Power-DDR5-RAM") to the plain memory type ("DDR4", "LPDDR5").
+        /// </summary>
+        internal static string? NormalizeEdacMemoryType(string edacType)
+        {
+            var match = Regex.Match(edacType, @"DDR\d*");
+            if (!match.Success)
+                return null;
+
+            return edacType.StartsWith("Low-Power", StringComparison.Ordinal) ? "LP" + match.Value : match.Value;
         }
 
         [SupportedOSPlatform("windows6.0.6000")]
-        private static unsafe (long? FrequencyMts, string? MemoryType, byte? CasLatency) GetWindowsSmbiosMemoryDetails()
+        private static unsafe (long? SpeedMts, string? MemoryType) GetWindowsMemoryDetails()
         {
             try
             {
@@ -180,81 +204,99 @@ namespace BenchmarkDotNet.Environments
                 var provider = (FIRMWARE_TABLE_PROVIDER)rsMb;
                 uint bufferSize = PInvoke.GetSystemFirmwareTable(provider, 0, null, 0);
                 if (bufferSize == 0)
-                    return (null, null, null);
+                    return (null, null);
 
                 byte[] buffer = new byte[bufferSize];
                 fixed (byte* pBuffer = buffer)
                 {
                     if (PInvoke.GetSystemFirmwareTable(provider, 0, pBuffer, bufferSize) == 0)
-                        return (null, null, null);
+                        return (null, null);
                 }
 
-                // SMBIOS table header: Data at offset 8
-                int offset = 8;
-                long? maxSpeed = null;
-                string? detectedType = null;
-                byte? casLatency = null;
-
-                while (offset + 4 <= buffer.Length)
-                {
-                    byte type = buffer[offset];
-                    byte length = buffer[offset + 1];
-
-                    if (length < 4 || offset + length > buffer.Length)
-                        break;
-
-                    // Type 17: Memory Device
-                    if (type == 17 && length >= 0x15)
-                    {
-                        // Memory Type at offset 0x12
-                        byte rawMemoryType = buffer[offset + 0x12];
-                        string? memTypeStr = MapSmbiosMemoryType(rawMemoryType);
-                        if (memTypeStr != null && detectedType == null)
-                        {
-                            detectedType = memTypeStr;
-                        }
-
-                        // Speed at offset 0x15 (WORD) in MT/s (SMBIOS spec)
-                        if (length >= 0x17)
-                        {
-                            ushort speedMts = (ushort)(buffer[offset + 0x15] | (buffer[offset + 0x16] << 8));
-                            if (speedMts > 0)
-                            {
-                                if (maxSpeed == null || speedMts > maxSpeed.Value)
-                                {
-                                    maxSpeed = speedMts;
-                                }
-                            }
-                        }
-
-                        // CAS Latency at offset 0x1C (BYTE)
-                        if (length >= 0x1D && casLatency == null)
-                        {
-                            byte cas = buffer[offset + 0x1C];
-                            if (cas > 0)
-                            {
-                                casLatency = cas;
-                            }
-                        }
-                    }
-
-                    // Move past formatted area
-                    offset += length;
-
-                    // Skip unformatted string section (double null-terminated)
-                    while (offset < buffer.Length - 1 && !(buffer[offset] == 0 && buffer[offset + 1] == 0))
-                    {
-                        offset++;
-                    }
-                    offset += 2;
-                }
-
-                return (maxSpeed, detectedType, casLatency);
+                // RawSMBIOSData header: 4 version bytes, then the DWORD length of the structure table that follows.
+                const int headerSize = 8;
+                if (buffer.Length < headerSize)
+                    return (null, null);
+                int tableLength = (int)Math.Min(BinaryPrimitives.ReadUInt32LittleEndian(buffer.AsSpan(4)), (uint)(buffer.Length - headerSize));
+                return ParseSmbiosMemoryDevices(buffer.AsSpan(headerSize, tableLength));
             }
             catch
             {
-                return (null, null, null);
+                return (null, null);
             }
+        }
+
+        /// <summary>
+        /// Reads the memory type and speed from the Memory Device (type 17) structures of an SMBIOS structure table (DMTF DSP0134).
+        /// </summary>
+        internal static (long? SpeedMts, string? MemoryType) ParseSmbiosMemoryDevices(ReadOnlySpan<byte> table)
+        {
+            const byte memoryDeviceType = 17;
+            const byte endOfTableType = 127;
+
+            long? speed = null;
+            string? memoryType = null;
+            int offset = 0;
+
+            while (offset + 4 <= table.Length)
+            {
+                byte structureType = table[offset];
+                byte length = table[offset + 1];
+
+                if (structureType == endOfTableType || length < 4 || offset + length > table.Length)
+                    break;
+
+                if (structureType == memoryDeviceType)
+                {
+                    var device = table.Slice(offset, length);
+                    if (IsInstalledMemoryDevice(device))
+                    {
+                        if (memoryType == null && device.Length > 0x12)
+                            memoryType = MapSmbiosMemoryType(device[0x12]);
+
+                        // Mixed modules all run at the speed of the slowest one.
+                        long? deviceSpeed = GetMemoryDeviceSpeed(device);
+                        if (deviceSpeed.HasValue && (speed == null || deviceSpeed.Value < speed.Value))
+                            speed = deviceSpeed;
+                    }
+                }
+
+                // Skip the formatted area, then the string-set, which ends with a double null.
+                offset += length;
+                while (offset + 1 < table.Length && (table[offset] != 0 || table[offset + 1] != 0))
+                    offset++;
+                offset += 2;
+            }
+
+            return (speed, memoryType);
+        }
+
+        // Size (WORD at 0x0C) is 0 for an empty slot.
+        private static bool IsInstalledMemoryDevice(ReadOnlySpan<byte> device)
+            => device.Length < 0x0E || BinaryPrimitives.ReadUInt16LittleEndian(device.Slice(0x0C)) != 0;
+
+        // Configured Memory Speed (0x20, SMBIOS 2.7+) is what the module actually runs at.
+        // Speed (0x15) is the module's maximum rated speed, used only when the configured speed is not reported.
+        private static long? GetMemoryDeviceSpeed(ReadOnlySpan<byte> device)
+            => ReadSmbiosSpeed(device, wordOffset: 0x20, extendedOffset: 0x58)
+                ?? ReadSmbiosSpeed(device, wordOffset: 0x15, extendedOffset: 0x54);
+
+        private static long? ReadSmbiosSpeed(ReadOnlySpan<byte> device, int wordOffset, int extendedOffset)
+        {
+            if (device.Length < wordOffset + 2)
+                return null;
+
+            ushort speed = BinaryPrimitives.ReadUInt16LittleEndian(device.Slice(wordOffset));
+            if (speed == 0)
+                return null; // unknown
+            if (speed != 0xFFFF)
+                return speed;
+
+            // 0xFFFF means the speed is in the DWORD Extended field (SMBIOS 3.3+), whose bit 31 is reserved.
+            if (device.Length < extendedOffset + 4)
+                return null;
+            uint extendedSpeed = BinaryPrimitives.ReadUInt32LittleEndian(device.Slice(extendedOffset)) & 0x7FFFFFFF;
+            return extendedSpeed == 0 ? null : extendedSpeed;
         }
 
         private static string? MapSmbiosMemoryType(byte type) => type switch
@@ -305,62 +347,17 @@ namespace BenchmarkDotNet.Environments
                 }
             }
 
-            var (freq, type) = GetMacMemorySpecs();
-            return new PhysicalMemoryInfo(total, available, freq, type, null);
+            var (speed, type) = GetMacMemoryDetails();
+            return new PhysicalMemoryInfo(total, available, speed, type);
         }
 
-        private static (long? Frequency, string? Type) GetMacMemorySpecs()
+        private static (long? SpeedMts, string? MemoryType) GetMacMemoryDetails()
         {
             try
             {
-                string? jsonOutput = ProcessHelper.RunAndReadOutput("system_profiler", "-json SPMemoryDataType");
-                if (string.IsNullOrEmpty(jsonOutput))
-                    return (null, null);
-
-                using (JsonDocument doc = JsonDocument.Parse(jsonOutput!))
-                {
-                    var root = doc.RootElement;
-
-                    if (!root.TryGetProperty("SPMemoryDataType", out JsonElement memoryArray) || memoryArray.ValueKind != JsonValueKind.Array)
-                        return (null, null);
-
-                    long? maxFreq = null;
-                    string? detectedType = null;
-
-                    foreach (var memoryItem in memoryArray.EnumerateArray())
-                    {
-                        // Try to find Speed property (can be in different formats)
-                        if (memoryItem.TryGetProperty("Speed", out JsonElement speedDirect) && speedDirect.ValueKind == JsonValueKind.String)
-                        {
-                            ParseSpeedValue(speedDirect.GetString(), ref maxFreq);
-                        }
-
-                        // Try _properties array structure
-                        if (memoryItem.TryGetProperty("_properties", out JsonElement properties) && properties.ValueKind == JsonValueKind.Array)
-                        {
-                            foreach (var prop in properties.EnumerateArray())
-                            {
-                                if (prop.TryGetProperty("Speed", out JsonElement speedProp) && speedProp.ValueKind == JsonValueKind.String)
-                                {
-                                    ParseSpeedValue(speedProp.GetString(), ref maxFreq);
-                                }
-
-                                if (prop.TryGetProperty("Type", out JsonElement typeProp) && typeProp.ValueKind == JsonValueKind.String)
-                                {
-                                    ParseTypeValue(typeProp.GetString(), ref detectedType);
-                                }
-                            }
-                        }
-
-                        // Try Type property (can be at top level)
-                        if (memoryItem.TryGetProperty("Type", out JsonElement typeDirect) && typeDirect.ValueKind == JsonValueKind.String)
-                        {
-                            ParseTypeValue(typeDirect.GetString(), ref detectedType);
-                        }
-                    }
-
-                    return (maxFreq, detectedType);
-                }
+                string? json = ProcessHelper.RunAndReadOutput("system_profiler", "-json SPMemoryDataType", timeout: SystemProfilerTimeout);
+                if (!string.IsNullOrEmpty(json))
+                    return ParseMacMemoryJson(json!);
             }
             catch
             {
@@ -370,27 +367,58 @@ namespace BenchmarkDotNet.Environments
             return (null, null);
         }
 
-        private static void ParseSpeedValue(string? speedStr, ref long? maxFreq)
+        /// <summary>
+        /// Parses the output of <c>system_profiler -json SPMemoryDataType</c>.
+        /// Apple silicon reports a single entry with <c>dimm_type</c> and no speed; Intel Macs report one <c>_items</c> entry per slot.
+        /// </summary>
+        internal static (long? SpeedMts, string? MemoryType) ParseMacMemoryJson(string json)
         {
-            if (string.IsNullOrEmpty(speedStr))
-                return;
+            using var doc = JsonDocument.Parse(json);
 
-            var speedMatch = Regex.Match(speedStr, @"(\d+)\s*MHz");
-            if (speedMatch.Success && long.TryParse(speedMatch.Groups[1].Value, out long speedMhz) && speedMhz > 0)
+            if (!doc.RootElement.TryGetProperty("SPMemoryDataType", out var entries) || entries.ValueKind != JsonValueKind.Array)
+                return (null, null);
+
+            long? speed = null;
+            string? memoryType = null;
+
+            foreach (var entry in entries.EnumerateArray())
             {
-                long speedMts = speedMhz * 2; // DDR: MT/s = MHz × 2
-                if (maxFreq == null || speedMts > maxFreq.Value)
-                    maxFreq = speedMts;
+                ReadMemoryDevice(entry);
+
+                if (entry.TryGetProperty("_items", out var items) && items.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in items.EnumerateArray())
+                        ReadMemoryDevice(item);
+                }
             }
-        }
 
-        private static void ParseTypeValue(string? typeStr, ref string? detectedType)
-        {
-            if (string.IsNullOrEmpty(typeStr) || typeStr == "Unknown")
-                return;
+            return (speed, memoryType);
 
-            if (detectedType == null)
-                detectedType = typeStr;
+            void ReadMemoryDevice(JsonElement device)
+            {
+                if (device.ValueKind != JsonValueKind.Object)
+                    return;
+
+                // Empty slots report "empty" for every field.
+                if (memoryType == null
+                    && device.TryGetProperty("dimm_type", out var typeElement) && typeElement.ValueKind == JsonValueKind.String
+                    && typeElement.GetString() is string type && type.IsNotBlank()
+                    && !type.Equals("empty", StringComparison.OrdinalIgnoreCase) && !type.Equals("unknown", StringComparison.OrdinalIgnoreCase))
+                {
+                    memoryType = type;
+                }
+
+                // Despite the "MHz" label, the value is the transfer rate: DDR4-2667 is reported as "2667 MHz".
+                if (device.TryGetProperty("dimm_speed", out var speedElement) && speedElement.ValueKind == JsonValueKind.String)
+                {
+                    var match = Regex.Match(speedElement.GetString() ?? "", @"^\s*(\d+)\s*MHz");
+                    if (match.Success && long.TryParse(match.Groups[1].Value, out long deviceSpeed) && deviceSpeed > 0
+                        && (speed == null || deviceSpeed < speed.Value))
+                    {
+                        speed = deviceSpeed;
+                    }
+                }
+            }
         }
     }
 }
