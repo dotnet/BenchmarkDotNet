@@ -399,14 +399,15 @@ namespace BenchmarkDotNet.Environments
                 if (device.ValueKind != JsonValueKind.Object)
                     return;
 
-                // Empty slots report "empty" for every field.
-                if (memoryType == null
-                    && device.TryGetProperty("dimm_type", out var typeElement) && typeElement.ValueKind == JsonValueKind.String
-                    && typeElement.GetString() is string type && type.IsNotBlank()
-                    && !type.Equals("empty", StringComparison.OrdinalIgnoreCase) && !type.Equals("unknown", StringComparison.OrdinalIgnoreCase))
+                // Empty slots report "empty" and virtual machines report placeholders such as "Unknown" or "RAM" (with a made-up speed),
+                // so only devices with a real memory type are used.
+                if (!device.TryGetProperty("dimm_type", out var typeElement) || typeElement.ValueKind != JsonValueKind.String
+                    || typeElement.GetString() is not string type || !Regex.IsMatch(type, "DDR|HBM"))
                 {
-                    memoryType = type;
+                    return;
                 }
+
+                memoryType ??= type;
 
                 // Despite the "MHz" label, the value is the transfer rate: DDR4-2667 is reported as "2667 MHz".
                 if (device.TryGetProperty("dimm_speed", out var speedElement) && speedElement.ValueKind == JsonValueKind.String)

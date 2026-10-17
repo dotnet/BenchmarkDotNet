@@ -156,6 +156,17 @@ namespace BenchmarkDotNet.Tests.Environments
         }
 
         [Fact]
+        public void MacVirtualMachinePlaceholdersAreIgnored()
+        {
+            // Placeholder values seen on the GitHub Actions macOS arm64 and x64 runners.
+            const string arm64 = """{ "SPMemoryDataType" : [ { "dimm_manufacturer" : "Unknown", "dimm_type" : "Unknown", "SPMemoryDataType" : "7 GB" } ] }""";
+            const string x64 = """{ "SPMemoryDataType" : [ { "_items" : [ { "_name" : "DIMM0", "dimm_size" : "14 GB", "dimm_speed" : "1600 MHz", "dimm_type" : "RAM" } ] } ] }""";
+
+            Assert.Equal(((long?)null, (string?)null), SystemMemory.ParseMacMemoryJson(arm64));
+            Assert.Equal(((long?)null, (string?)null), SystemMemory.ParseMacMemoryJson(x64));
+        }
+
+        [Fact]
         public void MacWithoutMemoryDataReturnsNothing()
         {
             Assert.Equal(((long?)null, (string?)null), SystemMemory.ParseMacMemoryJson("""{ "SPMemoryDataType" : [] }"""));
