@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.IntegrationTests.RuntimeAsync;
 
 public class RuntimeAsyncEmitTest(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
-    private const MethodImplAttributes AsyncMethodImpl = (MethodImplAttributes)0x2000;
+    private const MethodImplAttributes AsyncMethodImpl = (MethodImplAttributes) 0x2000;
 
     [Theory]
     [InlineData(typeof(RuntimeAsyncTaskCaseBenchmark))]
