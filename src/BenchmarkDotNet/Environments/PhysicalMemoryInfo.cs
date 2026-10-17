@@ -59,9 +59,9 @@ namespace BenchmarkDotNet.Environments
         [SupportedOSPlatform("windows5.1.2600")]
         private static PhysicalMemoryInfo? GetWindowsMemory()
         {
-            var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
+            var memStatus = new MEMORYSTATUSEX { dwLength = (uint) Marshal.SizeOf<MEMORYSTATUSEX>() };
             if (PInvoke.GlobalMemoryStatusEx(ref memStatus))
-                return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys);
+                return new PhysicalMemoryInfo((long) memStatus.ullTotalPhys, (long) memStatus.ullAvailPhys);
 
             return null;
         }

@@ -22,10 +22,10 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Stloc_3);
                     break;
                 case var i when i < 255:
-                    ilBuilder.Emit(OpCodes.Stloc_S, (byte)local.LocalIndex);
+                    ilBuilder.Emit(OpCodes.Stloc_S, (byte) local.LocalIndex);
                     break;
                 default:
-                    ilBuilder.Emit(OpCodes.Stloc, checked((short)local.LocalIndex));
+                    ilBuilder.Emit(OpCodes.Stloc, checked((short) local.LocalIndex));
                     break;
             }
         }
@@ -47,10 +47,10 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Ldloc_3);
                     break;
                 case var i when i < 255:
-                    ilBuilder.Emit(OpCodes.Ldloc_S, (byte)local.LocalIndex);
+                    ilBuilder.Emit(OpCodes.Ldloc_S, (byte) local.LocalIndex);
                     break;
                 default:
-                    ilBuilder.Emit(OpCodes.Ldloc, checked((short)local.LocalIndex));
+                    ilBuilder.Emit(OpCodes.Ldloc, checked((short) local.LocalIndex));
                     break;
             }
         }
@@ -60,10 +60,10 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
             switch (local.LocalIndex)
             {
                 case var i when i < 255:
-                    ilBuilder.Emit(OpCodes.Ldloca_S, (byte)local.LocalIndex);
+                    ilBuilder.Emit(OpCodes.Ldloca_S, (byte) local.LocalIndex);
                     break;
                 default:
-                    ilBuilder.Emit(OpCodes.Ldloca, checked((short)local.LocalIndex));
+                    ilBuilder.Emit(OpCodes.Ldloca, checked((short) local.LocalIndex));
                     break;
             }
         }
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
         {
             // this is passed as Ldarg_0
             var position = argument.Position;
-            if (!((MethodBase)argument.Member).IsStatic)
+            if (!((MethodBase) argument.Member).IsStatic)
                 position++;
 
             switch (position)
@@ -106,10 +106,10 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Ldarg_3);
                     break;
                 case var i when i < 255:
-                    ilBuilder.Emit(OpCodes.Ldarg_S, (byte)position);
+                    ilBuilder.Emit(OpCodes.Ldarg_S, (byte) position);
                     break;
                 default:
-                    ilBuilder.Emit(OpCodes.Ldarg, checked((short)position));
+                    ilBuilder.Emit(OpCodes.Ldarg, checked((short) position));
                     break;
             }
         }
@@ -117,16 +117,16 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
         public static void EmitStarg(this ILGenerator ilBuilder, ParameterInfo argument)
         {
             var position = argument.Position;
-            if (!((MethodBase)argument.Member).IsStatic)
+            if (!((MethodBase) argument.Member).IsStatic)
                 position++;
 
             if (position < 255)
             {
-                ilBuilder.Emit(OpCodes.Starg_S, (byte)position);
+                ilBuilder.Emit(OpCodes.Starg_S, (byte) position);
             }
             else
             {
-                ilBuilder.Emit(OpCodes.Starg, checked((short)position));
+                ilBuilder.Emit(OpCodes.Starg, checked((short) position));
             }
         }
 
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
                     ilBuilder.Emit(OpCodes.Ldc_I4_8);
                     break;
                 case var i when sbyte.MinValue <= i && i <= sbyte.MaxValue:
-                    ilBuilder.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
+                    ilBuilder.Emit(OpCodes.Ldc_I4_S, (sbyte) value);
                     break;
                 default:
                     ilBuilder.Emit(OpCodes.Ldc_I4, value);

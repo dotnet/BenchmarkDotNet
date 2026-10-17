@@ -56,11 +56,11 @@ namespace BenchmarkDotNet.Parameters
                     disposable.Dispose();
                     break;
                 case IAsyncDisposable asyncDisposable:
-                {
-                    using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
-                    context.ExecuteUntilComplete(asyncDisposable.DisposeAsync());
-                    break;
-                }
+                    {
+                        using var context = BenchmarkSynchronizationContext.CreateAndSetCurrent();
+                        context.ExecuteUntilComplete(asyncDisposable.DisposeAsync());
+                        break;
+                    }
             }
         }
 

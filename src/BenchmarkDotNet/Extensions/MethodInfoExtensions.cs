@@ -11,13 +11,13 @@ internal static class MethodInfoExtensions
     public static T CreateDelegate<T>(this MethodInfo methodInfo)
         where T : Delegate
     {
-        return (T)methodInfo.CreateDelegate(typeof(T));
+        return (T) methodInfo.CreateDelegate(typeof(T));
     }
 
     public static T CreateDelegate<T>(this MethodInfo methodInfo, object? target)
        where T : Delegate
     {
-        return (T)methodInfo.CreateDelegate(typeof(T), target);
+        return (T) methodInfo.CreateDelegate(typeof(T), target);
     }
 
 }

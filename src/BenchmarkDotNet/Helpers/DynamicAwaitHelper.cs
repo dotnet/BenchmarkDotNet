@@ -75,7 +75,7 @@ internal static class DynamicAwaitHelper
             while (true)
             {
                 var moveNextResult = Unwrapped(() => asyncEnumerableInfo.MoveNextAsyncMethod.Invoke(enumerator, moveNextAsyncArgs));
-                bool hasMore = (bool)(await new DynamicAwaitable(moveNextAwaitable, moveNextResult!))!;
+                bool hasMore = (bool) (await new DynamicAwaitable(moveNextAwaitable, moveNextResult!))!;
                 if (!hasMore)
                 {
                     break;

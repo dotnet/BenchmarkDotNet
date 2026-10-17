@@ -129,7 +129,7 @@ internal static class BenchmarkActionFactory
 
     /// <summary>Helper to enforce .ctor signature.</summary>
     private static BenchmarkActionBase Create(Type actionType, object? instance, MethodInfo method, int unrollFactor) =>
-        (BenchmarkActionBase)Activator.CreateInstance(actionType, instance, method, unrollFactor)!;
+        (BenchmarkActionBase) Activator.CreateInstance(actionType, instance, method, unrollFactor)!;
 
     private static readonly MethodInfo FallbackSignature = new Action(BenchmarkActionBase.OverheadStatic).GetMethodInfo();
 

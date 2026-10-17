@@ -59,7 +59,7 @@ namespace BenchmarkDotNet.Portability
 
                 if (methodInfo != null)
                 {
-                    return !(bool)methodInfo.Invoke(null, null);
+                    return !(bool) methodInfo.Invoke(null, null);
                 }
             }
 
@@ -220,12 +220,12 @@ namespace BenchmarkDotNet.Portability
         {
             // these are not part of .NET Standard 2.0, so we use hardcoded values taken from
             // https://github.com/dotnet/runtime/blob/080fcae7eaa8367abf7900e08ff2e52e3efea5bf/src/libraries/System.Private.CoreLib/src/System/Runtime/InteropServices/Architecture.cs#L9
-            const Architecture Wasm = (Architecture)4;
-            const Architecture S390x = (Architecture)5;
-            const Architecture LoongArch64 = (Architecture)6;
-            const Architecture Armv6 = (Architecture)7;
-            const Architecture Ppc64le = (Architecture)8;
-            const Architecture RiscV64 = (Architecture)9;
+            const Architecture Wasm = (Architecture) 4;
+            const Architecture S390x = (Architecture) 5;
+            const Architecture LoongArch64 = (Architecture) 6;
+            const Architecture Armv6 = (Architecture) 7;
+            const Architecture Ppc64le = (Architecture) 8;
+            const Architecture RiscV64 = (Architecture) 9;
 
             switch (ProcessArchitecture)
             {

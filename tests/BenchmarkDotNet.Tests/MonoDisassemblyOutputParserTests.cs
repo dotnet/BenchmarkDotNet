@@ -284,8 +284,8 @@ operable program or batch file.
             Assert.Equal(expected.Methods[0].Maps[0].SourceCodes.Length, disassemblyResult.Methods[0].Maps[0].SourceCodes.Length);
 
             for (int i = 0; i < expected.Methods[0].Maps[0].SourceCodes.Length; i++)
-                Assert.Equal(((MonoCode)expected.Methods[0].Maps[0].SourceCodes[i]).Text,
-                    ((MonoCode)disassemblyResult.Methods[0].Maps[0].SourceCodes[i]).Text);
+                Assert.Equal(((MonoCode) expected.Methods[0].Maps[0].SourceCodes[i]).Text,
+                    ((MonoCode) disassemblyResult.Methods[0].Maps[0].SourceCodes[i]).Text);
 
             Assert.Equal(expected.Errors.Length, disassemblyResult.Errors.Length);
             for (int i = 0; i < expected.Errors.Length; i++)

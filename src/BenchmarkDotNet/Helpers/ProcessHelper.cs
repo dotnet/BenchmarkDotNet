@@ -190,12 +190,12 @@ namespace BenchmarkDotNet.Helpers
 
             // Typed to char[] because it could be a string or char[] with newer .net versions
             var directories = Environment.GetEnvironmentVariable("PATH")!
-                .Split((char[])[Path.PathSeparator], StringSplitOptions.RemoveEmptyEntries);
+                .Split((char[]) [Path.PathSeparator], StringSplitOptions.RemoveEmptyEntries);
 
             if (OsDetector.IsWindows())
             {
                 var extensions = Environment.GetEnvironmentVariable("PATHEXT")!
-                    .Split((char[])[Path.PathSeparator], StringSplitOptions.RemoveEmptyEntries);
+                    .Split((char[]) [Path.PathSeparator], StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (var directory in directories)
                 {

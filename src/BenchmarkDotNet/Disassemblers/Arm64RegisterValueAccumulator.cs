@@ -88,7 +88,7 @@ internal struct Arm64RegisterValueAccumulator
                     details.Operands[1].Memory.Index == null) // And there is no extra index register
                 {
                     // Simulate the LDR instruction.
-                    long newValue = (long)_runtime.DataTarget.DataReader.ReadPointer((ulong)_value);
+                    long newValue = (long) _runtime.DataTarget.DataReader.ReadPointer((ulong) _value);
                     _value = newValue;
                     if (_value == 0)
                     {

@@ -281,7 +281,7 @@ namespace BenchmarkDotNet.Detectors.Cpu
             Type type = Type.GetType(typeName)!;
             if (type == null) return false;
 
-            return (bool)type.GetProperty("IsSupported", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!.GetValue(null, null)!;
+            return (bool) type.GetProperty("IsSupported", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)!.GetValue(null, null)!;
         }
     }
 }

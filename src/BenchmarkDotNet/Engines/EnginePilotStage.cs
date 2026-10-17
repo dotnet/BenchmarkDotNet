@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Engines
                 return;
             }
 
-            int roundedUpTimesPerIteration = (int)Math.Ceiling(timesPerIteration);
+            int roundedUpTimesPerIteration = (int) Math.Ceiling(timesPerIteration);
             // If we run it unrollFactor times per iteration, it's going to take longer than IterationTime.
             if (roundedUpTimesPerIteration < unrollFactor)
             {
@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Engines
 
             var measurement = measurements[measurements.Count - 1];
             double actualIterationTime = measurement.Nanoseconds;
-            long newInvokeCount = Autocorrect(Math.Max(minInvokeCount, (long)Math.Round(invokeCount * targetIterationTime / actualIterationTime)));
+            long newInvokeCount = Autocorrect(Math.Max(minInvokeCount, (long) Math.Round(invokeCount * targetIterationTime / actualIterationTime)));
 
             if (newInvokeCount < invokeCount)
             {

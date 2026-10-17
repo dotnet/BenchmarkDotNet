@@ -92,7 +92,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             var logger = new AccumulationLogger();
 
-            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
+            await ((ExporterBase) OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var settings = VerifyHelper.Create();
             await Verifier.Verify(logger.GetLog(), settings);
@@ -172,7 +172,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                             []);
             var logger = new AccumulationLogger();
 
-            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
+            await ((ExporterBase) OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var settings = VerifyHelper.Create();
             await Verifier.Verify(logger.GetLog(), settings);
@@ -216,7 +216,7 @@ namespace BenchmarkDotNet.Tests.Exporters
                 []);
             var logger = new AccumulationLogger();
 
-            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
+            await ((ExporterBase) OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var settings = VerifyHelper.Create();
             await Verifier.Verify(logger.GetLog(), settings);
@@ -258,7 +258,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
                 var logger = new AccumulationLogger();
 
-                await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
+                await ((ExporterBase) OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
                 var log = logger.GetLog();
                 // Verify that the value uses a period, not a comma
@@ -310,7 +310,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             var logger = new AccumulationLogger();
 
-            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
+            await ((ExporterBase) OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var settings = VerifyHelper.Create();
             await Verifier.Verify(logger.GetLog(), settings);
@@ -352,7 +352,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             var logger = new AccumulationLogger();
 
-            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
+            await ((ExporterBase) OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var log = logger.GetLog();
             Assert.Contains("# HELP benchmark_allocated_bytes Allocated managed memory per single benchmark operation.", log);
@@ -392,7 +392,7 @@ namespace BenchmarkDotNet.Tests.Exporters
 
             var logger = new AccumulationLogger();
 
-            await ((ExporterBase)OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
+            await ((ExporterBase) OpenMetricsExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             var log = logger.GetLog();
             Assert.Contains("# HELP benchmark_allocated_bytes Additional metric allocated_bytes", log);

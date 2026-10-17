@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Tests.Disassemblers
             var exporter = new GithubMarkdownDisassemblyExporter(results, config);
 
             // Act
-            await ((ExporterBase)exporter).ExportToLogAsync(summary, logger, CancellationToken.None);
+            await ((ExporterBase) exporter).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             // Assert
             var output = logger.GetLog();
@@ -49,7 +49,7 @@ namespace BenchmarkDotNet.Tests.Disassemblers
             var exporter = new GithubMarkdownDisassemblyExporter(results, config);
 
             // Act
-            await ((ExporterBase)exporter).ExportToLogAsync(summary, logger, CancellationToken.None);
+            await ((ExporterBase) exporter).ExportToLogAsync(summary, logger, CancellationToken.None);
 
             // Assert
             var output = logger.GetLog();

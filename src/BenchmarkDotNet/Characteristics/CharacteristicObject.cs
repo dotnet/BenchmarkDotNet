@@ -140,7 +140,7 @@ namespace BenchmarkDotNet.Characteristics
 
         internal T? GetValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic)
         {
-            return (T?)GetValue((Characteristic)characteristic);
+            return (T?) GetValue((Characteristic) characteristic);
         }
 
         internal object? GetValue(Characteristic characteristic)
@@ -180,7 +180,7 @@ namespace BenchmarkDotNet.Characteristics
 
         public T? ResolveValue<[DynamicallyAccessedMembers(CharacteristicObject.CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, T defaultValue)
         {
-            return HasValue(characteristic) ? GetValue(characteristic) : (T?)characteristic.ResolveValueCore(this, defaultValue!);
+            return HasValue(characteristic) ? GetValue(characteristic) : (T?) characteristic.ResolveValueCore(this, defaultValue!);
         }
 
         [PublicAPI]
@@ -191,14 +191,14 @@ namespace BenchmarkDotNet.Characteristics
 
         public T? ResolveValueAsNullable<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic) where T : struct
         {
-            return HasValue(characteristic) ? GetValue(characteristic) : (T?)null;
+            return HasValue(characteristic) ? GetValue(characteristic) : (T?) null;
         }
         #endregion
 
         #region Set value
         internal void SetValue<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] T>(Characteristic<T> characteristic, T value)
         {
-            SetValue((Characteristic)characteristic, value);
+            SetValue((Characteristic) characteristic, value);
         }
 
         internal void SetValue(Characteristic characteristic, object? value)
@@ -209,8 +209,8 @@ namespace BenchmarkDotNet.Characteristics
             {
                 AssertIsAssignable(characteristic, value);
 
-                var oldObjectValue = (CharacteristicObject?)GetValue(characteristic);
-                var newObjectValue = (CharacteristicObject?)ResolveCore(characteristic, value!);
+                var oldObjectValue = (CharacteristicObject?) GetValue(characteristic);
+                var newObjectValue = (CharacteristicObject?) ResolveCore(characteristic, value!);
 
                 if (!ReferenceEquals(oldObjectValue, newObjectValue))
                 {
@@ -241,7 +241,7 @@ namespace BenchmarkDotNet.Characteristics
                             $"The current node {this} has value for {characteristic} already.",
                             nameof(characteristic));
 
-                    var characteristicObject = (CharacteristicObject)ResolveCore(characteristic, value!)!;
+                    var characteristicObject = (CharacteristicObject) ResolveCore(characteristic, value!)!;
                     characteristicObject.SetOwnerCore(OwnerOrSelf);
 
                     sharedValues[characteristic] = characteristicObject;
@@ -314,7 +314,7 @@ namespace BenchmarkDotNet.Characteristics
             if (characteristic.HasChildCharacteristics)
             {
                 // DONTTOUCH: workaround on case there were no parent characteristic.
-                var characteristicObject = (CharacteristicObject?)GetValue(characteristic);
+                var characteristicObject = (CharacteristicObject?) GetValue(characteristic);
                 characteristicObject?.DetachFromOwner(characteristic);
             }
 
@@ -351,7 +351,7 @@ namespace BenchmarkDotNet.Characteristics
                 {
                     if (!HasValue(characteristic))
                     {
-                        var characteristicObject = (CharacteristicObject?)ResolveCore(characteristic, value);
+                        var characteristicObject = (CharacteristicObject?) ResolveCore(characteristic, value);
                         if (characteristicObject != null)
                         {
                             value = Activator.CreateInstance(characteristicObject.GetType());
@@ -392,7 +392,7 @@ namespace BenchmarkDotNet.Characteristics
         {
             AssertIsRoot();
 
-            var newRoot = (CharacteristicObject)Activator.CreateInstance(GetType())!;
+            var newRoot = (CharacteristicObject) Activator.CreateInstance(GetType())!;
             newRoot.ApplyCore(this);
 
             // Preserve the IdCharacteristic of the original object

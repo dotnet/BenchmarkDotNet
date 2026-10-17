@@ -351,7 +351,7 @@ namespace BenchmarkDotNet.Running
             await BenchmarkReportExporter.ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait();
 
             logger.WriteLineHeader("// * Summary *");
-            await ((MarkdownExporter)MarkdownExporter.Console).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait();
+            await ((MarkdownExporter) MarkdownExporter.Console).ExportToLogAsync(summary, logger, cancellationToken).ConfigureAwait();
 
             // TODO: make exporter
             ConclusionHelper.Print(logger, config.GetCompositeAnalyser().Analyse(summary).Distinct().ToList());
@@ -581,7 +581,7 @@ namespace BenchmarkDotNet.Running
                     double overheadApprox = new Statistics(measurements.Where(m => m.Is(IterationMode.Overhead, IterationStage.Actual)).Select(m => m.Nanoseconds)).Median;
                     double workloadApprox = new Statistics(measurements.Where(m => m.Is(IterationMode.Workload, IterationStage.Actual)).Select(m => m.Nanoseconds)).Median;
                     double percent = overheadApprox / workloadApprox * 100;
-                    launchCount = (int)Math.Round(Math.Max(2, 2 + (percent - 1) / 3)); // an empirical formula
+                    launchCount = (int) Math.Round(Math.Max(2, 2 + (percent - 1) / 3)); // an empirical formula
                 }
             }
             logger.WriteLine();
@@ -815,13 +815,13 @@ namespace BenchmarkDotNet.Running
             int executedBenchmarkCount = totalBenchmarkCount - benchmarksToRunCount;
             TimeSpan fromNow = GetEstimatedFinishTime(runsChronometer, benchmarksToRunCount, executedBenchmarkCount);
             DateTime estimatedEnd = DateTime.Now.Add(fromNow);
-            string message = $"// ** Remained {benchmarksToRunCount} ({(double)benchmarksToRunCount / totalBenchmarkCount:P1}) benchmark(s) to run." +
-                $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int)fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
+            string message = $"// ** Remained {benchmarksToRunCount} ({(double) benchmarksToRunCount / totalBenchmarkCount:P1}) benchmark(s) to run." +
+                $" Estimated finish {estimatedEnd:yyyy-MM-dd H:mm} ({(int) fromNow.TotalHours}h {fromNow.Minutes}m from now) **";
             logger.WriteLineHeader(message);
 
-            consoleTitler.UpdateTitle($"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int)fromNow.TotalHours}h {fromNow.Minutes}m to finish");
+            consoleTitler.UpdateTitle($"{benchmarksToRunCount}/{totalBenchmarkCount} Remaining - {(int) fromNow.TotalHours}h {fromNow.Minutes}m to finish");
 
-            taskbarProgress.SetProgress((float)executedBenchmarkCount / totalBenchmarkCount);
+            taskbarProgress.SetProgress((float) executedBenchmarkCount / totalBenchmarkCount);
         }
 
         private static TimeSpan GetEstimatedFinishTime(in StartedClock runsChronometer, int benchmarksToRunCount, int executedBenchmarkCount)

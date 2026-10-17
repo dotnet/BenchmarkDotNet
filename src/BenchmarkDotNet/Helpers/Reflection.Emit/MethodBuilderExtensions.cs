@@ -9,7 +9,7 @@ namespace BenchmarkDotNet.Helpers.Reflection.Emit
         public static ParameterInfo[] GetEmitParameters(this MethodBuilder method, IEnumerable<ParameterInfo> signatureParameters) =>
             signatureParameters
                 .Select(p =>
-                    (ParameterInfo)new EmitParameterInfo(
+                    (ParameterInfo) new EmitParameterInfo(
                         p.Position,
                         p.Name,
                         p.ParameterType,

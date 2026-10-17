@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Exporters.Xml
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         private void WriteCollectionProperty(object source, PropertyInfo property)
         {
-            var collection = (IEnumerable?)property.GetValue(source);
+            var collection = (IEnumerable?) property.GetValue(source);
 
             if (collection == null || !IsCollectionWritable(collection))
                 return;

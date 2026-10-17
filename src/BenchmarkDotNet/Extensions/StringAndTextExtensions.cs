@@ -70,7 +70,7 @@ namespace BenchmarkDotNet.Extensions
 
             return invalidFileNameChars.ToDictionary(
                 character => character.ToString(),
-                character => $"char{(short)character}");
+                character => $"char{(short) character}");
         }
 
         /// <summary>

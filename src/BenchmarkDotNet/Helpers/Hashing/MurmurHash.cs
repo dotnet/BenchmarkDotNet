@@ -42,18 +42,18 @@ namespace BenchmarkDotNet.Helpers.Hashing
                 }
                 else if (ch <= 0x07FF)
                 {
-                    cur |= (ulong)((ch & 0x003F) | ((ch << 2) & 0x1F00) | 0xC080) << bits;
+                    cur |= (ulong) ((ch & 0x003F) | ((ch << 2) & 0x1F00) | 0xC080) << bits;
                     bits += 16;
                 }
                 else
                 {
-                    cur |= (ulong)((ch & 0x003F) | ((ch << 2) & 0x3F00) | ((ch << 4) & 0x0F0000) | 0xE08080) << bits;
+                    cur |= (ulong) ((ch & 0x003F) | ((ch << 2) & 0x3F00) | ((ch << 4) & 0x0F0000) | 0xE08080) << bits;
                     bits += 24;
                 }
 
                 if (bits >= 32)
                 {
-                    hash = MurmurRound(hash, (uint)cur);
+                    hash = MurmurRound(hash, (uint) cur);
                     cur = cur >> 32;
                     bits -= 32;
                     len += 4;
@@ -62,12 +62,12 @@ namespace BenchmarkDotNet.Helpers.Hashing
 
             if (bits > 0)
             {
-                hash = MurmurRound(hash, (uint)cur);
+                hash = MurmurRound(hash, (uint) cur);
                 len += bits / 8;
             }
 
             // Encode the length.
-            hash = MurmurRound(hash, (uint)len);
+            hash = MurmurRound(hash, (uint) len);
 
             // Final mixing ritual for the hash.
             hash = MixHash(hash);

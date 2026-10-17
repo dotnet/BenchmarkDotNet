@@ -130,7 +130,7 @@ namespace BenchmarkDotNet.Columns
             }
         }
 
-        public override int PriorityInCategory => (int)Metric;
+        public override int PriorityInCategory => (int) Metric;
         public override bool IsNumeric => true;
         public override UnitType UnitType => UnitType.Dimensionless;
 

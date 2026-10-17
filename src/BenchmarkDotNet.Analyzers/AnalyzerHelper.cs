@@ -411,7 +411,7 @@ internal static class AnalyzerHelper
     {
         Debug.Assert(index >= 0);
         // Properties must come after constructor arguments, so we don't need to worry about it here.
-        var attrSyntax = (AttributeSyntax)attributeData.ApplicationSyntaxReference!.GetSyntax();
+        var attrSyntax = (AttributeSyntax) attributeData.ApplicationSyntaxReference!.GetSyntax();
         var args = attrSyntax.ArgumentList!.Arguments;
         Debug.Assert(args is { Count: > 0 });
         var maybeArrayExpression = args[0].Expression;
@@ -420,7 +420,7 @@ internal static class AnalyzerHelper
         if (maybeArrayExpression is CollectionExpressionSyntax collectionExpressionSyntax)
         {
             Debug.Assert(index < collectionExpressionSyntax.Elements.Count);
-            return ((ExpressionElementSyntax)collectionExpressionSyntax.Elements[index]).Expression;
+            return ((ExpressionElementSyntax) collectionExpressionSyntax.Elements[index]).Expression;
         }
 #endif
 
