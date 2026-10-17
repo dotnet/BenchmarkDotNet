@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Detectors.Cpu.Windows;
+using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Tests.XUnit;
 using Perfolizer.Helpers;
 using Perfolizer.Models;
@@ -50,19 +51,32 @@ public class CpuDetectorTests(ITestOutputHelper Output)
         cpuInfo1.Should().NotBeNull();
         cpuInfo2.Should().NotBeNull();
 
-        cpuInfo1.Should().BeEquivalentTo(cpuInfo2, options => options
-            .Using<long?>(ctx =>
-            {
-                if (ctx.Expectation is null)
+        try
+        {
+            cpuInfo1.Should().BeEquivalentTo(cpuInfo2, options => options
+                .Using<long?>(ctx =>
                 {
-                    ctx.Subject.Should().BeNull();
-                    return;
-                }
+                    if (ctx.Expectation is null)
+                    {
+                        ctx.Subject.Should().BeNull();
+                        return;
+                    }
 
-                var expected = (double)ctx.Expectation!.Value;
-                var actual = (double)ctx.Subject!.Value;
-                var tolerance = Math.Abs(expected) * 0.02d; // Accept 2％ difference
-                actual.Should().BeApproximately(expected, tolerance);
-            }).WhenTypeIs<long?>());
+                    var expected = (double)ctx.Expectation!.Value;
+                    var actual = (double)ctx.Subject!.Value;
+                    var tolerance = Math.Abs(expected) * 0.02d; // Accept 2％ difference
+                    actual.Should().BeApproximately(expected, tolerance);
+                }).WhenTypeIs<long?>());
+        }
+        catch
+        {
+            // Print CPU frequency information that is recognized by Windows.
+            // See: https://github.com/dotnet/BenchmarkDotNet/issues/3285
+            var result = ProcessHelper.RunAndReadOutput("systeminfo");
+            Output.WriteLine(result);
+
+            // TODO: Suppress throw exception on specific environment. (`Cobalt 100 2.85GHz` on `windows(arm64)`)
+            throw;
+        }
     }
 }
