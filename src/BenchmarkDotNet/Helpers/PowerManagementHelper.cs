@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Helpers
 
                 var activePolicyGuid = *activePolicyGuidPtr;
 
-                PInvoke.LocalFree((HLOCAL)activePolicyGuidPtr);
+                PInvoke.LocalFree((HLOCAL) activePolicyGuidPtr);
 
                 return activePolicyGuid;
             }
@@ -35,23 +35,23 @@ namespace BenchmarkDotNet.Helpers
                     return "";
 
                 Guid activeSchemaGuid = *activeGuidPtr;
-                PInvoke.LocalFree((HLOCAL)activeGuidPtr);
+                PInvoke.LocalFree((HLOCAL) activeGuidPtr);
 
                 Span<byte> buffer = stackalloc byte[260];
-                uint bufferSize = (uint)buffer.Length;
+                uint bufferSize = (uint) buffer.Length;
 
                 res = PInvoke.PowerReadFriendlyName(null, activeSchemaGuid, null, null, buffer, ref bufferSize);
                 if (res == WIN32_ERROR.ERROR_MORE_DATA)
                 {
-                    buffer = new byte[(int)bufferSize];
+                    buffer = new byte[(int) bufferSize];
                     res = PInvoke.PowerReadFriendlyName(null, activeSchemaGuid, null, null, buffer, ref bufferSize);
-                    bufferSize = (uint)buffer.Length;
+                    bufferSize = (uint) buffer.Length;
                 }
 
                 if (res != WIN32_ERROR.NO_ERROR)
                     return "";
 
-                ReadOnlySpan<char> chars = MemoryMarshal.Cast<byte, char>(buffer.Slice(0, (int)bufferSize));
+                ReadOnlySpan<char> chars = MemoryMarshal.Cast<byte, char>(buffer.Slice(0, (int) bufferSize));
                 return chars.TrimEnd('\0').ToString(); // Trim null terminator of PWSTR.
             }
         }

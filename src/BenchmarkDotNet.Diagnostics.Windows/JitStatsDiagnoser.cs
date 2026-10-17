@@ -14,7 +14,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
         public string ShortName => "jit";
 
-        protected override ulong EventType => (ulong)(ClrTraceEventParser.Keywords.Jit | ClrTraceEventParser.Keywords.Compilation);
+        protected override ulong EventType => (ulong) (ClrTraceEventParser.Keywords.Jit | ClrTraceEventParser.Keywords.Compilation);
 
         public override IEnumerable<Metric> ProcessResults(DiagnoserResults results)
         {

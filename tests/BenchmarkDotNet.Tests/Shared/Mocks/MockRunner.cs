@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Tests.Mocks
             var summary = BenchmarkRunner.Run<T>(config);
 
             var exporter = MarkdownExporter.Mock;
-            ((ExporterBase)exporter).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
+            ((ExporterBase) exporter).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
             output.WriteLine(logger.GetLog());
 
             return summary;

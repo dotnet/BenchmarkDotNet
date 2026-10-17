@@ -54,7 +54,7 @@ namespace BenchmarkDotNet.Environments
         // otherwise deduplicate against a plain net8.0 one. Compared as given, like everywhere else the platform is
         // used: "net8.0-Windows" and "net8.0-windows" are two runtimes, and deduplicating them is the caller's call.
         public override bool Equals(object? obj)
-            => base.Equals(obj) && platform == ((CoreRuntime)obj!).platform;
+            => base.Equals(obj) && platform == ((CoreRuntime) obj!).platform;
 
         public override int GetHashCode()
             => HashCode.Combine(base.GetHashCode(), platform);

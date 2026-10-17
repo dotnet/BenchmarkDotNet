@@ -26,8 +26,8 @@ public class RuntimeEqualityTests
         Runtime sameAsA = new CustomRuntime("Custom", new Version(1, 0), "a");
 
         // Directly via the concrete Equals(object).
-        Assert.False(a.Equals((object)differsByExtra));
-        Assert.True(a.Equals((object)sameAsA));
+        Assert.False(a.Equals((object) differsByExtra));
+        Assert.True(a.Equals((object) sameAsA));
 
         // Via IEquatable<Runtime> (Dictionary/HashSet/EqualityComparer use this) — the path that previously ignored Extra.
         var comparer = EqualityComparer<Runtime>.Default;

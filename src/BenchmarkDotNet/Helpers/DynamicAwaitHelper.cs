@@ -17,7 +17,7 @@ internal static class DynamicAwaitHelper
         // Sources are always read through IAsyncEnumerable<T>, pattern-based await foreach types are not supported.
         // A reference-type element needs no reflection at all: IAsyncEnumerable<out T> is covariant.
         => !elementType.IsValueType
-            ? (IAsyncEnumerable<object?>)asyncEnumerable
+            ? (IAsyncEnumerable<object?>) asyncEnumerable
             : EnumerateSourceAsyncCore(asyncEnumerable, ReflectionExtensions.GetAsyncEnumerableInterfaceInfo(elementType));
 
     private static async IAsyncEnumerable<object?> EnumerateSourceAsyncCore(object asyncEnumerable, AsyncEnumerableInfo asyncEnumerableInfo, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -27,14 +27,14 @@ internal static class DynamicAwaitHelper
 
         try
         {
-            while (await ((ValueTask<bool>)Unwrapped(() => asyncEnumerableInfo.MoveNextAsyncMethod.Invoke(enumerator, moveNextAsyncArgs))!).ConfigureAwait(false))
+            while (await ((ValueTask<bool>) Unwrapped(() => asyncEnumerableInfo.MoveNextAsyncMethod.Invoke(enumerator, moveNextAsyncArgs))!).ConfigureAwait(false))
             {
                 yield return Unwrapped(() => asyncEnumerableInfo.CurrentProperty.GetValue(enumerator));
             }
         }
         finally
         {
-            await ((IAsyncDisposable)enumerator).DisposeAsync().ConfigureAwait(false);
+            await ((IAsyncDisposable) enumerator).DisposeAsync().ConfigureAwait(false);
         }
     }
 
@@ -75,7 +75,7 @@ internal static class DynamicAwaitHelper
             while (true)
             {
                 var moveNextResult = Unwrapped(() => asyncEnumerableInfo.MoveNextAsyncMethod.Invoke(enumerator, moveNextAsyncArgs));
-                bool hasMore = (bool)(await new DynamicAwaitable(moveNextAwaitable, moveNextResult!))!;
+                bool hasMore = (bool) (await new DynamicAwaitable(moveNextAwaitable, moveNextResult!))!;
                 if (!hasMore)
                 {
                     break;

@@ -50,7 +50,7 @@ namespace BenchmarkDotNet.Tests.Exporters
             foreach (var exporter in exporters)
             {
                 PrintTitle(logger, exporter);
-                await ((ExporterBase)exporter).ExportToLogAsync(
+                await ((ExporterBase) exporter).ExportToLogAsync(
                     MockFactory.CreateSummary(
                         config.WithCultureInfo(cultureInfo),
                         hugeSd: false,

@@ -205,7 +205,7 @@ internal static class JitInfo
             {
                 return delayMs;
             }
-            long newDelayMs = (long)delayMs * multiplier;
+            long newDelayMs = (long) delayMs * multiplier;
             return newDelayMs > uint.MaxValue ? delayMs : newDelayMs;
         }
     }

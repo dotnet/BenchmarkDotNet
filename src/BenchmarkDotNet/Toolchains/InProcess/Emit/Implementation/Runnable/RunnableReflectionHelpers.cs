@@ -121,7 +121,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             if (result == null)
                 throw new InvalidOperationException($"Can't find a member {memberName}.");
 
-            return (TDelegate)(object)Delegate.CreateDelegate(typeof(TDelegate), instance, result);
+            return (TDelegate) (object) Delegate.CreateDelegate(typeof(TDelegate), instance, result);
         }
     }
 }

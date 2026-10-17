@@ -12,7 +12,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(0, 4, "0000")]
         public void ProcessorAffinityIsPrintedAsBitMask(int mask, int processorCount, string expectedResult)
         {
-            Assert.Equal(expectedResult, ((IntPtr)mask).ToPresentation(processorCount));
+            Assert.Equal(expectedResult, ((IntPtr) mask).ToPresentation(processorCount));
         }
 
         [Fact]

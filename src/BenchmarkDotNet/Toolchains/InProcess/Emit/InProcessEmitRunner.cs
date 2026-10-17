@@ -51,7 +51,7 @@ internal static class InProcessEmitRunner
     }
 
     internal static Type GetRunnableType(ExecuteParameters parameters)
-        => ((InProcessEmitArtifactsPath)parameters.BuildResult.ArtifactsPaths)
+        => ((InProcessEmitArtifactsPath) parameters.BuildResult.ArtifactsPaths)
             .GeneratedAssembly
             .GetType(EmittedTypePrefix + parameters.BenchmarkId)!;
 
@@ -63,7 +63,7 @@ internal static class InProcessEmitRunner
         // generated member by name on a type the benchmark also contributes members to.
         var constructorArguments = new object?[1];
         var instance = runnableType.GetConstructors().Single().Invoke(constructorArguments);
-        var trickTheJit = (Action)constructorArguments[0]!;
+        var trickTheJit = (Action) constructorArguments[0]!;
         FillMembers(instance, benchmarkCase, host.CancellationToken);
 
         host.WriteLine();

@@ -576,7 +576,7 @@ namespace BenchmarkDotNet.Tests
 
             public static IEnumerable<object> Values() { yield return "not an enum"; }
 
-            [Benchmark] public int Run() => (int)Value;
+            [Benchmark] public int Run() => (int) Value;
         }
 
         public class ErasedEnumSource
@@ -586,7 +586,7 @@ namespace BenchmarkDotNet.Tests
 
             public static IEnumerable<object> Values() { yield return 2; }
 
-            [Benchmark] public int Run() => (int)Value;
+            [Benchmark] public int Run() => (int) Value;
         }
 
         public static class ArgumentListSource
@@ -667,7 +667,7 @@ namespace BenchmarkDotNet.Tests
         [GenericTypeArguments(typeof(int))]
         public class MatchedGenericArgumentSource<T>
         {
-            public static IEnumerable<T> Values() { yield return (T)(object)7; }
+            public static IEnumerable<T> Values() { yield return (T) (object) 7; }
 
             [Benchmark]
             [ArgumentsSource(nameof(Values))]
@@ -677,7 +677,7 @@ namespace BenchmarkDotNet.Tests
         [GenericTypeArguments(typeof(byte[]))]
         public class SpanFromGenericArgumentSource<T>
         {
-            public static IEnumerable<T> Values() { yield return (T)(object)new byte[] { 1, 2, 3 }; }
+            public static IEnumerable<T> Values() { yield return (T) (object) new byte[] { 1, 2, 3 }; }
 
             [Benchmark]
             [ArgumentsSource(nameof(Values))]

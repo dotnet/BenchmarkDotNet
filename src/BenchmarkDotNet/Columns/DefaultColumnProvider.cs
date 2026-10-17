@@ -52,7 +52,7 @@ namespace BenchmarkDotNet.Columns
                 }
                 return keys
                     .OrderBy(key => key, StringComparer.Ordinal)
-                    .Select(key => (IColumn)new SettingsColumn(key));
+                    .Select(key => (IColumn) new SettingsColumn(key));
             }
         }
 

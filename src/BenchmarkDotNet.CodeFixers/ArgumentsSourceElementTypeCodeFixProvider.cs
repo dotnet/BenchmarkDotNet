@@ -498,7 +498,7 @@ public class ArgumentsSourceElementTypeCodeFixProvider : CodeFixProvider
         public SyntaxNodeOrToken[] Parts { get; } = parts;
 
         public ExpressionSyntax[] Expressions
-            => Parts.Where(part => part.IsNode).Select(part => (ExpressionSyntax)part.AsNode()!).ToArray();
+            => Parts.Where(part => part.IsNode).Select(part => (ExpressionSyntax) part.AsNode()!).ToArray();
     }
 
     /// <summary>
@@ -521,7 +521,7 @@ public class ArgumentsSourceElementTypeCodeFixProvider : CodeFixProvider
                     collection.OpenBracketToken,
                     collection.CloseBracketToken,
                     collection.Elements.GetWithSeparators()
-                        .Select(part => part.IsNode ? (SyntaxNodeOrToken)((ExpressionElementSyntax)part.AsNode()!).Expression : part)
+                        .Select(part => part.IsNode ? (SyntaxNodeOrToken) ((ExpressionElementSyntax) part.AsNode()!).Expression : part)
                         .ToArray())
                 : null,
 #endif

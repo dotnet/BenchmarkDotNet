@@ -49,8 +49,8 @@ namespace BenchmarkDotNet.Engines
             long? allocatedBytes = GetTotalAllocatedBytes(excludeAllocationQuantumSideEffects);
             return allocatedBytes == null ? null
                 : allocatedBytes == 0 ? 0
-                : (long)Math.Round( // let's round it to reduce the side effects of Allocation quantum
-                    (double)allocatedBytes.Value / TotalOperations,
+                : (long) Math.Round( // let's round it to reduce the side effects of Allocation quantum
+                    (double) allocatedBytes.Value / TotalOperations,
                     MidpointRounding.ToEven);
         }
 
@@ -256,7 +256,7 @@ namespace BenchmarkDotNet.Engines
                         return null;
 
                     // we create delegate to avoid boxing, IMPORTANT!
-                    var del = (Func<bool, long>)method.CreateDelegate(typeof(Func<bool, long>));
+                    var del = (Func<bool, long>) method.CreateDelegate(typeof(Func<bool, long>));
 
                     // verify the api works
                     return del.Invoke(true) >= 0 ? del : null;
@@ -278,7 +278,7 @@ namespace BenchmarkDotNet.Engines
                         return null;
 
                     // we create delegate to avoid boxing, IMPORTANT!
-                    var del = (Func<long>)method.CreateDelegate(typeof(Func<long>));
+                    var del = (Func<long>) method.CreateDelegate(typeof(Func<long>));
 
                     // verify the api works
                     return del.Invoke() >= 0 ? del : null;

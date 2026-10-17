@@ -116,10 +116,10 @@ internal sealed class MockMemory
             return 0;
 
         ulong offset = address - region.Address;
-        int available = region.Bytes.Length - (int)offset;
+        int available = region.Bytes.Length - (int) offset;
         int count = Math.Min(buffer.Length, available);
 
-        region.Bytes.AsSpan((int)offset, count).CopyTo(buffer);
+        region.Bytes.AsSpan((int) offset, count).CopyTo(buffer);
 
         return count;
     }
@@ -147,7 +147,7 @@ internal sealed class MockMemory
 
             ulong offset = address - region.Address;
 
-            if (offset < (ulong)region.Bytes.Length)
+            if (offset < (ulong) region.Bytes.Length)
                 return region;
         }
 
@@ -156,14 +156,14 @@ internal sealed class MockMemory
 
     private static bool IsOverlapping(ulong address1, int length1, ulong address2, int length2)
     {
-        ulong end1 = checked(address1 + (ulong)length1);
-        ulong end2 = checked(address2 + (ulong)length2);
+        ulong end1 = checked(address1 + (ulong) length1);
+        ulong end2 = checked(address2 + (ulong) length2);
 
         return address1 < end2 && address2 < end1;
     }
 
     private static ulong GetEndAddress(ulong address, int length)
-        => checked(address + (ulong)length);
+        => checked(address + (ulong) length);
 
     private sealed class MemoryRegion(ulong address, byte[] bytes)
     {

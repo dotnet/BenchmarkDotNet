@@ -325,7 +325,7 @@ public class JitListenerTests
 
         using var observer = JitListener.Create([watched.Method]);
 
-        RunJitStageToCompletion(observer, [driven.Method], i => driven((int)i));
+        RunJitStageToCompletion(observer, [driven.Method], i => driven((int) i));
 
         Assert.NotNull(observer);
         Assert.False(observer.ReachedFinalTier,
@@ -342,7 +342,7 @@ public class JitListenerTests
 
         using var observer = JitListener.Create([watched.Method]);
 
-        RunJitStageToCompletion(observer, [driven.Method], i => driven((int)i));
+        RunJitStageToCompletion(observer, [driven.Method], i => driven((int) i));
 
         Assert.NotNull(observer);
         Assert.False(observer.ReachedFinalTier,

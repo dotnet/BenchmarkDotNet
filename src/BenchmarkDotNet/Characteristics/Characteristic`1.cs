@@ -30,9 +30,9 @@ namespace BenchmarkDotNet.Characteristics
         internal override object? ResolveValueCore(CharacteristicObject obj, object? currentValue)
         {
             if (Resolver == null)
-                return (T?)base.ResolveValueCore(obj, currentValue);
+                return (T?) base.ResolveValueCore(obj, currentValue);
 
-            return Resolver(obj, (T?)base.ResolveValueCore(obj, currentValue));
+            return Resolver(obj, (T?) base.ResolveValueCore(obj, currentValue));
         }
     }
 }

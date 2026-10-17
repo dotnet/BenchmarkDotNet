@@ -206,7 +206,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             public static IEnumerable<T> SingleValue()
             {
-                yield return (T)(object)3;
+                yield return (T) (object) 3;
             }
 
             public static IEnumerable<object[]> ArgumentList()
@@ -534,7 +534,7 @@ namespace BenchmarkDotNet.IntegrationTests
             // arguments accept "params object[]", when we pass just a string[] it's recognized as an array of params
             public void TypeReflectionArrayGetType(object anArray)
             {
-                string[] strings = (string[])anArray;
+                string[] strings = (string[]) anArray;
 
                 if (strings.Length != 0)
                     throw new ArgumentException("The array should be empty");
@@ -1019,16 +1019,16 @@ namespace BenchmarkDotNet.IntegrationTests
             }
 
             [Benchmark]
-            [Arguments(SomeEnum.First, (SomeEnum)100, (SomeEnum)(-100))]
+            [Arguments(SomeEnum.First, (SomeEnum) 100, (SomeEnum) (-100))]
             public void Test(SomeEnum defined, SomeEnum undefined, SomeEnum undefinedNegative)
             {
                 if (SomeEnum.First != defined)
                     throw new ArgumentException("The passed defined enum has wrong value!");
 
-                if ((SomeEnum)100 != undefined)
+                if ((SomeEnum) 100 != undefined)
                     throw new ArgumentException("The passed undefined enum has wrong value!");
 
-                if ((SomeEnum)(-100) != undefinedNegative)
+                if ((SomeEnum) (-100) != undefinedNegative)
                     throw new ArgumentException("The passed undefined negative enum has wrong value!");
             }
         }

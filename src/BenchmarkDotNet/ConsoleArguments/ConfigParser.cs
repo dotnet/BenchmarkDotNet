@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.ConsoleArguments
                 return false;
             }
 
-            exporters = [(IExporter)Activator.CreateInstance(type)!];
+            exporters = [(IExporter) Activator.CreateInstance(type)!];
             error = null;
             return true;
         }
@@ -412,11 +412,11 @@ namespace BenchmarkDotNet.ConsoleArguments
         {
             if (pointerSize >= 8)
             {
-                affinity = new IntPtr(unchecked((long)mask));
+                affinity = new IntPtr(unchecked((long) mask));
                 return true;
             }
 
-            affinity = new IntPtr(unchecked((int)mask));
+            affinity = new IntPtr(unchecked((int) mask));
             return mask <= uint.MaxValue;
         }
 
@@ -436,7 +436,7 @@ namespace BenchmarkDotNet.ConsoleArguments
             config.AddExporter(options.Exporters.SelectMany(exporter => TryResolveExporters(exporter, out var resolved, out _) ? resolved : []).ToArray());
 
             config.AddHardwareCounters(options.HardwareCounters
-                .Select(counterName => (HardwareCounter)Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
+                .Select(counterName => (HardwareCounter) Enum.Parse(typeof(HardwareCounter), counterName, ignoreCase: true))
                 .ToArray());
 
             if (options.UseMemoryDiagnoser)

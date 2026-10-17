@@ -173,7 +173,7 @@ namespace BenchmarkDotNet.Diagnosers
                         logger.WriteLineError($"kill(perfcollect, SIGINT) failed with {lastError}");
                     }
 
-                    if (!perfCollectProcess.WaitForExit((int)config.Timeout.TotalMilliseconds))
+                    if (!perfCollectProcess.WaitForExit((int) config.Timeout.TotalMilliseconds))
                     {
                         logger.WriteLineError($"The perfcollect script did not stop in {config.Timeout.TotalSeconds}s. It's going to be force killed now.");
                         logger.WriteLineInfo("You can create PerfCollectProfiler providing PerfCollectProfilerConfig with custom timeout value.");

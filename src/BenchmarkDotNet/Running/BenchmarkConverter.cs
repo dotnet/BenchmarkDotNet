@@ -375,7 +375,7 @@ namespace BenchmarkDotNet.Running
             // [EnumeratorCancellation] CancellationToken); we invoke it with their default values.
             object? sourceValue = source is MethodInfo method
                 ? method.Invoke(method.IsStatic ? null : Activator.CreateInstance(sourceType), GetDefaultArguments(method))
-                : ((PropertyInfo)source).GetValue(((PropertyInfo)source).GetMethod!.IsStatic ? null : Activator.CreateInstance(sourceType)!);
+                : ((PropertyInfo) source).GetValue(((PropertyInfo) source).GetMethod!.IsStatic ? null : Activator.CreateInstance(sourceType)!);
 
             return await ToArrayAsync(sourceValue, source, sourceType, declarationErrors, cancellationToken).ConfigureAwait() is { } values
                 ? (source, values)
@@ -413,7 +413,7 @@ namespace BenchmarkDotNet.Running
         {
             var sourceType = memberInfo is MethodInfo methodInfo
                 ? methodInfo.ReturnType
-                : ((PropertyInfo)memberInfo).PropertyType;
+                : ((PropertyInfo) memberInfo).PropertyType;
 
             // Checked before the shape, so a null async source reports the same declaration error a null
             // synchronous source does instead of failing while being enumerated.
