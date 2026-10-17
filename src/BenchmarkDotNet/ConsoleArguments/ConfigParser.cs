@@ -16,11 +16,12 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CoreRun;
-using BenchmarkDotNet.Toolchains.Mono;
-using BenchmarkDotNet.Toolchains.Wasm;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.Framework;
+using BenchmarkDotNet.Toolchains.Mono;
+using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.NetCoreApp;
 using BenchmarkDotNet.Toolchains.R2R;
+using BenchmarkDotNet.Toolchains.Wasm;
 using CommandLine;
 using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
@@ -28,7 +29,6 @@ using Perfolizer.Metrology;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
-using BenchmarkDotNet.Toolchains.NetCoreApp;
 
 namespace BenchmarkDotNet.ConsoleArguments
 {
@@ -128,7 +128,20 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
 
             args = expandedArgs;
-            using (var parser = CreateParser(logger))
+
+            // First path: Detect repeated options with and `allowMultiInstance: false` setting.
+            bool allowMultiInstance;
+            using (var probe = CreateParser(TextWriter.Null, allowMultiInstance: false))
+            {
+                allowMultiInstance = false;
+                probe
+                    .ParseArguments<CommandLineOptions>(args)
+                    .WithParsed(_ => allowMultiInstance = false)
+                    .WithNotParsed(errors => allowMultiInstance = HasMultiValueRepeatErrorsOnly(errors));
+            }
+
+            // Second path: Run actual parse logics.
+            using (var parser = CreateParser(new LoggerWrapper(logger), allowMultiInstance))
             {
                 parser
                     .ParseArguments<CommandLineOptions>(args)
@@ -245,7 +258,18 @@ namespace BenchmarkDotNet.ConsoleArguments
             (bool isSuccess, CommandLineOptions? options) result = default;
 
             ILogger logger = NullLogger.Instance;
-            using (var parser = CreateParser(logger))
+
+            bool allowMultiInstance;
+            using (var probe = CreateParser(TextWriter.Null, allowMultiInstance: false))
+            {
+                allowMultiInstance = false;
+                probe
+                    .ParseArguments<CommandLineOptions>(args)
+                    .WithParsed(_ => allowMultiInstance = false)
+                    .WithNotParsed(errors => allowMultiInstance = HasMultiValueRepeatErrorsOnly(errors));
+            }
+
+            using (var parser = CreateParser(new LoggerWrapper(logger), allowMultiInstance))
             {
                 parser
                     .ParseArguments<CommandLineOptions>(args)
@@ -265,16 +289,31 @@ namespace BenchmarkDotNet.ConsoleArguments
             }
         }
 
-        private static Parser CreateParser(ILogger logger)
+        private static Parser CreateParser(TextWriter helpWriter, bool allowMultiInstance)
             => new Parser(settings =>
             {
+                settings.AllowMultiInstance = allowMultiInstance;
                 settings.CaseInsensitiveEnumValues = true;
                 settings.CaseSensitive = false;
                 settings.EnableDashDash = true;
                 settings.IgnoreUnknownArguments = false;
-                settings.HelpWriter = new LoggerWrapper(logger);
+                settings.HelpWriter = helpWriter;
                 settings.MaximumDisplayWidth = Math.Max(MinimumDisplayWidth, GetMaximumDisplayWidth());
             });
+
+        private static bool HasMultiValueRepeatErrorsOnly(IEnumerable<Error> errors)
+        {
+            if (errors.IsEmpty())
+                return false;
+
+            return errors.All(error =>
+            {
+                if (error is not RepeatedOptionError repeated)
+                    return false;
+
+                return CommandLineOptions.IsMultiValueOption(repeated.NameInfo.LongName);
+            });
+        }
 
         private static bool Validate(CommandLineOptions options, ILogger logger)
         {
