@@ -308,5 +308,40 @@ namespace BenchmarkDotNet.Tests.Environments
             bytes.Add(0);
             return bytes.ToArray();
         }
+        [Fact]
+        public void MacAvailableMemoryIncludesReusablePages()
+        {
+            const string vmStat = """
+                Mach Virtual Memory Statistics: (page size of 16384 bytes)
+                Pages free:                               100.
+                Pages active:                           2000.
+                Pages inactive:                          300.
+                Pages speculative:                        50.
+                Pages throttled:                           0.
+                Pages wired down:                       500.
+                """;
+
+            Assert.Equal(7_372_800, SystemMemory.ParseMacAvailableMemory(vmStat));
+        }
+
+        [Fact]
+        public void MacAvailableMemoryReturnsZeroWhenAllAvailablePagesAreZero()
+        {
+            const string vmStat = """
+                Mach Virtual Memory Statistics: (page size of 4096 bytes)
+                Pages free:                                 0.
+                Pages inactive:                             0.
+                Pages speculative:                           0.
+                """;
+
+            Assert.Equal(0, SystemMemory.ParseMacAvailableMemory(vmStat));
+        }
+
+        [Fact]
+        public void MacAvailableMemoryReturnsNullWhenPageDataIsIncomplete()
+        {
+            Assert.Null(SystemMemory.ParseMacAvailableMemory(
+                "Mach Virtual Memory Statistics: (page size of 4096 bytes)"));
+        }
     }
 }
