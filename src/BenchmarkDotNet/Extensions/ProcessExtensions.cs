@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Extensions
         private static IntPtr FixAffinity(IntPtr processorAffinity)
         {
             // Max supported affinity without CPU groups is 64
-            long cpuMask = Environment.ProcessorCount >= 64 ? unchecked((long)0xFFFF_FFFF_FFFF_FFFF) : (1L << Environment.ProcessorCount) - 1;
+            long cpuMask = Environment.ProcessorCount >= 64 ? unchecked((long) 0xFFFF_FFFF_FFFF_FFFF) : (1L << Environment.ProcessorCount) - 1;
 
             return RuntimeInformation.Is64BitPlatform()
                 ? new IntPtr(processorAffinity.ToInt64() & cpuMask)
@@ -84,7 +84,7 @@ namespace BenchmarkDotNet.Extensions
             catch (Exception ex)
             {
                 logger.WriteLineError(
-                    $"// ! Failed to set up processor affinity 0x{(long)processorAffinity:X} for process {process}. Make sure you have the right permissions. Message: {ex.Message}");
+                    $"// ! Failed to set up processor affinity 0x{(long) processorAffinity:X} for process {process}. Make sure you have the right permissions. Message: {ex.Message}");
             }
 
             return false;
@@ -214,7 +214,7 @@ namespace BenchmarkDotNet.Extensions
             {
                 process.Start();
                 processOutputReader.BeginRead();
-                process.WaitForExit((int)timeout.TotalMilliseconds);
+                process.WaitForExit((int) timeout.TotalMilliseconds);
             }
             return (process.HasExited ? process.ExitCode : -1, processOutputReader.GetOutputText());
         }
@@ -233,7 +233,7 @@ namespace BenchmarkDotNet.Extensions
 
             using (var process = Process.Start(startInfo)!)
             {
-                if (!process.WaitForExit((int)timeout.TotalMilliseconds))
+                if (!process.WaitForExit((int) timeout.TotalMilliseconds))
                     process.Kill();
 
                 return process.ExitCode;

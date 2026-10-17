@@ -194,7 +194,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             var seen = new HashSet<Instruction>();
             while (IsLeave(target) && seen.Add(target))
             {
-                target = (Instruction)target.Operand;
+                target = (Instruction) target.Operand;
             }
             return target;
         }
@@ -619,29 +619,29 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             }
             else if (op1.Operand is TypeReference tr)
             {
-                DiffSignature(tr, (TypeReference)op2.Operand);
+                DiffSignature(tr, (TypeReference) op2.Operand);
             }
             else if (op1.Operand is FieldReference fr)
             {
-                DiffSignature(fr, (FieldReference)op2.Operand);
+                DiffSignature(fr, (FieldReference) op2.Operand);
             }
             else if (op1.Operand is MethodReference mr)
             {
-                DiffSignature(mr, (MethodReference)op2.Operand);
+                DiffSignature(mr, (MethodReference) op2.Operand);
             }
             else if (op1.Operand is ParameterDefinition p)
             {
-                DiffSignature(p, (ParameterDefinition)op2.Operand);
+                DiffSignature(p, (ParameterDefinition) op2.Operand);
             }
             else if (op1.Operand is VariableDefinition v)
             {
-                DiffSignature(v, (VariableDefinition)op2.Operand, method1);
+                DiffSignature(v, (VariableDefinition) op2.Operand, method1);
             }
             else if (op1.Operand is Instruction i)
             {
                 // Follow leave-chains so a paired-up Leave on each side compares against its FINAL
                 // destination — Roslyn jumps directly, ILGenerator chains via implicit hops.
-                var resolved2 = ResolveLeaveTarget((Instruction)op2.Operand);
+                var resolved2 = ResolveLeaveTarget((Instruction) op2.Operand);
                 var resolved1 = ResolveLeaveTarget(i);
                 op2ToOp1Map.TryGetValue(resolved2, out var expectedOp1Operand);
                 if (resolved1 != expectedOp1Operand)
@@ -651,7 +651,7 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             {
                 // OpCodes.Switch has an Instruction[] operand. Each branch target must map to the
                 // same instruction-index on both sides via op2ToOp1Map, just like the single-target case.
-                var targets2 = (Instruction[])op2.Operand;
+                var targets2 = (Instruction[]) op2.Operand;
                 if (targets1.Length != targets2.Length)
                     throw new InvalidOperationException($"No matching op for {op1} vs {op2} ({method1}).");
                 for (int t = 0; t < targets1.Length; t++)

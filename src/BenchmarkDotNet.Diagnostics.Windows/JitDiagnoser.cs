@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public abstract class JitDiagnoser<TStats> : EtwDiagnoser<TStats>, IDiagnoser where TStats : new()
     {
-        protected override ulong EventType => (ulong)ClrTraceEventParser.Keywords.JitTracing;
+        protected override ulong EventType => (ulong) ClrTraceEventParser.Keywords.JitTracing;
 
         protected override string SessionNamePrefix => "JitTracing";
 

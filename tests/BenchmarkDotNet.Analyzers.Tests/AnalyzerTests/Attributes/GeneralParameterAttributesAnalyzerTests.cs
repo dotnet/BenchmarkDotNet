@@ -523,7 +523,7 @@ public class GeneralParameterAttributesAnalyzerTests
 #pragma warning restore IDE0028 // Simplify collection initialization
 
         public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages
-            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int)tdr[1], (tdr[2] as int[])!));
+            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int) tdr[1], (tdr[2] as int[])!));
 
         public static IEnumerable<int[]> DuplicateParameterAttributeUsageCounts
             => DuplicateAttributeUsageCountsTheoryData;
@@ -692,7 +692,7 @@ public class GeneralParameterAttributesAnalyzerTests
 #pragma warning restore IDE0028 // Simplify collection initialization
 
         public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages
-            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int)tdr[1], (tdr[2] as int[])!));
+            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int) tdr[1], (tdr[2] as int[])!));
 
         public static TheoryData<int[]> DuplicateParameterAttributeUsageCounts
             => DuplicateAttributeUsageCountsTheoryData;
@@ -1155,7 +1155,7 @@ public class GeneralParameterAttributesAnalyzerTests
             => UniqueParameterAttributesTheoryData.Select(tdr => ((tdr[0] as string)!, (tdr[1] as string)!));
 
         public static IEnumerable<(string CurrentUniqueAttributeUsage, int CurrentUniqueAttributeUsagePosition, int[] Counts)> DuplicateSameParameterAttributeUsages
-            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int)tdr[1], (tdr[2] as int[])!));
+            => DuplicateSameAttributeUsagesTheoryData.Select(tdr => ((tdr[0] as string)!, (int) tdr[1], (tdr[2] as int[])!));
 
         public static TheoryData<int[]> DuplicateParameterAttributeUsageCounts
             => DuplicateAttributeUsageCountsTheoryData;

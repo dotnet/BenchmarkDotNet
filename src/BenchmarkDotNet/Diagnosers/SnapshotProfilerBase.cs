@@ -201,7 +201,7 @@ public abstract class SnapshotProfilerBase : IProfiler
 
         public void Report(double value)
         {
-            int progress = (int)Math.Floor(value);
+            int progress = (int) Math.Floor(value);
             bool needToReport = stopwatch == null ||
                                 (stopwatch != null && stopwatch?.Elapsed > ReportInterval) ||
                                 progress == 100;

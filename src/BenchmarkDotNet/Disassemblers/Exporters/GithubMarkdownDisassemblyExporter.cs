@@ -61,7 +61,7 @@ namespace BenchmarkDotNet.Disassemblers.Exporters
                     {
                         checked
                         {
-                            totalSizeInBytes += (uint)asm.InstructionLength;
+                            totalSizeInBytes += (uint) asm.InstructionLength;
                         }
 
                         await writer.WriteLineAsync($"       {element.TextRepresentation}", cancellationToken).ConfigureAwait(false);

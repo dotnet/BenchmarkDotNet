@@ -29,10 +29,10 @@ namespace BenchmarkDotNet.Engines;
 internal sealed class JitListener : EventListener
 {
     private const string RuntimeEventSourceName = "Microsoft-Windows-DotNETRuntime";
-    private const EventKeywords JitKeyword = (EventKeywords)0x10;
+    private const EventKeywords JitKeyword = (EventKeywords) 0x10;
     // The "Compilation" keyword carries the TieredCompilation/Pause|Resume and BackgroundJit Start/Stop events. Low
     // volume (a handful per delay/batch cycle), so enabling it adds no meaningful cost.
-    private const EventKeywords CompilationKeyword = (EventKeywords)0x1000000000;
+    private const EventKeywords CompilationKeyword = (EventKeywords) 0x1000000000;
     private const string TieredCompilationResumeEvent = "TieredCompilationResume";
     private const string TieredCompilationPauseEvent = "TieredCompilationPause";
     // The background tiering worker brackets each batch with these: Start when it begins draining its queue, Stop when
@@ -512,7 +512,7 @@ internal sealed class JitListener : EventListener
             {
                 return 0;
             }
-            return (ulong)((IntPtr)field.GetValue(module)!).ToInt64();
+            return (ulong) ((IntPtr) field.GetValue(module)!).ToInt64();
         }
         catch
         {
@@ -563,7 +563,7 @@ internal sealed class JitListener : EventListener
             }
             else
             {
-                methodId = (ulong)method.MethodHandle.Value.ToInt64();
+                methodId = (ulong) method.MethodHandle.Value.ToInt64();
             }
         }
 

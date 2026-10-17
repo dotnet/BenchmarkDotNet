@@ -10,7 +10,7 @@ namespace BenchmarkDotNet.Characteristics
 
         protected CharacteristicObject(string id) : base(id) { }
 
-        public new T Apply(CharacteristicObject other) => (T)ApplyCore(other);
+        public new T Apply(CharacteristicObject other) => (T) ApplyCore(other);
 
         [PublicAPI]
         public T Apply(params CharacteristicObject[] others)
@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Characteristics
             {
                 result.Apply(other);
             }
-            return (T)result;
+            return (T) result;
         }
 
         [PublicAPI]
@@ -29,9 +29,9 @@ namespace BenchmarkDotNet.Characteristics
         [PublicAPI]
         public T ApplyAndFreeze(params CharacteristicObject[] others) => Apply(others).Freeze();
 
-        public new T Freeze() => (T)FreezeCore();
+        public new T Freeze() => (T) FreezeCore();
 
-        public new T UnfreezeCopy() => (T)UnfreezeCopyCore();
+        public new T UnfreezeCopy() => (T) UnfreezeCopyCore();
 
         protected static Characteristic<TC> CreateCharacteristic<[DynamicallyAccessedMembers(CharacteristicMemberTypes)] TC>(string memberName) => Characteristic.Create<T, TC>(memberName);
 

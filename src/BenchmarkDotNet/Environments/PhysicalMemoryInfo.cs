@@ -93,7 +93,7 @@ namespace BenchmarkDotNet.Environments
         [SupportedOSPlatform("windows6.0.6000")]
         private static PhysicalMemoryInfo? GetWindowsMemory()
         {
-            var memStatus = new MEMORYSTATUSEX { dwLength = (uint)Marshal.SizeOf<MEMORYSTATUSEX>() };
+            var memStatus = new MEMORYSTATUSEX { dwLength = (uint) Marshal.SizeOf<MEMORYSTATUSEX>() };
             if (PInvoke.GlobalMemoryStatusEx(ref memStatus))
             {
                 var (speed, type) = GetWindowsMemoryDetails();

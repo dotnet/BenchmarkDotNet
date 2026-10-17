@@ -136,7 +136,7 @@ public class RuntimeParseTests
             "mono" => MonoCoreRuntime.From(new Version(99, 0, 30)),
             "monowasm" => MonoWasmRuntime.From(new Version(99, 0, 30)),
             "monowasmaot" => MonoWasmAotRuntime.From(new Version(99, 0, 30)),
-            _ => (Runtime)CoreWasmRuntime.From(new Version(99, 0, 30)),
+            _ => (Runtime) CoreWasmRuntime.From(new Version(99, 0, 30)),
         };
 
         Assert.Equal(new Version(99, 0), withBuild.Version);

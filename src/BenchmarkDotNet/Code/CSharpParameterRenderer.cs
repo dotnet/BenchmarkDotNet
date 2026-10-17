@@ -184,8 +184,8 @@ internal sealed class CSharpParameterRenderer
     private static string InvocationPostfix(MemberInfo source) => source is PropertyInfo ? string.Empty : "()";
 
     private static bool IsStatic(MemberInfo source)
-        => source is PropertyInfo property ? property.GetMethod!.IsStatic : ((MethodInfo)source).IsStatic;
+        => source is PropertyInfo property ? property.GetMethod!.IsStatic : ((MethodInfo) source).IsStatic;
 
     private static Type ReturnType(MemberInfo source)
-        => source is PropertyInfo property ? property.GetMethod!.ReturnType : ((MethodInfo)source).ReturnType;
+        => source is PropertyInfo property ? property.GetMethod!.ReturnType : ((MethodInfo) source).ReturnType;
 }

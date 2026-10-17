@@ -132,7 +132,7 @@ internal static class ExtensionMethods
 
     public static Arm64Instruction ToCapstoneArm64Instruction(this uint rawInstruction, ulong baseAddress, uint i)
     {
-        ulong offset = (ulong)i * 4;
+        ulong offset = (ulong) i * 4;
         return rawInstruction.ToCapstoneArm64Instruction(baseAddress + offset);
     }
 
@@ -144,7 +144,7 @@ internal static class ExtensionMethods
         using var disassembler = CapstoneDisassembler.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
         disassembler.EnableInstructionDetails = true;
 
-        var instructions = disassembler.Disassemble(bytes.ToArray(), (long)baseAddress);
+        var instructions = disassembler.Disassemble(bytes.ToArray(), (long) baseAddress);
         if (instructions.Length == 0)
         {
             var instruction = AsmArm64.Arm64Instruction.Decode(rawInstruction);

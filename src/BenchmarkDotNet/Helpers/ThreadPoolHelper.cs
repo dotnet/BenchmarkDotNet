@@ -19,9 +19,9 @@ internal static class ThreadPoolHelper
             => cancellationToken.ThrowIfCancellationRequested();
 
         public void OnCompleted(Action continuation)
-            => ThreadPool.QueueUserWorkItem(static state => ((Action)state!)(), continuation);
+            => ThreadPool.QueueUserWorkItem(static state => ((Action) state!)(), continuation);
 
         public void UnsafeOnCompleted(Action continuation)
-            => ThreadPool.UnsafeQueueUserWorkItem(static state => ((Action)state!)(), continuation);
+            => ThreadPool.UnsafeQueueUserWorkItem(static state => ((Action) state!)(), continuation);
     }
 }

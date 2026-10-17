@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             var logger = new AccumulationLogger();
             var summary = MockFactory.CreateSummary<MockBenchmarkClass>(DefaultConfig.Instance, hugeSd, metrics);
-            ((ExporterBase)MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
+            ((ExporterBase) MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
             output.WriteLine(logger.GetLog());
             return summary;
         }

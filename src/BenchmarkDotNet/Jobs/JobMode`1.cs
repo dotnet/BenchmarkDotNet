@@ -11,6 +11,6 @@ namespace BenchmarkDotNet.Jobs
 
         protected JobMode(string id) : base(id) { }
 
-        [PublicAPI] public Job Job => (Job)OwnerOrSelf;
+        [PublicAPI] public Job Job => (Job) OwnerOrSelf;
     }
 }

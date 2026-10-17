@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Parameters
             // the whole array, because the generated code emits no index here to reach inside one with, and
             // unwrapping only the in-process side would have the two toolchains assign different values.
             if (values.All(value => value is object[] { Length: 1 } wrapper && SourceCodeHelper.IsCompilationTimeConstant(wrapper[0])))
-                values = values.Select(value => ((object[])value!)[0]).ToArray();
+                values = values.Select(value => ((object[]) value!)[0]).ToArray();
 
             bool namesNothing = source.GetSourceReturnType().TryGetSourceElementType(out var elementType) && elementType == typeof(object);
 

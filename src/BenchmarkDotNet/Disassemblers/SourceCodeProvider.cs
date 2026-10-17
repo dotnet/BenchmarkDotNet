@@ -112,7 +112,7 @@ namespace BenchmarkDotNet.Disassemblers
             if (reader == null)
                 return null;
 
-            return reader.SourceLocationForManagedCode((uint)method.MetadataToken, ilOffset);
+            return reader.SourceLocationForManagedCode((uint) method.MetadataToken, ilOffset);
         }
 
         private ManagedSymbolModule? GetReaderForMethod(IClrMethod? method)
