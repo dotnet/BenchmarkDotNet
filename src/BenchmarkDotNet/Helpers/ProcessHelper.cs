@@ -14,10 +14,10 @@ namespace BenchmarkDotNet.Helpers
     {
         /// <summary>
         /// Run external process and return the console output.
-        /// In the case of any exception, null will be returned.
+        /// In the case of any exception, or if the process does not finish within <paramref name="timeout"/>, null will be returned.
         /// </summary>
         internal static string? RunAndReadOutput(string fileName, string arguments = "", ILogger? logger = null,
-            Dictionary<string, string>? environmentVariables = null)
+            Dictionary<string, string>? environmentVariables = null, TimeSpan? timeout = null)
         {
             var processStartInfo = new ProcessStartInfo
             {
@@ -43,9 +43,19 @@ namespace BenchmarkDotNet.Helpers
                 {
                     return null;
                 }
-                string output = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
-                return output;
+
+                if (timeout is null)
+                {
+                    string output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+                    return output;
+                }
+
+                // On timeout, disposing the cleanup helper kills the still-running process.
+                var readTask = process.StandardOutput.ReadToEndAsync();
+                if (!readTask.Wait(timeout.Value) || !process.WaitForExit((int)timeout.Value.TotalMilliseconds))
+                    return null;
+                return readTask.Result;
             }
         }
 
