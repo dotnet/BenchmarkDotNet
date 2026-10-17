@@ -18,7 +18,7 @@ indent_size = 2
 indent_size = 2
 
 # .NET solution/project files
-[*.{slnx,csproj,vbproj]
+[*.{slnx,csproj,vbproj}]
 indent_size = 2
 
 # Shell scripts
