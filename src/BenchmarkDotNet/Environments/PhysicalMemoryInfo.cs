@@ -136,22 +136,29 @@ namespace BenchmarkDotNet.Environments
                     string output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
 
-                    long pageSize = 4096;
-                    var pageSizeMatch = Regex.Match(output, @"page size of (\d+) bytes");
-                    if (pageSizeMatch.Success && long.TryParse(pageSizeMatch.Groups[1].Value, out long parsedPageSize))
-                    {
-                        pageSize = parsedPageSize;
-                    }
-
-                    var match = Regex.Match(output, @"Pages free:\s+(\d+)");
-                    if (match.Success && long.TryParse(match.Groups[1].Value, out long pagesFree))
-                    {
-                        available = pagesFree * pageSize;
-                    }
+                    available = ParseMacAvailableMemory(output);
                 }
             }
 
             return new PhysicalMemoryInfo(total, available);
+        }
+
+        internal static long? ParseMacAvailableMemory(string output)
+        {
+            var pageSizeMatch = Regex.Match(output, @"page size of (\d+) bytes");
+            long pageSize = pageSizeMatch.Success && long.TryParse(pageSizeMatch.Groups[1].Value, out long parsedPageSize)
+                ? parsedPageSize
+                : 4096;
+
+            long availablePages = 0;
+            foreach (string pageName in new[] { "free", "inactive", "speculative", "purgeable" })
+            {
+                var match = Regex.Match(output, $@"Pages {pageName}:\s+(\d+)");
+                if (match.Success && long.TryParse(match.Groups[1].Value, out long pages))
+                    availablePages += pages;
+            }
+
+            return availablePages > 0 ? availablePages * pageSize : null;
         }
     }
 }
