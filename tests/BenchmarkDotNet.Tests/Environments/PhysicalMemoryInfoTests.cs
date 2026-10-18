@@ -1,3 +1,4 @@
+using AwesomeAssertions;
 using BenchmarkDotNet.Environments;
 using System.Buffers.Binary;
 using Xunit;
@@ -8,6 +9,7 @@ namespace BenchmarkDotNet.Tests.Environments
     {
         private const long SixteenGb = 16L * 1024 * 1024 * 1024;
         private const long EightGb = 8L * 1024 * 1024 * 1024;
+        private const long TwoHundredFiftySixMb = 256L * 1024 * 1024;
 
         private const byte Ddr4 = 0x1A;
         private const byte Ddr5 = 0x22;
@@ -183,6 +185,78 @@ namespace BenchmarkDotNet.Tests.Environments
         public void EdacMemoryTypeIsNormalized(string edacType, string? expected)
         {
             Assert.Equal(expected, SystemMemory.NormalizeEdacMemoryType(edacType));
+        }
+
+        [Fact]
+        public void LinuxPrefersMemAvailableOverMemFree()
+        {
+            // /proc/meminfo lists MemFree before MemAvailable; the kernel's MemAvailable estimate must win.
+            // Arrange
+            string[] memInfo =
+            [
+                "MemTotal:       16777216 kB",
+                "MemFree:         262144 kB",
+                "MemAvailable:   8388608 kB",
+                "Buffers:          123456 kB",
+                "Cached:           500000 kB",
+            ];
+
+            // Act
+            var result = SystemMemory.ParseMemInfo(memInfo);
+
+            // Assert
+            result.TotalBytes.Should().Be(SixteenGb);
+            result.AvailableBytes.Should().Be(EightGb);
+        }
+
+        [Fact]
+        public void LinuxAvailableMemoryIsOrderIndependent()
+        {
+            // Arrange
+            string[] memInfo =
+            [
+                "MemAvailable:   8388608 kB",
+                "MemFree:         262144 kB",
+            ];
+
+            // Act
+            var result = SystemMemory.ParseMemInfo(memInfo);
+
+            // Assert
+            result.AvailableBytes.Should().Be(EightGb);
+        }
+
+        [Fact]
+        public void LinuxFallsBackToMemFreeWithoutMemAvailable()
+        {
+            // MemAvailable was added in Linux 3.14 and is missing from older kernels.
+            // Arrange
+            string[] memInfo =
+            [
+                "MemTotal:       16777216 kB",
+                "MemFree:         262144 kB",
+            ];
+
+            // Act
+            var result = SystemMemory.ParseMemInfo(memInfo);
+
+            // Assert
+            result.TotalBytes.Should().Be(SixteenGb);
+            result.AvailableBytes.Should().Be(TwoHundredFiftySixMb);
+        }
+
+        [Fact]
+        public void LinuxWithoutMemoryValuesReturnsNothing()
+        {
+            // Arrange
+            string[] memInfo = ["Buffers: 0 kB", "Cached: 0 kB"];
+
+            // Act
+            var result = SystemMemory.ParseMemInfo(memInfo);
+
+            // Assert
+            result.TotalBytes.Should().Be(0);
+            result.AvailableBytes.Should().BeNull();
         }
 
         private static byte[] Table(params byte[][] structures)
