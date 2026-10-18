@@ -16,16 +16,39 @@ public class PerfonarTests(ITestOutputHelper output)
 {
     [Theory]
     [MemberData(nameof(EntryDataKeys))]
-    public Task PerfonarIndexTest(string key) => VerifyString(key, new PerfonarIndex(TableDataMap[key].RootEntry).Dump());
+    public async Task PerfonarIndexTest(string key)
+    {
+        var content = new PerfonarIndex(TableDataMap[key].RootEntry).Dump();
+
+        try
+        {
+            await VerifyString(key, content);
+        }
+        catch
+        {
+            output.WriteLine(content);
+            throw;
+        }
+    }
 
     [Theory]
     [MemberData(nameof(EntryDataKeys))]
-    public Task PerfonarTableTest(string key)
+    public async Task PerfonarTableTest(string key)
     {
         var table = TableDataMap[key];
         string markdown = table.ToMarkdown(new PerfonarTableStyle());
         string json = LightJsonSerializer.Serialize(table.RootEntry, new LightJsonSettings { Indent = true });
-        return VerifyString(key, markdown + "\n" + json);
+
+        var content = $"{markdown}\n{json}";
+        try
+        {
+            await VerifyString(key, content);
+        }
+        catch
+        {
+            output.WriteLine(content);
+            throw;
+        }
     }
 
     private static readonly IDictionary<string, PerfonarTable> TableDataMap = new Dictionary<string, PerfonarTable>
@@ -162,7 +185,6 @@ public class PerfonarTests(ITestOutputHelper output)
 
     private Task VerifyString(string key, string content)
     {
-        output.WriteLine(content);
         var settings = VerifyHelper.Create("Perfonar");
         settings.UseParameters(key);
         return Verifier.Verify(content, settings);

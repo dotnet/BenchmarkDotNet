@@ -32,7 +32,7 @@ public class UnitTestRunner(BuildContext context)
     private DirectoryPath TestOutputDirectory { get; } = context.RootDirectory
         .Combine("TestResults");
 
-    private DotNetTestSettings GetTestSettingsParameters(FilePath logFile, string tfm)
+    private DotNetTestSettings GetTestSettingsParameters(FilePath logFile, string tfm, string consoleLogVerbosity)
     {
         var settings = new DotNetTestSettings
         {
@@ -40,7 +40,7 @@ public class UnitTestRunner(BuildContext context)
             Framework = tfm,
             NoBuild = true,
             NoRestore = true,
-            Loggers = new[] { "trx", $"trx;LogFileName={logFile.FullPath}", "console;verbosity=detailed" },
+            Loggers = ["trx", $"trx;LogFileName={logFile.FullPath}", $"console;verbosity={consoleLogVerbosity}"],
             EnvironmentVariables =
             {
                 ["Platform"] = "" // force the tool to not look for the .dll in platform-specific directory
@@ -51,11 +51,15 @@ public class UnitTestRunner(BuildContext context)
 
     private void RunTests(FilePath projectFile, string alias, string tfm)
     {
+        var consoleLogVerbosity = projectFile == AnalyzerTestsProjectFile
+            ? "minimal"   // Show logs when test failed only.
+            : "detailed"; // Show detailed logs including stdout.
+
         var os = Utils.GetOs();
         var arch = RuntimeInformation.OSArchitecture.ToString().ToLower();
         var trxFileName = $"{os}({arch})-{alias}-{tfm}.trx";
         var trxFile = TestOutputDirectory.CombineWithFilePath(trxFileName);
-        var settings = GetTestSettingsParameters(trxFile, tfm);
+        var settings = GetTestSettingsParameters(trxFile, tfm, consoleLogVerbosity);
 
         context.Information($"Run tests for {projectFile} ({tfm}), result file: '{trxFile}'");
         context.DotNetTest(projectFile.FullPath, settings);
