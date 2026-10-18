@@ -53,7 +53,7 @@ namespace BenchmarkDotNet.Helpers
 
                 // On timeout, disposing the cleanup helper kills the still-running process.
                 var readTask = process.StandardOutput.ReadToEndAsync();
-                if (!readTask.Wait(timeout.Value) || !process.WaitForExit((int)timeout.Value.TotalMilliseconds))
+                if (!readTask.Wait(timeout.Value) || !process.WaitForExit((int) timeout.Value.TotalMilliseconds))
                     return null;
                 return readTask.Result;
             }

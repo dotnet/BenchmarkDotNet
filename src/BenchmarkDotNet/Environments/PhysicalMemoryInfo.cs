@@ -97,7 +97,7 @@ namespace BenchmarkDotNet.Environments
             if (PInvoke.GlobalMemoryStatusEx(ref memStatus))
             {
                 var (speed, type) = GetWindowsMemoryDetails();
-                return new PhysicalMemoryInfo((long)memStatus.ullTotalPhys, (long)memStatus.ullAvailPhys, speed, type);
+                return new PhysicalMemoryInfo((long) memStatus.ullTotalPhys, (long) memStatus.ullAvailPhys, speed, type);
             }
 
             return null;
@@ -201,7 +201,7 @@ namespace BenchmarkDotNet.Environments
             try
             {
                 const uint rsMb = 0x52534D42; // 'RSMB'
-                var provider = (FIRMWARE_TABLE_PROVIDER)rsMb;
+                var provider = (FIRMWARE_TABLE_PROVIDER) rsMb;
                 uint bufferSize = PInvoke.GetSystemFirmwareTable(provider, 0, null, 0);
                 if (bufferSize == 0)
                     return (null, null);
@@ -217,7 +217,7 @@ namespace BenchmarkDotNet.Environments
                 const int headerSize = 8;
                 if (buffer.Length < headerSize)
                     return (null, null);
-                int tableLength = (int)Math.Min(BinaryPrimitives.ReadUInt32LittleEndian(buffer.AsSpan(4)), (uint)(buffer.Length - headerSize));
+                int tableLength = (int) Math.Min(BinaryPrimitives.ReadUInt32LittleEndian(buffer.AsSpan(4)), (uint) (buffer.Length - headerSize));
                 return ParseSmbiosMemoryDevices(buffer.AsSpan(headerSize, tableLength));
             }
             catch
