@@ -69,6 +69,8 @@ namespace BenchmarkDotNet.Environments
     {
         private static readonly TimeSpan SystemProfilerTimeout = TimeSpan.FromSeconds(5);
 
+        private static readonly Regex MemInfoValueRegex = new(@"[0-9]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         public static PhysicalMemoryInfo? GetPhysicalMemory()
         {
             try
@@ -106,34 +108,64 @@ namespace BenchmarkDotNet.Environments
         private static PhysicalMemoryInfo? GetLinuxMemory()
         {
             const string path = "/proc/meminfo";
-            if (File.Exists(path))
+            if (!File.Exists(path))
+                return null;
+
+            var (total, available) = ParseMemInfo(File.ReadAllLines(path));
+            if (total <= 0)
+                return null;
+
+            var (speed, type) = GetLinuxMemoryDetails();
+            return new PhysicalMemoryInfo(total, available, speed, type);
+        }
+
+        internal static (long TotalBytes, long? AvailableBytes) ParseMemInfo(IEnumerable<string> lines)
+        {
+            long total = 0;
+            long? available = null;
+            long? free = null;
+
+            foreach (var line in lines)
             {
-                long total = 0;
-                long? available = null;
+                if (!TryParseLine(line, out string field, out long bytes))
+                    continue;
 
-                foreach (var line in File.ReadAllLines(path))
+                switch (field)
                 {
-                    if (line.StartsWith("MemTotal:"))
-                    {
-                        var match = Regex.Match(line, @"\d+");
-                        if (match.Success && long.TryParse(match.Value, out long kb))
-                            total = kb * 1024;
-                    }
-                    else if (line.StartsWith("MemAvailable:") || line.StartsWith("MemFree:"))
-                    {
-                        var match = Regex.Match(line, @"\d+");
-                        if (match.Success && long.TryParse(match.Value, out long kb) && available == null)
-                            available = kb * 1024;
-                    }
-                }
-
-                if (total > 0)
-                {
-                    var (speed, type) = GetLinuxMemoryDetails();
-                    return new PhysicalMemoryInfo(total, available, speed, type);
+                    case "MemTotal":
+                        total = bytes;
+                        break;
+                    case "MemAvailable":
+                        available = bytes;
+                        break;
+                    case "MemFree":
+                        free = bytes;
+                        break;
                 }
             }
-            return null;
+
+            // MemFree is used only as a fallback when MemAvailable is not available.
+            return (total, available ?? free);
+
+            static bool TryParseLine(string line, out string field, out long bytes)
+            {
+                field = "";
+                bytes = 0;
+
+                int separator = line.IndexOf(':');
+                if (separator <= 0)
+                    return false;
+
+                var match = MemInfoValueRegex.Match(line, separator + 1);
+                if (match.Success && long.TryParse(match.Value, out long kb))
+                {
+                    field = line.Substring(0, separator);
+                    bytes = kb * 1024;
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         private static (long? SpeedMts, string? MemoryType) GetLinuxMemoryDetails()
