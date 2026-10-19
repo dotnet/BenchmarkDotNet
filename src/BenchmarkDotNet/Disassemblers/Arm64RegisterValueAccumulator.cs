@@ -1,5 +1,6 @@
 using Gee.External.Capstone.Arm64;
 using Microsoft.Diagnostics.Runtime.Interfaces;
+using System.Diagnostics;
 
 namespace BenchmarkDotNet.Disassemblers;
 
@@ -14,8 +15,8 @@ internal struct Arm64RegisterValueAccumulator
     }
 
     private State _state;
-    private long _value;
-    private int _expectedMovkShift;
+    private ulong _addressValue;
+    private long _addressOffset;
     private Arm64RegisterId _registerId;
     private IClrRuntime _runtime;
 
@@ -27,118 +28,329 @@ internal struct Arm64RegisterValueAccumulator
 
     internal void Reset(
         State state = State.LookingForPattern,
-        int expectedMovkShift = 0,
-        long value = 0,
+        ulong value = 0,
         Arm64RegisterId registerId = Arm64RegisterId.Invalid)
     {
         _state = state;
-        _expectedMovkShift = expectedMovkShift;
-        _value = value;
+        _addressValue = value;
+        _addressOffset = 0;
         _registerId = registerId;
     }
 
     public void Feed(Arm64Instruction instruction)
     {
-        Arm64InstructionDetail details = instruction.Details;
-
         switch (_state)
         {
             case State.LookingForPattern:
-                if (instruction.Id == Arm64InstructionId.ARM64_INS_MOVZ)
-                {
-                    _registerId = details.Operands[0].Register.Id;
-                    _value = details.Operands[1].Immediate;
-                    _state = State.ExpectingMovk;
-                    _expectedMovkShift = 16;
-                }
-                else if (instruction.Id == Arm64InstructionId.ARM64_INS_ADRP)
-                {
-                    _registerId = details.Operands[0].Register.Id;
-                    _value = details.Operands[1].Immediate;
-                    _state = State.ExpectingAdd;
-                }
+                if (TryHandleLookingForPattern(instruction))
+                    return;
                 break;
+
             case State.ExpectingMovk:
-                if (instruction.Id == Arm64InstructionId.ARM64_INS_MOVK &&
-                    details.Operands[0].Register.Id == _registerId &&
-                    details.Operands[1].ShiftOperation == Arm64ShiftOperation.ARM64_SFT_LSL &&
-                    details.Operands[1].ShiftValue == _expectedMovkShift)
-                {
-                    _value = _value | (instruction.Details.Operands[1].Immediate << details.Operands[1].ShiftValue);
-                    _expectedMovkShift += 16;
-                    break;
-                }
+                if (TryHandleExpectingMovk(instruction))
+                    return;
+
+                // MOVK instructions are expected to be placed after MOVZ instruction. 
+                // If other instruction found on ExpectingMovk state.
+                // Then state is transitioned to LookingForPossibleLdr.
                 _state = State.LookingForPossibleLdr;
                 goto case State.LookingForPossibleLdr;
+
             case State.ExpectingAdd:
-                if (instruction.Id == Arm64InstructionId.ARM64_INS_ADD &&
-                    details.Operands[0].Register.Id == _registerId &&
-                    details.Operands[1].Register.Id == _registerId &&
-                    details.Operands[2].Type == Arm64OperandType.Immediate)
-                {
-                    _value = _value | instruction.Details.Operands[2].Immediate;
-                    _state = State.LookingForPossibleLdr;
-                }
-                break;
+                if (TryHandleExpectingAdd(instruction))
+                    return;
+
+                goto default;
+
             case State.LookingForPossibleLdr:
-                if (instruction.Id == Arm64InstructionId.ARM64_INS_LDR &&
-                    details.Operands[1].Type == Arm64OperandType.Memory &&
-                    details.Operands[1].Memory.Base.Id == _registerId && // The source address is in the register we are tracking
-                    details.Operands[1].Memory.Displacement == 0 && // There is no displacement
-                    details.Operands[1].Memory.Index == null) // And there is no extra index register
+                if (TryHandleLdrFromTrackedRegister(instruction))
+                    return;
+
+                // Try handle MOVZ/ADRP for new constand load.
+                if (TryHandleLookingForPattern(instruction))
+                    return;
+
+                goto default;
+
+            default:
+                if (TryHandleConditionalInstruction(instruction))
+                    return;
+
+                // Reset accumulated state if instruction overwriting the accumulated register.
+                if (IsTrackedRegisterOverwritten(instruction))
                 {
-                    // Simulate the LDR instruction.
-                    long newValue = (long)_runtime.DataTarget.DataReader.ReadPointer((ulong)_value);
-                    _value = newValue;
-                    if (_value == 0)
-                    {
-                        _state = State.LookingForPattern;
-                    }
-                    else
-                    {
-                        // The LDR might have loaded the result in another register
-                        _registerId = details.Operands[0].Register.Id;
-                    }
+                    Reset();
+
+                    // Reprocess current instruction.
+                    TryHandleLookingForPattern(instruction);
                 }
-                else if (instruction.Id == Arm64InstructionId.ARM64_INS_CBZ ||
-                        instruction.Id == Arm64InstructionId.ARM64_INS_CBNZ ||
-                        instruction.Id == Arm64InstructionId.ARM64_INS_B && details.ConditionCode != Arm64ConditionCode.Invalid)
-                {
-                    // ignore conditional branches
-                }
-                else if (details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE) ||
-                         details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_CALL) ||
-                         details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_JUMP))
-                {
-                    // We've encountered an unconditional jump or call, the accumulated registers value is not valid anymore
-                    _state = State.LookingForPattern;
-                }
-                else if (instruction.Id == Arm64InstructionId.ARM64_INS_MOVZ)
-                {
-                    // Another constant loading is starting
-                    _state = State.LookingForPattern;
-                    goto case State.LookingForPattern;
-                }
-                else
-                {
-                    // Finally check if the current instruction modified the register that was accumulating the constant
-                    // and reset the state machine in case it did.
-                    foreach (Arm64Register reg in details.AllWrittenRegisters)
-                    {
-                        // Some unexpected instruction overwriting the accumulated register
-                        if (reg.Id == _registerId)
-                        {
-                            _state = State.LookingForPattern;
-                        }
-                    }
-                }
-                break;
+                return;
         }
     }
 
-    public bool HasValue => _state == State.ExpectingMovk || _state == State.LookingForPossibleLdr;
+    public bool HasValue
+    {
+        get
+        {
+            // Value == 0 means invalid(negative combined clamps to 0, LDR resets on 0),
+            // So it is excluded to avoid a useless address lookup in the disassembler.
+            if (Value == 0)
+                return false;
 
-    public long Value => _value;
+            switch (_state)
+            {
+                case State.ExpectingMovk:
+                case State.LookingForPossibleLdr:
+                case State.ExpectingAdd:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets accumulated address value.
+    /// Address arithmetic wraps modulo 2^64, like hardware.
+    /// A negative combined value is invalid as a real address, so 0 is returned
+    /// (0 is already treated as invalid: LDR resets on 0, disassembler filters it).
+    /// </summary>
+    public ulong Value
+    {
+        get
+        {
+            if (_addressOffset < 0)
+            {
+                // Magnitude of the negative offset, safe even for long.MinValue.
+                ulong magnitude = unchecked((ulong)(-(_addressOffset + 1)) + 1);
+                if (_addressValue < magnitude)
+                    return 0;
+            }
+            return unchecked(_addressValue + (ulong)_addressOffset);
+        }
+    }
 
     public Arm64RegisterId RegisterId => _registerId;
+
+    private bool TryHandleLookingForPattern(Arm64Instruction instruction)
+    {
+        switch (instruction.Id)
+        {
+            case Arm64InstructionId.ARM64_INS_MOVZ:
+                return TryStartMovzSequence(instruction);
+            case Arm64InstructionId.ARM64_INS_ADRP:
+                return TryStartAdrpSequence(instruction);
+            default:
+                return false;
+        }
+    }
+
+    private bool TryHandleExpectingMovk(Arm64Instruction instruction)
+    {
+        try
+        {
+            if (instruction.Id != Arm64InstructionId.ARM64_INS_MOVK)
+                return false;
+
+            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _)
+             || !instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
+                return false;
+
+            if (instruction.GetRegisterId(0) != _registerId)
+                return false;
+
+            // Note: MOVK instruction accept only LSL shift operation.
+            var shiftAmount = instruction.GetShiftAmount(1);
+            if (shiftAmount is not (0 or 16 or 32 or 48))
+                return false;
+
+            var shiftedImmediateValue = instruction.GetUnsignedShiftedImmediateValue(1);
+            const ulong mask = 0xFFFF;
+            _addressValue &= ~(mask << shiftAmount); // Clear 16-bits of MOVK target
+            _addressValue |= shiftedImmediateValue;  // Set shifted immediate value
+
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Handle following expecting ADD instruction that source/target registers match value tracked register.
+    ///   ADD Xd|SP, Xn|SP, #imm, {shift}
+    ///   ADD Wd|SP, Wn|SP, #imm, {shift}
+    /// If condition is not matched. skip processing. and wait succeeding ADD instruction.
+    /// </summary>
+    private bool TryHandleExpectingAdd(Arm64Instruction instruction)
+    {
+        try
+        {
+            if (instruction.Id != Arm64InstructionId.ARM64_INS_ADD)
+                return false;
+
+            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _)
+                || !instruction.TryGetOperand(1, Arm64OperandType.Register, out _))
+                return false;
+
+            if (instruction.GetRegisterId(0) != _registerId)
+                return false;
+
+            if (instruction.GetRegisterId(1) != _registerId)
+                return false;
+
+            if (!instruction.TryGetOperand(2, Arm64OperandType.Immediate, out _))
+                return false;
+
+            var shiftedImmediateValue = instruction.GetUnsignedShiftedImmediateValue(2);
+            _addressValue += shiftedImmediateValue;
+            _state = State.LookingForPossibleLdr;
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Only decoding failures (missing/mistyped operands, unexpected shift/instruction)
+    /// are treated as "not matched". Anything else (e.g. OOM) must propagate.
+    /// </summary>
+    private static bool IsDecodingException(Exception ex)
+        => ex is ArgumentOutOfRangeException
+            or ArgumentException
+            or NotSupportedException
+            or InvalidOperationException
+            or UnreachableException;
+
+    private bool TryStartMovzSequence(Arm64Instruction instruction)
+    {
+        if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _))
+            return false;
+
+        if (!instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
+            return false;
+
+        try
+        {
+            _registerId = instruction.GetRegisterId(0);
+            _addressValue = instruction.GetUnsignedShiftedImmediateValue(1);
+            _addressOffset = 0;
+            _state = State.ExpectingMovk;
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
+    private bool TryStartAdrpSequence(Arm64Instruction instruction)
+    {
+        if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _)
+            || !instruction.TryGetOperand(1, Arm64OperandType.Immediate, out _))
+            return false;
+
+        try
+        {
+            _registerId = instruction.GetRegisterId(0);
+            _addressOffset = instruction.GetShiftedImmediateValue(1);
+            _addressValue = 0;
+            _state = State.ExpectingAdd;
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
+    private bool TryHandleLdrFromTrackedRegister(Arm64Instruction instruction)
+    {
+        try
+        {
+            if (!instruction.IsLdrFromTrackedRegister(_registerId))
+                return false;
+
+            if (!instruction.TryGetOperand(0, Arm64OperandType.Register, out _))
+                return false;
+
+            // Address 0 is never valid to dereference (e.g. `movz x0, #0` or clamped negative ADRP+ADD).
+            if (Value == 0)
+            {
+                Reset();
+                return true;
+            }
+
+            // Simulate the LDR instruction.
+            // Use combined Value: after ADRP+ADD the effective address is _addressValue + _addressOffset.
+            // Use the Try-pattern so an unreadable address drops tracking instead of aborting disassembly.
+            if (!_runtime.DataTarget.DataReader.ReadPointer(Value, out ulong dereferenced))
+            {
+                Reset();
+                return true;
+            }
+
+            _addressValue = dereferenced;
+            _addressOffset = 0;
+
+            if (_addressValue == 0)
+            {
+                Reset();
+                return true;
+            }
+
+            // The LDR might have loaded the result in another register
+            _registerId = instruction.GetRegisterId(0);
+            return true;
+        }
+        catch (Exception ex) when (IsDecodingException(ex))
+        {
+            return false;
+        }
+    }
+
+    private bool TryHandleConditionalInstruction(Arm64Instruction instruction)
+    {
+        if (instruction.IsConditionalBranch())
+            return true;
+
+        if (instruction.IsUnconditionalControlFlow())
+        {
+            Reset();
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsTrackedRegisterOverwritten(Arm64Instruction instruction)
+    {
+        try
+        {
+            // Finally check if the current instruction modified the register that was accumulating the constant
+            // and reset the state machine in case it did.
+            var details = instruction.Details;
+            if (details is null)
+                return true; // Conservative: unknown writes invalidate tracking (avoid false HasValue).
+
+            foreach (Arm64Register writtenRegister in details.AllWrittenRegisters)
+            {
+                if (writtenRegister.Id != _registerId)
+                    continue;
+
+                return true;
+            }
+
+            return false;
+        }
+        catch (Exception ex) when (IsDecodingException(ex) || ex is NullReferenceException)
+        {
+            // Conservative: on decoding failure assume overwritten so a stale value
+            // is not reported as a false-positive ReferencedAddress.
+            return true;
+        }
+    }
 }
