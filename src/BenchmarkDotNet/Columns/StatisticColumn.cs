@@ -125,7 +125,7 @@ namespace BenchmarkDotNet.Columns
         public bool IsAvailable(Summary summary) => true;
         public bool AlwaysShow => true;
         public ColumnCategory Category => ColumnCategory.Statistics;
-        public int PriorityInCategory => (int)priority;
+        public int PriorityInCategory => (int) priority;
         public bool IsNumeric => true;
         public UnitType UnitType { get; }
 

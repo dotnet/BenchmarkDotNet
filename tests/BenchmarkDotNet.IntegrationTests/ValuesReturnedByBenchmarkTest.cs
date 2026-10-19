@@ -105,7 +105,7 @@ namespace BenchmarkDotNet.IntegrationTests
             public unsafe void* PointerToAnything() => System.IntPtr.Zero.ToPointer();
 
             [Benchmark]
-            public unsafe int* PointerToUnmanagedType() => (int*)System.IntPtr.Zero.ToPointer();
+            public unsafe int* PointerToUnmanagedType() => (int*) System.IntPtr.Zero.ToPointer();
 
             [Benchmark]
             public unsafe delegate*<int, int> FunctionPointer() => &ReturnArgument;

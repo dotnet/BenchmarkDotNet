@@ -15,7 +15,7 @@ internal sealed class TcpListener : IpcListener
     internal int StartAndGetPort()
     {
         listener.Start(1);
-        return ((IPEndPoint)listener.LocalEndpoint).Port;
+        return ((IPEndPoint) listener.LocalEndpoint).Port;
     }
 
     internal override async ValueTask<IpcConnection> AcceptConnection(CancellationToken cancellationToken)

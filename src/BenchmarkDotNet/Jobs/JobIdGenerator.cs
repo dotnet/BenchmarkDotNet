@@ -13,7 +13,7 @@ namespace BenchmarkDotNet.Jobs
             var random = new Random(seed);
             string id = "";
             for (int i = 0; i < 6; i++)
-                id += (char)('A' + random.Next(26));
+                id += (char) ('A' + random.Next(26));
             return "Job-" + id;
         }
 
@@ -25,7 +25,7 @@ namespace BenchmarkDotNet.Jobs
             {
                 hash = ((hash << 5) + hash) + c; // hash * 32 + hash + c
             }
-            return unchecked((int)hash);
+            return unchecked((int) hash);
         }
     }
 }

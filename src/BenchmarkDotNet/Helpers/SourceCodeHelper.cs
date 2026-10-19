@@ -161,21 +161,21 @@ namespace BenchmarkDotNet.Helpers
             switch (Type.GetTypeCode(Enum.GetUnderlyingType(@enum.GetType())))
             {
                 case TypeCode.Byte:
-                    return ((byte)@enum).ToString(CultureInfo.InvariantCulture);
+                    return ((byte) @enum).ToString(CultureInfo.InvariantCulture);
                 case TypeCode.Int16:
-                    return ((short)@enum).ToString(CultureInfo.InvariantCulture);
+                    return ((short) @enum).ToString(CultureInfo.InvariantCulture);
                 case TypeCode.Int32:
-                    return ((int)@enum).ToString(CultureInfo.InvariantCulture);
+                    return ((int) @enum).ToString(CultureInfo.InvariantCulture);
                 case TypeCode.Int64:
-                    return ((long)@enum).ToString(CultureInfo.InvariantCulture);
+                    return ((long) @enum).ToString(CultureInfo.InvariantCulture);
                 case TypeCode.SByte:
-                    return ((sbyte)@enum).ToString(CultureInfo.InvariantCulture);
+                    return ((sbyte) @enum).ToString(CultureInfo.InvariantCulture);
                 case TypeCode.UInt16:
-                    return ((ushort)@enum).ToString(CultureInfo.InvariantCulture);
+                    return ((ushort) @enum).ToString(CultureInfo.InvariantCulture);
                 case TypeCode.UInt32:
-                    return ((uint)@enum).ToString(CultureInfo.InvariantCulture);
+                    return ((uint) @enum).ToString(CultureInfo.InvariantCulture);
                 case TypeCode.UInt64:
-                    return ((ulong)@enum).ToString(CultureInfo.InvariantCulture);
+                    return ((ulong) @enum).ToString(CultureInfo.InvariantCulture);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(@enum));
             }

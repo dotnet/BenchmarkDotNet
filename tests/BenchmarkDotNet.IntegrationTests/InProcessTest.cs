@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [AssertionMethod]
         private async Task TestInvoke(Expression<Action<BenchmarkAllCases>> methodCall, int unrollFactor)
         {
-            var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
+            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
             var descriptor = new Descriptor(typeof(BenchmarkAllCases), targetMethod, targetMethod, targetMethod);
 
             // Run mode
@@ -119,7 +119,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [AssertionMethod]
         private async Task TestInvoke<T>(Expression<Func<BenchmarkAllCases, T>> methodCall, int unrollFactor)
         {
-            var targetMethod = ((MethodCallExpression)methodCall.Body).Method;
+            var targetMethod = ((MethodCallExpression) methodCall.Body).Method;
             await TestInvoke(targetMethod, unrollFactor);
         }
 

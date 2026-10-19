@@ -35,7 +35,7 @@ namespace BenchmarkDotNet.Validators
                 return true;
             if (obj.GetType() != GetType())
                 return false;
-            return Equals((ValidationError)obj);
+            return Equals((ValidationError) obj);
         }
 
         public override int GetHashCode() => HashCode.Combine(IsCritical, Message, BenchmarkCase);

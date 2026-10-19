@@ -21,14 +21,14 @@ namespace BenchmarkDotNet.Disassemblers
                 Arm64RegisterValueAccumulator accumulator = new();
                 accumulator.Init(state.Runtime);
 
-                Arm64Instruction[] instructions = disassembler.Disassemble(code, (long)startAddress);
+                Arm64Instruction[] instructions = disassembler.Disassemble(code, (long) startAddress);
                 foreach (Arm64Instruction instruction in instructions)
                 {
                     bool isIndirect = false;
                     bool isPrestubMD = false;
 
                     ulong address = 0;
-                    if (TryGetReferencedAddress(instruction, accumulator, (uint)state.Runtime.DataTarget.DataReader.PointerSize, out address, out isIndirect))
+                    if (TryGetReferencedAddress(instruction, accumulator, (uint) state.Runtime.DataTarget.DataReader.PointerSize, out address, out isIndirect))
                     {
                         if (isIndirect && state.RuntimeVersion.Major >= 7)
                         {
@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Disassemblers
 
                     yield return new Arm64Asm()
                     {
-                        InstructionPointer = (ulong)instruction.Address,
+                        InstructionPointer = (ulong) instruction.Address,
                         InstructionLength = instruction.Bytes.Length,
                         Instruction = instruction,
                         ReferencedAddress = (address > ushort.MaxValue) ? address : null,
@@ -76,7 +76,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && IsLdrLiteral64(instr1, out int rt1, out int off1) && rt1 == 12
                 && instr2 == 0xD61F0140u)
             {
-                ulong mdSlot = unchecked(parseBase + 4 + (ulong)(long)off1);
+                ulong mdSlot = unchecked(parseBase + 4 + (ulong) (long) off1);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
                 {
                     address = md;
@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && instr1 == 0xD61F0160u
                 && IsLdrLiteral64(instr2, out int rtB, out int off2) && rtB == 12)
             {
-                ulong mdSlot = unchecked(parseBase + 8 + (ulong)(long)off2);
+                ulong mdSlot = unchecked(parseBase + 8 + (ulong) (long) off2);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
                 {
                     address = md;
@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && IsLdrLiteral64(instr1, out int rtF1, out int _) && rtF1 == 11
                 && instr2 == 0xD61F0160u)
             {
-                ulong mdSlot = unchecked(parseBase + (ulong)(long)offF0);
+                ulong mdSlot = unchecked(parseBase + (ulong) (long) offF0);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
                 {
                     address = md;
@@ -126,7 +126,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && instr1 == 0x7940012Au
                 && instr2 == 0x7100054Au)
             {
-                ulong countSlot = unchecked(parseBase + (ulong)(long)offCount);
+                ulong countSlot = unchecked(parseBase + (ulong) (long) offCount);
                 if (reader.ReadPointer(countSlot + 8, out ulong target) && IsValidAddress(target))
                 {
                     address = target;
@@ -173,10 +173,10 @@ namespace BenchmarkDotNet.Disassemblers
         }
 
         private static uint ReadInstr(byte[] buffer, int offset)
-            => (uint)buffer[offset]
-             | ((uint)buffer[offset + 1] << 8)
-             | ((uint)buffer[offset + 2] << 16)
-             | ((uint)buffer[offset + 3] << 24);
+            => (uint) buffer[offset]
+             | ((uint) buffer[offset + 1] << 8)
+             | ((uint) buffer[offset + 2] << 16)
+             | ((uint) buffer[offset + 3] << 24);
 
         // LDR (literal), 64-bit form. Encoding: bits[31:24]=0x58, bits[23:5]=imm19 (signed,
         // word-scaled offset relative to the LDR's own PC), bits[4:0]=Xt. Returns the destination
@@ -187,11 +187,11 @@ namespace BenchmarkDotNet.Disassemblers
             offsetBytes = 0;
             if ((instr & 0xFF000000u) != 0x58000000u)
                 return false;
-            rt = (int)(instr & 0x1Fu);
-            int imm19 = (int)((instr >> 5) & 0x7FFFFu);
+            rt = (int) (instr & 0x1Fu);
+            int imm19 = (int) ((instr >> 5) & 0x7FFFFu);
             // Sign-extend 19-bit imm to 32-bit.
             if ((imm19 & 0x40000) != 0)
-                imm19 |= unchecked((int)0xFFF80000u);
+                imm19 |= unchecked((int) 0xFFF80000u);
             offsetBytes = imm19 * 4;
             return true;
         }
@@ -201,7 +201,7 @@ namespace BenchmarkDotNet.Disassemblers
             if ((instruction.Id == Arm64InstructionId.ARM64_INS_BR || instruction.Id == Arm64InstructionId.ARM64_INS_BLR) && instruction.Details.Operands[0].Register.Id == accumulator.RegisterId && accumulator.HasValue)
             {
                 // Branch via register where we have extracted the value of the register by parsing the disassembly
-                referencedAddress = (ulong)accumulator.Value;
+                referencedAddress = (ulong) accumulator.Value;
                 isReferencedAddressIndirect = true;
                 return true;
             }
@@ -212,7 +212,7 @@ namespace BenchmarkDotNet.Disassemblers
                 {
                     if (instruction.Details.Operands[i].Type == Arm64OperandType.Immediate)
                     {
-                        referencedAddress = (ulong)instruction.Details.Operands[i].Immediate;
+                        referencedAddress = (ulong) instruction.Details.Operands[i].Immediate;
                         isReferencedAddressIndirect = false;
                         return true;
                     }
@@ -257,10 +257,10 @@ namespace BenchmarkDotNet.Disassemblers
             {
                 uint imm26 = firstInstr & 0x03FFFFFFu;
                 // Sign-extend the 26-bit immediate to 32 bits, then multiply by 4 (instructions are 4-byte aligned).
-                int offset = (int)(imm26 & 0x02000000u) != 0
-                    ? unchecked((int)(imm26 | 0xFC000000u)) << 2
-                    : (int)imm26 << 2;
-                target = unchecked(address + (ulong)(long)offset);
+                int offset = (int) (imm26 & 0x02000000u) != 0
+                    ? unchecked((int) (imm26 | 0xFC000000u)) << 2
+                    : (int) imm26 << 2;
+                target = unchecked(address + (ulong) (long) offset);
                 return IsValidAddress(target);
             }
 
@@ -272,7 +272,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && IsLdrLiteral64(instr1, out int rt1, out int _) && rt1 == 12
                 && instr2 == 0xD61F0140u)
             {
-                ulong targetSlot = unchecked(parseBase + (ulong)(long)off0);
+                ulong targetSlot = unchecked(parseBase + (ulong) (long) off0);
                 if (dataReader.ReadPointer(targetSlot, out target) && IsValidAddress(target))
                     return true;
                 target = 0;
@@ -284,7 +284,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && instr1 == 0xD61F0160u
                 && IsLdrLiteral64(instr2, out int rtB, out int _) && rtB == 12)
             {
-                ulong targetSlot = unchecked(parseBase + (ulong)(long)offA);
+                ulong targetSlot = unchecked(parseBase + (ulong) (long) offA);
                 if (dataReader.ReadPointer(targetSlot, out target) && IsValidAddress(target))
                     return true;
                 target = 0;
@@ -297,7 +297,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && instr1 == 0x7940012Au
                 && instr2 == 0x7100054Au)
             {
-                ulong countSlot = unchecked(parseBase + (ulong)(long)offCount);
+                ulong countSlot = unchecked(parseBase + (ulong) (long) offCount);
                 if (dataReader.ReadPointer(countSlot + 8, out target) && IsValidAddress(target))
                     return true;
                 target = 0;

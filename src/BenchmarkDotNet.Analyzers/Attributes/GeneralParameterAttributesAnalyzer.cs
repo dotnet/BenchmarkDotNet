@@ -392,7 +392,7 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             }
             else
             {
-                var syntax = (AttributeSyntax)attributeData.ApplicationSyntaxReference!.GetSyntax();
+                var syntax = (AttributeSyntax) attributeData.ApplicationSyntaxReference!.GetSyntax();
                 if (syntax.ArgumentList?.Arguments.Count > 0)
                 {
                     sourceName = ExtractNameFromExpression(syntax.ArgumentList.Arguments[0].Expression, context.SemanticModel);
@@ -416,7 +416,7 @@ public class GeneralParameterAttributesAnalyzer : DiagnosticAnalyzer
             }
             else
             {
-                var syntax = (AttributeSyntax)attributeData.ApplicationSyntaxReference!.GetSyntax();
+                var syntax = (AttributeSyntax) attributeData.ApplicationSyntaxReference!.GetSyntax();
                 if (syntax.ArgumentList?.Arguments.Count > 1)
                 {
                     sourceName = ExtractNameFromExpression(syntax.ArgumentList.Arguments[1].Expression, context.SemanticModel);

@@ -29,7 +29,7 @@ namespace BenchmarkDotNet.Disassemblers
                 bool isPrestubMD = false;
 
                 ulong address = 0;
-                bool haveAddress = TryGetReferencedAddress(instruction, (uint)state.Runtime.DataTarget.DataReader.PointerSize, out address);
+                bool haveAddress = TryGetReferencedAddress(instruction, (uint) state.Runtime.DataTarget.DataReader.PointerSize, out address);
                 if (!haveAddress && isIndirect
                     && TryResolveIndirectThroughTrackedReg(instruction, trackedRegs, out address))
                 {
@@ -96,7 +96,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && buffer[13] == 0xFF && buffer[14] == 0x25)
             {
                 int dispMD = BitConverter.ToInt32(buffer, 9);
-                ulong mdSlot = unchecked(address + 13 + (ulong)(long)dispMD);
+                ulong mdSlot = unchecked(address + 13 + (ulong) (long) dispMD);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
                 {
                     address = md;
@@ -113,7 +113,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && buffer[7] == 0xFF && buffer[8] == 0x25)
             {
                 int dispMD = BitConverter.ToInt32(buffer, 3);
-                ulong mdSlot = unchecked(address + 7 + (ulong)(long)dispMD);
+                ulong mdSlot = unchecked(address + 7 + (ulong) (long) dispMD);
                 if (reader.ReadPointer(mdSlot, out ulong md) && IsValidAddress(md))
                 {
                     address = md;
@@ -135,7 +135,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && buffer[7] == 0x66 && buffer[8] == 0xFF && buffer[9] == 0x08)
             {
                 int dispCount = BitConverter.ToInt32(buffer, 3);
-                ulong countSlot = unchecked(address + 7 + (ulong)(long)dispCount);
+                ulong countSlot = unchecked(address + 7 + (ulong) (long) dispCount);
                 if (reader.ReadPointer(countSlot + 8, out ulong target) && IsValidAddress(target))
                 {
                     address = target;
@@ -252,15 +252,15 @@ namespace BenchmarkDotNet.Disassemblers
             if (read >= 5 && buffer[0] == 0xE9)
             {
                 int rel = BitConverter.ToInt32(buffer, 1);
-                target = unchecked(address + 5 + (ulong)(long)rel);
+                target = unchecked(address + 5 + (ulong) (long) rel);
                 return IsValidAddress(target);
             }
 
             // EB rel8 — JMP short (target = next-instr + sign_extended(rel8))
             if (buffer[0] == 0xEB)
             {
-                sbyte rel = (sbyte)buffer[1];
-                target = unchecked(address + 2 + (ulong)(long)rel);
+                sbyte rel = (sbyte) buffer[1];
+                target = unchecked(address + 2 + (ulong) (long) rel);
                 return IsValidAddress(target);
             }
 
@@ -269,7 +269,7 @@ namespace BenchmarkDotNet.Disassemblers
             if (read >= 6 && buffer[0] == 0xFF && buffer[1] == 0x25)
             {
                 int disp = BitConverter.ToInt32(buffer, 2);
-                ulong slot = unchecked(address + 6 + (ulong)(long)disp);
+                ulong slot = unchecked(address + 6 + (ulong) (long) disp);
                 if (dataReader.ReadPointer(slot, out ulong slotTarget) && IsValidAddress(slotTarget))
                 {
                     target = slotTarget;
@@ -292,7 +292,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && buffer[7] == 0x66 && buffer[8] == 0xFF && buffer[9] == 0x08)
             {
                 int disp = BitConverter.ToInt32(buffer, 3);
-                ulong countSlot = unchecked(address + 7 + (ulong)(long)disp);
+                ulong countSlot = unchecked(address + 7 + (ulong) (long) disp);
                 if (dataReader.ReadPointer(countSlot + 8, out target) && IsValidAddress(target))
                     return true;
                 target = 0;
@@ -305,7 +305,7 @@ namespace BenchmarkDotNet.Disassemblers
                 && buffer[7] == 0xFF && buffer[8] == 0x25)
             {
                 int disp = BitConverter.ToInt32(buffer, 9);
-                ulong slot = unchecked(address + 13 + (ulong)(long)disp);
+                ulong slot = unchecked(address + 13 + (ulong) (long) disp);
                 if (dataReader.ReadPointer(slot, out target) && IsValidAddress(target))
                     return true;
                 target = 0;

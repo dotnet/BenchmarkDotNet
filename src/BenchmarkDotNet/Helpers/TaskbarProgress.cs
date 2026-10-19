@@ -46,7 +46,7 @@ namespace BenchmarkDotNet.Helpers
             {
                 throw new ArgumentOutOfRangeException(nameof(progressValue), "progressValue must be between 0 and 1 inclusive.");
             }
-            uint value = (uint)(progressValue * 100);
+            uint value = (uint) (progressValue * 100);
             com?.SetValue(value);
             terminal?.SetValue(value);
         }
@@ -102,7 +102,7 @@ namespace BenchmarkDotNet.Helpers
 
             private Com(IntPtr handle)
             {
-                taskbarInstance = (ITaskbarList3)new TaskbarInstance();
+                taskbarInstance = (ITaskbarList3) new TaskbarInstance();
                 consoleWindowHandle = handle;
             }
 

@@ -59,8 +59,8 @@ public class CpuDetectorTests(ITestOutputHelper Output)
                     return;
                 }
 
-                var expected = (double)ctx.Expectation!.Value;
-                var actual = (double)ctx.Subject!.Value;
+                var expected = (double) ctx.Expectation!.Value;
+                var actual = (double) ctx.Subject!.Value;
                 var tolerance = Math.Abs(expected) * 0.02d; // Accept 2％ difference
                 actual.Should().BeApproximately(expected, tolerance);
             }).WhenTypeIs<long?>());

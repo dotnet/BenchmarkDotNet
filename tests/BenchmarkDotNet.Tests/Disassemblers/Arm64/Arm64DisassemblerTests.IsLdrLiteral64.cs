@@ -29,10 +29,10 @@ public partial class Arm64DisassemblerTests
         var instruction = Arm64Instruction.Decode(rawInstruction);
         instruction.Id.Should().Be(Arm64InstructionId.LDR_64_loadlit);
 
-        var registerOperand = (Arm64RegisterOperand)instruction.GetOperand(0);
-        registerOperand.Value.Should().Be((Arm64RegisterAny)X5);
+        var registerOperand = (Arm64RegisterOperand) instruction.GetOperand(0);
+        registerOperand.Value.Should().Be((Arm64RegisterAny) X5);
 
-        var labelOperand = (Arm64LabelOperand)instruction.GetOperand(1);
+        var labelOperand = (Arm64LabelOperand) instruction.GetOperand(1);
         labelOperand.Offset.Should().Be(expectedOffsetBytes);
     }
 
@@ -55,11 +55,11 @@ public partial class Arm64DisassemblerTests
         var instruction = Arm64Instruction.Decode(rawInstruction);
         instruction.Id.Should().Be(Arm64InstructionId.LDR_64_loadlit);
 
-        var registerOperand = (Arm64RegisterOperand)instruction.GetOperand(0);
-        registerOperand.Value.Should().Be((Arm64RegisterAny)X0);
+        var registerOperand = (Arm64RegisterOperand) instruction.GetOperand(0);
+        registerOperand.Value.Should().Be((Arm64RegisterAny) X0);
 
 
-        var labelOperand = (Arm64LabelOperand)instruction.GetOperand(1);
+        var labelOperand = (Arm64LabelOperand) instruction.GetOperand(1);
         labelOperand.Offset.Should().Be(expectedOffsetBytes);
     }
 
@@ -82,10 +82,10 @@ public partial class Arm64DisassemblerTests
         var instruction = Arm64Instruction.Decode(rawInstruction);
         instruction.Id.Should().Be(Arm64InstructionId.LDR_64_loadlit);
 
-        var registerOperand = (Arm64RegisterOperand)instruction.GetOperand(0);
-        registerOperand.Value.Should().Be((Arm64RegisterAny)X0);
+        var registerOperand = (Arm64RegisterOperand) instruction.GetOperand(0);
+        registerOperand.Value.Should().Be((Arm64RegisterAny) X0);
 
-        var labelOperand = (Arm64LabelOperand)instruction.GetOperand(1);
+        var labelOperand = (Arm64LabelOperand) instruction.GetOperand(1);
         labelOperand.Offset.Should().Be(expectedOffsetBytes);
     }
 
@@ -105,8 +105,8 @@ public partial class Arm64DisassemblerTests
         var instruction = Arm64Instruction.Decode(rawInstruction);
         instruction.Id.Should().Be(Arm64InstructionId.LDR_32_loadlit);
 
-        var registerOperand = (Arm64RegisterOperand)instruction.GetOperand(0);
-        registerOperand.Value.Should().Be((Arm64RegisterAny)W5);
+        var registerOperand = (Arm64RegisterOperand) instruction.GetOperand(0);
+        registerOperand.Value.Should().Be((Arm64RegisterAny) W5);
     }
 }
 #endif

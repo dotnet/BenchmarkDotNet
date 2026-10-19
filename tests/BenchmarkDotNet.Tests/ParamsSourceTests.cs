@@ -667,7 +667,7 @@ namespace BenchmarkDotNet.Tests
         [GenericTypeArguments(typeof(int))]
         public class MatchedGenericArgumentSource<T>
         {
-            public static IEnumerable<T> Values() { yield return (T)(object)7; }
+            public static IEnumerable<T> Values() { yield return (T) (object) 7; }
 
             [Benchmark]
             [ArgumentsSource(nameof(Values))]
@@ -677,7 +677,7 @@ namespace BenchmarkDotNet.Tests
         [GenericTypeArguments(typeof(byte[]))]
         public class SpanFromGenericArgumentSource<T>
         {
-            public static IEnumerable<T> Values() { yield return (T)(object)new byte[] { 1, 2, 3 }; }
+            public static IEnumerable<T> Values() { yield return (T) (object) new byte[] { 1, 2, 3 }; }
 
             [Benchmark]
             [ArgumentsSource(nameof(Values))]

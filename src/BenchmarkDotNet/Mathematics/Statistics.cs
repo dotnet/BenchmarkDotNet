@@ -42,7 +42,7 @@ namespace BenchmarkDotNet.Mathematics
         { }
 
         public Statistics(IEnumerable<int> values) :
-            this(values.Select(value => (double)value))
+            this(values.Select(value => (double) value))
         { }
 
         public Statistics(IEnumerable<double> values) : this(new Sample(values.ToArray(), TimeUnit.Nanosecond)) { }

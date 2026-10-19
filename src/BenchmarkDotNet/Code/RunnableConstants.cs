@@ -1,4 +1,4 @@
-﻿
+
 namespace BenchmarkDotNet.Code;
 
 // Member names emitted by the code generator onto the generated runnable type - used by both the out-of-process

@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 TestCultureInfo.Instance,
                 [],
                 []);
-            ((ExporterBase)MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
+            ((ExporterBase) MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
             output.WriteLine(logger.GetLog());
             return summary;
         }

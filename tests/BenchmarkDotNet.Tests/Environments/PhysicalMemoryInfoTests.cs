@@ -79,7 +79,7 @@ namespace BenchmarkDotNet.Tests.Environments
         {
             byte[] table = Table(MemoryDevice(Smbios28Length, Ddr5, speed: 0xFFFF, configuredSpeed: 0xFFFF));
 
-            Assert.Equal(((long?)null, "DDR5"), SystemMemory.ParseSmbiosMemoryDevices(table));
+            Assert.Equal(((long?) null, "DDR5"), SystemMemory.ParseSmbiosMemoryDevices(table));
         }
 
         [Fact]
@@ -110,7 +110,7 @@ namespace BenchmarkDotNet.Tests.Environments
                 OtherStructure(type: 127),
                 MemoryDevice(Smbios28Length, Ddr5, speed: 4800, configuredSpeed: 4800));
 
-            Assert.Equal(((long?)null, (string?)null), SystemMemory.ParseSmbiosMemoryDevices(table));
+            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseSmbiosMemoryDevices(table));
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace BenchmarkDotNet.Tests.Environments
         {
             byte[] full = Table(MemoryDevice(Smbios28Length, Ddr5, speed: 4800, configuredSpeed: 4800));
 
-            Assert.Equal(((long?)null, (string?)null), SystemMemory.ParseSmbiosMemoryDevices(full.AsSpan(0, 10)));
+            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseSmbiosMemoryDevices(full.AsSpan(0, 10)));
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace BenchmarkDotNet.Tests.Environments
                 }
                 """;
 
-            Assert.Equal(((long?)null, "LPDDR5"), SystemMemory.ParseMacMemoryJson(json));
+            Assert.Equal(((long?) null, "LPDDR5"), SystemMemory.ParseMacMemoryJson(json));
         }
 
         [Fact]
@@ -164,15 +164,15 @@ namespace BenchmarkDotNet.Tests.Environments
             const string arm64 = """{ "SPMemoryDataType" : [ { "dimm_manufacturer" : "Unknown", "dimm_type" : "Unknown", "SPMemoryDataType" : "7 GB" } ] }""";
             const string x64 = """{ "SPMemoryDataType" : [ { "_items" : [ { "_name" : "DIMM0", "dimm_size" : "14 GB", "dimm_speed" : "1600 MHz", "dimm_type" : "RAM" } ] } ] }""";
 
-            Assert.Equal(((long?)null, (string?)null), SystemMemory.ParseMacMemoryJson(arm64));
-            Assert.Equal(((long?)null, (string?)null), SystemMemory.ParseMacMemoryJson(x64));
+            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseMacMemoryJson(arm64));
+            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseMacMemoryJson(x64));
         }
 
         [Fact]
         public void MacWithoutMemoryDataReturnsNothing()
         {
-            Assert.Equal(((long?)null, (string?)null), SystemMemory.ParseMacMemoryJson("""{ "SPMemoryDataType" : [] }"""));
-            Assert.Equal(((long?)null, (string?)null), SystemMemory.ParseMacMemoryJson("{}"));
+            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseMacMemoryJson("""{ "SPMemoryDataType" : [] }"""));
+            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseMacMemoryJson("{}"));
         }
 
         [Theory]
@@ -271,7 +271,7 @@ namespace BenchmarkDotNet.Tests.Environments
         {
             var formatted = new byte[4];
             formatted[0] = type;
-            formatted[1] = (byte)formatted.Length;
+            formatted[1] = (byte) formatted.Length;
             return WithStrings(formatted, strings);
         }
 

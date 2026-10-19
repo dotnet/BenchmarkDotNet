@@ -52,12 +52,12 @@ namespace BenchmarkDotNet.Characteristics
             var fieldValues = characteristicObjectType.GetTypeInfo()
                 .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
                 .Where(f => IsCharacteristicSubclass(f.FieldType))
-                .Select(f => AssertHasValue(f, (Characteristic?)f.GetValue(null)));
+                .Select(f => AssertHasValue(f, (Characteristic?) f.GetValue(null)));
 
             var propertyValues = characteristicObjectType.GetTypeInfo()
                 .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Static)
                 .Where(p => p.GetMethod != null && IsCharacteristicSubclass(p.PropertyType))
-                .Select(p => AssertHasValue(p, (Characteristic?)p.GetValue(null)));
+                .Select(p => AssertHasValue(p, (Characteristic?) p.GetValue(null)));
 
             // DONTTOUCH: DO NOT change the order of characteristic as it may break logic of some operations.
             return fieldValues
