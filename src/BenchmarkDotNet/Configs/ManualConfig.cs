@@ -276,6 +276,11 @@ namespace BenchmarkDotNet.Configs
                     manualConfig.Add(globalConfig);
                     manualConfig.Add(localConfig);
                     break;
+                case ConfigUnionRule.UnionAndUseLocalJob:
+                    manualConfig.Add(globalConfig);
+                    manualConfig.RemoveAllJobs();
+                    manualConfig.Add(localConfig);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -4,6 +4,7 @@ using BenchmarkDotNet.Diagnosers;
 namespace BenchmarkDotNet.Samples
 {
     [ShortRunJob]
+    [UseLocalJobOnly]
     [EventPipeProfiler(EventPipeProfile.CpuSampling)]
     public class IntroEventPipeProfiler
     {
