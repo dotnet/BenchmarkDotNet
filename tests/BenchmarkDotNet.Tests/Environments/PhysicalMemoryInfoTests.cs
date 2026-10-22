@@ -308,6 +308,7 @@ namespace BenchmarkDotNet.Tests.Environments
             bytes.Add(0);
             return bytes.ToArray();
         }
+
         [Fact]
         public void MacAvailableMemoryIncludesReusablePages()
         {
@@ -338,10 +339,40 @@ namespace BenchmarkDotNet.Tests.Environments
         }
 
         [Fact]
-        public void MacAvailableMemoryReturnsNullWhenPageDataIsIncomplete()
+        public void MacAvailableMemoryReturnsNullWhenFreePagesAreMissing()
         {
-            Assert.Null(SystemMemory.ParseMacAvailableMemory(
-                "Mach Virtual Memory Statistics: (page size of 4096 bytes)"));
+            const string vmStat = """
+                Mach Virtual Memory Statistics: (page size of 4096 bytes)
+                Pages inactive:                          300.
+                Pages speculative:                        50.
+                """;
+
+            Assert.Null(SystemMemory.ParseMacAvailableMemory(vmStat));
+        }
+
+        [Fact]
+        public void MacAvailableMemoryTreatsMissingReusablePagesAsZero()
+        {
+            const string vmStat = """
+                Mach Virtual Memory Statistics: (page size of 16384 bytes)
+                Pages free:                               100.
+                Pages inactive:                          300.
+                """;
+
+            Assert.Equal(400 * 16384, SystemMemory.ParseMacAvailableMemory(vmStat));
+        }
+
+        [Fact]
+        public void MacAvailableMemoryDefaultsTo4KPagesWhenPageSizeIsMissing()
+        {
+            const string vmStat = """
+                Mach Virtual Memory Statistics:
+                Pages free:                               100.
+                Pages inactive:                          300.
+                Pages speculative:                        50.
+                """;
+
+            Assert.Equal(450 * 4096, SystemMemory.ParseMacAvailableMemory(vmStat));
         }
     }
 }

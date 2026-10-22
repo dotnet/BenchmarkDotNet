@@ -361,10 +361,10 @@ namespace BenchmarkDotNet.Environments
             if (string.IsNullOrEmpty(sysctlOutput) || !long.TryParse(sysctlOutput!.Trim(), out total) || total == 0)
                 return null;
 
-            // 2. Get Free Memory using vm_stat
+            // 2. Get Available Memory using vm_stat
             string? vmStatOutput = ProcessHelper.RunAndReadOutput("vm_stat");
             if (!string.IsNullOrEmpty(vmStatOutput))
-                available = ParseMacAvailableMemory(vmStatOutput);
+                available = ParseMacAvailableMemory(vmStatOutput!);
 
             var (speed, type) = GetMacMemoryDetails();
             return new PhysicalMemoryInfo(total, available, speed, type);
@@ -441,23 +441,29 @@ namespace BenchmarkDotNet.Environments
             }
         }
 
+        /// <summary>
+        /// Available memory is free + speculative + inactive pages, the pages macOS can reuse for new allocations.
+        /// vm_stat reports speculative pages separately from "Pages free". Only "Pages free" is required.
+        /// </summary>
         internal static long? ParseMacAvailableMemory(string output)
         {
+            long pageSize = 4096;
             var pageSizeMatch = Regex.Match(output, @"page size of (\d+) bytes");
-            if (!pageSizeMatch.Success || !long.TryParse(pageSizeMatch.Groups[1].Value, out long pageSize))
+            if (pageSizeMatch.Success && long.TryParse(pageSizeMatch.Groups[1].Value, out long parsedPageSize))
+                pageSize = parsedPageSize;
+
+            if (TryGetPages("free") is not long availablePages)
                 return null;
 
-            long availablePages = 0;
-            foreach (string pageName in new[] { "free", "inactive", "speculative" })
+            availablePages += TryGetPages("speculative") ?? 0;
+            availablePages += TryGetPages("inactive") ?? 0;
+            return availablePages * pageSize;
+
+            long? TryGetPages(string pageName)
             {
                 var match = Regex.Match(output, $@"Pages {pageName}:\s+(\d+)");
-                if (!match.Success || !long.TryParse(match.Groups[1].Value, out long pages))
-                    return null;
-
-                availablePages += pages;
+                return match.Success && long.TryParse(match.Groups[1].Value, out long pages) ? pages : null;
             }
-
-            return availablePages * pageSize;
         }
     }
 }
