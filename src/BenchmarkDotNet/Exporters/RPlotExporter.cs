@@ -16,6 +16,7 @@ namespace BenchmarkDotNet.Exporters
         public string Name => nameof(RPlotExporter);
 
         private const string ImageExtension = ".png";
+        private const string ScriptFileName = "BuildPlots.R";
         private static readonly SemaphoreSlim BuildScriptLock = new(1, 1);
 
         public IEnumerable<IExporter> Dependencies
@@ -24,20 +25,26 @@ namespace BenchmarkDotNet.Exporters
             get { yield return CsvMeasurementsExporter.Default; }
         }
 
+        /// <summary>
+        /// The R script that is written to the results directory as BuildPlots.R and run with the full path of the measurements CSV file
+        /// as its only argument. Override it to plot with your own script. By default it is the script that ships with BenchmarkDotNet.
+        /// </summary>
+        protected virtual async ValueTask<string> GetScriptAsync(Summary summary, CancellationToken cancellationToken)
+            => (await ResourceHelper.LoadTemplateAsync(ScriptFileName, cancellationToken).ConfigureAwait(false))
+                .Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.Instance.BrandTitle)
+                .Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
+
         public async ValueTask ExportAsync(Summary summary, ILogger logger, CancellationToken cancellationToken)
         {
-            const string scriptFileName = "BuildPlots.R";
             const string logFileName = "BuildPlots.log";
 
             string csvFullPath = Path.GetFullPath(CsvMeasurementsExporter.Default.GetArtifactFullName(summary));
-            string scriptFullPath = Path.GetFullPath(Path.Combine(summary.ResultsDirectoryPath, scriptFileName));
+            string scriptFullPath = Path.GetFullPath(Path.Combine(summary.ResultsDirectoryPath, ScriptFileName));
             string logFullPath = Path.GetFullPath(Path.Combine(summary.ResultsDirectoryPath, logFileName));
 
             logger.WriteLineInfo($"  {scriptFullPath.GetBaseName(Directory.GetCurrentDirectory())}");
 
-            string script = (await ResourceHelper.LoadTemplateAsync(scriptFileName, cancellationToken).ConfigureAwait(false))
-                .Replace("$BenchmarkDotNetVersion$", BenchmarkDotNetInfo.Instance.BrandTitle)
-                .Replace("$CsvSeparator$", CsvMeasurementsExporter.Default.Separator);
+            string script = await GetScriptAsync(summary, cancellationToken).ConfigureAwait(false);
             using (await BuildScriptLock.EnterScopeAsync(cancellationToken).ConfigureAwait(false))
             {
                 await File.WriteAllTextAsync(scriptFullPath, script, cancellationToken).ConfigureAwait(false);
