@@ -470,7 +470,33 @@ namespace BenchmarkDotNet.Toolchains.CsProj
 
             CollectSettingsToCopy(benchmarkProject, itemGroup, propertyGroup, projectFile);
 
+            string? userRuntimeConfig = GetUserRuntimeConfigPath(benchmarkProject, projectFile);
+            if (userRuntimeConfig != null)
+                propertyGroup.Add(new XElement("UserRuntimeConfig", userRuntimeConfig));
+
             return new[] { itemGroup, propertyGroup }.Where(group => group.HasElements);
+        }
+
+        /// <summary>
+        /// The SDK looks for runtimeconfig.template.json beside the project it builds, which for the generated project
+        /// is the build directory, so the benchmark project's template has to be passed on by its full path. #2428
+        /// </summary>
+        private static string? GetUserRuntimeConfigPath(XElement benchmarkProject, FileInfo projectFile)
+        {
+            var directoryName = projectFile.DirectoryName ?? throw new DirectoryNotFoundException(projectFile.DirectoryName);
+
+            // MSBuild uses the last definition of a property
+            string path = DescendantsNamed(benchmarkProject, "PropertyGroup").Elements()
+                .LastOrDefault(element => element.Name.LocalName == "UserRuntimeConfig")?.Value.Trim()
+                ?? "runtimeconfig.template.json";
+
+            path = path.Replace("$(MSBuildProjectDirectory)", directoryName);
+            // Any other property can't be evaluated here, so the setting is left alone
+            if (path.Contains("$("))
+                return null;
+
+            path = Path.GetFullPath(Path.Combine(directoryName, path));
+            return File.Exists(path) ? path : null;
         }
 
         private static void CollectSettingsToCopy(XElement projectElement, XElement itemGroup, XElement propertyGroup, FileInfo projectFile)

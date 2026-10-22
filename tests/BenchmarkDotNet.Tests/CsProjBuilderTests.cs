@@ -174,6 +174,82 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void RuntimeConfigTemplateBesideTheProjectIsPassedOn()
+        {
+            var templatePath = Path.Combine(TestAssemblyFileInfo.DirectoryName!, "runtimeconfig.template.json");
+            File.WriteAllText(templatePath, "{}");
+
+            try
+            {
+                AssertCopiedSettings("""<Project Sdk="Microsoft.NET.Sdk" />""", $"""
+                    <PropertyGroup>
+                      <UserRuntimeConfig>{templatePath}</UserRuntimeConfig>
+                    </PropertyGroup>
+                    """);
+            }
+            finally
+            {
+                File.Delete(templatePath);
+            }
+        }
+
+        [Fact]
+        public void CustomUserRuntimeConfigIsResolvedAgainstTheProjectDirectory()
+        {
+            var configDirectory = Path.Combine(TestAssemblyFileInfo.DirectoryName!, "runtimeconfig-test");
+            var templatePath = Path.Combine(configDirectory, "custom.json");
+            Directory.CreateDirectory(configDirectory);
+            File.WriteAllText(templatePath, "{}");
+
+            try
+            {
+                const string withUserRuntimeConfig = """
+                    <Project Sdk="Microsoft.NET.Sdk">
+                      <PropertyGroup>
+                        <UserRuntimeConfig>runtimeconfig-test/custom.json</UserRuntimeConfig>
+                      </PropertyGroup>
+                    </Project>
+                    """;
+                AssertCopiedSettings(withUserRuntimeConfig, $"""
+                    <PropertyGroup>
+                      <UserRuntimeConfig>{templatePath}</UserRuntimeConfig>
+                    </PropertyGroup>
+                    """);
+
+                const string withProjectDirectoryProperty = """
+                    <Project Sdk="Microsoft.NET.Sdk">
+                      <PropertyGroup>
+                        <UserRuntimeConfig>$(MSBuildProjectDirectory)/runtimeconfig-test/custom.json</UserRuntimeConfig>
+                      </PropertyGroup>
+                    </Project>
+                    """;
+                AssertCopiedSettings(withProjectDirectoryProperty, $"""
+                    <PropertyGroup>
+                      <UserRuntimeConfig>{templatePath}</UserRuntimeConfig>
+                    </PropertyGroup>
+                    """);
+            }
+            finally
+            {
+                Directory.Delete(configDirectory, recursive: true);
+            }
+        }
+
+        [Fact]
+        public void UserRuntimeConfigIsNotPassedOnWhenTheFileDoesNotExist()
+        {
+            const string withMissingUserRuntimeConfig = """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <PropertyGroup>
+                    <UserRuntimeConfig>missing.json</UserRuntimeConfig>
+                  </PropertyGroup>
+                </Project>
+                """;
+
+            Assert.Empty(CsProjBuilder.GetSettingsToCopy(XElement.Parse(withMissingUserRuntimeConfig), TestAssemblyFileInfo));
+        }
+
+        [Fact]
         public void WarningsAsErrorsSettingGetsCopied()
         {
             const string withWarningsAsErrors = """
