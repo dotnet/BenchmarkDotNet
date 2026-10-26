@@ -59,6 +59,7 @@
     <PolySharpExcludeGeneratedTypes>
         System.Diagnostics.CodeAnalysis.UnscopedRefAttribute;
         System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute;
+        System.Runtime.CompilerServices.UnsafeAccessorAttribute;
     </PolySharpExcludeGeneratedTypes>
   </PropertyGroup>
   <ItemGroup>
