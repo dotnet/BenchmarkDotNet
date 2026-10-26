@@ -335,6 +335,26 @@ public class VersionIncrementTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
+[TaskDescription("Replaces the unreleased current version with the next minor version")]
+public class VersionMinorIncrementTask : FrostingTask<BuildContext>, IHelpProvider
+{
+    private const string Name = "version-minor-increment";
+    public override void Run(BuildContext context)
+    {
+        context.ReleaseRunner.VersionMinorIncrement();
+        context.BuildRunner.PackWeaver();
+    }
+
+    public HelpInfo GetHelp() => new()
+    {
+        Examples =
+        [
+            new Example(Name)
+        ]
+    };
+}
+
+[TaskName(Name)]
 [TaskDescription("Release new version")]
 [IsDependentOn(typeof(BuildTask))]
 [IsDependentOn(typeof(PackTask))]

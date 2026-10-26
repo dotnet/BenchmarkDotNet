@@ -38,6 +38,20 @@ public class ReleaseRunner
         UpdateTemplateVersion(nextVersion);
     }
 
+    public void VersionMinorIncrement()
+    {
+        // The current version is unreleased, so it is replaced rather than kept in the history.
+        var currentVersion = Version.Parse(context.VersionHistory.CurrentVersion);
+        if (currentVersion.Build == 0)
+            throw new Exception($"v{currentVersion} is already a minor version");
+        var nextVersion = $"{currentVersion.Major}.{currentVersion.Minor + 1}.0";
+        context.Information($"Evaluated NextVersion: {nextVersion}");
+
+        ReplaceCurrentVersionInVersionsTxt(nextVersion);
+        UpdateCommonPropsVersion(nextVersion);
+        UpdateTemplateVersion(nextVersion);
+    }
+
     public void Run()
     {
         KnownOptions.Stable.AssertTrue(context);
@@ -84,6 +98,13 @@ public class ReleaseRunner
         var content = context.FileReadText(context.VersionsFile).Trim();
         context.GenerateFile(context.VersionsFile, $"{content}\n{versionToAppend}");
         context.Information($"Added v{versionToAppend} to {context.VersionsFile}");
+    }
+
+    private void ReplaceCurrentVersionInVersionsTxt(string newCurrentVersion)
+    {
+        var lines = context.FileReadText(context.VersionsFile).Trim().Split('\n').Select(line => line.TrimEnd('\r'));
+        context.GenerateFile(context.VersionsFile, string.Join("\n", lines.SkipLast(1).Append(newCurrentVersion)));
+        context.Information($"Replaced v{context.VersionHistory.CurrentVersion} with v{newCurrentVersion} in {context.VersionsFile}");
     }
 
     private void UpdateCommonPropsVersion(string newCurrentVersion)

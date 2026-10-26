@@ -59,18 +59,18 @@ jobs:
     - name: Version increment
       run: ./build.cmd version-increment
 
+    - name: Read next version
+      id: next_version
+      run: echo "NEXT_VERSION=$(grep -v '^$' build/versions.txt | tail -n 1)" >> $GITHUB_OUTPUT
+
     - name: Commit changes
       uses: EndBug/add-and-commit@cc9c08ba6c8df3b93a8f2db63e89b98368ae2ae8 # v11.1.1
       with:
-        message: "Set next BenchmarkDotNet version: ${{ steps.version.outputs.VERSION }} and update released analyzer rules"
+        message: "Set next BenchmarkDotNet version: ${{ steps.next_version.outputs.NEXT_VERSION }} and update released analyzer rules"
         author_name: GitHub Actions
         author_email: actions@github.com
         committer_name: GitHub Actions
         committer_email: actions@github.com
-
-    - name: Read next version
-      id: next_version
-      run: echo "NEXT_VERSION=$(grep -v '^$' build/versions.txt | tail -n 1)" >> $GITHUB_OUTPUT
 
     # --- Release ---
 

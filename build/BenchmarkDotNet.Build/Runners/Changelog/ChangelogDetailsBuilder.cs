@@ -124,7 +124,9 @@ public static class ChangelogDetailsBuilder
                 return commit.Commit.Author.Name;
             }
 
+            // Release automation commits as actions-user, which GitHub reports as a regular user rather than a bot.
             var contributors = compare.Commits
+                .Where(commit => commit.Author?.Login != "actions-user")
                 .Select(PresentContributor)
                 .OrderBy(it => it)
                 .Distinct()

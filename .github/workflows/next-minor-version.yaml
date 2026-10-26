@@ -1,0 +1,93 @@
+name: next-minor-version
+run-name: Set next minor version
+
+on:
+  workflow_dispatch:
+
+jobs:
+  next-minor-version:
+    runs-on: ubuntu-latest
+    environment: deploy # Only maintainers can execute this workflow
+    permissions:
+      contents: write
+      issues: write
+    steps:
+
+    # --- Init ---
+
+    - name: Checkout sources
+      uses: actions/checkout@v7
+
+    - name: Checkout changelog
+      uses: actions/checkout@v7
+      with:
+        ref: docs-changelog
+        path: docs/_changelog
+
+    - name: Read current version
+      id: version
+      run: echo "VERSION=$(grep -v '^$' build/versions.txt | tail -n 1)" >> $GITHUB_OUTPUT
+
+    # --- Next Version ---
+
+    - name: Version increment
+      run: ./build.cmd version-minor-increment
+
+    - name: Read next version
+      id: next_version
+      run: echo "NEXT_VERSION=$(grep -v '^$' build/versions.txt | tail -n 1)" >> $GITHUB_OUTPUT
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@cc9c08ba6c8df3b93a8f2db63e89b98368ae2ae8 # v11.1.1
+      with:
+        message: "Set next BenchmarkDotNet version: ${{ steps.next_version.outputs.NEXT_VERSION }}"
+        author_name: GitHub Actions
+        author_email: actions@github.com
+        committer_name: GitHub Actions
+        committer_email: actions@github.com
+
+    - name: Push git changes
+      uses: ad-m/github-push-action@881a6320fdb16eb5318c5054f31c218aec2b324c # v1.3.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: master
+
+    # The milestone is renamed rather than recreated, so the issues and pull requests already assigned to it move along.
+    - name: Rename milestone
+      run: |
+        number=$(gh api "repos/${{ github.repository }}/milestones?state=open&per_page=100" --jq '.[] | select(.title == "v${{ steps.version.outputs.VERSION }}") | .number')
+        if [ -n "$number" ]; then
+          gh api -X PATCH "repos/${{ github.repository }}/milestones/$number" -f title="v${{ steps.next_version.outputs.NEXT_VERSION }}"
+        else
+          gh api "repos/${{ github.repository }}/milestones" -f title="v${{ steps.next_version.outputs.NEXT_VERSION }}"
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # --- Changelog ---
+
+    # A header already written for the replaced version is kept for the new one; its generated files are deleted.
+    - name: Remove changelog of replaced version
+      working-directory: docs/_changelog
+      run: |
+        old=v${{ steps.version.outputs.VERSION }}.md
+        new=v${{ steps.next_version.outputs.NEXT_VERSION }}.md
+        if [ -s "header/$old" ] && [ ! -e "header/$new" ]; then
+          mv "header/$old" "header/$new"
+        fi
+        rm -f "header/$old" "details/$old" "footer/$old"
+
+    # Pushes made with GITHUB_TOKEN don't trigger the generate-changelog workflow, so the details are fetched here.
+    - name: Fetch changelog
+      run: ./build.cmd docs-fetch --depth 1 --preview
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push changelog
+      uses: JamesIves/github-pages-deploy-action@fa24774553152dd7873cd16ebd8d959b010c5445 # v4.9.0
+      with:
+        branch: docs-changelog
+        folder: docs/_changelog
+        git-config-name: GitHub Actions
+        git-config-email: actions@github.com
+        clean: true
