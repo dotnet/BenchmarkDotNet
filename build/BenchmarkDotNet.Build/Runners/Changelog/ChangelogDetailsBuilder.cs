@@ -104,8 +104,9 @@ public static class ChangelogDetailsBuilder
                 .OrderBy(issue => issue.Number)
                 .ToList();
 
-            var compare =
-                await client.Repository.Commit.Compare(Repo.Owner, Repo.Name, $"v{previousVersion}", lastCommit);
+            // Without paging, the compare API returns at most 250 commits.
+            var compare = await client.Repository.Commit.Compare(Repo.Owner, Repo.Name, $"v{previousVersion}", lastCommit,
+                new ApiOptions { PageSize = 100 });
             var commits = compare.Commits;
 
             foreach (var contributor in commits.Select(commit => commit.Author))
