@@ -16,6 +16,12 @@
   <ItemGroup>
     <ProjectReference Include="..\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
+  <!-- Settings for PolySharp -->
+  <PropertyGroup>
+    <PolySharpIncludeGeneratedTypes>
+      System.Diagnostics.CodeAnalysis.NotNullWhenAttribute
+    </PolySharpIncludeGeneratedTypes>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ScottPlot" Version="5.1.59" />
     <PackageReference Include="PolySharp" Version="1.16.0">
