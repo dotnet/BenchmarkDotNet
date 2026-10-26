@@ -54,12 +54,29 @@
   </ItemGroup>
   <!-- Settings for PolySharp -->
   <PropertyGroup>
-    <PolySharpIncludeRuntimeSupportedAttributes>true</PolySharpIncludeRuntimeSupportedAttributes>
-    <!-- Required to avoid conflicts with CSWin32-->
-    <PolySharpExcludeGeneratedTypes>
-        System.Diagnostics.CodeAnalysis.UnscopedRefAttribute;
-        System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute;
-    </PolySharpExcludeGeneratedTypes>
+    <!--
+      Only polyfill what we use. Polyfills are compiled into the shipped assembly, and source generators in consuming projects
+      can mistake them for real runtime support (#3305). This also avoids conflicts with the polyfills CsWin32 generates.
+    -->
+    <PolySharpIncludeGeneratedTypes>
+      System.Index,
+      System.Range,
+      System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute,
+      System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute,
+      System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembersAttribute,
+      System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes,
+      System.Diagnostics.CodeAnalysis.NotNullAttribute,
+      System.Diagnostics.CodeAnalysis.NotNullWhenAttribute,
+      System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute,
+      System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessageAttribute,
+      System.Runtime.CompilerServices.CallerArgumentExpressionAttribute,
+      System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute,
+      System.Runtime.CompilerServices.CompilerLoweringPreserveAttribute,
+      System.Runtime.CompilerServices.IsExternalInit,
+      System.Runtime.CompilerServices.RequiredMemberAttribute,
+      System.Runtime.Versioning.SupportedOSPlatformAttribute,
+      System.Runtime.Versioning.SupportedOSPlatformGuardAttribute
+    </PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PolySharp" Version="1.16.0">

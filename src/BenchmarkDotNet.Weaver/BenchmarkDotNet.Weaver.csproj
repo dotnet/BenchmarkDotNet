@@ -32,6 +32,13 @@ then run `build.cmd pack-weaver`.
     <None Remove="packages\**" />
   </ItemGroup>
 
+  <!-- Settings for PolySharp -->
+  <PropertyGroup>
+    <PolySharpIncludeGeneratedTypes>
+      System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute,
+      System.Runtime.CompilerServices.RequiredMemberAttribute
+    </PolySharpIncludeGeneratedTypes>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PolySharp" Version="1.16.0">
       <PrivateAssets>all</PrivateAssets>
