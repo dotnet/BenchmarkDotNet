@@ -1005,6 +1005,21 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(customValue, parsedConfig.SummaryStyle.MaxParameterColumnWidth);
         }
 
+        [Theory]
+        [InlineData("19")]
+        [InlineData("0")]
+        [InlineData("-1")]
+        public void MaxParameterColumnWidthBelowMinimumFailsValidation(string maxWidth)
+        {
+            var logger = new AccumulationLogger();
+
+            var (isSuccess, config, _) = ConfigParser.Parse(["--maxWidth", maxWidth], logger);
+
+            Assert.False(isSuccess);
+            Assert.Null(config);
+            Assert.Contains("--maxWidth", logger.GetLog());
+        }
+
         [Fact]
         public void UserCanSpecifyEnvironmentVariables()
         {
