@@ -32,7 +32,7 @@ public partial class Arm64RegisterValueAccumulatorTests
     }
 
     [Fact]
-    public void AdrpThenAdd_WithNegativeOffset_ShouldCalculateAddress()
+    public void AdrpThenAdd_WithNegativeOffset_ShouldClampToZero()
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
@@ -48,8 +48,9 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.Feed(instructions[1]);
 
         // Assert
-        accumulator.HasValue.Should().BeTrue();
-        accumulator.Value.Should().Be(-0x1000 + 0x100);
+        // A negative combined value is invalid as a real address, so it is clamped to 0.
+        accumulator.HasValue.Should().BeFalse();
+        accumulator.Value.Should().Be(0UL);
     }
 
     [Fact]
@@ -73,7 +74,7 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.HasValue.Should().BeFalse();
     }
 
-    [Fact(Skip = "Shifted value is not supported on current implementation.")]
+    [Fact]
     public void AdrpThenAdd_WithShiftedImm_ShouldCalculateAddress()
     {
         // Arrange
@@ -95,7 +96,7 @@ public partial class Arm64RegisterValueAccumulatorTests
     }
 
     [Fact]
-    public void AdrpThenAdd_DifferentDestinationRegister_ShouldResetValue()
+    public void AdrpThenAdd_DifferentDestinationRegister_ShouldKeepValue()
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
@@ -111,10 +112,13 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.Feed(instructions[1]);
 
         // Assert
-        accumulator.HasValue.Should().BeFalse(); // Register is not matched
+        // The ADD writes X1, so the tracked X0 value (page address) is still valid.
+        accumulator.HasValue.Should().BeTrue();
+        accumulator.Value.Should().Be(0x2000UL);
+        accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
     }
 
-    [Fact(Skip = "On current implementation, `State.ExpectingAdd` don't reset value when unexpected instruction passed.")]
+    [Fact]
     public void AdrpThenOther_ThenAdd_ShouldResetValue()
     {
         // Arrange

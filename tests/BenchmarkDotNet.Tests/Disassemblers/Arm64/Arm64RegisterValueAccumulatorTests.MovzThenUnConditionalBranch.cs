@@ -34,7 +34,7 @@ public partial class Arm64RegisterValueAccumulatorTests
 
 
     [Fact]
-    public void MovzThenTbz_ShouldResetValue()
+    public void MovzThenTbz_ShouldKeepValue()
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
@@ -45,22 +45,21 @@ public partial class Arm64RegisterValueAccumulatorTests
         };
         PrintInstructions(instructions);
 
-        // Act        
+        // Act
         accumulator.Feed(instructions[0]);
         accumulator.Feed(instructions[1]);
 
         // Assert
-        accumulator.HasValue.Should().BeFalse();
-
-        // TODO: Current accumulator don't reset registerId.
-        // accumulator.RegisterId.Should().Be(Arm64RegisterId.Invalid);
+        accumulator.HasValue.Should().BeTrue();
+        accumulator.Value.Should().Be(0x1000UL); // TBZ is a conditional branch that does not overwrite the tracked register,
+        accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
 
         var details = instructions[1].Details;
         details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_JUMP).Should().BeTrue();
         details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE).Should().BeTrue();
     }
 
-    [Fact(Skip = "Capstone 4.0.2 don't grouping RET instruction as JUMP group.")]
+    [Fact]
     public void MovzThenRet_ShouldResetValue()
     {
         // Arrange
@@ -81,7 +80,7 @@ public partial class Arm64RegisterValueAccumulatorTests
         // accumulator.RegisterId.Should().Be(Arm64RegisterId.Invalid);
     }
 
-    [Fact(Skip = "Capstone 4.0.2 don't grouping DRPS instruction as JUMP group.")]
+    [Fact]
     public void MovzThenDrps_ShouldResetValue()
     {
         // Arrange
