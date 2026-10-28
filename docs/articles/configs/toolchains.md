@@ -101,6 +101,24 @@ namespace BenchmarkDotNet.Samples
 
 The recommended way of running the benchmarks for multiple runtimes is to use the `--runtimes` console line argument. By using the console line argument you don't need to edit the source code anytime you want to change the list of runtimes. Moreover, if you share the source code of the benchmark other people can run it even if they don't have the exact same framework version installed.
 
+## runtimeconfig.template.json
+
+The project that BenchmarkDotNet generates and builds lives in a `.bdn` folder next to your benchmark project. The .NET SDK looks for `runtimeconfig.template.json` next to the project it builds, so a template beside your benchmark project is not applied to the benchmark process.
+
+To use it, point `UserRuntimeConfig` at the template from a `Directory.Build.props` file next to your benchmark project (or in a parent folder). MSBuild imports that file for the generated project too:
+
+```xml
+<Project>
+  <PropertyGroup>
+    <UserRuntimeConfig>$(MSBuildThisFileDirectory)runtimeconfig.template.json</UserRuntimeConfig>
+  </PropertyGroup>
+</Project>
+```
+
+For individual settings you can use `RuntimeHostConfigurationOption` items in the benchmark project instead, since those are copied to the generated project.
+
+Keep garbage collector options out of the template. If it sets `System.GC.Concurrent`, for example, the benchmark process runs with the template's value even when the job asks for something else, so the summary no longer shows the settings that were actually used. Configure them through the job instead, with `[GcServer]`, `[GcConcurrent]` or the job's `GcMode`.
+
 
 ## Custom .NET Core Runtime
 
