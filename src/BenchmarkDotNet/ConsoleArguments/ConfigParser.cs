@@ -392,6 +392,12 @@ namespace BenchmarkDotNet.ConsoleArguments
                 }
             }
 
+            if (options.MaxParameterColumnWidth < SummaryStyle.DefaultMaxParameterColumnWidth)
+            {
+                logger.WriteLineError($"The provided --maxWidth {options.MaxParameterColumnWidth} is invalid. The minimum is {SummaryStyle.DefaultMaxParameterColumnWidth}.");
+                return false;
+            }
+
             if (options.EnvironmentVariables.Any(envVar => envVar.IndexOf(EnvVarKeyValueSeparator) <= 0))
             {
                 logger.WriteLineError($"Environment variable value must be separated from the key using '{EnvVarKeyValueSeparator}'. Use --help to see examples.");
