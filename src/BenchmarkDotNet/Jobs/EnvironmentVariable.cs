@@ -28,7 +28,7 @@ namespace BenchmarkDotNet.Jobs
                 return true;
             if (obj.GetType() != GetType())
                 return false;
-            return Equals((EnvironmentVariable)obj);
+            return Equals((EnvironmentVariable) obj);
         }
 
         public override int GetHashCode() => HashCode.Combine(Key, Value);

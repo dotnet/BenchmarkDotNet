@@ -72,7 +72,7 @@ namespace BenchmarkDotNet.Exporters
             IEnumerable<ulong> Range(Asm asm)
             {
                 // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
-                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong)asm.InstructionLength; instructionPointer++)
+                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong) asm.InstructionLength; instructionPointer++)
                     yield return instructionPointer;
             }
 
@@ -122,7 +122,7 @@ namespace BenchmarkDotNet.Exporters
                             foreach (var hardwareCounter in pmcStats.Counters)
                             {
                                 // most probably asm.StartAddress would be enough, but I don't want to miss any edge case
-                                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong)asm.InstructionLength; instructionPointer++)
+                                for (ulong instructionPointer = asm.InstructionPointer; instructionPointer < asm.InstructionPointer + (ulong) asm.InstructionLength; instructionPointer++)
                                     if (hardwareCounter.Value.PerInstructionPointer.TryGetValue(instructionPointer, out ulong value))
                                         totalsPerCounter[hardwareCounter.Key] = totalsPerCounter[hardwareCounter.Key] + value;
                             }
@@ -214,7 +214,7 @@ namespace BenchmarkDotNet.Exporters
                             ulong forRange = instruction.SumPerCounter[hardwareCounter];
 
                             await writer.WriteAsync(forRange != 0
-                                ? $"<td title=\"{forRange} of {totalWithoutNoise}\">{(double)forRange / totalWithoutNoise:P}</td>"
+                                ? $"<td title=\"{forRange} of {totalWithoutNoise}\">{(double) forRange / totalWithoutNoise:P}</td>"
                                 : "<td>-</td>", cancellationToken).ConfigureAwait(false);
                         }
 
@@ -237,7 +237,7 @@ namespace BenchmarkDotNet.Exporters
                     ulong forMethod = method.SumPerCounter[hardwareCounter];
 
                     await writer.WriteAsync(forMethod != 0
-                        ? $"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{(double)forMethod / totalWithoutNoise:P}</td>"
+                        ? $"<td class=\"perMethod\" title=\"{forMethod} of {totalWithoutNoise}\">{(double) forMethod / totalWithoutNoise:P}</td>"
                         : "<td  class=\"perMethod\">-</td>", cancellationToken).ConfigureAwait(false);
                 }
                 await writer.WriteLineAsync("<td></td></tr>", cancellationToken).ConfigureAwait(false);

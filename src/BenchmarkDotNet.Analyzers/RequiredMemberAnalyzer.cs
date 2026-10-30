@@ -66,7 +66,7 @@ public class RequiredMemberAnalyzer : DiagnosticAnalyzer
             // benchmark type (that one reports its own members), so no state is shared between types.
             startContext.RegisterSymbolAction(symbolContext =>
             {
-                var benchmarkType = (INamedTypeSymbol)symbolContext.Symbol;
+                var benchmarkType = (INamedTypeSymbol) symbolContext.Symbol;
                 if (benchmarkType.TypeKind != TypeKind.Class || !IsBenchmarkType(benchmarkType, benchmarkAttribute))
                 {
                     return;

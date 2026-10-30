@@ -22,7 +22,7 @@ internal sealed class WebSocketListener : IpcListener
     internal async ValueTask<int> StartAndGetPortAsync()
     {
         await listener.StartAsync().ConfigureAwait(false);
-        return ((IPEndPoint)listener.LocalEndpoints.First()).Port;
+        return ((IPEndPoint) listener.LocalEndpoints.First()).Port;
     }
 
     internal override async ValueTask<IpcConnection> AcceptConnection(CancellationToken cancellationToken)

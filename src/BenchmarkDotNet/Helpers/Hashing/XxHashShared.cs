@@ -218,7 +218,7 @@ internal static unsafe class XxHashShared
     {
         Debug.Assert(state.BufferedCount <= InternalBufferLengthBytes, "Expected state.BufferedCount to be less than or equals InternalBufferLengthBytes");
 
-        state.TotalLength += (uint)source.Length;
+        state.TotalLength += (uint) source.Length;
 
         fixed (byte* buffer = state.Buffer)
         {
@@ -233,7 +233,7 @@ internal static unsafe class XxHashShared
                     Buffer.MemoryCopy(sourcePtr, buffer + state.BufferedCount, source.Length, source.Length);
                 }
 #endif
-                state.BufferedCount += (uint)source.Length;
+                state.BufferedCount += (uint) source.Length;
                 return;
             }
 
@@ -250,7 +250,7 @@ internal static unsafe class XxHashShared
                 int sourceIndex = 0;
                 if (state.BufferedCount != 0)
                 {
-                    int loadSize = InternalBufferLengthBytes - (int)state.BufferedCount;
+                    int loadSize = InternalBufferLengthBytes - (int) state.BufferedCount;
 
 #if NET
                     source.AsSpan().Slice(0, loadSize).CopyTo(new Span<byte>(buffer + state.BufferedCount, loadSize));
@@ -268,16 +268,16 @@ internal static unsafe class XxHashShared
                 // Large input to consume: ingest per full block.
                 if (source.Length - sourceIndex > NumStripesPerBlock * StripeLengthBytes)
                 {
-                    ulong stripes = (ulong)(source.Length - sourceIndex - 1) / StripeLengthBytes;
+                    ulong stripes = (ulong) (source.Length - sourceIndex - 1) / StripeLengthBytes;
                     Debug.Assert(state.StripesProcessedInCurrentBlock <= NumStripesPerBlock, "Expected NumStripesPerBlock to be greater than or equals state.StripesProcessedInCurrentBlock");
 
                     // Join to current block's end.
                     ulong stripesToEnd = NumStripesPerBlock - state.StripesProcessedInCurrentBlock;
                     Debug.Assert(stripesToEnd <= stripes, "Expected stripesToEnd to be smaller than or equals stripes");
-                    Accumulate(accumulators, sourcePtr + sourceIndex, secret + ((int)state.StripesProcessedInCurrentBlock * SecretConsumeRateBytes), (int)stripesToEnd);
+                    Accumulate(accumulators, sourcePtr + sourceIndex, secret + ((int) state.StripesProcessedInCurrentBlock * SecretConsumeRateBytes), (int) stripesToEnd);
                     ScrambleAccumulators(accumulators, secret + (SecretLengthBytes - StripeLengthBytes));
                     state.StripesProcessedInCurrentBlock = 0;
-                    sourceIndex += (int)stripesToEnd * StripeLengthBytes;
+                    sourceIndex += (int) stripesToEnd * StripeLengthBytes;
                     stripes -= stripesToEnd;
 
                     // Consume entire blocks.
@@ -290,8 +290,8 @@ internal static unsafe class XxHashShared
                     }
 
                     // Consume complete stripes in the last partial block.
-                    Accumulate(accumulators, sourcePtr + sourceIndex, secret, (int)stripes);
-                    sourceIndex += (int)stripes * StripeLengthBytes;
+                    Accumulate(accumulators, sourcePtr + sourceIndex, secret, (int) stripes);
+                    sourceIndex += (int) stripes * StripeLengthBytes;
                     Debug.Assert(sourceIndex < source.Length, "Expected sourceIndex to be smaller than source.Length");  // at least some bytes left
                     state.StripesProcessedInCurrentBlock = stripes;
 
@@ -333,7 +333,7 @@ internal static unsafe class XxHashShared
                 Debug.Assert(source.Length - sourceIndex <= InternalBufferLengthBytes, "Expected remaining.Length to be less than or equals InternalBufferLengthBytes");
                 Debug.Assert(state.BufferedCount == 0, "Expected BufferedCount to be zero.");
                 Buffer.MemoryCopy(sourcePtr + sourceIndex, buffer, source.Length - sourceIndex, source.Length - sourceIndex);
-                state.BufferedCount = (uint)(source.Length - sourceIndex);
+                state.BufferedCount = (uint) (source.Length - sourceIndex);
 #endif
             }
 #pragma warning restore SA1519 // Braces should not be omitted from multi-line child statement
@@ -357,12 +357,12 @@ internal static unsafe class XxHashShared
 
         const int StripesPerBlock = (SecretLengthBytes - StripeLengthBytes) / SecretConsumeRateBytes;
         const int BlockLen = StripeLengthBytes * StripesPerBlock;
-        int blocksNum = (int)((length - 1) / BlockLen);
+        int blocksNum = (int) ((length - 1) / BlockLen);
 
         Accumulate(accumulators, source, secret, StripesPerBlock, true, blocksNum);
         int offset = BlockLen * blocksNum;
 
-        int stripesNumber = (int)((length - 1 - offset) / StripeLengthBytes);
+        int stripesNumber = (int) ((length - 1 - offset) / StripeLengthBytes);
         Accumulate(accumulators, source + offset, secret, stripesNumber);
         Accumulate512(accumulators, source + length - StripeLengthBytes, secret + (SecretLengthBytes - StripeLengthBytes - SecretLastAccStartBytes));
     }
@@ -377,14 +377,14 @@ internal static unsafe class XxHashShared
         {
             // need a scrambling operation
             ulong stripesAfterBlock = stripes - stripesToEndOfBlock;
-            Accumulate(accumulators, source, secret + ((int)stripesSoFar * SecretConsumeRateBytes), (int)stripesToEndOfBlock);
+            Accumulate(accumulators, source, secret + ((int) stripesSoFar * SecretConsumeRateBytes), (int) stripesToEndOfBlock);
             ScrambleAccumulators(accumulators, secret + (SecretLengthBytes - StripeLengthBytes));
-            Accumulate(accumulators, source + ((int)stripesToEndOfBlock * StripeLengthBytes), secret, (int)stripesAfterBlock);
+            Accumulate(accumulators, source + ((int) stripesToEndOfBlock * StripeLengthBytes), secret, (int) stripesAfterBlock);
             stripesSoFar = stripesAfterBlock;
         }
         else
         {
-            Accumulate(accumulators, source, secret + ((int)stripesSoFar * SecretConsumeRateBytes), (int)stripes);
+            Accumulate(accumulators, source, secret + ((int) stripesSoFar * SecretConsumeRateBytes), (int) stripes);
             stripesSoFar += stripes;
         }
     }
@@ -436,14 +436,14 @@ internal static unsafe class XxHashShared
             else
             {
                 byte* lastStripe = stackalloc byte[StripeLengthBytes];
-                int catchupSize = StripeLengthBytes - (int)state.BufferedCount;
+                int catchupSize = StripeLengthBytes - (int) state.BufferedCount;
 
 #if NET
                 new ReadOnlySpan<byte>(buffer + InternalBufferLengthBytes - catchupSize, catchupSize).CopyTo(new Span<byte>(lastStripe, StripeLengthBytes));
                 new ReadOnlySpan<byte>(buffer, (int)state.BufferedCount).CopyTo(new Span<byte>(lastStripe + catchupSize, (int)state.BufferedCount));
 #else
                 Buffer.MemoryCopy(buffer + InternalBufferLengthBytes - catchupSize, lastStripe, StripeLengthBytes, catchupSize);
-                Buffer.MemoryCopy(buffer, lastStripe + catchupSize, (int)state.BufferedCount, (int)state.BufferedCount);
+                Buffer.MemoryCopy(buffer, lastStripe + catchupSize, (int) state.BufferedCount, (int) state.BufferedCount);
 #endif
                 accumulateData = lastStripe;
             }
@@ -502,7 +502,7 @@ internal static unsafe class XxHashShared
 
     /// <summary>Calculates a 32-bit to 64-bit long multiply.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ulong Multiply32To64(uint v1, uint v2) => (ulong)v1 * v2;
+    public static ulong Multiply32To64(uint v1, uint v2) => (ulong) v1 * v2;
 
     /// <summary>This is a fast avalanche stage, suitable when input bits are already partially mixed.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -520,10 +520,10 @@ internal static unsafe class XxHashShared
 #if NET
         return Math.BigMul(left, right, out lower);
 #else
-        ulong lowerLow = Multiply32To64((uint)left, (uint)right);
-        ulong higherLow = Multiply32To64((uint)(left >> 32), (uint)right);
-        ulong lowerHigh = Multiply32To64((uint)left, (uint)(right >> 32));
-        ulong higherHigh = Multiply32To64((uint)(left >> 32), (uint)(right >> 32));
+        ulong lowerLow = Multiply32To64((uint) left, (uint) right);
+        ulong higherLow = Multiply32To64((uint) (left >> 32), (uint) right);
+        ulong lowerHigh = Multiply32To64((uint) left, (uint) (right >> 32));
+        ulong higherHigh = Multiply32To64((uint) (left >> 32), (uint) (right >> 32));
 
         ulong cross = (lowerLow >> 32) + (higherLow & 0xFFFFFFFF) + lowerHigh;
         ulong upper = (higherLow >> 32) + (cross >> 32) + higherHigh;
@@ -721,7 +721,7 @@ internal static unsafe class XxHashShared
                 ulong sourceKey = sourceVal ^ ReadUInt64LE(secret + (i * 8));
 
                 accumulators[i ^ 1] += sourceVal; // swap adjacent lanes
-                accumulators[i] += Multiply32To64((uint)sourceKey, (uint)(sourceKey >> 32));
+                accumulators[i] += Multiply32To64((uint) sourceKey, (uint) (sourceKey >> 32));
             }
         }
     }

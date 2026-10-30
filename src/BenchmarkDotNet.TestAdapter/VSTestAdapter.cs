@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.TestAdapter
             try
             {
                 // Ensure that the test enumeration is done inside the context of the source directory.
-                var enumerator = (BenchmarkEnumeratorWrapper)CreateIsolatedType(typeof(BenchmarkEnumeratorWrapper), assemblyPath);
+                var enumerator = (BenchmarkEnumeratorWrapper) CreateIsolatedType(typeof(BenchmarkEnumeratorWrapper), assemblyPath);
                 var testCases = enumerator
                     .GetTestCasesFromAssemblyPathSerialized(assemblyPath)
                     .Select(SerializationHelpers.Deserialize<TestCase>)
@@ -188,7 +188,7 @@ namespace BenchmarkDotNet.TestAdapter
             try
             {
                 // Ensure that test execution is done inside the context of the source directory.
-                var executor = (BenchmarkExecutorWrapper)CreateIsolatedType(typeof(BenchmarkExecutorWrapper), source);
+                var executor = (BenchmarkExecutorWrapper) CreateIsolatedType(typeof(BenchmarkExecutorWrapper), source);
                 cts?.Token.Register(executor.Cancel);
 
                 executor.RunBenchmarks(source, new TestExecutionRecorderWrapper(frameworkHandle), caseIds);

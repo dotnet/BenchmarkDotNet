@@ -45,13 +45,13 @@ internal sealed class UniqueIdGenerator
         // does not affect endianness, so we can safely assume the byte data are at the end of the int.
         // We also don't care to specify the whole expansion of the int in the bit masks, which effectively ignores all the data in the int
         // before the last byte data, but that is okay, they will always be zero.
-        hashBytes[firstByte] = (byte)((hashBytes[firstByte] & 0b0000_1111) | (hashVersion << 4));
+        hashBytes[firstByte] = (byte) ((hashBytes[firstByte] & 0b0000_1111) | (hashVersion << 4));
         // We set first 4bits 7th byte to 8 to indicate that this is a version 8 UUID. https://www.rfc-editor.org/rfc/rfc9562.html#name-uuid-version-8
-        hashBytes[versionByte] = (byte)((hashBytes[versionByte] & 0b0000_1111) | 0b1000_0000);
+        hashBytes[versionByte] = (byte) ((hashBytes[versionByte] & 0b0000_1111) | 0b1000_0000);
 
         // We set the first 2 bits of nineth byte to 0b10. In the guid this is stored as byte, so we don't care about endiannes.
         int variantByte = 8;
-        hashBytes[variantByte] = (byte)((hashBytes[variantByte] & 0b0011_1111) | 0b1000_0000);
+        hashBytes[variantByte] = (byte) ((hashBytes[variantByte] & 0b0011_1111) | 0b1000_0000);
 
         return CreateGuidFromBigEndian(hashBytes);
     }
@@ -63,8 +63,8 @@ internal sealed class UniqueIdGenerator
 #else
         return new Guid(
             (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3],
-            (short)((bytes[4] << 8) | bytes[5]),
-            (short)((bytes[6] << 8) | bytes[7]),
+            (short) ((bytes[4] << 8) | bytes[5]),
+            (short) ((bytes[6] << 8) | bytes[7]),
             bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]);
 #endif
     }

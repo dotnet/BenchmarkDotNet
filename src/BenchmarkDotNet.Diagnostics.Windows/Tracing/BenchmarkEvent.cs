@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
         protected override Delegate Target
         {
             get => target;
-            set => target = (Action<BenchmarkEvent>)value;
+            set => target = (Action<BenchmarkEvent>) value;
         }
 
         public override string[] PayloadNames => payloadNames ?? (payloadNames = [nameof(BenchmarkName)]);

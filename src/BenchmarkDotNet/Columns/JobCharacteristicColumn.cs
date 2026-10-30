@@ -63,7 +63,7 @@ namespace BenchmarkDotNet.Columns
         private static readonly Lazy<IColumn[]> LazyAllColumns =
             new Lazy<IColumn[]>(() =>
                 CharacteristicHelper.GetAllPresentableCharacteristics(typeof(Job), true)
-                .Select(c => (IColumn)new JobCharacteristicColumn(c)).ToArray());
+                .Select(c => (IColumn) new JobCharacteristicColumn(c)).ToArray());
 
         public static IColumn[] AllColumns => LazyAllColumns.Value;
 

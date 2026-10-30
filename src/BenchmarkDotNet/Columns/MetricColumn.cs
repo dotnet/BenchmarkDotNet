@@ -49,12 +49,12 @@ namespace BenchmarkDotNet.Columns
 
             if (printUnits && descriptor.UnitType == UnitType.CodeSize)
             {
-                var measurement = SizeValue.FromBytes((long)metric.Value).ToMeasurement(style.CodeSizeUnit);
+                var measurement = SizeValue.FromBytes((long) metric.Value).ToMeasurement(style.CodeSizeUnit);
                 return UnitHelper.Format(measurement, numberFormat, cultureInfo, style.PrintUnitsInContent);
             }
             if (printUnits && descriptor.UnitType == UnitType.Size)
             {
-                var measurement = SizeValue.FromBytes((long)metric.Value).ToMeasurement(style.SizeUnit);
+                var measurement = SizeValue.FromBytes((long) metric.Value).ToMeasurement(style.SizeUnit);
                 return UnitHelper.Format(measurement, numberFormat, cultureInfo, style.PrintUnitsInContent);
             }
             if (printUnits && descriptor.UnitType == UnitType.Time)

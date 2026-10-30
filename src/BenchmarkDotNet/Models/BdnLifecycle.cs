@@ -28,7 +28,7 @@ internal class BdnLifecycle : LifecycleInfo, IEquatable<BdnLifecycle>, IComparab
             return true;
         if (obj.GetType() != GetType())
             return false;
-        return Equals((BdnLifecycle)obj);
+        return Equals((BdnLifecycle) obj);
     }
 
     public override int GetHashCode() => HashCode.Combine(LaunchIndex, IterationMode, IterationStage);

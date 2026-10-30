@@ -13,7 +13,7 @@ public class DotTraceTests
         var diagnoser = new DotTraceDiagnoser();
         foreach (var field in typeof(RuntimeMoniker).GetFields(BindingFlags.Public | BindingFlags.Static))
         {
-            var moniker = (string)field.GetValue(null)!;
+            var moniker = (string) field.GetValue(null)!;
             diagnoser.IsSupported(Runtime.Parse(moniker)); // Just check that it doesn't throw exceptions
         }
     }

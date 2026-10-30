@@ -36,7 +36,7 @@ namespace BenchmarkDotNet.Samples
         public void ConstantDelays() => Thread.Sleep(20);
 
         [Benchmark]
-        public void RandomDelays() => Thread.Sleep(10 + (int)(20 * Rnd.NextDouble()));
+        public void RandomDelays() => Thread.Sleep(10 + (int) (20 * Rnd.NextDouble()));
 
         [Benchmark]
         public void RareDelays()

@@ -122,11 +122,11 @@ internal sealed class EngineJitStage : EngineStage
         TimeInterval iterationTime = parameters.TargetJob.ResolveValue(RunMode.IterationTimeCharacteristic, parameters.Resolver);
         long remainingCalls = JitInfo.TieredCallCountThreshold;
         if (jitTieringMode == JitTieringMode.Auto
-            && iterationTime.Nanoseconds / (lastMeasurement.Nanoseconds / (double)userInvokeCount) < 1.5)
+            && iterationTime.Nanoseconds / (lastMeasurement.Nanoseconds / (double) userInvokeCount) < 1.5)
         {
             ++iterationIndex;
             yield return GetWorkloadIterationData(userInvokeCount);
-            if (iterationTime.Nanoseconds / (lastMeasurement.Nanoseconds / (double)userInvokeCount) < 1.5)
+            if (iterationTime.Nanoseconds / (lastMeasurement.Nanoseconds / (double) userInvokeCount) < 1.5)
             {
                 didStopEarly = true;
                 yield break;

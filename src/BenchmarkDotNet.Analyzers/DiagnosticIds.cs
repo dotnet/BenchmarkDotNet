@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Analyzers;
+namespace BenchmarkDotNet.Analyzers;
 
 public static class DiagnosticIds
 {

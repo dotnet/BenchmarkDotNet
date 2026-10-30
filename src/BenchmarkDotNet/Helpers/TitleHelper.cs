@@ -64,7 +64,7 @@ namespace BenchmarkDotNet.Helpers
             => Truncate(customTitle.IsBlank() ? JoinedSummaryTitle : Escape(customTitle), desiredMaxLength);
 
         // the title becomes a file name, so it can not contain characters that are invalid for a path
-        private static string Escape(string title) => FolderNameHelper.ToFolderName((object)title);
+        private static string Escape(string title) => FolderNameHelper.ToFolderName((object) title);
 
         /// <summary>
         /// shortens the title so that the paths of the artifacts named after it don't exceed the limits of the OS

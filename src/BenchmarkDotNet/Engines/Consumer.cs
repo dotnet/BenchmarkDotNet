@@ -86,7 +86,7 @@ namespace BenchmarkDotNet.Engines
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
-        public void Consume(string? stringValue) => Consume((object?)stringValue);
+        public void Consume(string? stringValue) => Consume((object?) stringValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
@@ -101,13 +101,13 @@ namespace BenchmarkDotNet.Engines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [PublicAPI]
         public void Consume<T>(T objectValue) where T : class // class constraint prevents from boxing structs
-             => Consume((object)objectValue);
+             => Consume((object) objectValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void Consume<T>(T* ptrValue) where T : unmanaged => ptrHolder = (IntPtr)ptrValue;
+        public unsafe void Consume<T>(T* ptrValue) where T : unmanaged => ptrHolder = (IntPtr) ptrValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe void Consume(void* ptrValue) => ptrHolder = (IntPtr)ptrValue;
+        public unsafe void Consume(void* ptrValue) => ptrHolder = (IntPtr) ptrValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Consume<T>(in T value)
@@ -118,33 +118,33 @@ namespace BenchmarkDotNet.Engines
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8605 // Unboxing a possibly null value.
             if (typeof(T) == typeof(byte))
-                byteHolder = (byte)(object)value;
+                byteHolder = (byte) (object) value;
             else if (typeof(T) == typeof(sbyte))
-                sbyteHolder = (sbyte)(object)value;
+                sbyteHolder = (sbyte) (object) value;
             else if (typeof(T) == typeof(short))
-                shortHolder = (short)(object)value;
+                shortHolder = (short) (object) value;
             else if (typeof(T) == typeof(ushort))
-                ushortHolder = (ushort)(object)value;
+                ushortHolder = (ushort) (object) value;
             else if (typeof(T) == typeof(int))
-                intHolder = (int)(object)value;
+                intHolder = (int) (object) value;
             else if (typeof(T) == typeof(uint))
-                uintHolder = (uint)(object)value;
+                uintHolder = (uint) (object) value;
             else if (typeof(T) == typeof(bool))
-                boolHolder = (bool)(object)value;
+                boolHolder = (bool) (object) value;
             else if (typeof(T) == typeof(char))
-                charHolder = (char)(object)value;
+                charHolder = (char) (object) value;
             else if (typeof(T) == typeof(float))
-                floatHolder = (float)(object)value;
+                floatHolder = (float) (object) value;
             else if (typeof(T) == typeof(double))
-                Volatile.Write(ref doubleHolder, (double)(object)value);
+                Volatile.Write(ref doubleHolder, (double) (object) value);
             else if (typeof(T) == typeof(long))
-                Volatile.Write(ref longHolder, (long)(object)value);
+                Volatile.Write(ref longHolder, (long) (object) value);
             else if (typeof(T) == typeof(ulong))
-                Volatile.Write(ref ulongHolder, (ulong)(object)value);
+                Volatile.Write(ref ulongHolder, (ulong) (object) value);
 #pragma warning restore CS8600
 #pragma warning restore CS8605
             else if (default(T) == null && !typeof(T).IsValueType)
-                Consume((object?)value);
+                Consume((object?) value);
             else
                 DeadCodeEliminationHelper.KeepAliveWithoutBoxing(in value); // non-primitive and nullable value types
         }

@@ -147,7 +147,7 @@ namespace BenchmarkDotNet.Exporters
             }
 
             if (argumentType != null && argumentType.IsArray)
-                return GetArray((IEnumerable)argumentValue);
+                return GetArray((IEnumerable) argumentValue);
 
             return argumentValue.ToString()!;
         }

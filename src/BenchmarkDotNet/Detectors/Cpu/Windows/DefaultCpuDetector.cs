@@ -103,7 +103,7 @@ internal class DefaultCpuDetector : ICpuDetector
             uint bufferLength = 0;
             PInvoke.GetLogicalProcessorInformationEx(LOGICAL_PROCESSOR_RELATIONSHIP.RelationAll, null, ref bufferLength);
 
-            var error = (WIN32_ERROR)Marshal.GetLastWin32Error();
+            var error = (WIN32_ERROR) Marshal.GetLastWin32Error();
             if (bufferLength == 0 || error != WIN32_ERROR.ERROR_INSUFFICIENT_BUFFER)
                 return null;
 
@@ -112,7 +112,7 @@ internal class DefaultCpuDetector : ICpuDetector
             {
                 var isSuccess = PInvoke.GetLogicalProcessorInformationEx(
                     LOGICAL_PROCESSOR_RELATIONSHIP.RelationAll,
-                    (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*)bufferPtr,
+                    (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) bufferPtr,
                     &bufferLength
                 );
 
@@ -134,9 +134,9 @@ internal class DefaultCpuDetector : ICpuDetector
 
             while (currentPtr < endPtr)
             {
-                var info = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*)currentPtr;
+                var info = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) currentPtr;
                 uint size = info->Size;
-                uint remaining = (uint)(endPtr - currentPtr);
+                uint remaining = (uint) (endPtr - currentPtr);
 
                 // Additional boundary for unexpected data. 
                 if (size == 0 || size > remaining)

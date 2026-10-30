@@ -18,7 +18,7 @@ namespace BenchmarkDotNet.Helpers
                 case string s:
                     return Escape(new StringBuilder(s));
                 case char c:
-                    return ((int)c).ToString(); // TODO: rewrite
+                    return ((int) c).ToString(); // TODO: rewrite
                 case float f:
                     return f.ToString("F", CultureInfo.InvariantCulture).Replace(".", "-");
                 case double d:

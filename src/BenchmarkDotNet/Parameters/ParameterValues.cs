@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Parameters
+namespace BenchmarkDotNet.Parameters
 {
     /// <summary>
     /// A parameter and the values it takes; the benchmark cases are the cartesian product of these.

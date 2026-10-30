@@ -125,8 +125,8 @@ public class DisassemblerModelSerializationTests
             DisassembleSyntax = disassembleSyntax,
             Instruction = instruction,
             InstructionLength = instruction.Bytes.Length,
-            InstructionPointer = (ulong)instruction.Address,
-            ReferencedAddress = (instruction.Address > ushort.MaxValue) ? (ulong)instruction.Address : null,
+            InstructionPointer = (ulong) instruction.Address,
+            ReferencedAddress = (instruction.Address > ushort.MaxValue) ? (ulong) instruction.Address : null,
             IsReferencedAddressIndirect = true, // Test with dummy value
         };
 
