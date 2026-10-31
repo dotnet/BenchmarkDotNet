@@ -43,7 +43,7 @@ internal sealed unsafe class XxHash128
 
     /// <summary>Initializes a new instance of the <see cref="XxHash128"/> class using the specified seed.</summary>
     public XxHash128(long seed)
-        => Initialize(ref _state, (ulong)seed);
+        => Initialize(ref _state, (ulong) seed);
 
     /// <summary>Initializes a new instance of the <see cref="XxHash128"/> class using the state from another instance.</summary>
     private XxHash128(State state)
@@ -125,7 +125,7 @@ internal sealed unsafe class XxHash128
 
     private static Hash128 HashToHash128(byte[] source, long seed = 0)
     {
-        uint length = (uint)source.Length;
+        uint length = (uint) source.Length;
         fixed (byte* sourcePtr = source)
         {
             return HashToHash128(sourcePtr, length, seed);
@@ -136,22 +136,22 @@ internal sealed unsafe class XxHash128
     {
         if (length <= 16)
         {
-            return HashLength0To16(sourcePtr, length, (ulong)seed);
+            return HashLength0To16(sourcePtr, length, (ulong) seed);
         }
 
         if (length <= 128)
         {
-            return HashLength17To128(sourcePtr, length, (ulong)seed);
+            return HashLength17To128(sourcePtr, length, (ulong) seed);
         }
 
 #pragma warning disable IDE0046 // Convert to conditional expression
         if (length <= MidSizeMaxBytes)
         {
-            return HashLength129To240(sourcePtr, length, (ulong)seed);
+            return HashLength129To240(sourcePtr, length, (ulong) seed);
         }
 #pragma warning restore IDE0046 // Convert to conditional expression
 
-        return HashLengthOver240(sourcePtr, length, (ulong)seed);
+        return HashLengthOver240(sourcePtr, length, (ulong) seed);
     }
 
     public void Reset()
@@ -197,7 +197,7 @@ internal sealed unsafe class XxHash128
         {
             fixed (byte* buffer = _state.Buffer)
             {
-                current = HashToHash128(buffer, (uint)(int)_state.TotalLength, (long)_state.Seed);
+                current = HashToHash128(buffer, (uint) (int) _state.TotalLength, (long) _state.Seed);
             }
         }
 
@@ -232,8 +232,8 @@ internal sealed unsafe class XxHash128
 #else
         fixed (byte* dest0 = destination)
         {
-            *(ulong*)(void*)dest0 = high;
-            *((ulong*)(void*)dest0 + 1) = low;
+            *(ulong*) (void*) dest0 = high;
+            *((ulong*) (void*) dest0 + 1) = low;
         }
 #endif
     }
@@ -283,11 +283,11 @@ internal sealed unsafe class XxHash128
         byte c2 = source[length >> 1];
         byte c3 = source[length - 1];
 
-        uint combinedl = ((uint)c1 << 16) | ((uint)c2 << 24) | c3 | (length << 8);
+        uint combinedl = ((uint) c1 << 16) | ((uint) c2 << 24) | c3 | (length << 8);
 
         uint combinedh = BitOperations.RotateLeft(BinaryPrimitives.ReverseEndianness(combinedl), 13);
-        const uint SecretXorL = unchecked((uint)DefaultSecretUInt64_0) ^ (uint)(DefaultSecretUInt64_0 >> 32);
-        const uint SecretXorH = unchecked((uint)DefaultSecretUInt64_1) ^ (uint)(DefaultSecretUInt64_1 >> 32);
+        const uint SecretXorL = unchecked((uint) DefaultSecretUInt64_0) ^ (uint) (DefaultSecretUInt64_0 >> 32);
+        const uint SecretXorH = unchecked((uint) DefaultSecretUInt64_1) ^ (uint) (DefaultSecretUInt64_1 >> 32);
         ulong bitflipl = SecretXorL + seed;
         ulong bitfliph = SecretXorH - seed;
         ulong keyedLo = combinedl ^ bitflipl;
@@ -301,11 +301,11 @@ internal sealed unsafe class XxHash128
     {
         Debug.Assert(length is >= 4 and <= 8, "Length was expected to be between 4 and 8.");
 
-        seed ^= (ulong)BinaryPrimitives.ReverseEndianness((uint)seed) << 32;
+        seed ^= (ulong) BinaryPrimitives.ReverseEndianness((uint) seed) << 32;
 
         uint inputLo = ReadUInt32LE(source);
         uint inputHi = ReadUInt32LE(source + length - 4);
-        ulong input64 = inputLo + ((ulong)inputHi << 32);
+        ulong input64 = inputLo + ((ulong) inputHi << 32);
         ulong bitflip = (DefaultSecretUInt64_2 ^ DefaultSecretUInt64_3) + seed;
         ulong keyed = input64 ^ bitflip;
 
@@ -332,12 +332,12 @@ internal sealed unsafe class XxHash128
         ulong inputHi = ReadUInt64LE(source + length - 8);
         ulong m128High = Multiply64To128(inputLo ^ inputHi ^ bitflipl, Prime64_1, out ulong m128Low);
 
-        m128Low += (ulong)(length - 1) << 54;
+        m128Low += (ulong) (length - 1) << 54;
         inputHi ^= bitfliph;
 
         m128High += sizeof(void*) < sizeof(ulong) ?
-            (inputHi & 0xFFFFFFFF00000000UL) + Multiply32To64((uint)inputHi, Prime32_2) :
-            inputHi + Multiply32To64((uint)inputHi, Prime32_2 - 1);
+            (inputHi & 0xFFFFFFFF00000000UL) + Multiply32To64((uint) inputHi, Prime32_2) :
+            inputHi + Multiply32To64((uint) inputHi, Prime32_2 - 1);
 
         m128Low ^= BinaryPrimitives.ReverseEndianness(m128High);
 

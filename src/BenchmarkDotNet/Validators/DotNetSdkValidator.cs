@@ -148,7 +148,7 @@ namespace BenchmarkDotNet.Validators
                 {
                     if (ndpKey.GetValue("Release") != null)
                     {
-                        versions.Add(CheckFor45PlusVersion((int)ndpKey.GetValue("Release")!));
+                        versions.Add(CheckFor45PlusVersion((int) ndpKey.GetValue("Release")!));
                     }
                 }
             }

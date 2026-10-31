@@ -17,7 +17,7 @@ internal static partial class EnumExtensions
         public static TEnum Parse<TEnum>(string value)
             where TEnum : struct, Enum
         {
-            return (TEnum)Enum.Parse(typeof(TEnum), value);
+            return (TEnum) Enum.Parse(typeof(TEnum), value);
         }
 
         public static string[] GetNames<TEnum>()

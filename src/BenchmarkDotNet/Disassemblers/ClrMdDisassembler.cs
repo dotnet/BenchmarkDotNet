@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.Disassemblers
             if (OsDetector.IsWindows())
                 return ushort.MaxValue + 1;
             if (OsDetector.IsLinux())
-                return (ulong)Environment.SystemPageSize;
+                return (ulong) Environment.SystemPageSize;
             if (OsDetector.IsMacOS())
                 return RuntimeInformation.GetCurrentPlatform() switch
                 {
@@ -88,7 +88,7 @@ namespace BenchmarkDotNet.Disassemblers
             {
                 // A type handle is the type's method table, so it cannot resolve to a same-named type of another module.
                 var typeWithBenchmark = args.TypeHandle != IntPtr.Zero
-                    ? state.Runtime.GetTypeByMethodTable((ulong)args.TypeHandle.ToInt64())
+                    ? state.Runtime.GetTypeByMethodTable((ulong) args.TypeHandle.ToInt64())
                         ?? throw new InvalidOperationException($"No type has the method table {args.TypeHandle.ToInt64():X} ({args.TypeName}).")
                     : state.Runtime.EnumerateModules().Select(module => module.GetTypeByName(args.TypeName)).WhereNotNull().First();
 
@@ -114,7 +114,7 @@ namespace BenchmarkDotNet.Disassemblers
             {
                 Methods = filteredMethods,
                 AddressToNameMapping = state.AddressToNameMapping,
-                PointerSize = (uint)IntPtr.Size
+                PointerSize = (uint) IntPtr.Size
             };
         }
 
@@ -221,14 +221,14 @@ namespace BenchmarkDotNet.Disassemblers
         private IEnumerable<Asm> Decode(ILToNativeMap map, State state, int depth, IClrMethod currentMethod, DisassemblySyntax syntax)
         {
             ulong startAddress = map.StartAddress;
-            uint size = (uint)(map.EndAddress - map.StartAddress);
+            uint size = (uint) (map.EndAddress - map.StartAddress);
 
             byte[] code = new byte[size];
 
             int totalBytesRead = 0;
             do
             {
-                int bytesRead = state.Runtime.DataTarget.DataReader.Read(startAddress + (ulong)totalBytesRead, new Span<byte>(code, totalBytesRead, (int)size - totalBytesRead));
+                int bytesRead = state.Runtime.DataTarget.DataReader.Read(startAddress + (ulong) totalBytesRead, new Span<byte>(code, totalBytesRead, (int) size - totalBytesRead));
                 if (bytesRead <= 0)
                 {
                     throw new EndOfStreamException($"Tried to read {size} bytes for {currentMethod.Signature}, got only {totalBytesRead}");
@@ -281,7 +281,7 @@ namespace BenchmarkDotNet.Disassemblers
             }
 
             var method = runtime.GetMethodByInstructionPointer(address);
-            if (method is null && (address & ((uint)runtime.DataTarget.DataReader.PointerSize - 1)) == 0
+            if (method is null && (address & ((uint) runtime.DataTarget.DataReader.PointerSize - 1)) == 0
                 && runtime.DataTarget.DataReader.ReadPointer(address, out ulong newAddress) && IsValidAddress(newAddress))
             {
                 method = runtime.GetMethodByInstructionPointer(newAddress);

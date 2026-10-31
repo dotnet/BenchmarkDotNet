@@ -148,10 +148,10 @@ namespace BenchmarkDotNet.Tests
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
 
             // Check that we sort by numeric value, not string order!!
-            Assert.Equal(1, ((ComplexParameter)sortedData[0].Items[0].Value!).Value);
-            Assert.Equal(2, ((ComplexParameter)sortedData[1].Items[0].Value!).Value);
-            Assert.Equal(3, ((ComplexParameter)sortedData[2].Items[0].Value!).Value);
-            Assert.Equal(4, ((ComplexParameter)sortedData[3].Items[0].Value!).Value);
+            Assert.Equal(1, ((ComplexParameter) sortedData[0].Items[0].Value!).Value);
+            Assert.Equal(2, ((ComplexParameter) sortedData[1].Items[0].Value!).Value);
+            Assert.Equal(3, ((ComplexParameter) sortedData[2].Items[0].Value!).Value);
+            Assert.Equal(4, ((ComplexParameter) sortedData[3].Items[0].Value!).Value);
         }
 
         [Fact]
@@ -180,10 +180,10 @@ namespace BenchmarkDotNet.Tests
 
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
 
-            Assert.Equal(1, (((ComplexNonIComparableParameter, int))sortedData[0].Items[0].Value!).Item2);
-            Assert.Equal(2, (((ComplexNonIComparableParameter, int))sortedData[1].Items[0].Value!).Item2);
-            Assert.Equal(3, (((ComplexNonIComparableParameter, int))sortedData[2].Items[0].Value!).Item2);
-            Assert.Equal(4, (((ComplexNonIComparableParameter, int))sortedData[3].Items[0].Value!).Item2);
+            Assert.Equal(1, (((ComplexNonIComparableParameter, int)) sortedData[0].Items[0].Value!).Item2);
+            Assert.Equal(2, (((ComplexNonIComparableParameter, int)) sortedData[1].Items[0].Value!).Item2);
+            Assert.Equal(3, (((ComplexNonIComparableParameter, int)) sortedData[2].Items[0].Value!).Item2);
+            Assert.Equal(4, (((ComplexNonIComparableParameter, int)) sortedData[3].Items[0].Value!).Item2);
         }
 
         [Fact]
@@ -212,10 +212,10 @@ namespace BenchmarkDotNet.Tests
 
             var sortedData = originalData.OrderBy(d => d, comparer).ToArray();
 
-            Assert.Equal(1, ((Tuple<ComplexNonIComparableParameter, int>)sortedData[0].Items[0].Value!).Item2);
-            Assert.Equal(2, ((Tuple<ComplexNonIComparableParameter, int>)sortedData[1].Items[0].Value!).Item2);
-            Assert.Equal(3, ((Tuple<ComplexNonIComparableParameter, int>)sortedData[2].Items[0].Value!).Item2);
-            Assert.Equal(4, ((Tuple<ComplexNonIComparableParameter, int>)sortedData[3].Items[0].Value!).Item2);
+            Assert.Equal(1, ((Tuple<ComplexNonIComparableParameter, int>) sortedData[0].Items[0].Value!).Item2);
+            Assert.Equal(2, ((Tuple<ComplexNonIComparableParameter, int>) sortedData[1].Items[0].Value!).Item2);
+            Assert.Equal(3, ((Tuple<ComplexNonIComparableParameter, int>) sortedData[2].Items[0].Value!).Item2);
+            Assert.Equal(4, ((Tuple<ComplexNonIComparableParameter, int>) sortedData[3].Items[0].Value!).Item2);
         }
 
         private class ComplexParameter : IComparable<ComplexParameter>, IComparable

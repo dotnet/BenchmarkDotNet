@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
             // (or processes) we should be monitoring. Communication between the benchmark thread
             // and the ETW collection thread is through the statsPerProcess concurrent dictionary
             // and through the TraceEventSession class, which is thread-safe.
-            var task = Task.Factory.StartNew((Action)(() => Session.Source.Process()), TaskCreationOptions.LongRunning);
+            var task = Task.Factory.StartNew((Action) (() => Session.Source.Process()), TaskCreationOptions.LongRunning);
 
             // wait until the processing has started, block by then so we don't loose any
             // information (very important for jit-related things)

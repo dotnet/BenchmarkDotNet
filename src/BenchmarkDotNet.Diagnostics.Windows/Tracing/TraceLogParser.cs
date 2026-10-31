@@ -142,11 +142,11 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
                 overheadTotalPerCounter.TryGetValue(perCounter.Key, out var overhead);
 
                 // result = (avg(workload) - avg(overhead))/op
-                double result = perCounter.Value / (double)workloadIterations.Length;
+                double result = perCounter.Value / (double) workloadIterations.Length;
 
                 if (overheadIterations.Length > 0) // we skip the overhead phase for long-running benchmarks
                 {
-                    result -= (overhead / (double)overheadIterations.Length);
+                    result -= (overhead / (double) overheadIterations.Length);
                 }
 
                 result /= totalOperationsPerIteration.Value;
@@ -236,7 +236,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
             checked
             {
                 ProfileSourceIdToCount.TryGetValue(profileSource, out ulong existing);
-                ProfileSourceIdToCount[profileSource] = existing + (ulong)interval;
+                ProfileSourceIdToCount[profileSource] = existing + (ulong) interval;
             }
 
             return true;

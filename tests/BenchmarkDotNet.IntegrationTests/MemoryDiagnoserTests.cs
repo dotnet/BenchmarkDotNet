@@ -436,7 +436,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 var sizeOf = typeof(Unsafe).GetTypeInfo().GetMethod(nameof(Unsafe.SizeOf))!;
 
-                return (int)sizeOf.MakeGenericMethod(type).Invoke(null, null)!;
+                return (int) sizeOf.MakeGenericMethod(type).Invoke(null, null)!;
             }
 
             return typeof(T)

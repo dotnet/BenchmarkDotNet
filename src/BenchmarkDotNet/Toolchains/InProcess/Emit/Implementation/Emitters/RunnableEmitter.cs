@@ -144,7 +144,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 #endif
 
             var assemblyMode = saveToDisk
-                ? (AssemblyBuilderAccess)3 // https://apisof.net/catalog/System.Reflection.Emit.AssemblyBuilderAccess.RunAndSave
+                ? (AssemblyBuilderAccess) 3 // https://apisof.net/catalog/System.Reflection.Emit.AssemblyBuilderAccess.RunAndSave
                 : AssemblyBuilderAccess.RunAndCollect;
 
             var assemblyBuilder = saveToDisk
@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
 
             var attBuilder = new CustomAttributeBuilder(
                 attributeCtor,
-                [(int)CompilationRelaxations.NoStringInterning]);
+                [(int) CompilationRelaxations.NoStringInterning]);
             assemblyBuilder.SetCustomAttribute(attBuilder);
 
             // [assembly: RuntimeCompatibility(WrapNonExceptionThrows = true)]
@@ -484,10 +484,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 ?? throw new MissingMemberException(nameof(Random.Next));
 
             ilBuilder.Emit(OpCodes.Ldarg_0);
-            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte)123);
+            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte) 123);
             ilBuilder.Emit(OpCodes.Newobj, randomCtor);
             ilBuilder.Emit(OpCodes.Ldc_I4_0);
-            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte)10);
+            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte) 10);
             ilBuilder.Emit(OpCodes.Callvirt, randomNextMethod);
             ilBuilder.Emit(OpCodes.Call, forDisassemblyDiagnoserMethod);
 
@@ -524,7 +524,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
                 IL_0003: bne.un.s IL_0014  // we use long jump
              */
             ilBuilder.Emit(OpCodes.Ldarg_1);
-            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte)11);
+            ilBuilder.Emit(OpCodes.Ldc_I4_S, (byte) 11);
             ilBuilder.Emit(OpCodes.Bne_Un, notElevenLabel);
             {
                 /*
@@ -567,7 +567,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             // Replace arg names
             var parameters = Descriptor.WorkloadMethod.GetParameters()
                 .Select(p =>
-                    (ParameterInfo)new EmitParameterInfo(
+                    (ParameterInfo) new EmitParameterInfo(
                         p.Position,
                         ArgParamPrefix + p.Position,
                         p.ParameterType,

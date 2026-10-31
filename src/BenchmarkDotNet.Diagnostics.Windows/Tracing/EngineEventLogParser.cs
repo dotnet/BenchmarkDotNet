@@ -115,12 +115,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         private static IterationEvent BenchmarkStartTemplate(Action<IterationEvent>? action)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
-            return new IterationEvent(action, EngineEventSource.BenchmarkStartEventId, (int)EngineEventSource.Tasks.Benchmark, nameof(EngineEventSource.Tasks.Benchmark), Guid.Empty, (int)EventOpcode.Start, nameof(EventOpcode.Start), ProviderGuid, ProviderName);
+            return new IterationEvent(action, EngineEventSource.BenchmarkStartEventId, (int) EngineEventSource.Tasks.Benchmark, nameof(EngineEventSource.Tasks.Benchmark), Guid.Empty, (int) EventOpcode.Start, nameof(EventOpcode.Start), ProviderGuid, ProviderName);
         }
 
         private static IterationEvent BenchmarkStopTemplate(Action<IterationEvent>? action)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
-            return new IterationEvent(action, EngineEventSource.BenchmarkStopEventId, (int)EngineEventSource.Tasks.Benchmark, nameof(EngineEventSource.Tasks.Benchmark), Guid.Empty, (int)EventOpcode.Stop, nameof(EventOpcode.Stop), ProviderGuid, ProviderName);
+            return new IterationEvent(action, EngineEventSource.BenchmarkStopEventId, (int) EngineEventSource.Tasks.Benchmark, nameof(EngineEventSource.Tasks.Benchmark), Guid.Empty, (int) EventOpcode.Stop, nameof(EventOpcode.Stop), ProviderGuid, ProviderName);
         }
 
         private static IterationEvent OverheadJittingStartTemplate(Action<IterationEvent>? action)
@@ -167,12 +167,12 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
 
         private static IterationEvent CreateIterationStartTemplate(Action<IterationEvent>? action, int eventId, EventTask eventTask)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
-            return new IterationEvent(action, eventId, (int)eventTask, eventTask.ToString(), Guid.Empty, (int)EventOpcode.Start, nameof(EventOpcode.Start), ProviderGuid, ProviderName);
+            return new IterationEvent(action, eventId, (int) eventTask, eventTask.ToString(), Guid.Empty, (int) EventOpcode.Start, nameof(EventOpcode.Start), ProviderGuid, ProviderName);
         }
 
         private static IterationEvent CreateIterationStopTemplate(Action<IterationEvent>? action, int eventId, EventTask eventTask)
         {                  // action, eventid, taskid, taskName, taskGuid, opcode, opcodeName, providerGuid, providerName
-            return new IterationEvent(action, eventId, (int)eventTask, eventTask.ToString(), Guid.Empty, (int)EventOpcode.Stop, nameof(EventOpcode.Stop), ProviderGuid, ProviderName);
+            return new IterationEvent(action, eventId, (int) eventTask, eventTask.ToString(), Guid.Empty, (int) EventOpcode.Stop, nameof(EventOpcode.Stop), ProviderGuid, ProviderName);
         }
 
         protected override void EnumerateTemplates(Func<string, string, EventFilterResponse>? eventsToObserve, Action<TraceEvent> callback)

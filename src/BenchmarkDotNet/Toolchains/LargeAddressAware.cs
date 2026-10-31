@@ -11,7 +11,7 @@ namespace BenchmarkDotNet.Toolchains
                 var value = binaryReader.ReadInt16();
                 if ((value & 0x20) == 0)
                 {
-                    value = (short)(value | 0x20);
+                    value = (short) (value | 0x20);
                     stream.Position -= 2;
                     var binaryWriter = new BinaryWriter(stream);
                     binaryWriter.Write(value);

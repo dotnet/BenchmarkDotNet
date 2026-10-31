@@ -32,7 +32,7 @@ namespace BenchmarkDotNet.Loggers
 
             if (withStyle != null)
             {
-                var isDarkTheme = (bool)(withStyle.DeclaringType!.GetProperty("IsDarkThemeEnabled", BindingFlags.Static | BindingFlags.Public)?.GetValue(null) ?? false);
+                var isDarkTheme = (bool) (withStyle.DeclaringType!.GetProperty("IsDarkThemeEnabled", BindingFlags.Static | BindingFlags.Public)?.GetValue(null) ?? false);
                 var colorScheme = isDarkTheme ? CreateDarkScheme() : CreateLightScheme();
                 return new LinqPadLogger(withStyle, colorScheme);
             }

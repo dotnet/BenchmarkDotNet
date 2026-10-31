@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.Tests.Reports
             var config = DefaultConfig.Instance;
             var summary = MockFactory.CreateSummary(config);
             var table = new SummaryTable(summary);
-            ((ExporterBase)MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
+            ((ExporterBase) MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
             output.WriteLine(logger.GetLog());
             return table;
         }

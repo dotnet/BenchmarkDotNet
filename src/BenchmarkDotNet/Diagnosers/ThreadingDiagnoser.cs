@@ -165,7 +165,7 @@ namespace BenchmarkDotNet.Diagnosers
 
             // we create delegate to avoid boxing, IMPORTANT!
             return property != null
-                ? (Func<long>)property.GetGetMethod()!.CreateDelegate(typeof(Func<long>))
+                ? (Func<long>) property.GetGetMethod()!.CreateDelegate(typeof(Func<long>))
                 : () => 0;
         }
 #endif

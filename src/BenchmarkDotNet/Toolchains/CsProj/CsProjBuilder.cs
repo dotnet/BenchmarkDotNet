@@ -410,7 +410,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
                 itemGroup.Add(new XElement("Reference",
                     new XAttribute("Include", Path.GetFileNameWithoutExtension(assemblyFile)),
                     new XElement("HintPath", assemblyFile)
-                    // TODO: Add Aliases here for extern alias #2289
+                // TODO: Add Aliases here for extern alias #2289
                 ));
             }
 

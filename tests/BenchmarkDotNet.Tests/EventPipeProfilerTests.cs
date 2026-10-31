@@ -31,12 +31,12 @@ namespace BenchmarkDotNet.Tests
             var defaultSettings = new EventPipeProvider(
                 DotNetRuntime,
                 EventLevel.Informational,
-                (long)ClrTraceEventParser.Keywords.Default);
+                (long) ClrTraceEventParser.Keywords.Default);
 
             var userSettings = new EventPipeProvider(
                 DotNetRuntime,
                 EventLevel.Verbose,
-                (long)(ClrTraceEventParser.Keywords.Default | ClrTraceEventParser.Keywords.JitTracing));
+                (long) (ClrTraceEventParser.Keywords.Default | ClrTraceEventParser.Keywords.JitTracing));
 
             var result = EventPipeProfiler.MapToProviders(EventPipeProfile.CpuSampling, [userSettings]);
 

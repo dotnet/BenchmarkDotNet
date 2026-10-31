@@ -241,7 +241,7 @@ internal sealed class State
             return x.NativeCode == y.NativeCode;
         }
 
-        public int GetHashCode(IClrMethod obj) => (int)obj.NativeCode;
+        public int GetHashCode(IClrMethod obj) => (int) obj.NativeCode;
     }
 }
 

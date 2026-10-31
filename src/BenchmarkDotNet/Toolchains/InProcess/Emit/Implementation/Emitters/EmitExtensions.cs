@@ -14,10 +14,10 @@ namespace BenchmarkDotNet.Toolchains.InProcess.Emit.Implementation
             => ExecuteMethodUsingReflection(assemblyBuilder, nameof(Save), assemblyFileName);
 
         internal static ModuleBuilder DefineDynamicModule(this AssemblyBuilder assemblyBuilder, string moduleName, string moduleFileName)
-            => (ModuleBuilder)ExecuteMethodUsingReflection(assemblyBuilder, nameof(AssemblyBuilder.DefineDynamicModule), moduleName, moduleFileName);
+            => (ModuleBuilder) ExecuteMethodUsingReflection(assemblyBuilder, nameof(AssemblyBuilder.DefineDynamicModule), moduleName, moduleFileName);
 
         internal static AssemblyBuilder DefineDynamicAssembly(this AppDomain domain, AssemblyName assemblyName, AssemblyBuilderAccess assemblyMode, string assemblyDirectory)
-            => (AssemblyBuilder)ExecuteMethodUsingReflection(domain, nameof(AssemblyBuilder.DefineDynamicAssembly), assemblyName, assemblyMode, assemblyDirectory);
+            => (AssemblyBuilder) ExecuteMethodUsingReflection(domain, nameof(AssemblyBuilder.DefineDynamicAssembly), assemblyName, assemblyMode, assemblyDirectory);
 
         private static object ExecuteMethodUsingReflection<T>(T instance, string methodName, params object[] arguments)
         {

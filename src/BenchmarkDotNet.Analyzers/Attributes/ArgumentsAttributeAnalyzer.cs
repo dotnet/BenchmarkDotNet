@@ -219,7 +219,7 @@ public class ArgumentsAttributeAnalyzer : DiagnosticAnalyzer
                 }
                 else
                 {
-                    var syntax = (AttributeSyntax)attr.ApplicationSyntaxReference!.GetSyntax();
+                    var syntax = (AttributeSyntax) attr.ApplicationSyntaxReference!.GetSyntax();
                     AnalyzeAssignableValueType(
                         attr.ConstructorArguments[0],
                         syntax.ArgumentList!.Arguments[0].Expression,

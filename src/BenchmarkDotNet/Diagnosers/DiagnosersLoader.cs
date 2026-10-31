@@ -90,6 +90,6 @@ namespace BenchmarkDotNet.Diagnosers
         }
 
         private static IDiagnoser CreateDiagnoser(Assembly loadedAssembly, string typeName)
-            => (IDiagnoser)Activator.CreateInstance(loadedAssembly.GetType(typeName)!)!;
+            => (IDiagnoser) Activator.CreateInstance(loadedAssembly.GetType(typeName)!)!;
     }
 }

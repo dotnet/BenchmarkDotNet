@@ -43,7 +43,7 @@ namespace BenchmarkDotNet.Tests.Reports
         {
             if (value.Contains('.'))
             {
-                Assert.Equal((1 / (double)baseLineValues[0]) < 0.01 ? 3 : 2, value.Split('.')[1].Length);
+                Assert.Equal((1 / (double) baseLineValues[0]) < 0.01 ? 3 : 2, value.Split('.')[1].Length);
             }
         }
 
@@ -69,7 +69,7 @@ namespace BenchmarkDotNet.Tests.Reports
                 TestCultureInfo.Instance,
                 [],
                 []);
-            ((ExporterBase)MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
+            ((ExporterBase) MarkdownExporter.Default).ExportToLogAsync(summary, logger, CancellationToken.None).AsTask().GetAwaiter().GetResult();
             output.WriteLine(logger.GetLog());
             return summary;
         }

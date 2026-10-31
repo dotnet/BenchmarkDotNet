@@ -85,7 +85,7 @@ public class UniqueIdGeneratorTests
     private static byte GetEmbeddedHashVersion(Guid guid)
     {
         var b = guid.ToByteArray();
-        return (byte)(b[3] >> 4);
+        return (byte) (b[3] >> 4);
     }
 
     public class Benchmarks
