@@ -1,4 +1,4 @@
-﻿open System
+open System
 open BenchmarkDotNet.Running
 open _BenchmarkProjectName_
 

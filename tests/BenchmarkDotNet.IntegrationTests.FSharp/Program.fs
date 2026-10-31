@@ -1,4 +1,4 @@
-﻿module FSharpBenchmarks
+module FSharpBenchmarks
 
 open System.Threading
 open System.Collections.Generic

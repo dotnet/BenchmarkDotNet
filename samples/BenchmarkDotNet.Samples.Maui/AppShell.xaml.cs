@@ -1,4 +1,4 @@
-﻿namespace BenchmarkDotNet.Samples.Maui;
+namespace BenchmarkDotNet.Samples.Maui;
 
 public partial class AppShell : Shell
 {

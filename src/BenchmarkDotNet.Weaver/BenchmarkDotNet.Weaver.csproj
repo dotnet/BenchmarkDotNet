@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 If any changes are made to this project, increment the WeaverVersionSuffix in the common.props file,
 then run `build.cmd pack-weaver`.
 -->

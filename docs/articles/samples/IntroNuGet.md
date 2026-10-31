@@ -1,4 +1,4 @@
-﻿---
+---
 uid: BenchmarkDotNet.Samples.IntroNuGet
 ---
 

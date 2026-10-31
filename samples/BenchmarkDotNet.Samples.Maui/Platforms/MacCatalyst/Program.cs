@@ -1,4 +1,4 @@
-﻿using ObjCRuntime;
+using ObjCRuntime;
 using UIKit;
 
 namespace BenchmarkDotNet.Samples.Maui;

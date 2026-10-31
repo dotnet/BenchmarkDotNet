@@ -1,4 +1,4 @@
-﻿---
+---
 uid: docs.event-pipe-profiler
 name: EventPipeProfiler
 ---

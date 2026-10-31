@@ -1,4 +1,4 @@
-﻿<RuleSet Name="Microsoft.Analyzers.ManagedCodeAnalysis" Description="Microsoft.Analyzers.ManagedCodeAnalysis" ToolsVersion="14.0">
+<RuleSet Name="Microsoft.Analyzers.ManagedCodeAnalysis" Description="Microsoft.Analyzers.ManagedCodeAnalysis" ToolsVersion="14.0">
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1000" Action="None" /> <!-- Do not declare static members on generic types -->
     <Rule Id="CA1001" Action="None" /> <!-- Non disposable class owns disposable fields -->

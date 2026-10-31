@@ -1,1 +1,1 @@
-﻿# BenchmarkDotNet API Reference
+# BenchmarkDotNet API Reference

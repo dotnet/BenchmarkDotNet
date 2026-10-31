@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+$(document).ready(function () {
     var selectedIndex = 0;
 
     function highlight() {
