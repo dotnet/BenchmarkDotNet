@@ -20,9 +20,9 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.1.301" />
+    <PackageReference Update="FSharp.Core" Version="10.1.403" />
     <PackageReference Update="System.ValueTuple" Version="4.6.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
   </ItemGroup>
 
   <Import Project="..\..\build\common.targets" />
