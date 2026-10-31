@@ -91,7 +91,7 @@ namespace BenchmarkDotNet.Validators
                     DeadCodeEliminationHelper.KeepAliveWithoutBoxing(result);
                 }
             }
-            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancellation(ex, cancellationToken))
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,

@@ -85,7 +85,7 @@ namespace BenchmarkDotNet.Toolchains.InProcess.NoEmit
 
                 exitCode = await InProcessNoEmitRunner.Run(host, parameters, benchmarkActionFactory).ConfigureAwait(false);
             }
-            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, host.CancellationToken))
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancellation(ex, host.CancellationToken))
             {
                 parameters.Logger.WriteLineError($"// ! {GetType().Name}, exception: {ex}");
             }

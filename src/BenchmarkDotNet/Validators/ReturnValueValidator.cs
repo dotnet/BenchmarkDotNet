@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Validators
                     return (workloadMethod.ReturnType != typeof(void), result);
                 }
             }
-            catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
+            catch (Exception ex) when (!ExceptionHelper.IsProperCancellation(ex, cancellationToken))
             {
                 errors.Add(new ValidationError(
                     TreatsWarningsAsErrors,

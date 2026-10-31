@@ -65,14 +65,14 @@ namespace BenchmarkDotNet.Engines
             Host.CancellationToken.ThrowIfCancellationRequested();
 
             await Parameters.GlobalSetupAction.Invoke().ConfigureAwait();
-            bool didThrowNonCancelation = false;
+            bool didThrowNonCancellation = false;
             try
             {
                 return await RunCore().ConfigureAwait();
             }
             catch (Exception e)
             {
-                didThrowNonCancelation = !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken);
+                didThrowNonCancellation = !ExceptionHelper.IsProperCancellation(e, Host.CancellationToken);
                 throw;
             }
             finally
@@ -82,7 +82,7 @@ namespace BenchmarkDotNet.Engines
                     await Parameters.GlobalCleanupAction.Invoke().ConfigureAwait();
                 }
                 // We only catch if the benchmark threw to not overwrite the exception. #1045
-                catch (Exception e) when (didThrowNonCancelation && !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken))
+                catch (Exception e) when (didThrowNonCancellation && !ExceptionHelper.IsProperCancellation(e, Host.CancellationToken))
                 {
                     Host.SendError($"Exception during GlobalCleanup!{Environment.NewLine}{e}");
                 }
@@ -127,7 +127,7 @@ namespace BenchmarkDotNet.Engines
                     bool randomizeMemory = iterationData.mode == IterationMode.Workload && MemoryRandomization;
 
                     await iterationData.setupAction().ConfigureAwait();
-                    bool didThrowNonCancelation = false;
+                    bool didThrowNonCancellation = false;
                     ClockSpan clockSpan;
                     try
                     {
@@ -149,7 +149,7 @@ namespace BenchmarkDotNet.Engines
                     }
                     catch (Exception e)
                     {
-                        didThrowNonCancelation = !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken);
+                        didThrowNonCancellation = !ExceptionHelper.IsProperCancellation(e, Host.CancellationToken);
                         throw;
                     }
                     finally
@@ -159,7 +159,7 @@ namespace BenchmarkDotNet.Engines
                             await iterationData.cleanupAction().ConfigureAwait();
                         }
                         // We only catch if the benchmark threw to not overwrite the exception. #1045
-                        catch (Exception e) when (didThrowNonCancelation && !ExceptionHelper.IsProperCancelation(e, Host.CancellationToken))
+                        catch (Exception e) when (didThrowNonCancellation && !ExceptionHelper.IsProperCancellation(e, Host.CancellationToken))
                         {
                             Host.SendError($"Exception during IterationCleanup!{Environment.NewLine}{e}");
                         }

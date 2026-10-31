@@ -38,7 +38,7 @@ internal static class InProcessEmitRunner
 
             return -1;
         }
-        catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, host.CancellationToken))
+        catch (Exception ex) when (!ExceptionHelper.IsProperCancellation(ex, host.CancellationToken))
         {
             host.WriteLine();
             host.WriteLine(ex.ToString());

@@ -55,7 +55,7 @@ namespace BenchmarkDotNet.Running
             {
                 return await RunCore().ConfigureAwait(false);
             }
-            catch (Exception e) when (ctrlCCanceler?.IsCancelled == true && !cancellationToken.IsCancellationRequested && ExceptionHelper.IsCancelation(e))
+            catch (Exception e) when (ctrlCCanceler?.IsCancelled == true && !cancellationToken.IsCancellationRequested && ExceptionHelper.IsCancellation(e))
             {
                 // The run was cancelled via Ctrl+C (CtrlCCanceler cancels an internal linked token, so the
                 // caller-provided token is not cancellation-requested here). CtrlCCanceler already logged the
@@ -501,7 +501,7 @@ namespace BenchmarkDotNet.Running
                 return await buildPartition.RepresentativeBenchmarkCase.GetToolchain().Builder
                     .BuildAsync(buildPartition, buildLogger, rootArtifactsFolderPath, cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception e) when (!ExceptionHelper.IsProperCancelation(e, cancellationToken))
+            catch (Exception e) when (!ExceptionHelper.IsProperCancellation(e, cancellationToken))
             {
                 return BuildResult.Failure(ArtifactsPaths.Empty, e);
             }

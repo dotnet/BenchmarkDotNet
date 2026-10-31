@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Engines;
 using JetBrains.Annotations;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -7,6 +8,7 @@ using System.Text;
 namespace BenchmarkDotNet.Helpers;
 
 [UsedImplicitly]
+[EditorBrowsable(EditorBrowsableState.Never)]
 public static class IpcHelper
 {
     public static readonly TimeSpan ConnectionTimeout = TimeSpan.FromMinutes(1);

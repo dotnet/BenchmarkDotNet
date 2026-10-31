@@ -21,7 +21,7 @@ public sealed class CompositeExporter(ImmutableArray<IExporter> exporters) : IEx
             {
                 await exporter.ExportAsync(summary, logger, cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception e) when (!ExceptionHelper.IsProperCancelation(e, cancellationToken))
+            catch (Exception e) when (!ExceptionHelper.IsProperCancellation(e, cancellationToken))
             {
                 logger.WriteLineError(e.ToString());
             }

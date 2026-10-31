@@ -65,7 +65,7 @@ namespace BenchmarkDotNet.Environments
         }
     }
 
-    public static class SystemMemory
+    internal static class SystemMemory
     {
         private static readonly TimeSpan SystemProfilerTimeout = TimeSpan.FromSeconds(5);
 

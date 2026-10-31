@@ -28,7 +28,7 @@ public abstract class ExecutionValidatorBase : IValidator
 
             return true;
         }
-        catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
+        catch (Exception ex) when (!ExceptionHelper.IsProperCancellation(ex, cancellationToken))
         {
             errors.Add(new ValidationError(
                 TreatsWarningsAsErrors,
@@ -59,7 +59,7 @@ public abstract class ExecutionValidatorBase : IValidator
                 await DynamicAwaitHelper.AwaitResult(result, awaitableInfo).ConfigureAwait(false);
             }
         }
-        catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
+        catch (Exception ex) when (!ExceptionHelper.IsProperCancellation(ex, cancellationToken))
         {
             errors.Add(new ValidationError(TreatsWarningsAsErrors,
                 $"Failed to execute [{GetAttributeName(typeof(T))}] for '{benchmark.DisplayInfo}', exception was {GetDisplayExceptionMessage(ex)}", benchmark));
@@ -97,7 +97,7 @@ public abstract class ExecutionValidatorBase : IValidator
         {
             Toolchains.InProcess.NoEmit.InProcessNoEmitRunner.FillMembers(benchmarkTypeInstance, benchmark, cancellationToken);
         }
-        catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
+        catch (Exception ex) when (!ExceptionHelper.IsProperCancellation(ex, cancellationToken))
         {
             errors.Add(new ValidationError(TreatsWarningsAsErrors, $"Failed to set parameters for {benchmark.Descriptor.Type.Name}, exception was: {GetDisplayExceptionMessage(ex)}", benchmark));
             args = null;

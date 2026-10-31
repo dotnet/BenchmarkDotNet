@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BenchmarkDotNet.Helpers;
 
-public sealed class CancelableStreamReader : IDisposable
+internal sealed class CancelableStreamReader : IDisposable
 {
 #if NET7_0_OR_GREATER
     private readonly StreamReader _defaultReader;

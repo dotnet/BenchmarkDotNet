@@ -35,7 +35,7 @@ public abstract class BuilderBase : IBuilder
 
             buildResult = await BuildAsync(artifactsPaths, buildPartition, logger, cancellationToken).ConfigureAwait(false);
         }
-        catch (Exception ex) when (!ExceptionHelper.IsProperCancelation(ex, cancellationToken))
+        catch (Exception ex) when (!ExceptionHelper.IsProperCancellation(ex, cancellationToken))
         {
             buildResult = BuildResult.Failure(artifactsPaths, ex);
         }
