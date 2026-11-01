@@ -74,6 +74,10 @@ jobs:
 
     # --- Release ---
 
+    # Runs before anything public (tag, version bump, GitHub release) so a failed upload stops the release cleanly.
+    - name: Publish to NuGet
+      run: ./.dotnet/dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
     - name: Push git changes
       uses: ad-m/github-push-action@881a6320fdb16eb5318c5054f31c218aec2b324c # v1.3.0
       with:
@@ -105,9 +109,6 @@ jobs:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       with:
         title: v${{ steps.next_version.outputs.NEXT_VERSION }}
-
-    - name: Publish to NuGet
-      run: ./.dotnet/dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
     # --- Documentation ---
 
