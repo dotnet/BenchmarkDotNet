@@ -319,7 +319,7 @@ public class VersionIncrementTask : FrostingTask<BuildContext>, IHelpProvider
     public override void Run(BuildContext context)
     {
         context.ReleaseRunner.VersionIncrement();
-        context.BuildRunner.PackWeaver();
+        context.BuildRunner.PackWeaver(develop: true);
     }
 
     public HelpInfo GetHelp() => new()
@@ -342,7 +342,7 @@ public class VersionMinorIncrementTask : FrostingTask<BuildContext>, IHelpProvid
     public override void Run(BuildContext context)
     {
         context.ReleaseRunner.VersionMinorIncrement();
-        context.BuildRunner.PackWeaver();
+        context.BuildRunner.PackWeaver(develop: true);
     }
 
     public HelpInfo GetHelp() => new()
