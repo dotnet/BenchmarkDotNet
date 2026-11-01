@@ -43,7 +43,7 @@
 
   <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
     <!-- When this is changed, optionally reset WeaverVersionSuffix, then run `build.cmd pack-weaver`. -->
-    <VersionPrefix>0.16.1</VersionPrefix>
+    <VersionPrefix>0.16.0</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(NoVersionSuffix)' == '' AND '$(VersionSuffix)' == '' ">
