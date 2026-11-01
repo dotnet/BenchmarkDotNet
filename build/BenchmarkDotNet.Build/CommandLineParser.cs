@@ -71,7 +71,8 @@ public class CommandLineParser
             if (arg.StartsWith('-'))
             {
                 cakeArgs.Add(arg);
-                if (argsToProcess.Any() && !argsToProcess.Peek().StartsWith('-'))
+                // An MSBuild property is never an option's value: `--stable /p:X=Y` must not swallow `/p:X=Y`.
+                if (argsToProcess.Any() && !argsToProcess.Peek().StartsWith('-') && !argsToProcess.Peek().StartsWith("/p:"))
                     cakeArgs.Add(argsToProcess.Dequeue());
                 continue;
             }
