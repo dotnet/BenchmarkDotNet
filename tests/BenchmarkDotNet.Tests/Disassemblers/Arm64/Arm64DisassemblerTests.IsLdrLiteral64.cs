@@ -1,9 +1,8 @@
-// TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
-#if NET
 using AsmArm64;
 using AwesomeAssertions;
-using static AsmArm64.Arm64RegisterX;
 using static AsmArm64.Arm64RegisterW;
+using static AsmArm64.Arm64RegisterX;
+using Arm64Disassembler = BenchmarkDotNet.Disassemblers.Arm64Disassembler;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
@@ -17,7 +16,7 @@ public partial class Arm64DisassemblerTests
         var rawInstruction = Arm64InstructionFactory.LDR(X5, label: expectedOffsetBytes);
 
         // Act
-        var result = Arm64DisassemblerHelper.IsLdrLiteral64(rawInstruction, out var rt, out var offsetBytes);
+        var result = Arm64Disassembler.IsLdrLiteral64(rawInstruction, out var rt, out var offsetBytes);
 
         // Assert
         result.Should().BeTrue();
@@ -44,7 +43,7 @@ public partial class Arm64DisassemblerTests
         var rawInstruction = Arm64InstructionFactory.LDR(X0, label: new Arm64LabelOffset(expectedOffsetBytes));
 
         // Act
-        var result = Arm64DisassemblerHelper.IsLdrLiteral64(rawInstruction, out var rt, out var offsetBytes);
+        var result = Arm64Disassembler.IsLdrLiteral64(rawInstruction, out var rt, out var offsetBytes);
 
         // Assert
         result.Should().BeTrue();
@@ -71,7 +70,7 @@ public partial class Arm64DisassemblerTests
         var rawInstruction = Arm64InstructionFactory.LDR(X0, label: new Arm64LabelOffset(expectedOffsetBytes));
 
         // Act
-        var result = Arm64DisassemblerHelper.IsLdrLiteral64(rawInstruction, out var rt, out var offsetBytes);
+        var result = Arm64Disassembler.IsLdrLiteral64(rawInstruction, out var rt, out var offsetBytes);
 
         // Assert
         result.Should().BeTrue();
@@ -96,7 +95,7 @@ public partial class Arm64DisassemblerTests
         var rawInstruction = Arm64InstructionFactory.LDR(W5, label: 0x100);
 
         // Act
-        var result = Arm64DisassemblerHelper.IsLdrLiteral64(rawInstruction, out var rt, out var offsetBytes);
+        var result = Arm64Disassembler.IsLdrLiteral64(rawInstruction, out var rt, out var offsetBytes);
 
         // Assert
         result.Should().BeFalse();
@@ -109,4 +108,3 @@ public partial class Arm64DisassemblerTests
         registerOperand.Value.Should().Be((Arm64RegisterAny) W5);
     }
 }
-#endif
