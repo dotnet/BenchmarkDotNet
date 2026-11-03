@@ -1,8 +1,8 @@
+using AsmArm64;
 using BenchmarkDotNet.Diagnosers;
-using Gee.External.Capstone;
-using Gee.External.Capstone.Arm64;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interfaces;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.Disassemblers
 {
@@ -10,47 +10,43 @@ namespace BenchmarkDotNet.Disassemblers
     {
         protected override IEnumerable<Asm> Decode(byte[] code, ulong startAddress, State state, int depth, IClrMethod currentMethod, DisassemblySyntax syntax)
         {
-            const Arm64DisassembleMode disassembleMode = Arm64DisassembleMode.Arm;
-            using (CapstoneArm64Disassembler disassembler = CapstoneFactory.CreateArm64Disassembler(disassembleMode))
+            Arm64RegisterValueAccumulator accumulator = new();
+            accumulator.Init(state.Runtime);
+
+            ReadOnlySpan<uint> rawInstructions = MemoryMarshal.Cast<byte, uint>(code);
+
+            var results = new List<Arm64Asm>();
+
+            for (int i = 0; i < rawInstructions.Length; ++i)
             {
-                // Enables disassemble details, which are disabled by default, to provide more detailed information on
-                // disassembled binary code.
-                disassembler.EnableInstructionDetails = true;
-                disassembler.DisassembleSyntax = Map(syntax);
+                var rawInstruction = rawInstructions[i];
+                var instruction = Arm64Instruction.Decode(rawInstruction);
+                var instructionAddress = startAddress + (4 * (ulong) i);
 
-                Arm64RegisterValueAccumulator accumulator = new();
-                accumulator.Init(state.Runtime);
-
-                Arm64Instruction[] instructions = disassembler.Disassemble(code, (long) startAddress);
-                foreach (Arm64Instruction instruction in instructions)
+                if (TryGetReferencedAddress(instruction, instructionAddress, accumulator, (uint) state.Runtime.DataTarget.DataReader.PointerSize, out var referencedAddress, out var isIndirect))
                 {
-                    bool isIndirect = false;
                     bool isPrestubMD = false;
-
-                    ulong address = 0;
-                    if (TryGetReferencedAddress(instruction, accumulator, (uint) state.Runtime.DataTarget.DataReader.PointerSize, out address, out isIndirect))
+                    if (isIndirect && state.RuntimeVersion.Major >= 7)
                     {
-                        if (isIndirect && state.RuntimeVersion.Major >= 7)
-                        {
-                            FlushCachedDataIfNeeded(state.Runtime.DataTarget.DataReader, address, new byte[1]);
-                            TryResolvePrecode(state.Runtime.DataTarget.DataReader, ref address, out isPrestubMD);
-                        }
-                        TryTranslateAddressToName(address, isPrestubMD, state, depth, currentMethod);
+                        FlushCachedDataIfNeeded(state.Runtime.DataTarget.DataReader, referencedAddress, new byte[1]);
+                        TryResolvePrecode(state.Runtime.DataTarget.DataReader, ref referencedAddress, out isPrestubMD);
                     }
-
-                    accumulator.Feed(instruction);
-
-                    yield return new Arm64Asm()
-                    {
-                        InstructionPointer = (ulong) instruction.Address,
-                        InstructionLength = instruction.Bytes.Length,
-                        Instruction = instruction,
-                        ReferencedAddress = (address > ushort.MaxValue) ? address : null,
-                        IsReferencedAddressIndirect = isIndirect,
-                        DisassembleSyntax = disassembler.DisassembleSyntax
-                    };
+                    TryTranslateAddressToName(referencedAddress, isPrestubMD, state, depth, currentMethod);
                 }
+
+                accumulator.Feed(instruction, instructionAddress);
+
+                results.Add(new Arm64Asm()
+                {
+                    InstructionPointer = instructionAddress,
+                    RawInstruction = rawInstruction,
+                    DisassembleSyntax = DisassembleSyntax.Gas,
+                    ReferencedAddress = IsValidAddress(referencedAddress) ? referencedAddress : null,
+                    IsReferencedAddressIndirect = isIndirect,
+                });
             }
+
+            return results;
         }
 
         // Counterpart of IntelDisassembler.TryResolvePrecode: recognise the AArch64 precode/stub
@@ -65,7 +61,7 @@ namespace BenchmarkDotNet.Disassemblers
         // data-section layout is also stable. What can change between versions is the offset
         // between the code page and its data section, so we extract the LDR-literal displacements
         // straight from the bytes instead of consulting a runtime-version-specific page-size table.
-        private static bool TryResolvePrecode(IDataReader reader, ref ulong address, out bool isPrestubMD)
+        internal static bool TryResolvePrecode(IDataReader reader, ref ulong address, out bool isPrestubMD)
         {
             isPrestubMD = false;
             if (!TryReadStubHead(reader, address, out ulong parseBase, out uint instr0, out uint instr1, out uint instr2))
@@ -145,22 +141,31 @@ namespace BenchmarkDotNet.Disassemblers
         // Encoding: DMB ISHLD = 0xD50339BF.
         private const uint DmbIshLdInstr = 0xD50339BFu;
 
-        private static bool TryReadStubHead(IDataReader reader, ulong address, out ulong parseBase, out uint instr0, out uint instr1, out uint instr2)
+        internal static bool TryReadStubHead(IDataReader reader, ulong address, out ulong parseBase, out uint instr0, out uint instr1, out uint instr2)
         {
             parseBase = address;
             instr0 = instr1 = instr2 = 0;
 
-            byte[] buffer = new byte[16];
-            // TODO: IDataReader.Read might return partial data. It need to call multiple times until buffer filled or readLength<=0.
-            int read = reader.Read(address, buffer);
-            if (read < 12)
+            // IDataReader.Read may return partial data.
+            // Call it repeatedly until the buffer is filled or no more data is available.
+            Span<byte> buffer = stackalloc byte[16];
+            int totalBytesRead = 0;
+            while (totalBytesRead < buffer.Length)
+            {
+                int bytesRead = reader.Read(address + (ulong) totalBytesRead, buffer.Slice(totalBytesRead));
+                if (bytesRead <= 0)
+                    break;
+                totalBytesRead += bytesRead;
+            }
+
+            if (totalBytesRead < 12)
                 return false;
 
             int offset = 0;
             uint first = ReadInstr(buffer, 0);
             if (first == DmbIshLdInstr)
             {
-                if (read < 16)
+                if (totalBytesRead < 16)
                     return false;
                 offset = 4;
                 parseBase = address + 4;
@@ -172,7 +177,7 @@ namespace BenchmarkDotNet.Disassemblers
             return true;
         }
 
-        private static uint ReadInstr(byte[] buffer, int offset)
+        private static uint ReadInstr(ReadOnlySpan<byte> buffer, int offset)
             => (uint) buffer[offset]
              | ((uint) buffer[offset + 1] << 8)
              | ((uint) buffer[offset + 2] << 16)
@@ -181,7 +186,7 @@ namespace BenchmarkDotNet.Disassemblers
         // LDR (literal), 64-bit form. Encoding: bits[31:24]=0x58, bits[23:5]=imm19 (signed,
         // word-scaled offset relative to the LDR's own PC), bits[4:0]=Xt. Returns the destination
         // register and the byte-scaled offset from the LDR instruction's address to the loaded slot.
-        private static bool IsLdrLiteral64(uint instr, out int rt, out int offsetBytes)
+        internal static bool IsLdrLiteral64(uint instr, out int rt, out int offsetBytes)
         {
             rt = 0;
             offsetBytes = 0;
@@ -196,40 +201,56 @@ namespace BenchmarkDotNet.Disassemblers
             return true;
         }
 
-        private static bool TryGetReferencedAddress(Arm64Instruction instruction, Arm64RegisterValueAccumulator accumulator, uint pointerSize, out ulong referencedAddress, out bool isReferencedAddressIndirect)
+        internal static bool TryGetReferencedAddress(
+            Arm64Instruction instruction,
+            ulong instructionAddress,
+            Arm64RegisterValueAccumulator accumulator,
+            uint pointerSize,
+            out ulong referencedAddress,
+            out bool isReferencedAddressIndirect)
         {
-            if ((instruction.Id == Arm64InstructionId.ARM64_INS_BR || instruction.Id == Arm64InstructionId.ARM64_INS_BLR) && instruction.Details.Operands[0].Register.Id == accumulator.RegisterId && accumulator.HasValue)
+
+            switch (instruction.Mnemonic)
             {
-                // Branch via register where we have extracted the value of the register by parsing the disassembly
-                referencedAddress = (ulong) accumulator.Value;
-                isReferencedAddressIndirect = true;
-                return true;
-            }
-            else if (instruction.Details.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE))
-            {
-                // One of the operands is the address
-                for (int i = 0; i < instruction.Details.Operands.Length; i++)
-                {
-                    if (instruction.Details.Operands[i].Type == Arm64OperandType.Immediate)
+                // TODO: Add support for BRAA/BRAB/BRAAZ/BRABZ/BLRAA/BLRAB/BLRAAZ/BLRABZ instructions. Currently .NET JIT don't emit these instructions.
+                // See: https://github.com/dotnet/runtime/blob/v11.0.0-rc.3.26522.148/src/coreclr/jit/instrsarm64.h
+                case Arm64Mnemonic.BR:
+                case Arm64Mnemonic.BLR:
+                    if (instruction.TryGetOperand(0, out Arm64RegisterOperand register) && register.Value == accumulator.TrackedRegister)
                     {
-                        referencedAddress = (ulong) instruction.Details.Operands[i].Immediate;
+                        if (accumulator.HasValue)
+                        {
+                            // Branch via register where we have extracted the value of the register by parsing the disassembly.
+                            // The accumulator holds an absolute address (MOVZ/MOVK constant or ADRP resolved to a page address).
+                            referencedAddress = accumulator.Value;
+                            isReferencedAddressIndirect = true;
+                            return true;
+                        }
+                    }
+                    break;
+            }
+
+            if (instruction.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE))
+            {
+                if (instruction.Flags.HasFlag(Arm64InstructionFlags.HasLabel))
+                {
+                    // One of the label operands is the address
+                    for (int i = 0; i < instruction.Operands.Count; i++)
+                    {
+                        if (!instruction.TryGetOperand(i, out Arm64LabelOperand labelOperand))
+                            continue;
+
+                        referencedAddress = instruction.GetTargetAddress(instructionAddress, labelOperand.Offset);
                         isReferencedAddressIndirect = false;
                         return true;
                     }
                 }
             }
+
             referencedAddress = 0;
             isReferencedAddressIndirect = false;
             return false;
         }
-
-        private static DisassembleSyntax Map(DisassemblySyntax syntax)
-            => syntax switch
-            {
-                DisassemblySyntax.Att => DisassembleSyntax.Att,
-                DisassemblySyntax.Intel => DisassembleSyntax.Intel,
-                _ => DisassembleSyntax.Masm
-            };
 
         // Recognise the AArch64 jump trampoline shape the CLR JIT emits when a call's real target
         // is out of rel26 range (±128 MB), plus the precode/stub shapes the runtime emits as the
