@@ -1,5 +1,3 @@
-// TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
-#if NET
 using AsmArm64;
 using AwesomeAssertions;
 using BenchmarkDotNet.Disassemblers;
@@ -316,4 +314,3 @@ public partial class Arm64DisassemblerTests
         state.Todo.Should().BeEmpty();
     }
 }
-#endif
