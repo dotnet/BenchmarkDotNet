@@ -6,6 +6,7 @@ namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(Config))]
     [ShortRunJob]
+    [UseLocalJobOnly]
     public class IntroCultureInfo
     {
         private class Config : ManualConfig

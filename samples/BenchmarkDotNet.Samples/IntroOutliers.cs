@@ -6,6 +6,7 @@ using Perfolizer.Mathematics.OutlierDetection;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(Config))]
+    [UseLocalJobOnly]
     public class IntroOutliers
     {
         private class Config : ManualConfig

@@ -11,6 +11,7 @@ using System.Diagnostics.Tracing;
 namespace BenchmarkDotNet.Samples
 {
     [Config(typeof(CustomConfig))]
+    [UseLocalJobOnly]
     public class IntroEventPipeProfilerAdvanced
     {
         private class CustomConfig : ManualConfig
