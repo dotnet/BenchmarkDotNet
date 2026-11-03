@@ -1,174 +1,141 @@
 using AsmArm64;
-using Gee.External.Capstone.Arm64;
-using System.Buffers.Binary;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using AsmArm64Instruction = AsmArm64.Arm64Instruction;
-using AsmArm64Operand = AsmArm64.Arm64Operand;
-using Arm64InstructionId = AsmArm64.Arm64InstructionId;
-using CapstoneArm64Instruction = Gee.External.Capstone.Arm64.Arm64Instruction;
-using CapstoneArm64InstructionId = Gee.External.Capstone.Arm64.Arm64InstructionId;
-using CapstoneArm64Operand = Gee.External.Capstone.Arm64.Arm64Operand;
-using CapstoneArm64OperandType = Gee.External.Capstone.Arm64.Arm64OperandType;
-using CapstoneArm64RegisterId = Gee.External.Capstone.Arm64.Arm64RegisterId;
 
 namespace BenchmarkDotNet.Disassemblers;
 
 internal static class Arm64InstructionExtensions
 {
-    #region Extension methods for Capstone
-    extension(CapstoneArm64Instruction instruction)
+    private static bool TryGetOperandCore<T>(Arm64Instruction instruction, int index, Arm64OperandKind expectedKind, Func<Arm64Operand, T> castFunc, out T result)
+           where T : struct, IArm64Operand
     {
-        public CapstoneArm64RegisterId GetRegisterId(int index)
+        if ((uint) index >= (uint) instruction.Operands.Count)
         {
-            var operands = instruction.Details.Operands;
-            if ((uint)index >= (uint)operands.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var operand = operands[index];
-            if (operand.Type != CapstoneArm64OperandType.Register)
-                throw new ArgumentException($"Operand at index {index} is not a register (actual: {operand.Type}).");
-
-            return operand.Register.Id;
-        }
-
-        public Arm64ShiftOperation GetShiftOperation(int index)
-        {
-            var operands = instruction.Details.Operands;
-            if ((uint)index >= (uint)operands.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var operand = operands[index];
-            var shiftOperation = operand.ShiftOperation;
-
-            switch (instruction.Id)
-            {
-                case CapstoneArm64InstructionId.ARM64_INS_ADD:
-                case CapstoneArm64InstructionId.ARM64_INS_ADRP:
-                case CapstoneArm64InstructionId.ARM64_INS_MOVK:
-                case CapstoneArm64InstructionId.ARM64_INS_MOVZ:
-                    switch (shiftOperation)
-                    {
-                        case Arm64ShiftOperation.ARM64_SFT_LSL:
-                            return shiftOperation;
-
-                        // Capstone represents `LSL #0` as ARM64_SFT_INVALID.
-                        // So handle ARM64_SFT_INVALID as `LSL` for these instructions. (Other shift operation is not used currently)
-                        case Arm64ShiftOperation.Invalid:
-                            return Arm64ShiftOperation.ARM64_SFT_LSL;
-
-                        // Currently used instructions don't accept other shift operations.
-                        default:
-                            throw new NotSupportedException($"Unexpected shift operation({shiftOperation}) is specified on instruction({instruction.Id})");
-                    }
-
-                // Currently other instructions are not supported.
-                default:
-                    throw new UnreachableException($"Unexpected instruction({instruction.Id}) is specified");
-            }
-        }
-
-        public int GetShiftAmount(int index)
-        {
-            var operands = instruction.Details.Operands;
-            if ((uint)index >= (uint)operands.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var operand = operands[index];
-
-            // Capstone represents LSL #0 as ARM64_SFT_INVALID.
-            if (operand.ShiftOperation == Arm64ShiftOperation.Invalid)
-                return 0;
-
-            return operand.ShiftValue;
-        }
-
-        public long GetRawImmediateValue(int index)
-        {
-            var operands = instruction.Details.Operands;
-            if ((uint)index >= (uint)operands.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            return operands[index].Immediate;
-        }
-
-        /// <summary>
-        /// Gets shifted immediate value as signed value (e.g. ADRP page offset can be negative).
-        /// </summary>
-        public long GetShiftedImmediateValue(int index)
-            => unchecked((long)instruction.GetUnsignedShiftedImmediateValue(index));
-
-        /// <summary>
-        /// Gets shifted immediate value as unsigned value (e.g. MOVZ/MOVK/ADD address construction).
-        /// Shift is performed in ulong to avoid signed overflow
-        /// (e.g. <c>movz x0, #0xFFFF, lsl #48</c> exceeds long.MaxValue)
-        /// </summary>
-        public ulong GetUnsignedShiftedImmediateValue(int index)
-        {
-            var operands = instruction.Details.Operands;
-            if ((uint)index >= (uint)operands.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            var operand = operands[index];
-
-            var shiftOperation = instruction.GetShiftOperation(index);
-            switch (shiftOperation)
-            {
-                case Arm64ShiftOperation.ARM64_SFT_LSL:
-                    var shiftAmount = instruction.GetShiftAmount(index);
-                    return unchecked((ulong)operand.Immediate << shiftAmount);
-                default:
-                    throw new NotSupportedException($"Unexpected shift operation({shiftOperation}) is specified on instruction({instruction.Id})");
-            }
-        }
-
-        public bool TryGetOperand(
-          int index,
-          CapstoneArm64OperandType type,
-          [NotNullWhen(true)] out CapstoneArm64Operand? result)
-        {
-            var operands = instruction.Details.Operands;
-            if ((uint)index >= (uint)operands.Length)
-            {
-                result = null;
-                return false;
-            }
-
-            result = operands[index];
-            if (result.Type == type)
-                return true;
-
-            result = null;
+            result = default;
             return false;
         }
 
-        public bool BelongsToGroup(Arm64InstructionGroupId expectedGroup)
+        var operand = instruction.GetOperand(index);
+
+        if (operand.Kind != expectedKind)
         {
-            if (instruction.Bytes.Length < 4)
-                return false;
-            var rawInstruction = BinaryPrimitives.ReadUInt32LittleEndian(instruction.Bytes);
-            return AsmArm64Instruction.Decode(rawInstruction).BelongsToGroup(expectedGroup);
+            result = default;
+            return false;
         }
 
-        public bool IsLdrFromTrackedRegister(CapstoneArm64RegisterId trackedRegister)
+        result = castFunc(operand);
+        return true;
+    }
+
+    // Define TryGetOperand helper extension method per operand types.
+    // It's required because when using generics, it can't resolve cast (expicit operator).
+    extension(Arm64Instruction instruction)
+    {
+        public bool TryGetOperand(int index, out Arm64RegisterOperand result)
+            => TryGetOperandCore(instruction, index, Arm64OperandKind.Register, x => (Arm64RegisterOperand) x, out result);
+
+        public bool TryGetOperand(int index, out Arm64ImmediateOperand result)
+            => TryGetOperandCore(instruction, index, Arm64OperandKind.Immediate, x => (Arm64ImmediateOperand) x, out result);
+
+        public bool TryGetOperand(int index, out Arm64LabelOperand result)
+            => TryGetOperandCore(instruction, index, Arm64OperandKind.Label, x => (Arm64LabelOperand) x, out result);
+
+        public bool TryGetOperand(int index, out Arm64ShiftOperand result)
+            => TryGetOperandCore(instruction, index, Arm64OperandKind.Shift, x => (Arm64ShiftOperand) x, out result);
+
+        public bool TryGetOperand(int index, out Arm64EnumOperand result)
+            => TryGetOperandCore(instruction, index, Arm64OperandKind.Enum, x => (Arm64EnumOperand) x, out result);
+
+        public bool TryGetOperand(int index, out Arm64MemoryOperand result)
+            => TryGetOperandCore(instruction, index, Arm64OperandKind.Memory, x => (Arm64MemoryOperand) x, out result);
+    }
+
+    extension(Arm64Instruction instruction)
+    {
+        /// <summary>
+        /// Helper method to get immediate value as `ulong`.
+        /// arm64 immediate value is expected to be represented as signed long.
+        /// Note:
+        /// Some SIMD/SVE/SME instruction might have 64-bit immediate value, FP immediate value, or bitmask.
+        /// In this case, it needs to use separated API (Currently there is no code path that handles these immediate values).
+        /// </summary>
+        public bool TryGetShiftedImmediateValueUnsigned(int index, out ulong value)
         {
-            if (instruction.Id != CapstoneArm64InstructionId.ARM64_INS_LDR)
+            if (instruction.TryGetShiftedImmediateValue(index, out long signed))
+            {
+                value = (ulong) signed;
+                return true;
+            }
+
+            value = 0;
+            return false;
+        }
+
+        public bool TryGetShiftedImmediateValue(int index, out long value)
+        {
+            value = 0;
+            var operands = instruction.Operands;
+            if ((uint) index >= (uint) operands.Count)
                 return false;
 
-            if (!instruction.TryGetOperand(1, CapstoneArm64OperandType.Memory, out var memoryOperand))
+            if (!instruction.TryGetOperand(index, out Arm64ImmediateOperand immediateOperand))
                 return false;
+
+            var immediateValue = immediateOperand.Value;
+
+            // Try to get shift modifier (AsmArm64 handle shift modifier as independent operand)
+            if (!instruction.TryGetOperand(index + 1, out Arm64ShiftOperand shiftOperand))
+            {
+                value = immediateValue;
+                return true;
+            }
+
+            var shiftAmount = shiftOperand.Amount;
+            var shiftKind = shiftOperand.ShiftKind;
+            return TryShiftImmediateValue(immediateValue, shiftKind, shiftAmount, out value);
+        }
+
+        /// <summary>
+        /// Gets the base address used to resolve a label operand.
+        /// ADRP encodes a page delta relative to the 4KB page containing the instruction,
+        /// while other label operands are relative to the instruction address.
+        /// (Matches AsmArm64's Arm64Disassembler.GetTargetAddress.)
+        /// </summary>
+        public ulong GetTargetAddressBase(ulong instructionAddress)
+        {
+            if (instruction.Mnemonic == Arm64Mnemonic.ADRP)
+                return instructionAddress & ~0xFFFUL;
+            return instructionAddress;
+        }
+
+        /// <summary>
+        /// Resolves the absolute target address of a label operand.
+        /// Address arithmetic wraps modulo 2^64, like hardware.
+        /// </summary>
+        public ulong GetTargetAddress(ulong instructionAddress, long labelOffset)
+        {
+            var targetAddress = instruction.GetTargetAddressBase(instructionAddress);
+            return unchecked(targetAddress + (ulong) labelOffset);
+        }
+
+        public bool IsLdrFromTrackedRegister(Arm64RegisterAny trackedRegister)
+        {
+            if (instruction.Mnemonic != Arm64Mnemonic.LDR)
+                return false;
+
+            if (!instruction.TryGetOperand(1, out Arm64MemoryOperand memoryOperand))
+                return false;
+
+            var memoryAccessor = memoryOperand.Accessor;
 
             // Check base register is the register that is currently tracked.
-            var memory = memoryOperand.Memory;
-            if (memory.Base.Id != trackedRegister)
+            if (memoryAccessor.BaseRegister != trackedRegister)
                 return false;
 
             // Check displacement.
-            if (memory.Displacement != 0)
+            if (memoryAccessor.HasOptionalOffset && memoryAccessor.HasImmediate && memoryAccessor.Immediate != 0)
                 return false;
 
             // Check index register is specified.
-            if (memory.Index != null)
+            if (memoryAccessor.HasIndexRegister)
                 return false;
 
             // Ldr from tracked register (with no displacement/index register).
@@ -177,20 +144,25 @@ internal static class Arm64InstructionExtensions
 
         public bool IsConditionalBranch()
         {
-            switch (instruction.Id)
+            switch (instruction.Mnemonic)
             {
-                case Gee.External.Capstone.Arm64.Arm64InstructionId.ARM64_INS_CBZ:
-                case Gee.External.Capstone.Arm64.Arm64InstructionId.ARM64_INS_CBNZ:
-                case Gee.External.Capstone.Arm64.Arm64InstructionId.ARM64_INS_TBZ:
-                case Gee.External.Capstone.Arm64.Arm64InstructionId.ARM64_INS_TBNZ:
+                case Arm64Mnemonic.CBZ:
+                case Arm64Mnemonic.CBNZ:
+                case Arm64Mnemonic.TBZ:
+                case Arm64Mnemonic.TBNZ:
                     return true;
 
-                case Gee.External.Capstone.Arm64.Arm64InstructionId.ARM64_INS_B:
-                    switch (instruction.Details.ConditionCode)
+                case Arm64Mnemonic.B:
+
+                    var conditionalKind = Arm64ConditionalKind.Undefined;
+                    if (instruction.TryGetOperand(0, out Arm64EnumOperand enumOperand))
+                        conditionalKind = enumOperand.AsConditional;
+
+                    switch (conditionalKind)
                     {
                         // `B` and `B.AL` instructions is unconditional branch.
-                        case Gee.External.Capstone.Arm64.Arm64ConditionCode.Invalid:
-                        case Gee.External.Capstone.Arm64.Arm64ConditionCode.ARM64_CC_AL:
+                        case Arm64ConditionalKind.Undefined:
+                        case Arm64ConditionalKind.AL:
                             return false;
                         default:
                             return true;
@@ -208,117 +180,89 @@ internal static class Arm64InstructionExtensions
                 || instruction.BelongsToGroup(Arm64InstructionGroupId.ARM64_GRP_JUMP);
         }
 
-    }
-    #endregion
-
-    #region Extension methods for AsmArm64
-    extension(AsmArm64Instruction instruction)
-    {
-        public Arm64RegisterOperand GetRegisterOperand(int index)
-        => (Arm64RegisterOperand)instruction.GetOperand(index, Arm64OperandKind.Register);
-
-        public Arm64ImmediateOperand GetImmediateOperand(int index)
-           => (Arm64ImmediateOperand)instruction.GetOperand(index, Arm64OperandKind.Immediate);
-
-        private AsmArm64Operand GetOperand(int index, Arm64OperandKind expectedKind)
-        {
-            var operand = instruction.GetOperand(index);
-            if (operand.Kind != expectedKind)
-                throw new ArgumentException($"The operand at index {index} is not of the expected kind {expectedKind}. Actual kind: {operand.Kind}");
-
-            return operand;
-        }
-
         public bool BelongsToGroup(Arm64InstructionGroupId expectedGroup)
         {
             // AsmArm64 don't provide mapping for instruction groups.
             // So it need to simulate Capstone's BelongsToGroup behavior.
-            // Capstone's group mappings are defined at https://github.com/capstone-engine/capstone/blob/6.0.0-Alpha10/arch/AArch64/AArch64GenCSMappingInsn.inc
+            // Capstone's group mappings are defined at https://github.com/capstone-engine/capstone/blob/6.0.0-Alpha11/arch/AArch64/AArch64GenCSMappingInsn.inc
             switch (expectedGroup)
             {
                 case Arm64InstructionGroupId.ARM64_GRP_JUMP:
-                    switch (instruction.Id)
+                    switch (instruction.Mnemonic)
                     {
-                        case Arm64InstructionId.B_only_branch_imm:
-                        case Arm64InstructionId.B_only_condbranch:
-                        case Arm64InstructionId.BC_only_condbranch:
-                        case Arm64InstructionId.BR_64_branch_reg:
-                        case Arm64InstructionId.BRAA_64p_branch_reg:
-                        case Arm64InstructionId.BRAAZ_64_branch_reg:
-                        case Arm64InstructionId.BRAB_64p_branch_reg:
-                        case Arm64InstructionId.BRABZ_64_branch_reg:
-                        case Arm64InstructionId.CBNZ_32_compbranch:
-                        case Arm64InstructionId.CBNZ_64_compbranch:
-                        case Arm64InstructionId.CBZ_32_compbranch:
-                        case Arm64InstructionId.CBZ_64_compbranch:
-                        case Arm64InstructionId.DRPS_64e_branch_reg:
-                        case Arm64InstructionId.ERET_64e_branch_reg:
-                        case Arm64InstructionId.ERETAA_64e_branch_reg:
-                        case Arm64InstructionId.ERETAB_64e_branch_reg:
-                        case Arm64InstructionId.RET_64r_branch_reg:
-                        case Arm64InstructionId.RETAA_64e_branch_reg:
-                        case Arm64InstructionId.RETAASPPCR_64m_branch_reg:
-                        case Arm64InstructionId.RETAASPPC_only_miscbranch:
-                        case Arm64InstructionId.RETAB_64e_branch_reg:
-                        case Arm64InstructionId.RETABSPPCR_64m_branch_reg:
-                        case Arm64InstructionId.RETABSPPC_only_miscbranch:
-                        case Arm64InstructionId.TBNZ_only_testbranch:
-                        case Arm64InstructionId.TBZ_only_testbranch:
+                        case Arm64Mnemonic.B:
+                        case Arm64Mnemonic.BC:
+                        case Arm64Mnemonic.BR:
+                        case Arm64Mnemonic.BRAA:
+                        case Arm64Mnemonic.BRAAZ:
+                        case Arm64Mnemonic.BRAB:
+                        case Arm64Mnemonic.BRABZ:
+                        case Arm64Mnemonic.CBNZ:
+                        case Arm64Mnemonic.CBZ:
+                        case Arm64Mnemonic.DRPS:
+                        case Arm64Mnemonic.ERET:
+                        case Arm64Mnemonic.ERETAA:
+                        case Arm64Mnemonic.ERETAB:
+                        case Arm64Mnemonic.RET:
+                        case Arm64Mnemonic.RETAA:
+                        case Arm64Mnemonic.RETAASPPC:
+                        case Arm64Mnemonic.RETAASPPCR:
+                        case Arm64Mnemonic.RETAB:
+                        case Arm64Mnemonic.RETABSPPC:
+                        case Arm64Mnemonic.RETABSPPCR:
+                        case Arm64Mnemonic.TBZ:
+                        case Arm64Mnemonic.TBNZ:
                             return true;
-
                         default:
                             return false;
                     }
 
                 case Arm64InstructionGroupId.ARM64_GRP_CALL:
-                    switch (instruction.Id)
+                    switch (instruction.Mnemonic)
                     {
-                        case Arm64InstructionId.BL_only_branch_imm:
-                        case Arm64InstructionId.BLR_64_branch_reg:    // BLR: Branch with link
-                        case Arm64InstructionId.BLRAA_64p_branch_reg: // BLRAA: Branch with link to register with PAC
-                        case Arm64InstructionId.BLRAB_64p_branch_reg: // BLRAB: Branch with link to register with PAC
-                        case Arm64InstructionId.BLRAAZ_64_branch_reg: // Z: Zero modifier
-                        case Arm64InstructionId.BLRABZ_64_branch_reg: // Z: Zero modifier
-                        case Arm64InstructionId.HVC_ex_exception:
-                        case Arm64InstructionId.SMC_ex_exception:
-                        case Arm64InstructionId.SVC_ex_exception:
+                        case Arm64Mnemonic.BL:
+                        case Arm64Mnemonic.BLR:
+                        case Arm64Mnemonic.BLRAA:
+                        case Arm64Mnemonic.BLRAB:
+                        case Arm64Mnemonic.BLRAAZ:
+                        case Arm64Mnemonic.BLRABZ:
+                        case Arm64Mnemonic.HVC:
+                        case Arm64Mnemonic.SMC:
+                        case Arm64Mnemonic.SVC:
                             return true;
                         default:
                             return false;
                     }
                 case Arm64InstructionGroupId.ARM64_GRP_RET:
-                    switch (instruction.Id)
+                    switch (instruction.Mnemonic)
                     {
-                        case Arm64InstructionId.DRPS_64e_branch_reg:
-                        case Arm64InstructionId.ERET_64e_branch_reg:
-                        case Arm64InstructionId.ERETAA_64e_branch_reg:
-                        case Arm64InstructionId.ERETAB_64e_branch_reg:
-                        case Arm64InstructionId.RET_64r_branch_reg:
-                        case Arm64InstructionId.RETAA_64e_branch_reg:
-                        case Arm64InstructionId.RETAASPPC_only_miscbranch:
-                        case Arm64InstructionId.RETAASPPCR_64m_branch_reg:
-                        case Arm64InstructionId.RETAB_64e_branch_reg:
-                        case Arm64InstructionId.RETABSPPC_only_miscbranch:
-                        case Arm64InstructionId.RETABSPPCR_64m_branch_reg:
+                        case Arm64Mnemonic.DRPS:
+                        case Arm64Mnemonic.ERET:
+                        case Arm64Mnemonic.ERETAA:
+                        case Arm64Mnemonic.ERETAB:
+                        case Arm64Mnemonic.RET:
+                        case Arm64Mnemonic.RETAA:
+                        case Arm64Mnemonic.RETAASPPC:
+                        case Arm64Mnemonic.RETAASPPCR:
+                        case Arm64Mnemonic.RETAB:
+                        case Arm64Mnemonic.RETABSPPC:
+                        case Arm64Mnemonic.RETABSPPCR:
                             return true;
                         default:
                             return false;
                     }
                 case Arm64InstructionGroupId.ARM64_GRP_BRANCH_RELATIVE:
-                    switch (instruction.Id)
+                    switch (instruction.Mnemonic)
                     {
-                        case Arm64InstructionId.B_only_branch_imm:
-                        case Arm64InstructionId.B_only_condbranch:
-                        case Arm64InstructionId.BC_only_condbranch:
-                        case Arm64InstructionId.BL_only_branch_imm:
-                        case Arm64InstructionId.CBNZ_32_compbranch:
-                        case Arm64InstructionId.CBNZ_64_compbranch:
-                        case Arm64InstructionId.CBZ_32_compbranch:
-                        case Arm64InstructionId.CBZ_64_compbranch:
-                        case Arm64InstructionId.RETAASPPC_only_miscbranch:
-                        case Arm64InstructionId.RETABSPPC_only_miscbranch:
-                        case Arm64InstructionId.TBNZ_only_testbranch:
-                        case Arm64InstructionId.TBZ_only_testbranch:
+                        case Arm64Mnemonic.B:
+                        case Arm64Mnemonic.BC:
+                        case Arm64Mnemonic.BL:
+                        case Arm64Mnemonic.CBNZ:
+                        case Arm64Mnemonic.CBZ:
+                        case Arm64Mnemonic.RETAASPPC:
+                        case Arm64Mnemonic.RETABSPPC:
+                        case Arm64Mnemonic.TBNZ:
+                        case Arm64Mnemonic.TBZ:
                             return true;
                         default:
                             return false;
@@ -344,7 +288,7 @@ internal static class Arm64InstructionExtensions
                 switch (operand.Kind)
                 {
                     case Arm64OperandKind.Register:
-                        var registerOperand = (Arm64RegisterOperand)operand;
+                        var registerOperand = (Arm64RegisterOperand) operand;
 
                         if ((registerOperand.Flags & Arm64OperandFlags.Write) != 0)
                             yield return registerOperand.Value;
@@ -352,7 +296,7 @@ internal static class Arm64InstructionExtensions
                         continue;
 
                     case Arm64OperandKind.RegisterGroup:
-                        var registerGroupOperand = (Arm64RegisterGroupOperand)operand;
+                        var registerGroupOperand = (Arm64RegisterGroupOperand) operand;
 
                         if ((registerGroupOperand.Flags & Arm64OperandFlags.Write) != 0)
                         {
@@ -371,5 +315,47 @@ internal static class Arm64InstructionExtensions
             }
         }
     }
-    #endregion
+
+    /// <summary>
+    /// Applies a shift to an immediate value. Returns false for unsupported/invalid shift kinds.
+    /// Use internal modifier for unit tests.
+    /// </summary>
+    internal static bool TryShiftImmediateValue(
+        long immediateValue,
+        Arm64ShiftKind shiftKind,
+        byte shiftAmount,
+        out long result)
+    {
+        result = 0;
+        switch (shiftKind)
+        {
+            case Arm64ShiftKind.LSL:
+                result = immediateValue << shiftAmount;
+                return true;
+
+            case Arm64ShiftKind.LSR:
+                result = (long) ((ulong) immediateValue >> shiftAmount);
+                return true;
+
+            case Arm64ShiftKind.ASR:
+                result = immediateValue >> shiftAmount;
+                return true;
+
+            case Arm64ShiftKind.ROR:
+                {
+                    var unsigned = (ulong) immediateValue;
+                    var amount = shiftAmount & 63;
+                    result = amount == 0
+                        ? (long) unsigned
+                        : (long) ((unsigned >> amount) | (unsigned << (64 - amount)));
+                    return true;
+                }
+
+            // MSL (mask shift left) is used by bitmask immediates.
+            // Treat as unsupported to avoid producing an incorrect value.
+            case Arm64ShiftKind.MSL:
+            default:
+                return false;
+        }
+    }
 }
