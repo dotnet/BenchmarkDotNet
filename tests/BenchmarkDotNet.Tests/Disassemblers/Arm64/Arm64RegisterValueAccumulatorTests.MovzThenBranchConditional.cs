@@ -1,9 +1,7 @@
-// TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
-#if NET
 using AsmArm64;
 using AwesomeAssertions;
-using Gee.External.Capstone.Arm64;
 using static AsmArm64.Arm64RegisterX;
+using static AsmArm64.Arm64InstructionFactory;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
@@ -15,11 +13,12 @@ public partial class Arm64RegisterValueAccumulatorTests
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
-        var instructions = new[]
+        var rawInstructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x1000), // movz x0, #0x1000
-            Arm64TestInstructions.Cbz(X0, 0x0100),  // cbz x0, #0x0100
+            MOVZ(X0, 0x1000), // movz x0, #0x1000
+            CBZ(X0, 0x0100),  // cbz x0, #0x0100
         };
+        var instructions = rawInstructions.ToArm64Instructions();
         PrintInstructions(instructions);
 
         // Act
@@ -29,7 +28,7 @@ public partial class Arm64RegisterValueAccumulatorTests
         // Assert
         accumulator.HasValue.Should().BeTrue();
         accumulator.Value.Should().Be(0x1000);
-        accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
+        accumulator.TrackedRegister.Should().Be(X0);
     }
 
     [Fact]
@@ -37,11 +36,12 @@ public partial class Arm64RegisterValueAccumulatorTests
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
-        var instructions = new[]
+        var rawInstructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x1000), // movz x0, #0x1000
-            Arm64TestInstructions.Cbnz(X0, 0x0100), // cbnz x0, #0x0100 
+            MOVZ(X0, 0x1000), // movz x0, #0x1000
+            CBNZ(X0, 0x0100), // cbnz x0, #0x0100
         };
+        var instructions = rawInstructions.ToArm64Instructions();
         PrintInstructions(instructions);
 
         // Act
@@ -51,7 +51,7 @@ public partial class Arm64RegisterValueAccumulatorTests
         // Assert
         accumulator.HasValue.Should().BeTrue();
         accumulator.Value.Should().Be(0x1000);
-        accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
+        accumulator.TrackedRegister.Should().Be(X0);
     }
 
     [Fact]
@@ -59,11 +59,12 @@ public partial class Arm64RegisterValueAccumulatorTests
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
-        var instructions = new[]
+        var rawInstructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x1000),                                        // movz x0, #0x1000
-            Arm64TestInstructions.B(Arm64ConditionalKind.EQ, 0x100), // b.eq x0, #0x0100 
+            MOVZ(X0, 0x1000),                  // movz x0, #0x1000
+            B(Arm64ConditionalKind.EQ, 0x100), // b.eq x0, #0x0100 
         };
+        var instructions = rawInstructions.ToArm64Instructions();
         PrintInstructions(instructions);
 
         // Act
@@ -73,7 +74,6 @@ public partial class Arm64RegisterValueAccumulatorTests
         // Assert
         accumulator.HasValue.Should().BeTrue();
         accumulator.Value.Should().Be(0x1000); // branch instruction's immediate value is not affects accumulated value.
-        accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
+        accumulator.TrackedRegister.Should().Be(X0);
     }
 }
-#endif

@@ -1,9 +1,8 @@
-// TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
-#if NET
 using AsmArm64;
 using AwesomeAssertions;
 using static AsmArm64.Arm64RegisterW;
 using static AsmArm64.Arm64RegisterX;
+using Arm64Disassembler = BenchmarkDotNet.Disassemblers.Arm64Disassembler;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
@@ -34,7 +33,7 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeTrue();
@@ -68,7 +67,7 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeTrue();
@@ -102,7 +101,7 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeTrue();
@@ -134,7 +133,7 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeTrue();
@@ -161,7 +160,7 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeFalse();
@@ -188,7 +187,7 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeFalse();
@@ -220,7 +219,7 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeFalse();
@@ -252,7 +251,7 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeFalse();
@@ -284,7 +283,7 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeFalse();
@@ -314,10 +313,9 @@ public partial class Arm64DisassemblerTests
 
         // Act
         ulong address = BaseAddress;
-        var result = Arm64DisassemblerHelper.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
+        var result = Arm64Disassembler.TryResolvePrecode(dataReader, ref address, out var isPrestubMd);
 
         // Assert
         result.Should().BeFalse();
     }
 }
-#endif

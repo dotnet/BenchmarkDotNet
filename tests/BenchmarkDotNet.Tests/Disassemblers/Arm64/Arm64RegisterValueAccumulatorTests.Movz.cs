@@ -1,8 +1,6 @@
-// TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
-#if NET
 using AwesomeAssertions;
-using Gee.External.Capstone.Arm64;
 using static AsmArm64.Arm64RegisterX;
+using static AsmArm64.Arm64InstructionFactory;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
@@ -14,12 +12,13 @@ public partial class Arm64RegisterValueAccumulatorTests
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
-        var instructions = new[]
+        var rawInstructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x1111, 0),     // movz x0, #0x1111
-            Arm64TestInstructions.Movz(X0, 0x2222, 16),    // movz x0, #0x2222, lsl #16
-            Arm64TestInstructions.Movz(X0, 0x3333, 32),    // movz x0, #0x3333, lsl #32
+            MOVZ(X0, 0x1111, amount: 0),     // movz x0, #0x1111
+            MOVZ(X0, 0x2222, amount: 16),    // movz x0, #0x2222, lsl #16
+            MOVZ(X0, 0x3333, amount: 32),    // movz x0, #0x3333, lsl #32
         };
+        var instructions = rawInstructions.ToArm64Instructions();
         PrintInstructions(instructions);
 
         // Act
@@ -29,7 +28,7 @@ public partial class Arm64RegisterValueAccumulatorTests
 
         // Assert
         accumulator.HasValue.Should().BeTrue();
-        accumulator.RegisterId.Should().Be(Arm64RegisterId.ARM64_REG_X0);
+        accumulator.TrackedRegister.Should().Be(X0);
         accumulator.Value.Should().Be(0x3333_0000_0000);
     }
 
@@ -38,10 +37,11 @@ public partial class Arm64RegisterValueAccumulatorTests
     {
         // Arrange
         var accumulator = CreateValueAccumulator();
-        var instructions = new[]
+        var rawInstructions = new[]
         {
-            Arm64TestInstructions.Movz(X0, 0x0), // movz x0, #0x0
+            MOVZ(X0, 0x0), // movz x0, #0x0
         };
+        var instructions = rawInstructions.ToArm64Instructions();
         PrintInstructions(instructions);
 
         // Act
@@ -52,4 +52,3 @@ public partial class Arm64RegisterValueAccumulatorTests
         accumulator.Value.Should().Be(0UL);
     }
 }
-#endif
