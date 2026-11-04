@@ -41,7 +41,7 @@ public partial class Arm64RegisterValueAccumulatorTests
             ADD(X0, X0, 0x100), // add x0, x0, #0x100
         };
         var instructions = rawInstructions.ToArm64Instructions();
-        PrintInstructions(instructions); // Note: Capstone print minus offset as `0xFFFFFFFFFFFFF000`
+        PrintInstructions(instructions);
 
         // Act
         accumulator.Feed(instructions[0]);

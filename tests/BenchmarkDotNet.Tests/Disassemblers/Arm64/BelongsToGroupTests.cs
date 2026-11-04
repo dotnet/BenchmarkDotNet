@@ -67,14 +67,11 @@ public partial class BelongsToGroupTests
     {
         // Following instructions is based on
         // Capstone's group mapping at https://github.com/capstone-engine/capstone/blob/6.0.0-Alpha10/arch/AArch64/AArch64GenCSMappingInsn.inc
-        //
-        // Gee.External.Capstone internally use v4.0.2 mappings.
-        // https://github.com/capstone-engine/capstone/blob/4.0.2/arch/AArch64/AArch64MappingInsn.inc
         public static readonly TheoryData<uint> JumpInstructions =
         [
             B(0x100),                   // B_only_branch_imm:
             B(EQ, 0x100),               // B_only_condbranch:
-            BC(EQ, 0x100),              // BC_only_condbranch: // It's introduced at Armv9.2-A
+            BC(EQ, 0x100),              // BC_only_condbranch:
             BR(X0),                     // BR_64_branch_reg:
             BRAA(X0, X1),               // BRAA_64p_branch_reg:
             BRAAZ(X0),                  // BRAAZ_64_branch_reg:

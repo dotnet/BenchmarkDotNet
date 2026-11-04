@@ -126,11 +126,11 @@ internal struct Arm64RegisterValueAccumulator
             if (_addressOffset < 0)
             {
                 // Magnitude of the negative offset, safe even for long.MinValue.
-                ulong magnitude = unchecked((ulong)(-(_addressOffset + 1)) + 1);
+                ulong magnitude = unchecked((ulong) (-(_addressOffset + 1)) + 1);
                 if (_addressValue < magnitude)
                     return 0;
             }
-            return unchecked(_addressValue + (ulong)_addressOffset);
+            return unchecked(_addressValue + (ulong) _addressOffset);
         }
     }
 
@@ -140,17 +140,13 @@ internal struct Arm64RegisterValueAccumulator
     {
         switch (instruction.Mnemonic)
         {
-            // MOVZ is decoded as MOV instruction alias by default.
+            // Handle MOVZ instruction. It's decoded as MOV alias by default.
             case Arm64Mnemonic.MOV:
+            case Arm64Mnemonic.MOVZ:
                 var baseInstruction = instruction.AsBaseInstruction();
                 if (baseInstruction.Mnemonic != Arm64Mnemonic.MOVZ)
                     goto default;
-
                 return TryStartMovzSequence(baseInstruction);
-
-            case Arm64Mnemonic.MOVZ:
-                //return TryStartMovzSequence(instruction);
-                throw new UnreachableException();
 
             case Arm64Mnemonic.ADRP:
                 return TryStartAdrpSequence(instruction, instructionAddress);

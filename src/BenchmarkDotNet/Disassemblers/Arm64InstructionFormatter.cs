@@ -1,6 +1,7 @@
 using AsmArm64;
 using BenchmarkDotNet.Extensions;
 using Iced.Intel;
+using System.Buffers;
 using System.Globalization;
 using System.Text;
 
@@ -15,11 +16,12 @@ namespace BenchmarkDotNet.Disassemblers
             ImmediateFormat = Arm64NumericFormat.Auto,
             LabelOffsetFormat = Arm64NumericFormat.Auto,
             MemoryOffsetFormat = Arm64NumericFormat.Auto,
-            UseUppercaseHex = true,
+            UseUppercaseHex = false,
             UseUppercaseText = false,
             PrintDefaultOperands = false,
         };
 
+        // TODO: Use copy constructor.
         internal static readonly Arm64InstructionFormattingOptions BaseInstructionAliasModeFormattingOptions = new()
         {
             AliasMode = Arm64InstructionAliasMode.BaseInstruction,
@@ -27,11 +29,15 @@ namespace BenchmarkDotNet.Disassemblers
             ImmediateFormat = Arm64NumericFormat.Auto,
             LabelOffsetFormat = Arm64NumericFormat.Auto,
             MemoryOffsetFormat = Arm64NumericFormat.Auto,
-            UseUppercaseHex = true,
+            UseUppercaseHex = false,
             UseUppercaseText = false,
             PrintDefaultOperands = false,
         };
 
+        /// <summary>
+        /// Helper method to format instruction with default options.
+        /// This method is intended to be used from unit test projects.
+        /// </summary>
         internal static string Format(Arm64Instruction instruction)
         {
             var asm = new Arm64Asm
@@ -45,9 +51,15 @@ namespace BenchmarkDotNet.Disassemblers
         internal static (string Mnemonic, string OperandsText) GetInstructionDetails(
             Arm64Instruction instruction,
             ulong instructionAddress,
+            Iced.Intel.FormatterOptions? formatterOptions = default,
             IReadOnlyDictionary<ulong, string>? symbols = null)
         {
+            formatterOptions ??= new Iced.Intel.FormatterOptions { };
             var formattingOptions = GetFormattingOptions(instruction);
+
+            // TODO: Map Iced.Intel.Formatter to format instruction with custom options.
+            formattingOptions.UseUppercaseHex = formatterOptions.UppercaseHex;
+
             var instructionText = FormatInstruction(instruction, formattingOptions, instructionAddress, symbols);
             if (instructionText.IsBlank())
                 return ("", "");
@@ -64,7 +76,7 @@ namespace BenchmarkDotNet.Disassemblers
             ulong instructionAddress,
             IReadOnlyDictionary<ulong, string>? symbols)
         {
-            // If base address is not specified, keep the raw relative label offsets.
+            // If base address is not specified, Skip trying to resolve label names.
             if (instructionAddress == 0)
                 return instruction.ToString(formattingOptions);
 
@@ -74,10 +86,16 @@ namespace BenchmarkDotNet.Disassemblers
             for (int bufferLength = 256; bufferLength <= 64 * 1024; bufferLength *= 2)
             {
                 labelDidNotFit = false;
-                var buffer = new char[bufferLength];
-
-                if (instruction.TryFormat(formattingOptions, buffer, out int written, TryResolveLabel) && !labelDidNotFit)
-                    return new string(buffer, 0, written);
+                var buffer = ArrayPool<char>.Shared.Rent(bufferLength);
+                try
+                {
+                    if (instruction.TryFormat(formattingOptions, buffer, out int written, TryResolveLabel) && !labelDidNotFit)
+                        return new string(buffer, 0, written);
+                }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return(buffer);
+                }
             }
 
             return instruction.ToString(formattingOptions);
@@ -141,7 +159,7 @@ namespace BenchmarkDotNet.Disassemblers
                 FormatInstructionPointer(asm.InstructionPointer, formatterOptions, pointerSize, output);
             }
 
-            var (mnemonic, operandsText) = GetInstructionDetails(asm.Instruction, asm.InstructionPointer, symbols);
+            var (mnemonic, operandsText) = GetInstructionDetails(asm.Instruction, asm.InstructionPointer, formatterOptions, symbols);
 
             var padRight = operandsText != ""
                 ? Math.Max(formatterOptions.FirstOperandCharIndex, mnemonic.Length + 1)
