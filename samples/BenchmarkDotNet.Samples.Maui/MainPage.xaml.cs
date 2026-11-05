@@ -19,14 +19,14 @@ public partial class MainPage : ContentPage
         try
         {
             var logger = new AccumulationLogger();
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 var config = default(IConfig);
 #if DEBUG
                 config = new DebugInProcessConfig();
 #endif
                 var summary = BenchmarkRunner.Run<IntroBasic>(config);
-                MarkdownExporter.Console.ExportToLog(summary, logger);
+                await MarkdownExporter.Console.ExportAsync(summary, logger, default);
                 ConclusionHelper.Print(logger,
                         summary.BenchmarksCases
                                .SelectMany(benchmark => benchmark.Config.GetCompositeAnalyser().Analyse(summary))
