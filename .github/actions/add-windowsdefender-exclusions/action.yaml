@@ -19,9 +19,16 @@ runs:
           }
           catch {
             if ($i -ge $maxRetries) {
+              $serviceStatus = (Get-Service WinDefend).Status
+              Write-Host "Status: $serviceStatus"
+              if($serviceStatus -eq 'Running') {
+                Get-MpComputerStatus | Format-List * | Out-String -Stream | where { $_ -notmatch ':\s*$' } | Write-Host
+                Get-MpPreference     | Format-List * | Out-String -Stream | where { $_ -notmatch ':\s*$' } | Write-Host
+              }
+
               throw
             }
-            
+
             # Write warning by using Workflow command syntax
             Write-Host "::warning::Failed to configure Windows Defender exclusions (attempt $i/$maxRetries). Retrying..."
             Start-Sleep -Seconds 1
