@@ -58,8 +58,9 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.False(log.Contains("Failed to gather assembly references"), log);
             Assert.True(report.BuildResult.IsBuildSuccess, log);
             Assert.True(File.Exists(paths.ExecutablePath), log);
-            string compositeAssembly = Path.ChangeExtension(paths.ExecutablePath, ".r2r.dll");
-            Assert.True(File.Exists(compositeAssembly) && new FileInfo(compositeAssembly).Length > 0, log);
+            string compositeAssembly = Path.Combine(paths.BinariesDirectoryPath, $"{paths.ProgramName}.r2r.dll");
+            Assert.True(File.Exists(compositeAssembly) && new FileInfo(compositeAssembly).Length > 0,
+                $"Expected composite assembly: {compositeAssembly}{Environment.NewLine}{log}");
             Assert.True(report.ExecuteResults.Count > 0 && report.ExecuteResults.All(result => result.IsSuccess), log);
             Assert.True(report.Success, log);
 

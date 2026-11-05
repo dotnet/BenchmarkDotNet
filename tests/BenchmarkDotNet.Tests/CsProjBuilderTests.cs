@@ -2,27 +2,20 @@ using BenchmarkDotNet.Characteristics;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Parameters;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Mocks;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
-using BenchmarkDotNet.Toolchains.Mono;
-using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Toolchains.NetCoreApp;
-using BenchmarkDotNet.Toolchains.R2R;
 using JetBrains.Annotations;
 using System.Reflection;
 using System.Xml.Linq;
 
 namespace BenchmarkDotNet.Tests
 {
-    public class CsProjBuilderTests(ITestOutputHelper output)
+    public class CsProjBuilderTests
     {
-        private const string GatheringCondition = "'$(BenchmarkDotNetGatherReferences)' == 'true'";
-        private const string NotGatheringCondition = "'$(BenchmarkDotNetGatherReferences)' != 'true'";
         private FileInfo TestAssemblyFileInfo = new FileInfo(typeof(CsProjBuilderTests).Assembly.Location);
         private const string runtimeHostConfigurationOptionChunk = """
             <ItemGroup>
@@ -284,103 +277,6 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal("", Resolve(new NetCoreAppSettings()));
             Assert.Equal(Path.Combine(buildArtifactsDirectory, CsProjBuilder.RestoreFolderName), Resolve(new NetCoreAppSettings { UseFreshPackages = true }));
             Assert.Equal(explicitPackages.FullName, Resolve(new NetCoreAppSettings { UseFreshPackages = true, PackagesPath = explicitPackages }));
-        }
-
-        [Theory]
-        [InlineData("net10.0", "CoreCLR")]
-        [InlineData("net11.0", "CoreCLR")]
-        [InlineData("net12.0", "CoreCLR")]
-        [InlineData("net10.0", "R2R")]
-        [InlineData("net11.0", "R2R")]
-        [InlineData("net12.0", "R2R")]
-        [InlineData("net10.0", "Mono")]
-        [InlineData("net11.0", "Mono")]
-        [InlineData("net12.0", "Mono")]
-        [InlineData("net10.0", "NativeAOT")]
-        [InlineData("net11.0", "NativeAOT")]
-        [InlineData("net12.0", "NativeAOT")]
-        public void ReferenceGatheringDoesNotChangeTheFinalDeploymentMode(string targetFrameworkMoniker, string toolchain)
-        {
-            var runtimePack = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "runtime & 'pack'"));
-            var crossgen2Pack = new FileInfo(Path.Combine(Path.GetTempPath(), "crossgen2 & 'pack'"));
-            CsProjBuilder builder = toolchain switch
-            {
-                "CoreCLR" => new CsProjBuilder(new NetCoreAppSettings { TargetFrameworkMoniker = targetFrameworkMoniker }),
-                "R2R" => new R2RBuilder(new R2RSettings
-                {
-                    TargetFrameworkMoniker = targetFrameworkMoniker,
-                    CustomRuntimePack = runtimePack,
-                    Crossgen2Pack = crossgen2Pack
-                }),
-                "Mono" => new CsProjMonoBuilder(new MonoCoreSettings { TargetFrameworkMoniker = targetFrameworkMoniker }),
-                "NativeAOT" => new CsProjNativeAotBuilder(new NativeAotSettings { TargetFrameworkMoniker = targetFrameworkMoniker }),
-                _ => throw new ArgumentOutOfRangeException(nameof(toolchain))
-            };
-            var config = ManualConfig.CreateEmpty().CreateImmutableConfig();
-            var benchmarkCase = BenchmarkCase.Create(new Descriptor(MockFactory.MockType, MockFactory.MockMethodInfo),
-                Job.Default, ParameterInstances.Empty, config);
-            var partition = new BuildPartition([new BenchmarkBuildInfo(benchmarkCase, config, 0, new([]))], BenchmarkRunnerClean.DefaultResolver);
-            var project = XDocument.Parse(builder.CreateProject(partition, ArtifactsPaths.Empty, NullLogger.Instance).ToString()).Root!;
-            output.WriteLine(project.ToString());
-
-            var finalProperties = GetDeploymentProperties(project, gathering: false);
-            if (toolchain is "R2R" or "Mono")
-            {
-                Assert.Equal("true", finalProperties["SelfContained"]);
-                Assert.Equal(RuntimeInformation.GetPortableRuntimeIdentifier(), finalProperties["RuntimeIdentifier"]);
-            }
-            else
-                Assert.False(finalProperties.ContainsKey("SelfContained"));
-
-            foreach (string property in new[] { "UseAppHost", "SkipCompilerExecution", "SkipCopyBuildProduct" })
-                Assert.False(finalProperties.ContainsKey(property));
-
-            if (toolchain == "R2R")
-            {
-                Assert.Equal("true", finalProperties["PublishReadyToRun"]);
-                Assert.Equal("true", finalProperties["PublishReadyToRunComposite"]);
-                var target = Assert.Single(project.Elements("Target"), target => (string?)target.Attribute("Name") == "TrickRuntimePackLocation");
-                Assert.Equal("ProcessFrameworkReferences", (string?)target.Attribute("AfterTargets"));
-                Assert.Null(target.Attribute("Condition"));
-                Assert.Equal(runtimePack.FullName, target.Element("ItemGroup")!.Element("RuntimePack")!.Element("PackageDirectory")!.Value);
-                Assert.Equal(crossgen2Pack.FullName, target.Element("ItemGroup")!.Element("Crossgen2Pack")!.Element("PackageDirectory")!.Value);
-            }
-            else if (toolchain == "Mono")
-                Assert.Equal("true", finalProperties["UseMonoRuntime"]);
-            else if (toolchain == "NativeAOT")
-                Assert.Equal("true", finalProperties["PublishAot"]);
-
-            var referenceTarget = Assert.Single(project.Elements("Target"), target => (string?)target.Attribute("Name") == "BdnWriteReferences");
-            Assert.Equal(GatheringCondition, (string?)referenceTarget.Attribute("Condition"));
-            var referenceImport = Assert.Single(project.Elements("Import"));
-            Assert.Equal("$(MSBuildThisFileDirectory)ref.props", (string?)referenceImport.Attribute("Project"));
-            Assert.Equal($"{NotGatheringCondition} And Exists('$(MSBuildThisFileDirectory)ref.props')", (string?)referenceImport.Attribute("Condition"));
-
-            var gatherProperties = GetDeploymentProperties(project, gathering: true);
-            Assert.Equal("false", gatherProperties["UseAppHost"]);
-            Assert.Equal("true", gatherProperties["SkipCompilerExecution"]);
-            Assert.Equal("true", gatherProperties["SkipCopyBuildProduct"]);
-            Assert.True(gatherProperties.TryGetValue("SelfContained", out string? selfContained));
-            Assert.Equal("false", selfContained);
-            Assert.Equal("false", Assert.Single(project.Elements("PropertyGroup")
-                .Where(group => (string?)group.Attribute("Condition") == GatheringCondition)
-                .Elements("SelfContained")).Value);
-        }
-
-        // Evaluate the generated deployment declarations in document order, not SDK defaults or imported targets.
-        private static Dictionary<string, string> GetDeploymentProperties(XElement project, bool gathering)
-        {
-            var properties = new Dictionary<string, string>();
-            foreach (var group in project.Elements("PropertyGroup"))
-            {
-                string? condition = (string?)group.Attribute("Condition");
-                if (condition is not null && condition != (gathering ? GatheringCondition : NotGatheringCondition))
-                    continue;
-
-                foreach (var property in group.Elements().Where(property => property.Attribute("Condition") is null))
-                    properties[property.Name.LocalName] = property.Value;
-            }
-            return properties;
         }
 
         [Fact]

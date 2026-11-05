@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         /// that a path holding an XML character cannot corrupt the file, and it is complete when written: the
         /// reference-gathering pass adds a file beside it rather than editing it.
         /// </summary>
-        protected internal XDocument CreateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        protected XDocument CreateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger);
 
