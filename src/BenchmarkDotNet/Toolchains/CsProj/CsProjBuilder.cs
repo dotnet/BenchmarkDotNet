@@ -196,7 +196,7 @@ namespace BenchmarkDotNet.Toolchains.CsProj
         /// that a path holding an XML character cannot corrupt the file, and it is complete when written: the
         /// reference-gathering pass adds a file beside it rather than editing it.
         /// </summary>
-        protected XDocument CreateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
+        protected internal XDocument CreateProject(BuildPartition buildPartition, ArtifactsPaths artifactsPaths, ILogger logger)
         {
             var projectFile = GetProjectFilePath(buildPartition.RepresentativeBenchmarkCase.Descriptor.Type, logger);
 
@@ -319,6 +319,8 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             project.Add(new XElement("PropertyGroup",
                 new XAttribute("Condition", GatheringCondition),
                 new XElement("SkipCompilerExecution", "true"),
+                // A self-contained executable requires an apphost, which this pass never produces.
+                new XElement("SelfContained", "false"),
                 // Both of these copy a build product that no longer gets produced.
                 new XElement("UseAppHost", "false"),
                 new XElement("SkipCopyBuildProduct", "true")));
