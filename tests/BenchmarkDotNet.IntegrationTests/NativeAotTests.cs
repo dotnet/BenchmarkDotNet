@@ -34,6 +34,9 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithEnvironmentVariable(NativeAotBenchmark.EnvVarKey, IsAvx2Supported().ToString().ToLower()));
         }
 
+        // BenchmarkDotNet itself is not trim or AOT safe, so publishing reports IL2104 and IL3053 for its assembly.
+        private const bool AllowWarnings = true;
+
         [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR)]
         public void LatestNativeAotVersionIsSupported()
         {
@@ -42,7 +45,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             try
             {
-                CanExecute<NativeAotBenchmark>(GetConfig());
+                CanExecute<NativeAotBenchmark>(GetConfig(), allowWarnings: AllowWarnings);
             }
             catch (MisconfiguredEnvironmentException e)
             {
@@ -66,7 +69,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
                 try
                 {
-                    CanExecute<NativeAotBenchmark>(config);
+                    CanExecute<NativeAotBenchmark>(config, allowWarnings: AllowWarnings);
                 }
                 catch (MisconfiguredEnvironmentException e)
                 {

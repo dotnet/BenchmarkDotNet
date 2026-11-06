@@ -26,9 +26,10 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <typeparam name="TBenchmark">type that defines Benchmarks</typeparam>
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
+        /// <param name="allowWarnings">Optional: don't fail the validation on logged warnings (default = false)</param>
         /// <returns>The summary from the benchmark run</returns>
-        public Summary CanExecute<TBenchmark>(IConfig? config = null, bool fullValidation = true)
-            => CanExecute(typeof(TBenchmark), config, fullValidation);
+        public Summary CanExecute<TBenchmark>(IConfig? config = null, bool fullValidation = true, bool allowWarnings = false)
+            => CanExecute(typeof(TBenchmark), config, fullValidation, allowWarnings);
 
         /// <summary>
         /// Runs Benchmarks with the most simple config (SingleRunFastConfig)
@@ -38,31 +39,34 @@ namespace BenchmarkDotNet.IntegrationTests
         /// <param name="type">type that defines Benchmarks</param>
         /// <param name="config">Optional custom config to be used instead of the default</param>
         /// <param name="fullValidation">Optional: disable validation (default = true/enabled)</param>
+        /// <param name="allowWarnings">Optional: don't fail the validation on logged warnings (default = false)</param>
         /// <returns>The summary from the benchmark run</returns>
-        public Summary CanExecute(Type type, IConfig? config = null, bool fullValidation = true)
+        public Summary CanExecute(Type type, IConfig? config = null, bool fullValidation = true, bool allowWarnings = false)
         {
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var summary = BenchmarkRunner.Run(type, GetMinimalConfig(config));
+            var warnings = new WarningCollectingLogger();
+            var summary = BenchmarkRunner.Run(type, GetMinimalConfig(config).AddLogger(warnings));
 
             if (fullValidation)
             {
-                ValidateSummary(summary);
+                ValidateSummary(summary, warnings, allowWarnings);
             }
 
             return summary;
         }
 
-        public ValueTask<Summary> CanExecuteAsync<TBenchmark>(IConfig? config = null, bool fullValidation = true)
-            => CanExecuteAsync(typeof(TBenchmark), config, fullValidation);
+        public ValueTask<Summary> CanExecuteAsync<TBenchmark>(IConfig? config = null, bool fullValidation = true, bool allowWarnings = false)
+            => CanExecuteAsync(typeof(TBenchmark), config, fullValidation, allowWarnings);
 
-        public async ValueTask<Summary> CanExecuteAsync(Type type, IConfig? config = null, bool fullValidation = true)
+        public async ValueTask<Summary> CanExecuteAsync(Type type, IConfig? config = null, bool fullValidation = true, bool allowWarnings = false)
         {
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var summary = await BenchmarkRunner.RunAsync(type, GetMinimalConfig(config));
+            var warnings = new WarningCollectingLogger();
+            var summary = await BenchmarkRunner.RunAsync(type, GetMinimalConfig(config).AddLogger(warnings));
 
             if (fullValidation)
             {
-                ValidateSummary(summary);
+                ValidateSummary(summary, warnings, allowWarnings);
             }
 
             return summary;
@@ -85,7 +89,7 @@ namespace BenchmarkDotNet.IntegrationTests
             return config!;
         }
 
-        private static void ValidateSummary(Summary summary)
+        private static void ValidateSummary(Summary summary, WarningCollectingLogger warnings, bool allowWarnings)
         {
             Assert.False(summary.HasCriticalValidationErrors, "The \"Summary\" should have NOT \"HasCriticalValidationErrors\"");
 
@@ -103,6 +107,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
                 "All reports should have succeeded to execute");
+
+            Assert.True(allowWarnings || warnings.Warnings.Count == 0,
+                "The run should not log any warnings:" + Environment.NewLine + string.Join(Environment.NewLine, warnings.Warnings));
         }
 
         protected IConfig CreateSimpleConfig(OutputLogger? logger = null, Job? job = null)
