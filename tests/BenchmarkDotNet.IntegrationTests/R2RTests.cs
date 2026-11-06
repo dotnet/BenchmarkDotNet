@@ -21,9 +21,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var config = ManualConfig.CreateEmpty()
                 .AddLogger(logger)
                 .AddJob(Job.Dry
-                    .WithToolchain(CsProjR2RToolchain.R2R10_0)
-                    // Explicitly selecting Release bypasses the integration-test no-dependencies shortcut.
-                    .WithCustomBuildConfiguration(InfrastructureMode.ReleaseConfigurationName))
+                    .WithToolchain(CsProjR2RToolchain.R2R10_0))
                 .WithBuildTimeout(TimeSpan.FromSeconds(540))
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, true)
                 .WithOption(ConfigOptions.LogBuildOutput, true);

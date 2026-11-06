@@ -24,6 +24,8 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// </summary>
         protected virtual bool PublishesOutput => false;
 
+        internal bool IsPublishing => PublishesOutput;
+
         /// <summary>
         /// Extra arguments appended to every cli command.
         /// </summary>
