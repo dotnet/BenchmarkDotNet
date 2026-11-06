@@ -86,7 +86,11 @@ namespace BenchmarkDotNet.IntegrationTests
             if (!config.GetColumnProviders().Any())
                 config = config.AddColumnProvider(DefaultColumnProviders.Instance);
 
-            return config!;
+            if (!config.GetExporters().Any())
+                config = config.AddExporter(NullExporter.Instance);
+
+            // The test assembly references a non-optimized assembly on purpose, for the validator's own tests.
+            return config.WithOptions(ConfigOptions.DisableOptimizationsValidator);
         }
 
         private static void ValidateSummary(Summary summary, IssueCollectingLogger issues, bool allowWarnings)
@@ -108,11 +112,8 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
                 "All reports should have succeeded to execute");
 
-            // Validation errors are printed as errors too, and only the critical ones are failures (checked above).
-            var validationErrors = summary.ValidationErrors.Select(error => $"//    * {error.Message}").ToHashSet();
-            var errors = issues.Errors.Where(error => !validationErrors.Contains(error)).ToArray();
-            Assert.True(errors.Length == 0,
-                "The run should not log any errors:" + Environment.NewLine + string.Join(Environment.NewLine, errors));
+            Assert.True(issues.Errors.Count == 0,
+                "The run should not log any errors:" + Environment.NewLine + string.Join(Environment.NewLine, issues.Errors));
 
             Assert.True(allowWarnings || issues.Warnings.Count == 0,
                 "The run should not log any warnings:" + Environment.NewLine + string.Join(Environment.NewLine, issues.Warnings));
