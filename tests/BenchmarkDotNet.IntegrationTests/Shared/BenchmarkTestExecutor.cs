@@ -44,12 +44,12 @@ namespace BenchmarkDotNet.IntegrationTests
         public Summary CanExecute(Type type, IConfig? config = null, bool fullValidation = true, bool allowWarnings = false)
         {
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var warnings = new WarningCollectingLogger();
-            var summary = BenchmarkRunner.Run(type, GetMinimalConfig(config).AddLogger(warnings));
+            var issues = new IssueCollectingLogger();
+            var summary = BenchmarkRunner.Run(type, GetMinimalConfig(config).AddLogger(issues));
 
             if (fullValidation)
             {
-                ValidateSummary(summary, warnings, allowWarnings);
+                ValidateSummary(summary, issues, allowWarnings);
             }
 
             return summary;
@@ -61,12 +61,12 @@ namespace BenchmarkDotNet.IntegrationTests
         public async ValueTask<Summary> CanExecuteAsync(Type type, IConfig? config = null, bool fullValidation = true, bool allowWarnings = false)
         {
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
-            var warnings = new WarningCollectingLogger();
-            var summary = await BenchmarkRunner.RunAsync(type, GetMinimalConfig(config).AddLogger(warnings));
+            var issues = new IssueCollectingLogger();
+            var summary = await BenchmarkRunner.RunAsync(type, GetMinimalConfig(config).AddLogger(issues));
 
             if (fullValidation)
             {
-                ValidateSummary(summary, warnings, allowWarnings);
+                ValidateSummary(summary, issues, allowWarnings);
             }
 
             return summary;
@@ -89,7 +89,7 @@ namespace BenchmarkDotNet.IntegrationTests
             return config!;
         }
 
-        private static void ValidateSummary(Summary summary, WarningCollectingLogger warnings, bool allowWarnings)
+        private static void ValidateSummary(Summary summary, IssueCollectingLogger issues, bool allowWarnings)
         {
             Assert.False(summary.HasCriticalValidationErrors, "The \"Summary\" should have NOT \"HasCriticalValidationErrors\"");
 
@@ -108,8 +108,14 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.True(summary.Reports.All(r => r.ExecuteResults.All(er => er.IsSuccess)),
                 "All reports should have succeeded to execute");
 
-            Assert.True(allowWarnings || warnings.Warnings.Count == 0,
-                "The run should not log any warnings:" + Environment.NewLine + string.Join(Environment.NewLine, warnings.Warnings));
+            // Validation errors are printed as errors too, and only the critical ones are failures (checked above).
+            var validationErrors = summary.ValidationErrors.Select(error => $"//    * {error.Message}").ToHashSet();
+            var errors = issues.Errors.Where(error => !validationErrors.Contains(error)).ToArray();
+            Assert.True(errors.Length == 0,
+                "The run should not log any errors:" + Environment.NewLine + string.Join(Environment.NewLine, errors));
+
+            Assert.True(allowWarnings || issues.Warnings.Count == 0,
+                "The run should not log any warnings:" + Environment.NewLine + string.Join(Environment.NewLine, issues.Warnings));
         }
 
         protected IConfig CreateSimpleConfig(OutputLogger? logger = null, Job? job = null)
