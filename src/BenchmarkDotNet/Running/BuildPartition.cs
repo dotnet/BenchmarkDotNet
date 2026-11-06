@@ -131,7 +131,9 @@ namespace BenchmarkDotNet.Running
                 if (!XUnitHelper.IsIntegrationTest.Value || !RuntimeInformation.IsNetCore)
                     return false;
 
-                if (RepresentativeBenchmarkCase.GetToolchain().Builder is not DotNetCliBuilder)
+                // Publishing toolchains still go through the full process, so that reference gathering and the
+                // publish-specific project settings it has to coexist with stay covered by the integration tests.
+                if (RepresentativeBenchmarkCase.GetToolchain().Builder is not DotNetCliBuilder { PublishesOutput: false })
                     return false;
 
                 return !RepresentativeBenchmarkCase.Job.HasDynamicBuildCharacteristic();

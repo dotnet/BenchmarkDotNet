@@ -22,7 +22,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
         /// <summary>
         /// Whether the toolchain publishes the project after building it, rather than only building it.
         /// </summary>
-        protected virtual bool PublishesOutput => false;
+        protected internal virtual bool PublishesOutput => false;
 
         /// <summary>
         /// Extra arguments appended to every cli command.

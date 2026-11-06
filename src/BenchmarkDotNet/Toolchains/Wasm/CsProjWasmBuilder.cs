@@ -139,7 +139,7 @@ namespace BenchmarkDotNet.Toolchains.Wasm
         private string GetMainJsPath(ArtifactsPaths artifactsPaths)
             => GetExecutablePath(Path.GetDirectoryName(artifactsPaths.ProjectFilePath)!, "");
 
-        protected override bool PublishesOutput => true;
+        protected internal override bool PublishesOutput => true;
 
         // AOT builds take a long time, so we show the progress.
         protected override bool LogOutput => aot;

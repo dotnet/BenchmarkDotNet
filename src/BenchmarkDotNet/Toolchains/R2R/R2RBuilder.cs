@@ -48,7 +48,7 @@ namespace BenchmarkDotNet.Toolchains.R2R
                         new XElement("PackageDirectory", settings.Crossgen2Pack?.FullName)))));
         }
 
-        protected override bool PublishesOutput => true;
+        protected internal override bool PublishesOutput => true;
 
         protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
     }

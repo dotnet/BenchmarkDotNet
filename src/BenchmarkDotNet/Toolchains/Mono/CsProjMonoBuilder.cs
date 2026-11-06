@@ -7,7 +7,7 @@ namespace BenchmarkDotNet.Toolchains.Mono
 {
     internal sealed class CsProjMonoBuilder(MonoCoreSettings settings) : CsProjBuilder(settings)
     {
-        protected override bool PublishesOutput => true;
+        protected internal override bool PublishesOutput => true;
 
         protected override void AddProjectContent(XElement project, BuildPartition buildPartition, ArtifactsPaths artifactsPaths, FileInfo projectFile)
         {

@@ -21,7 +21,7 @@ namespace BenchmarkDotNet.Toolchains.CoreRun
 
         private bool NeedsCopy => SourceCoreRun != CopyCoreRun;
 
-        protected override bool PublishesOutput => true;
+        protected internal override bool PublishesOutput => true;
 
         protected override async ValueTask<BuildResult> BuildAsync(ArtifactsPaths artifactsPaths, BuildPartition buildPartition, ILogger logger, CancellationToken cancellationToken)
         {

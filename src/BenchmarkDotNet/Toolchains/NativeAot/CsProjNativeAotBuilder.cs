@@ -31,7 +31,7 @@ internal sealed class CsProjNativeAotBuilder : CsProjBuilder
 
     protected override string GetExecutableExtension() => OsDetector.ExecutableExtension;
 
-    protected override bool PublishesOutput => true;
+    protected internal override bool PublishesOutput => true;
 
     protected override async ValueTask GenerateNuGetConfigAsync(ArtifactsPaths artifactsPaths, CancellationToken cancellationToken)
     {
