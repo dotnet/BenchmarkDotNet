@@ -319,9 +319,13 @@ namespace BenchmarkDotNet.Toolchains.CsProj
             project.Add(new XElement("PropertyGroup",
                 new XAttribute("Condition", GatheringCondition),
                 new XElement("SkipCompilerExecution", "true"),
-                // Both of these copy a build product that no longer gets produced.
+                // A self-contained executable requires an apphost, which this pass never produces.
+                new XElement("SelfContained", "false"),
+                // All of these process a build product that no longer gets produced (static web assets convert
+                // and fingerprint the program's assembly, for one, which is how Wasm lays out its app).
                 new XElement("UseAppHost", "false"),
-                new XElement("SkipCopyBuildProduct", "true")));
+                new XElement("SkipCopyBuildProduct", "true"),
+                new XElement("StaticWebAssetsEnabled", "false")));
 
             project.Add(new XElement("Target",
                 new XAttribute("Name", "BdnWriteReferences"),

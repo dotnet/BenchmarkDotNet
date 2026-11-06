@@ -131,7 +131,8 @@ namespace BenchmarkDotNet.Running
                 if (!XUnitHelper.IsIntegrationTest.Value || !RuntimeInformation.IsNetCore)
                     return false;
 
-                if (RepresentativeBenchmarkCase.GetToolchain().Builder is not DotNetCliBuilder)
+                // Publishing toolchains need the full reference-gathering and publish path.
+                if (RepresentativeBenchmarkCase.GetToolchain().Builder is not DotNetCliBuilder { IsPublishing: false })
                     return false;
 
                 return !RepresentativeBenchmarkCase.Job.HasDynamicBuildCharacteristic();
