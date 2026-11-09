@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <!-- Set SolutionDir property to suppress warning that raised by Verify.Xunit solution discovery feature. -->
-    <SolutionDir>$([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))</SolutionDir>
+    <SolutionDir>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\))</SolutionDir>
   </PropertyGroup>
 
   <!-- ProjectReferences are not transitive, so we need to directly include the analyzers and code fixers for all test projects. -->
