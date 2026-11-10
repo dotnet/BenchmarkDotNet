@@ -9,7 +9,9 @@ namespace BenchmarkDotNet.Extensions
             => GetDebuggableAttribute(assembly)?.IsJitOptimizerDisabled();
 
         internal static bool? IsDebug(this Assembly? assembly)
-            => GetDebuggableAttribute(assembly)?.IsJitTrackingEnabled();
+            => GetDebuggableAttribute(assembly) is { } debuggableAttribute
+                ? debuggableAttribute.IsJITTrackingEnabled && debuggableAttribute.IsJITOptimizerDisabled
+                : null;
 
         internal static bool IsTrue(this bool? valueOrNothing) => valueOrNothing.HasValue && valueOrNothing.Value;
 
