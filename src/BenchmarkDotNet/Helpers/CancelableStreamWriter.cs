@@ -29,6 +29,15 @@ public sealed class CancelableStreamWriter : IDisposable
     public Task WriteAsync(ReadOnlyMemory<char> buffer, CancellationToken cancellationToken)
         => _writer.WriteAsync(buffer, cancellationToken);
 
+    public Task FlushAsync(CancellationToken cancellationToken)
+#if NET8_0_OR_GREATER
+        => _writer.FlushAsync(cancellationToken);
+#else
+        => cancellationToken.IsCancellationRequested
+            ? Task.FromCanceled(cancellationToken)
+            : _writer.FlushAsync();
+#endif
+
     public void Dispose()
         => _writer.Dispose();
 #else
