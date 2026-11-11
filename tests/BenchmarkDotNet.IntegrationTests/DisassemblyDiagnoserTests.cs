@@ -110,6 +110,7 @@ namespace BenchmarkDotNet.IntegrationTests
             AssertDisassemblyResult(result, $"{nameof(WithCalls.Static)}()");
             AssertDisassemblyResult(result, $"{nameof(WithCalls.Instance)}()");
             AssertDisassemblyResult(result, $"{nameof(WithCalls.Recursive)}()");
+            AssertIntelInstructionsKeepTheirAddresses(result);
         }
 
         [Theory]
@@ -287,6 +288,18 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(disassemblyDiagnoser)
                 .AddLogger(new OutputLogger(Output));
+
+        // The result is serialized back from the benchmark process, so the decoded instructions must still agree with the
+        // addresses recorded next to them; otherwise jumps and calls are printed as raw addresses instead of labels/names.
+        private static void AssertIntelInstructionsKeepTheirAddresses(DisassemblyResult result)
+        {
+            var intelAsm = result.Methods.SelectMany(method => method.Maps).SelectMany(map => map.SourceCodes).OfType<IntelAsm>().ToArray();
+
+            Assert.All(intelAsm, asm => Assert.Equal(asm.InstructionPointer, asm.Instruction.IP));
+            Assert.All(
+                intelAsm.Where(asm => asm.ReferencedAddress != null && (asm.Instruction.IsCallNear || asm.Instruction.IsJmpShortOrNear || asm.Instruction.IsJccShortOrNear)),
+                asm => Assert.Equal(asm.ReferencedAddress, asm.Instruction.NearBranchTarget));
+        }
 
         private void AssertDisassemblyResult(DisassemblyResult result, string methodSignature)
         {
