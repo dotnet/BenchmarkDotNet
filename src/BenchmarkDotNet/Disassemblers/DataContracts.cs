@@ -6,11 +6,6 @@ using System.ComponentModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-#if NET6_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
-
 namespace BenchmarkDotNet.Disassemblers;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
@@ -43,16 +38,108 @@ public abstract class Asm : SourceCode
     public bool IsReferencedAddressIndirect { get; set; }
 }
 
-#if NET6_0_OR_GREATER
-// There are way too many properties to serialize them manually.
-// Ensure the Instruction's properties are not trimmed.
-[method: DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(Instruction))]
-#endif
-public sealed class IntelAsm() : Asm
+public sealed class IntelAsm : Asm
 {
+    [JsonConverter(typeof(IntelInstructionConverter))]
     public Instruction Instruction { get; set; }
 
     public override string ToString() => Instruction.ToString();
+
+    // Instruction can't be round-tripped through its public properties: several of them alias the same
+    // private field at different widths (IP16/IP32/IP, NearBranch16/32/64, MemoryDisplacement32/64, ...),
+    // so whichever setter runs last truncates the value. Encode it to machine code instead and decode it back.
+    internal sealed class IntelInstructionConverter : JsonConverter<Instruction>
+    {
+        private const string CodeSizeKey = "codeSize";
+        private const string AddressKey = "address";
+        private const string LengthKey = "length";
+        private const string BytesKey = "bytes";
+
+        public override Instruction Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType != JsonTokenType.StartObject)
+                throw new JsonException();
+
+            CodeSize codeSize = CodeSize.Unknown;
+            ulong address = 0;
+            int length = 0;
+            byte[] bytes = [];
+
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                    throw new JsonException();
+
+                string propertyName = reader.GetString()!;
+                reader.Read();
+
+                switch (propertyName)
+                {
+                    case CodeSizeKey:
+                        codeSize = Enum.Parse<CodeSize>(reader.GetString()!);
+                        break;
+                    case AddressKey:
+                        address = reader.GetUInt64();
+                        break;
+                    case LengthKey:
+                        length = reader.GetInt32();
+                        break;
+                    case BytesKey:
+                        bytes = reader.GetBytesFromBase64();
+                        break;
+                    default:
+                        throw new NotSupportedException($"Unknown property({propertyName}) found.");
+                }
+            }
+
+            if (reader.TokenType != JsonTokenType.EndObject)
+                throw new JsonException("Invalid JSON");
+
+            // No bytes means the instruction was not encodable (e.g. the decoder hit invalid bytes), so only its location is kept.
+            Instruction instruction = default;
+            if (bytes.Length > 0)
+            {
+                var decoder = Iced.Intel.Decoder.Create(GetBitness(codeSize), new ByteArrayCodeReader(bytes));
+                decoder.IP = address;
+                decoder.Decode(out instruction);
+            }
+
+            // Restored as written, because an instruction that was created rather than decoded has no length or code size.
+            instruction.CodeSize = codeSize;
+            instruction.Length = length;
+            instruction.NextIP = address + (ulong) length;
+            return instruction;
+        }
+
+        public override void Write(Utf8JsonWriter writer, Instruction value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+            writer.WriteString(CodeSizeKey, value.CodeSize.ToString());
+            writer.WriteNumber(AddressKey, value.IP);
+            writer.WriteNumber(LengthKey, value.Length);
+
+            var codeWriter = new ByteListCodeWriter();
+            if (value.Code != Iced.Intel.Code.INVALID && Encoder.Create(GetBitness(value.CodeSize), codeWriter).TryEncode(value, value.IP, out _, out _))
+            {
+                writer.WriteBase64String(BytesKey, codeWriter.Bytes.ToArray());
+            }
+            writer.WriteEndObject();
+        }
+
+        private static int GetBitness(CodeSize codeSize) => codeSize switch
+        {
+            CodeSize.Code16 => 16,
+            CodeSize.Code32 => 32,
+            _ => 64,
+        };
+
+        private sealed class ByteListCodeWriter : CodeWriter
+        {
+            internal List<byte> Bytes { get; } = [];
+
+            public override void WriteByte(byte value) => Bytes.Add(value);
+        }
+    }
 }
 
 public sealed class Arm64Asm : Asm
