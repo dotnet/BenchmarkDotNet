@@ -18,7 +18,7 @@ jobs:
       discussions: write
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
 
       - name: Read current version
         id: version
@@ -28,7 +28,7 @@ jobs:
         run: ./build.cmd pack /p:VersionSuffix=${{ inputs.suffix }} /p:WeaverVersionSuffix=\"\"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: nupkgs
           path: artifacts/*.nupkg
@@ -42,7 +42,7 @@ jobs:
           git push origin v${{ steps.version.outputs.VERSION }}
 
       - name: Release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        uses: softprops/action-gh-release@v3.0.3
         with:
           name: v${{ steps.version.outputs.VERSION }}
           tag_name: v${{ steps.version.outputs.VERSION }}
