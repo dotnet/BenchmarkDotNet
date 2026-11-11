@@ -330,7 +330,7 @@ namespace BenchmarkDotNet.Code
             {
                 return false;
             }
-            asyncMethodBuilderAttribute = $"[{typeof(AsyncMethodBuilderAttribute).GetCorrectCSharpTypeName()}(typeof({builderType.GetCorrectCSharpTypeName()}))]";
+            asyncMethodBuilderAttribute = $"[{typeof(AsyncMethodBuilderAttribute).GetCorrectCSharpTypeName()}(typeof({builderType.GetCorrectCSharpTypeName(unboundGenericDefinition: true)}))]";
             return true;
         }
 

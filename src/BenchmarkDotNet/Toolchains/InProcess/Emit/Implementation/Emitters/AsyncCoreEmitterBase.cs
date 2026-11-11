@@ -99,7 +99,7 @@ partial class RunnableEmitter
             if (Descriptor.WorkloadMethod.GetAsyncMethodBuilderAttribute() is { } methodAttr
                 && methodAttr.GetType().GetProperty(nameof(AsyncMethodBuilderAttribute.BuilderType), BindingFlags.Public | BindingFlags.Instance)?.GetValue(methodAttr) is Type methodBuilderType)
             {
-                return methodBuilderType;
+                return GetConcreteBuilderType(methodBuilderType, returnType);
             }
             if (returnType.GetAsyncMethodBuilderAttribute() is { } typeAttr
                 && typeAttr.GetType().GetProperty(nameof(AsyncMethodBuilderAttribute.BuilderType), BindingFlags.Public | BindingFlags.Instance)?.GetValue(typeAttr) is Type typeBuilderType)

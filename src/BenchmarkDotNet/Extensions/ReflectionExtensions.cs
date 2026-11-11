@@ -33,8 +33,10 @@ namespace BenchmarkDotNet.Extensions
 
         /// <summary>
         /// returns type name which can be used in generated C# code
+        /// (with <c>unboundGenericDefinition</c>, a generic type definition is written in its unbound form <c>List&lt;&gt;</c>
+        /// instead of with its type parameter names <c>List&lt;T&gt;</c>, as <c>typeof</c> requires)
         /// </summary>
-        internal static string GetCorrectCSharpTypeName(this Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true, bool prefixWithGlobal = true)
+        internal static string GetCorrectCSharpTypeName(this Type type, bool includeNamespace = true, bool includeGenericArgumentsNamespace = true, bool prefixWithGlobal = true, bool unboundGenericDefinition = false)
         {
             while (!(type.IsPublic || type.IsNestedPublic) && type.BaseType != null)
                 type = type.BaseType;
@@ -73,11 +75,11 @@ namespace BenchmarkDotNet.Extensions
                 return repr;
             }
 
-            return prefix + string.Join(".", GetNestedTypeNames(type, includeGenericArgumentsNamespace, prefixWithGlobal).Reverse());
+            return prefix + string.Join(".", GetNestedTypeNames(type, includeGenericArgumentsNamespace, prefixWithGlobal, unboundGenericDefinition && type.IsGenericTypeDefinition).Reverse());
         }
 
         // from most nested to least
-        private static IEnumerable<string> GetNestedTypeNames(Type type, bool includeGenericArgumentsNamespace, bool prefixWithGlobal)
+        private static IEnumerable<string> GetNestedTypeNames(Type type, bool includeGenericArgumentsNamespace, bool prefixWithGlobal, bool unbound)
         {
             var allTypeParameters = new Stack<Type>(type.GetGenericArguments());
 
@@ -97,7 +99,9 @@ namespace BenchmarkDotNet.Extensions
                         .Select(_ => allTypeParameters.Pop())
                         .Reverse();
 
-                    var args = string.Join(", ", typeParameters.Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace, prefixWithGlobal)));
+                    var args = unbound
+                        ? new string(',', parameterCount - 1)
+                        : string.Join(", ", typeParameters.Select(T => GetCorrectCSharpTypeName(T, includeGenericArgumentsNamespace, includeGenericArgumentsNamespace, prefixWithGlobal)));
                     name = $"{mainName}<{args}>";
                 }
 

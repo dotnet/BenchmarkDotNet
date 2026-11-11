@@ -235,4 +235,45 @@ public class CustomTaskAndAwaitableTests(ITestOutputHelper output) : BenchmarkTe
         CanExecute<BenchmarkCustomBuilder>(config);
     }
 #endif
+
+#if NET6_0_OR_GREATER
+    public class BenchmarkOpenGenericBuilder
+    {
+        [Benchmark]
+        [AsyncMethodBuilder(typeof(PoolingAsyncValueTaskMethodBuilder<>))]
+        public async ValueTask<int> Benchmark()
+        {
+            await Task.Yield();
+            return 1;
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+    public void ReturnOpenGenericBuilder(IToolchain toolchain)
+    {
+        var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
+        CanExecute<BenchmarkOpenGenericBuilder>(config);
+    }
+
+    public class BenchmarkOpenGenericBuilderGenericClass<T>
+    {
+        [Benchmark]
+        [AsyncMethodBuilder(typeof(PoolingAsyncValueTaskMethodBuilder<>))]
+        public async ValueTask<T> Benchmark()
+        {
+            await Task.Yield();
+            return default!;
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
+    public void ReturnOpenGenericBuilderFromGenericClass(IToolchain toolchain)
+    {
+        var config = CreateSimpleConfig(job: Job.Dry.WithToolchain(toolchain));
+        CanExecute<BenchmarkOpenGenericBuilderGenericClass<int>>(config);
+        CanExecute<BenchmarkOpenGenericBuilderGenericClass<string>>(config);
+    }
+#endif
 }
