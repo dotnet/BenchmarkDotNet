@@ -17,6 +17,7 @@ using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Collection(Constants.FlakyTests)]
     public class ThreadingDiagnoserTests
     {
         private readonly ITestOutputHelper output;
