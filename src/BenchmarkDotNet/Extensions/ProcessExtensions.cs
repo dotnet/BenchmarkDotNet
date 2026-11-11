@@ -7,17 +7,11 @@ using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.CoreRun;
-using JetBrains.Annotations;
-using System.ComponentModel;
 using System.Diagnostics;
 
 namespace BenchmarkDotNet.Extensions
 {
-    // we need it public to reuse it in the auto-generated dll
-    // but we hide it from intellisense with following attribute
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [PublicAPI]
-    public static class ProcessExtensions
+    internal static class ProcessExtensions
     {
         private static readonly TimeSpan DefaultKillTimeout = TimeSpan.FromSeconds(30);
 
