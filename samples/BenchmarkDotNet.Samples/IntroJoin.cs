@@ -5,6 +5,7 @@ namespace BenchmarkDotNet.Samples
     // Run BenchmarkSwitcher with arguments: "--join --category=IntroJoinA"
 
     [DryJob]
+    [UseLocalJobOnly]
     public class IntroJoin1
     {
         [Benchmark]
@@ -17,6 +18,7 @@ namespace BenchmarkDotNet.Samples
     }
 
     [DryJob]
+    [UseLocalJobOnly]
     public class IntroJoin2
     {
         [Benchmark]

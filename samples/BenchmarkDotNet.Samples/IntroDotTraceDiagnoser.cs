@@ -8,6 +8,7 @@ namespace BenchmarkDotNet.Samples
     [DotTraceDiagnoser]
     [SimpleJob] // external-process execution
     [InProcess] // in-process execution
+    [UseLocalJobOnly]
     public class IntroDotTraceDiagnoser
     {
         [Benchmark]
