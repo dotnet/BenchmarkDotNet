@@ -2,6 +2,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.IntegrationTests.WasmBenchmarks;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
@@ -17,6 +18,7 @@ namespace BenchmarkDotNet.IntegrationTests
     /// * Install v8: `npm install jsvu -g && jsvu --os=default --engines=v8`
     /// * Add `$HOME/.jsvu/bin` to PATH
     /// </summary>
+    [Collection(Constants.LongRunningTests)]
     public class WasmTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
     {
         private const string V8SkipReason = "JSVU does not support ARM on Windows or Linux";

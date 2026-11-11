@@ -2,14 +2,14 @@ using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.XUnit;
-#if !DEBUG
-#endif
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Collection(Constants.LongRunningTests)]
     public class CustomBuildConfigurationTests : BenchmarkTestExecutor
     {
         public CustomBuildConfigurationTests(ITestOutputHelper output) : base(output)

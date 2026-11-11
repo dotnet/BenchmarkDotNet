@@ -7,6 +7,7 @@ using BenchmarkDotNet.Toolchains.R2R;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Collection(Constants.LongRunningTests)]
     public class R2RTests : BenchmarkTestExecutor
     {
         public R2RTests(ITestOutputHelper output) : base(output) { }

@@ -1,11 +1,13 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Collection(Constants.LongRunningTests)]
     public class MonoTests : BenchmarkTestExecutor
     {
         public MonoTests(ITestOutputHelper output) : base(output) { }

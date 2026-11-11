@@ -4,5 +4,8 @@ namespace BenchmarkDotNet.IntegrationTests.Xunit
     {
         public const string Category = "Category";
         public const string BackwardCompatibilityCategory = "BackwardCompatibility";
+
+        public const string FlakyTests = "FlakyTests";
+        public const string LongRunningTests = "LongRunningTests";
     }
 }

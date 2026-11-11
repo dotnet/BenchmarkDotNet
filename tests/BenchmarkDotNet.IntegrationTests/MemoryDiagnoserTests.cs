@@ -1,4 +1,3 @@
-using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
@@ -6,12 +5,9 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
-using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
@@ -20,12 +16,12 @@ using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Mono;
 using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
-using BenchmarkDotNet.Validators;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    [Collection(Constants.FlakyTests)]
     public class MemoryDiagnoserTests
     {
         private readonly ITestOutputHelper output;

@@ -18,6 +18,8 @@ using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
+    // This test is flaky on `macos(x64)` when using InProcessEmitToolchain.
+    [Collection(Constants.FlakyTests)]
     public class DisassemblyDiagnoserTests : BenchmarkTestExecutor
     {
         public DisassemblyDiagnoserTests(ITestOutputHelper output) : base(output) { }

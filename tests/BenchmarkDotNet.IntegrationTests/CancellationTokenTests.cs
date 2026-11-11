@@ -5,6 +5,7 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -12,7 +13,6 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
-using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using BenchmarkDotNet.Toolchains.Wasm;
@@ -20,6 +20,7 @@ using BenchmarkDotNet.Validators;
 
 namespace BenchmarkDotNet.IntegrationTests;
 
+[Collection(Constants.LongRunningTests)]
 public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExecutor(output)
 {
     [Fact]
