@@ -23,13 +23,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       # Checkout
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       # Add Windows Defender Exclusions
-      - uses: ./.github/actions/add-windowsdefender-exclusions
+      - uses: $/.github/actions/add-windowsdefender-exclusions
       # Setup additional tools
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.pull_request.draft != true }}
-        uses: ./.github/actions/setup-additional-tools
+        uses: $/.github/actions/setup-additional-tools
       # Build and Test
       - name: Run task 'build'
         shell: cmd
@@ -45,13 +45,13 @@ jobs:
         run: ./build.cmd in-tests-core -e
       # Report failed tests with unique name
       - name: Report failed tests
-        uses: ./.github/actions/report-failed-tests
+        uses: $/.github/actions/report-failed-tests
         if: ${{ !cancelled() }}
         with:
           name: test-windows-core-${{ matrix.os }}
       # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: test-windows-core-trx-${{ github.run_id }}-${{ matrix.os }}
@@ -64,13 +64,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       # Checkout
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       # Add Windows Defender Exclusions
-      - uses: ./.github/actions/add-windowsdefender-exclusions
+      - uses: $/.github/actions/add-windowsdefender-exclusions
       # Setup additional tools
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.pull_request.draft != true }}
-        uses: ./.github/actions/setup-additional-tools
+        uses: $/.github/actions/setup-additional-tools
       # Build and Test
       - name: Run task 'build'
         shell: cmd
@@ -86,13 +86,13 @@ jobs:
         run: ./build.cmd in-tests-full -e
       # Report failed tests with unique name
       - name: Report failed tests
-        uses: ./.github/actions/report-failed-tests
+        uses: $/.github/actions/report-failed-tests
         if: ${{ !cancelled() }}
         with:
           name: test-windows-full-${{ matrix.os }}
       # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: test-windows-full-trx-${{ github.run_id }}-${{ matrix.os }}
@@ -104,11 +104,11 @@ jobs:
         os: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       # Setup additional tools
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.pull_request.draft != true }}
-        uses: ./.github/actions/setup-additional-tools
+        uses: $/.github/actions/setup-additional-tools
       # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
@@ -120,13 +120,13 @@ jobs:
         run: ./build.cmd in-tests-core -e
       # Report failed tests with unique name
       - name: Report failed tests
-        uses: ./.github/actions/report-failed-tests
+        uses: $/.github/actions/report-failed-tests
         if: ${{ !cancelled() }}
         with:
           name: test-linux-${{ matrix.os }}
       # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: test-linux-trx-${{ github.run_id }}-${{ matrix.os }}
@@ -143,11 +143,11 @@ jobs:
           - runs-on: 'macos-26-intel'
             arch: 'x64'
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       # Setup additional tools
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.pull_request.draft != true }}
-        uses: ./.github/actions/setup-additional-tools
+        uses: $/.github/actions/setup-additional-tools
       # Build and Test
       - name: Run task 'build'
         run: ./build.cmd build
@@ -159,13 +159,13 @@ jobs:
         run: ./build.cmd in-tests-core -e
       # Report failed tests with unique name
       - name: Report failed tests
-        uses: ./.github/actions/report-failed-tests
+        uses: $/.github/actions/report-failed-tests
         if: ${{ !cancelled() }}
         with:
           name: test-macos(${{ matrix.os.arch }})
       # Upload Artifacts with Unique Name
       - name: Upload test results
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: test-macos(${{ matrix.os.arch }})-trx-${{ github.run_id }}
@@ -174,15 +174,15 @@ jobs:
   test-pack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Run task 'pack'
         run: ./build.cmd pack
 
   spellcheck-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         name: Setup node
         with:
           node-version: "24"

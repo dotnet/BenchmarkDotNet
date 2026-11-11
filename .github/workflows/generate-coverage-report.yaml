@@ -25,10 +25,10 @@ jobs:
         # https://github.com/microsoft/codecoverage/blob/main/docs/supported-os.md
         os: [windows-latest, ubuntu-latest, macos-26-intel, windows-11-arm]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
 
       # Ensure DOTNET_ROOT environment variable set on macOS
-      - uses: actions/setup-dotnet@v6
+      - uses: actions/setup-dotnet@v6.1.0
         with:
           dotnet-version: |
             10.x
@@ -36,7 +36,7 @@ jobs:
       # Setup additional tools
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.inputs.skip_integration_tests == 'false'}}
-        uses: ./.github/actions/setup-additional-tools
+        uses: $/.github/actions/setup-additional-tools
 
       - name: Install dotnet-coverage
         run: dotnet tool install --global dotnet-coverage
@@ -61,7 +61,7 @@ jobs:
         run: dotnet coverage shutdown bdn_coverage --timeout 60000
 
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: coverage-${{ matrix.os }}
           path: "**/*.cobertura.xml"
@@ -72,11 +72,11 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
 
       - name: Setup additional tools for Wasm/NativeAot tests
         if: ${{ github.event.inputs.skip_integration_tests == 'false'}}
-        uses: ./.github/actions/setup-additional-tools
+        uses: $/.github/actions/setup-additional-tools
         
       - name: Install dotnet-coverage
         run: dotnet tool install --global dotnet-coverage
@@ -101,7 +101,7 @@ jobs:
         run: dotnet coverage shutdown bdn_coverage --timeout 60000
 
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: coverage-windows-netfx
           path: "**/*.cobertura.xml"
@@ -113,14 +113,14 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@v8.0.2
         with:
           path: coverage
 
       - name: Upload raw coverage data
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: coverage
           path: coverage
@@ -167,7 +167,7 @@ jobs:
           Write-Output $markdown >> $env:GITHUB_STEP_SUMMARY
 
       - name: Upload HTML report files
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: coverage_report
           path: coverage_report
