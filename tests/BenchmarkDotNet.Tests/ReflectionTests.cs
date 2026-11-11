@@ -71,6 +71,29 @@ namespace BenchmarkDotNet.Tests
         }
 
         [Fact]
+        public void GetCorrectCSharpTypeNameWritesUnboundGenericDefinitions()
+        {
+            CheckCorrectUnboundTypeName("global::System.IEquatable<>", typeof(IEquatable<>));
+            CheckCorrectUnboundTypeName("global::System.Collections.Generic.Dictionary<,>", typeof(Dictionary<,>));
+            CheckCorrectUnboundTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<,>.NonGeneric2",
+                typeof(NestedGeneric1<,>.NonGeneric2));
+            CheckCorrectUnboundTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedGeneric1<,>.NonGeneric2.Generic3<,,>.Generic4<,>",
+                typeof(NestedGeneric1<,>.NonGeneric2.Generic3<,,>.Generic4<,>));
+
+            // Types that are not generic definitions are unaffected.
+            CheckCorrectUnboundTypeName("global::System.Int32", typeof(int));
+            CheckCorrectUnboundTypeName("global::System.Collections.Generic.Dictionary<global::System.Int32, global::System.String>", typeof(Dictionary<int, string>));
+            CheckCorrectUnboundTypeName("global::BenchmarkDotNet.Tests.ReflectionTests.NestedNonGeneric1.NestedGeneric2<global::System.Int16, global::System.Boolean, global::System.Decimal>.NestedNonGeneric3",
+                typeof(NestedNonGeneric1.NestedGeneric2<short, bool, decimal>.NestedNonGeneric3));
+        }
+
+        [AssertionMethod]
+        private static void CheckCorrectUnboundTypeName(string expectedName, Type type)
+        {
+            Assert.Equal(expectedName, type.GetCorrectCSharpTypeName(unboundGenericDefinition: true));
+        }
+
+        [Fact]
         public void GetCorrectCSharpTypeNameSupportsNestedTypesPassedByReference()
         {
             var byRefNestedType = typeof(Nested).GetMethod(nameof(Nested.TheMethod))!.GetParameters().Single().ParameterType;
