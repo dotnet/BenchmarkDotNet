@@ -1,4 +1,3 @@
-using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Extensions;
@@ -6,6 +5,7 @@ using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.XUnit;
+using System.Reflection;
 
 namespace BenchmarkDotNet.IntegrationTests
 {

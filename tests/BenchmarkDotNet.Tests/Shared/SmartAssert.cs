@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace BenchmarkDotNet.Tests.XUnit
+namespace BenchmarkDotNet.Tests
 {
     public static class SmartAssert
     {

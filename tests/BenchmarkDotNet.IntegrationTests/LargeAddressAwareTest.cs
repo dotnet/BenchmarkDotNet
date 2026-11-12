@@ -27,7 +27,7 @@ namespace BenchmarkDotNet.IntegrationTests
             config.AddColumnProvider(DefaultColumnProviders.Instance)
                   .AddLogger(new OutputLogger(output));
 
-            var summary = BenchmarkRunner.Run<NeedsMoreThan2GB>(config);
+            var summary = BenchmarkRunner.Run<NeedsMoreThan2GB>(config, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults
@@ -56,7 +56,7 @@ namespace BenchmarkDotNet.IntegrationTests
             config.AddColumnProvider(DefaultColumnProviders.Instance)
                   .AddLogger(new OutputLogger(output));
 
-            var summary = BenchmarkRunner.Run<NeedsMoreThan2GB>(config);
+            var summary = BenchmarkRunner.Run<NeedsMoreThan2GB>(config, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.True(summary.Reports
                 .All(report => report.ExecuteResults
