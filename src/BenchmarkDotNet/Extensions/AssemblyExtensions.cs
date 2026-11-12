@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Extensions
     internal static class AssemblyExtensions
     {
         internal static bool? IsJitOptimizationDisabled(this Assembly? assembly)
-            => GetDebuggableAttribute(assembly)?.IsJitOptimizerDisabled();
+            => GetDebuggableAttribute(assembly)?.IsJITOptimizerDisabled;
 
         internal static bool? IsDebug(this Assembly? assembly)
             => GetDebuggableAttribute(assembly) is { } debuggableAttribute
@@ -26,9 +26,5 @@ namespace BenchmarkDotNet.Extensions
                 return null;
             }
         }
-
-        private static bool? IsJitOptimizerDisabled(this DebuggableAttribute? attribute) => attribute?.IsJITOptimizerDisabled;
-
-        private static bool? IsJitTrackingEnabled(this DebuggableAttribute? attribute) => attribute?.IsJITTrackingEnabled;
     }
 }
