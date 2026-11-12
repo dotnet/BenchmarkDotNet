@@ -26,7 +26,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
         public static IEnumerable<object[]> GetAllJits()
         {
-            yield return [JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Default]; // InProcess
+            // Skip InProcessEmitToolchain tests on `macos(x64)`. Because it's flaky.
+            if (!IsMacOS_X64())
+                yield return [JitInfo.GetCurrentJit(), RuntimeInformation.GetCurrentPlatform(), InProcessEmitToolchain.Default];
 
             if (ContinuousIntegration.IsGitHubDraftPR())
                 yield break;
@@ -229,6 +231,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void InProcessDisassemblyTargetsTheRunnableOfEachBenchmark()
         {
+            if (IsMacOS_X64())
+                return; // Skip InProcessEmitToolchain tests on `macos(x64)`. Because it's flaky.
+
             var disassemblyDiagnoser = new DisassemblyDiagnoser(
                 new DisassemblyDiagnoserConfig(printSource: true, maxDepth: 3));
 
@@ -253,6 +258,9 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void InProcessDisassemblyIgnoresRunnablesOfEarlierRuns()
         {
+            if (IsMacOS_X64())
+                return; // Skip InProcessEmitToolchain tests on `macos(x64)`. Because it's flaky.
+
             CanExecute<WithCalls>(ManualConfig.CreateEmpty()
                 .AddJob(Job.Dry.WithToolchain(InProcessEmitToolchain.Default))
                 .AddLogger(new OutputLogger(Output))
@@ -308,5 +316,8 @@ namespace BenchmarkDotNet.IntegrationTests
             Assert.Contains(methodSignature, result.Methods.Select(m => m.Name.Split('.').Last()).ToArray());
             Assert.Contains(result.Methods.Single(m => m.Name.EndsWith(methodSignature)).Maps, map => map.SourceCodes.Length != 0);
         }
+
+        private static bool IsMacOS_X64()
+          => OsDetector.IsMacOS() && RuntimeInformation.GetCurrentPlatform() is Platform.X64;
     }
 }
