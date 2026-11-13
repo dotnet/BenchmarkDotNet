@@ -23,6 +23,11 @@ namespace BenchmarkDotNet.IntegrationTests.InProcess.EmitTests
             "System.Runtime.CompilerServices.NullableAttribute",
             "System.Runtime.CompilerServices.NullableContextAttribute",
             "System.Runtime.CompilerServices.NullablePublicOnlyAttribute",
+            // Types that are added .NET 11
+            "System.Runtime.CompilerServices.IUnion",
+            "System.Runtime.CompilerServices.IsClosedTypeAttribute",
+            "System.Runtime.CompilerServices.UnionAttribute",
+            "System.Diagnostics.CodeAnalysis.RequiresUnsafeAttribute",
         ];
 
         private static readonly HashSet<string> IgnoredAttributeTypeNames =
