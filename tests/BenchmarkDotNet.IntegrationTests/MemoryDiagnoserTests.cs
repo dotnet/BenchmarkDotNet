@@ -72,9 +72,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("We don't want to test NativeAOT twice (.NET Framework and .NET Core)", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR])]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
-            if (OsDetector.IsMacOS())
-                return; // currently not supported
-
             MemoryDiagnoserIsAccurate(CsProjNativeAotToolchain.Net10_0);
         }
 
