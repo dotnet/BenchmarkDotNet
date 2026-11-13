@@ -20,9 +20,9 @@ then run `build.cmd pack-weaver`.
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AsmResolver.DotNet" Version="6.0.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="18.11.0" PrivateAssets="all" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.11.0" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="AsmResolver.DotNet" Version="6.1.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="18.12.2" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.12.2" PrivateAssets="all" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,7 +40,7 @@ then run `build.cmd pack-weaver`.
     </PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="PolySharp" Version="1.16.0">
+    <PackageReference Include="PolySharp" Version="1.17.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
