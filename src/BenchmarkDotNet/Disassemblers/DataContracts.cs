@@ -1,12 +1,25 @@
-using Gee.External.Capstone;
-using Gee.External.Capstone.Arm64;
+using AsmArm64;
 using Iced.Intel;
 using Microsoft.Diagnostics.Runtime.Interfaces;
-using System.ComponentModel;
-using System.Text.Json;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace BenchmarkDotNet.Disassemblers;
+
+// Based on Capstone definition..
+public enum DisassembleSyntax
+{
+    Default = Masm,
+
+    // x64/x86
+    Att = 1,
+    Intel = 2,
+    Masm = 3,
+
+    // Following enum definitions are added for arm64 platform
+    Gas = 11,  // (Default) GNU assembler inspired style
+    Llvm = 12, // LLVM inspired style
+}
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
 [JsonDerivedType(typeof(Sharp), typeDiscriminator: nameof(Sharp))]
@@ -144,117 +157,32 @@ public sealed class IntelAsm : Asm
 
 public sealed class Arm64Asm : Asm
 {
-    [JsonInclude]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    internal Arm64AsmData Data { get; set; }
+    public Arm64Asm()
+    {
+        InstructionLength = 4;
+    }
+
+    public required uint RawInstruction { get; init; }
+
+    public required DisassembleSyntax DisassembleSyntax { get; init; }
+
+    private Arm64Instruction? _instruction;
 
     [JsonIgnore]
-    public Arm64Instruction? Instruction
+    public Arm64Instruction Instruction
     {
-        get => Data.Instruction;
-        set => Data = Data with { Instruction = value };
-    }
-
-    [JsonIgnore]
-    internal DisassembleSyntax DisassembleSyntax
-    {
-        get => Data.DisassembleSyntax;
-        set => Data = Data with { DisassembleSyntax = value };
-    }
-
-    public override string ToString() => Instruction?.ToString() ?? "";
-
-    // Wrapper class to hold Arm64 instruction and disassemble syntax.
-    [JsonConverter(typeof(Arm64AsmDataConverter))]
-    internal record struct Arm64AsmData
-    {
-        internal DisassembleSyntax DisassembleSyntax { get; set; }
-
-        public Arm64Instruction? Instruction { get; set; }
-    }
-
-    // Custom JsonConverter for Arm64AsmData.
-    internal class Arm64AsmDataConverter : JsonConverter<Arm64AsmData>
-    {
-        private const string Arm64AddressKey = "arm64Address";
-        private const string Arm64BytesKey = "arm64Bytes";
-        private const string Arm64SyntaxKey = "arm64Syntax";
-
-        public override Arm64AsmData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        get
         {
-            if (reader.TokenType != JsonTokenType.StartObject)
-                throw new JsonException();
-
-            long instructionAddress = default;
-            byte[] instructionBytes = [];
-            DisassembleSyntax syntax = DisassembleSyntax.Masm;
-
-            while (reader.Read())
-            {
-                if (reader.TokenType == JsonTokenType.EndObject)
-                    break;
-
-                if (reader.TokenType != JsonTokenType.PropertyName)
-                    throw new JsonException();
-
-                string propertyName = reader.GetString()!;
-                reader.Read();
-
-                switch (propertyName)
-                {
-                    case Arm64AddressKey:
-                        instructionAddress = reader.GetInt64();
-                        break;
-
-                    case Arm64BytesKey:
-                        instructionBytes = reader.GetBytesFromBase64();
-                        break;
-
-                    case Arm64SyntaxKey:
-                        var syntaxValue = reader.GetString()!;
-                        syntax = syntaxValue switch
-                        {
-                            "Intel" => DisassembleSyntax.Intel,
-                            "Att" => DisassembleSyntax.Att,
-                            "Masm" => DisassembleSyntax.Masm,
-                            _ => DisassembleSyntax.Masm,
-                        };
-                        break;
-
-                    default:
-                        throw new NotSupportedException($"Unknown property({propertyName}) found.");
-                }
-            }
-
-            if (reader.TokenType != JsonTokenType.EndObject)
-                throw new JsonException("Invalid JSON");
-
-            using var disassembler = CapstoneFactory.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
-            disassembler.EnableInstructionDetails = true;
-            disassembler.DisassembleSyntax = syntax;
-            var instruction = disassembler.Disassemble(instructionBytes, instructionAddress).SingleOrDefault();
-
-            return new Arm64AsmData
-            {
-                DisassembleSyntax = syntax,
-                Instruction = instruction,
-            };
-        }
-
-        public override void Write(Utf8JsonWriter writer, Arm64AsmData value, JsonSerializerOptions options)
-        {
-            writer.WriteStartObject();
-            writer.WriteString(Arm64SyntaxKey, value.DisassembleSyntax.ToString());
-            var instruction = value.Instruction;
-            if (instruction != null)
-            {
-                writer.WriteNumber(Arm64AddressKey, instruction.Address);
-                writer.WriteBase64String(Arm64BytesKey, instruction.Bytes);
-            }
-            writer.WriteEndObject();
+            _instruction ??= Arm64Instruction.Decode(RawInstruction);
+            return _instruction.Value;
         }
     }
 
+    public override string ToString()
+    {
+        var options = Arm64InstructionFormatter.GetFormattingOptions(Instruction);
+        return Instruction.ToString(options);
+    }
 }
 
 public sealed class MonoCode : SourceCode

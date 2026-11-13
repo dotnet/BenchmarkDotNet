@@ -19,7 +19,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AsmArm64" Version="2.3.0" />
     <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageReference Include="Verify.Xunit" Version="31.12.5" />
@@ -38,7 +37,7 @@
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />
   </ItemGroup>
   <ItemGroup>
-      
+
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
