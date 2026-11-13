@@ -33,11 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             yield return new object[] { Job.Default.GetToolchain() };
 
-            if (!ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies
-                && !OsDetector.IsMacOS()) // currently not supported
-            {
-                yield return new object[] { CsProjNativeAotToolchain.Net10_0 };
-            }
+            yield return new object[] { CsProjNativeAotToolchain.Net10_0 };
         }
 
         [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
