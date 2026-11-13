@@ -62,7 +62,7 @@ public class UnitTestRunner(BuildContext context)
                        .Append("--no-ansi")
                        .AppendSwitch("--progress", "off")
                        .AppendSwitch("--output", consoleLogVerbosity)
-                       .AppendSwitch("--show-stdout", "Failed")
+                       .AppendSwitch("--show-stdout", "All")
                        .Append("--diagnostic")
                        .AppendSwitch("--diagnostic-verbosity", diagnosticVerbosity),
         };

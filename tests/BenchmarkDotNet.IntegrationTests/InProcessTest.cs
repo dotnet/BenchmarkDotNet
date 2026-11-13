@@ -333,7 +333,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithToolchain(InProcessNoEmitToolchain.From(new InProcessNoEmitSettings { ExecuteOnSeparateThread = false }))
                     .WithInvocationCount(UnrollFactor)
                     .WithUnrollFactor(UnrollFactor))
-                .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)
+                .AddLogger(new OutputLogger(Output))
                 .AddColumnProvider(DefaultColumnProviders.Instance);
 
             CanExecute<SameThreadBenchmarkNoEmit>(config);
@@ -362,7 +362,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithToolchain(InProcessNoEmitToolchain.From(new InProcessNoEmitSettings { BenchmarkActionFactory = factory }))
                     .WithInvocationCount(UnrollFactor)
                     .WithUnrollFactor(UnrollFactor))
-                .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)
+                .AddLogger(new OutputLogger(Output))
                 .AddColumnProvider(DefaultColumnProviders.Instance);
 
             var summary = CanExecute<TaskYieldBenchmark>(config);

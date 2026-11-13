@@ -15,9 +15,8 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("UseMonoRuntime option is available in .NET Core only starting from .NET 6, and it's not supported on Windows+Arm", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonWindowsArm, EnvRequirement.NonGitHubDraftPR])]
         public void Mono80IsSupported()
         {
-            var logger = new OutputLogger(Output);
             var config = ManualConfig.CreateEmpty()
-                .AddLogger(logger)
+                .AddLogger(new OutputLogger(Output))
                 .AddJob(Job.Dry.WithRuntime(MonoCoreRuntime.Net80))
                 .WithBuildTimeout(TimeSpan.FromSeconds(240));
             // MonoBenchmark lives in a separate project that targets net8.0, because Mono packages

@@ -44,7 +44,7 @@ public class BenchmarkTestExecutor
             config = CreateSimpleConfig();
 
         if (!config.GetLoggers().OfType<OutputLogger>().Any())
-            config = config.AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
+            config = config.AddLogger(new OutputLogger(Output));
         if (!config.GetLoggers().OfType<ConsoleLogger>().Any())
             config = config.AddLogger(ConsoleLogger.Default);
 
@@ -78,7 +78,7 @@ public class BenchmarkTestExecutor
 
     protected IConfig CreateSimpleConfig(OutputLogger? logger = null, Job? job = null)
     {
-        var baseConfig = job == null ? (IConfig)new SingleRunFastConfig() : new SingleJobConfig(job);
+        var baseConfig = job == null ? (IConfig) new SingleRunFastConfig() : new SingleJobConfig(job);
         return baseConfig
             .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default))
             .AddColumnProvider(DefaultColumnProviders.Instance)

@@ -286,7 +286,6 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithCustomBuildConfiguration("Debug")
 #endif
                 )
-                .AddLogger(DefaultConfig.Instance.GetLoggers().ToArray())
                 .AddColumnProvider(DefaultColumnProviders.Instance)
                 .AddDiagnoser(disassemblyDiagnoser)
                 .AddLogger(new OutputLogger(Output));

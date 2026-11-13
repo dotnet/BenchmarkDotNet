@@ -16,7 +16,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [Fact]
         public void ExtraColumnsCanBeDefined()
         {
-            var logger = new OutputLogger(Output);
             var columns = new[]
             {
                 StatisticColumn.StdDev,
@@ -30,7 +29,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 StatisticColumn.P95,
                 StatisticColumn.P95
             };
-            var config = ManualConfig.CreateEmpty().AddJob(CreateJob()).AddLogger(logger).AddColumn(columns);
+            var config = ManualConfig.CreateEmpty().AddJob(CreateJob()).AddLogger(new OutputLogger(Output)).AddColumn(columns);
             var summary = CanExecute<Benchmarks>(config);
 
             var table = summary.Table;
