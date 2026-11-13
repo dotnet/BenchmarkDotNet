@@ -1,4 +1,5 @@
 using Xunit.Sdk;
+using Xunit.v3;
 
 namespace BenchmarkDotNet.IntegrationTests.Xunit;
 
@@ -8,14 +9,11 @@ namespace BenchmarkDotNet.IntegrationTests.Xunit;
 /// </summary>
 internal sealed class CustomTestCollectionOrderer : ITestCollectionOrderer
 {
-    public const string TypeName = "BenchmarkDotNet.IntegrationTests.Xunit.CustomTestCollectionOrderer";
-
-    public const string AssembyName = "BenchmarkDotNet.IntegrationTests";
-
     /// <inheritdoc/>
-    public IEnumerable<ITestCollection> OrderTestCollections(IEnumerable<ITestCollection> TestCollections)
+    public IReadOnlyCollection<T> OrderTestCollections<T>(IReadOnlyCollection<T> testCollections)
+        where T : ITestCollection
     {
-        var result = TestCollections.ToList();
+        var result = testCollections.ToList();
         result.Sort(Compare);
         return result;
     }
@@ -24,14 +22,14 @@ internal sealed class CustomTestCollectionOrderer : ITestCollectionOrderer
         where TTestCollection : ITestCollection
     {
         // FlakeyTests are ordered before default test collection.
-        var xIsFlaky = x.DisplayName == Constants.FlakyTests;
-        var yIsFlaky = y.DisplayName == Constants.FlakyTests;
+        var xIsFlaky = x.TestCollectionDisplayName == Constants.FlakyTests;
+        var yIsFlaky = y.TestCollectionDisplayName == Constants.FlakyTests;
         if (xIsFlaky != yIsFlaky)
             return xIsFlaky ? -1 : 1;
 
         // LongRunninTests are ordered after default test collection.
-        var xIsLongRunning = x.DisplayName == Constants.LongRunningTests;
-        var yIsLongRunning = y.DisplayName == Constants.LongRunningTests;
+        var xIsLongRunning = x.TestCollectionDisplayName == Constants.LongRunningTests;
+        var yIsLongRunning = y.TestCollectionDisplayName == Constants.LongRunningTests;
         if (xIsLongRunning != yIsLongRunning)
             return xIsLongRunning ? 1 : -1;
 

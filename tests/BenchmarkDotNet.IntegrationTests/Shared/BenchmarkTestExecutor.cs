@@ -1,11 +1,11 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Tests.Loggers;
+using Xunit;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -45,7 +45,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
             var warnings = new WarningCollectingLogger();
-            var summary = BenchmarkRunner.Run(type, GetMinimalConfig(config).AddLogger(warnings));
+            var summary = BenchmarkRunner.Run(type, GetMinimalConfig(config).AddLogger(warnings), cancellationToken: TestContext.Current.CancellationToken);
 
             if (fullValidation)
             {
@@ -62,7 +62,7 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // Make sure we ALWAYS combine the Config (default or passed in) with any Config applied to the Type/Class
             var warnings = new WarningCollectingLogger();
-            var summary = await BenchmarkRunner.RunAsync(type, GetMinimalConfig(config).AddLogger(warnings));
+            var summary = await BenchmarkRunner.RunAsync(type, GetMinimalConfig(config).AddLogger(warnings), cancellationToken: TestContext.Current.CancellationToken);
 
             if (fullValidation)
             {
@@ -79,9 +79,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 config = CreateSimpleConfig();
 
             if (!config.GetLoggers().OfType<OutputLogger>().Any())
-                config = config.AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default);
-            if (!config.GetLoggers().OfType<ConsoleLogger>().Any())
-                config = config.AddLogger(ConsoleLogger.Default);
+                config = config.AddLogger(new OutputLogger(Output));
 
             if (!config.GetColumnProviders().Any())
                 config = config.AddColumnProvider(DefaultColumnProviders.Instance);

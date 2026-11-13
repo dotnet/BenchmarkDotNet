@@ -1,5 +1,6 @@
 using AwesomeAssertions;
 using BenchmarkDotNet.Disassemblers;
+using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Serialization;
 using Gee.External.Capstone;
 using Gee.External.Capstone.Arm64;
@@ -107,6 +108,12 @@ public class DisassemblerModelSerializationTests
     [Fact]
     public void Arm64AsmSerializationTest()
     {
+        // TODO: Remove this temporary workaround after migrated to AsmArm64
+        if (RuntimeInformation.IsFullFramework)
+        {
+            Assert.Skip("Capstone based arm64 disassembler don't works on .NET Framework.");
+        }
+
         // Arrange
         byte[] instructionBytes = [0xE1, 0x0B, 0x40, 0xB9]; // ldr w1, [sp, #8]
         var disassembleSyntax = DisassembleSyntax.Intel;

@@ -633,7 +633,7 @@ public class ArgumentsAttributeAnalyzerTests
         {
             var testCode = /* lang=c#-test */ $$"""
                 using DifferentNamespace;
-                
+
                 using BenchmarkDotNet.Attributes;
 
                 public class BenchmarkClass
@@ -1188,7 +1188,7 @@ public class ArgumentsAttributeAnalyzerTests
         }
 
         public static IEnumerable<string> DummyAttributeUsage
-            => DummyAttributeUsageTheoryData;
+            => DummyAttributeUsageTheoryData.Select(x => x.Data);
 
         public static TheoryData<string> EmptyArgumentsAttributeUsagesWithMismatchingValueCount()
         {

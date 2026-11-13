@@ -1,4 +1,4 @@
-namespace BenchmarkDotNet.IntegrationTests.Xunit
+namespace BenchmarkDotNet.IntegrationTests
 {
     public class MisconfiguredEnvironmentException : Exception
     {

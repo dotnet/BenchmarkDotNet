@@ -57,7 +57,7 @@ namespace BenchmarkDotNet.IntegrationTests
                         .WithConsumeTasksSynchronously(consumeTasksSynchronously))
                 .AddJob(compiledJob)
                 .WithOptions(ConfigOptions.KeepBenchmarkFiles)
-                .AddLogger(logger ?? (Output != null ? new OutputLogger(Output) : ConsoleLogger.Default));
+                .AddLogger(logger);
 
             return config;
         }
@@ -422,7 +422,7 @@ namespace BenchmarkDotNet.IntegrationTests
                     .WithToolchain(InProcessEmitToolchain.From(new InProcessEmitSettings { ExecuteOnSeparateThread = false }))
                     .WithInvocationCount(UnrollFactor)
                     .WithUnrollFactor(UnrollFactor))
-                .AddLogger(Output != null ? new OutputLogger(Output) : ConsoleLogger.Default)
+                .AddLogger(new OutputLogger(Output))
                 .AddColumnProvider(DefaultColumnProviders.Instance);
 
             CanExecute<SameThreadBenchmarkEmit>(config);

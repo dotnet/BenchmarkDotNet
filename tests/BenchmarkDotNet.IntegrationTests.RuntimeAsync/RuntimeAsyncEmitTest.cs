@@ -27,12 +27,11 @@ public class RuntimeAsyncEmitTest(ITestOutputHelper output) : BenchmarkTestExecu
         Assert.NotEmpty(asyncMethods);
         Assert.All(asyncMethods, m => Assert.True(m.MethodImplementationFlags.HasFlag(AsyncMethodImpl), $"{m.Name} is not runtime-async"));
 
-        var logger = new OutputLogger(Output);
         var config = new ManualConfig()
             .AddJob(Job.Dry.WithToolchain(InProcessEmitToolchain.Default).WithInvocationCount(4).WithUnrollFactor(4))
             .AddJob(Job.Dry.WithInvocationCount(4).WithUnrollFactor(4))
             .WithOptions(ConfigOptions.KeepBenchmarkFiles)
-            .AddLogger(logger);
+            .AddLogger(new OutputLogger(Output));
 
         var summary = CanExecute(benchmarkType, config);
 
