@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
@@ -684,6 +685,27 @@ namespace BenchmarkDotNet.Tests
 
             Assert.NotNull(config);
             Assert.Equal(new IntPtr((long) affinity), config.GetJobs().Single().Environment.Affinity);
+        }
+
+        [Fact]
+        public void PerformanceCoresCanNotBeCombinedWithAffinity()
+        {
+            var config = ConfigParser.Parse(["--performanceCores", "--affinity", "1"], new OutputLogger(Output)).config;
+
+            Assert.Null(config);
+        }
+
+        [Fact]
+        public void PerformanceCoresSetTheDetectedAffinity()
+        {
+            var config = ConfigParser.Parse(["--performanceCores"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            ulong? expected = PerformanceCoresDetector.TryGetPerformanceCoresMask();
+            if (expected.HasValue && ConfigParser.TryConvertAffinity(expected.Value, IntPtr.Size, out var affinity))
+                Assert.Equal(affinity, config.GetJobs().Single().Environment.Affinity);
+            else // the CPU has homogeneous cores or the OS is not supported
+                Assert.DoesNotContain(config.GetJobs(), job => job.HasValue(EnvironmentMode.AffinityCharacteristic));
         }
 
         [FactEnvSpecific("A mask with a bit above 32 does not fit in IntPtr on a 32 bit runtime", EnvRequirement.Platform64BitOnly)]

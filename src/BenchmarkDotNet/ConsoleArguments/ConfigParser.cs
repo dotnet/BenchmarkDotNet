@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
@@ -402,6 +403,26 @@ namespace BenchmarkDotNet.ConsoleArguments
             {
                 logger.WriteLineError($"Environment variable value must be separated from the key using '{EnvVarKeyValueSeparator}'. Use --help to see examples.");
                 return false;
+            }
+
+            if (options.PerformanceCores)
+            {
+                if (options.Affinity.HasValue)
+                {
+                    logger.WriteLineError("--performanceCores can't be combined with --affinity.");
+                    return false;
+                }
+
+                ulong? performanceCoresMask = PerformanceCoresDetector.TryGetPerformanceCoresMask();
+                if (performanceCoresMask.HasValue)
+                {
+                    logger.WriteLineInfo($"// Affinitizing the benchmark process to the performance cores (mask 0x{performanceCoresMask.Value:X}).");
+                    options.Affinity = performanceCoresMask;
+                }
+                else
+                {
+                    logger.WriteLineWarning("--performanceCores was provided, but performance cores could not be detected (the CPU has homogeneous cores or the OS is not supported). No affinity is going to be set.");
+                }
             }
 
             if (options.Affinity.HasValue && !TryConvertAffinity(options.Affinity.Value, IntPtr.Size, out _))

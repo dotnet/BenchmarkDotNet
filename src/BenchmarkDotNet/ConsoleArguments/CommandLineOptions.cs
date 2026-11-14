@@ -68,6 +68,9 @@ namespace BenchmarkDotNet.ConsoleArguments
         [Option("affinity", Required = false, HelpText = "Affinity mask to set for the benchmark process")]
         public ulong? Affinity { get; set; }
 
+        [Option("performanceCores", Required = false, Default = false, HelpText = "Affinitizes the benchmark process to the performance cores (P-cores) of CPUs with heterogeneous cores. Windows and Linux only. Can't be combined with --affinity.")]
+        public bool PerformanceCores { get; set; }
+
         [Option("allStats", Required = false, Default = false, HelpText = "Displays all statistics (min, max & more)")]
         public bool DisplayAllStatistics { get; set; }
 
