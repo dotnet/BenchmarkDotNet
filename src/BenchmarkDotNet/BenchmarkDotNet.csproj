@@ -30,7 +30,7 @@
     <PackageReference Include="Microsoft.Diagnostics.Runtime" Version="4.2.751201" />
     <PackageReference Include="Perfolizer" Version="[0.7.5]" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="4.0.0" PrivateAssets="contentfiles;analyzers" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.12.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="11.0.0" />
     <PackageReference Include="System.Text.Json" Version="11.0.0" />
   </ItemGroup>
