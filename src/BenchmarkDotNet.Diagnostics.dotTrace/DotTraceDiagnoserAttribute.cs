@@ -13,6 +13,12 @@ public class DotTraceDiagnoserAttribute : Attribute, IConfigSource
         Config = ManualConfig.CreateEmpty().AddDiagnoser(diagnoser);
     }
 
+    public DotTraceDiagnoserAttribute(bool profileSingleIteration, Uri? nugetUrl = null, string? downloadTo = null)
+    {
+        var diagnoser = new DotTraceDiagnoser(nugetUrl, downloadTo, profileSingleIteration);
+        Config = ManualConfig.CreateEmpty().AddDiagnoser(diagnoser);
+    }
+
     public DotTraceDiagnoserAttribute(Uri? nugetUrl, string? downloadTo = null)
     {
         var diagnoser = new DotTraceDiagnoser(nugetUrl, downloadTo);

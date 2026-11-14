@@ -13,6 +13,12 @@ public class DotMemoryDiagnoserAttribute : Attribute, IConfigSource
         Config = ManualConfig.CreateEmpty().AddDiagnoser(diagnoser);
     }
 
+    public DotMemoryDiagnoserAttribute(bool profileSingleIteration, Uri? nugetUrl = null, string? downloadTo = null)
+    {
+        var diagnoser = new DotMemoryDiagnoser(nugetUrl, downloadTo, profileSingleIteration);
+        Config = ManualConfig.CreateEmpty().AddDiagnoser(diagnoser);
+    }
+
     public DotMemoryDiagnoserAttribute(Uri? nugetUrl, string? downloadTo = null)
     {
         var diagnoser = new DotMemoryDiagnoser(nugetUrl, downloadTo);

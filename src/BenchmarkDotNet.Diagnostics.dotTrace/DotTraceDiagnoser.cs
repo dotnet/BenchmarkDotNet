@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace BenchmarkDotNet.Diagnostics.dotTrace;
 
-public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) : SnapshotProfilerBase
+public class DotTraceDiagnoser(Uri? nugetUrl = null, string? downloadTo = null, bool profileSingleIteration = false) : SnapshotProfilerBase(profileSingleIteration)
 {
     public override string ShortName => "dotTrace";
 
