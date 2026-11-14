@@ -21,17 +21,9 @@ namespace BenchmarkDotNet.Disassemblers
             PrintDefaultOperands = false,
         };
 
-        // TODO: Use copy constructor.
-        internal static readonly Arm64InstructionFormattingOptions BaseInstructionAliasModeFormattingOptions = new()
+        internal static readonly Arm64InstructionFormattingOptions BaseInstructionAliasModeFormattingOptions = new(DefaultFormattingOptions)
         {
             AliasMode = Arm64InstructionAliasMode.BaseInstruction,
-            FormatProvider = CultureInfo.InvariantCulture,
-            ImmediateFormat = Arm64NumericFormat.Auto,
-            LabelOffsetFormat = Arm64NumericFormat.Auto,
-            MemoryOffsetFormat = Arm64NumericFormat.Auto,
-            UseUppercaseHex = false,
-            UseUppercaseText = false,
-            PrintDefaultOperands = false,
         };
 
         /// <summary>
