@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Detectors.Cpu;
+using BenchmarkDotNet.Jobs;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 
@@ -51,28 +52,70 @@ public class PerformanceCoresDetectorTests
     }
 
     [Fact]
-    public void WindowsCpuSetsAreParsed()
+    public void WindowsProcessorCoresAreParsed()
     {
-        // (group, logical processor index, efficiency class)
-        (ushort, byte, byte)[] cpuSets = [(0, 0, 1), (0, 1, 1), (0, 2, 0), (1, 0, 1)];
-        var buffer = cpuSets.SelectMany(cpuSet => CreateCpuSet(cpuSet.Item1, cpuSet.Item2, cpuSet.Item3)).ToArray();
+        // P-cores with hyper-threading (0-1, 2-3), an E-core (4) and a core in another processor group
+        var buffer = CreateProcessorCore(efficiencyClass: 1, group: 0, mask: 0b11)
+            .Concat(CreateProcessorCore(efficiencyClass: 1, group: 0, mask: 0b1100))
+            .Concat(CreateProcessorCore(efficiencyClass: 0, group: 0, mask: 0b10000))
+            .Concat(CreateProcessorCore(efficiencyClass: 1, group: 1, mask: 0b1))
+            .ToArray();
 
-        var processors = PerformanceCoresDetector.ParseWindowsCpuSets(buffer, buffer.Length);
+        var processors = PerformanceCoresDetector.ParseWindowsProcessorCores(buffer, buffer.Length);
 
-        Assert.Equal([(0, 1), (1, 1), (2, 0)], processors);
-        Assert.Equal(0b11UL, PerformanceCoresDetector.BuildMask(processors));
+        Assert.Equal([(0, 1), (1, 1), (2, 1), (3, 1), (4, 0)], processors);
+        Assert.Equal(0b1111UL, PerformanceCoresDetector.BuildMask(processors));
     }
 
-    private static byte[] CreateCpuSet(ushort group, byte logicalProcessorIndex, byte efficiencyClass)
+    [Fact]
+    public void WindowsProcessorCoresWithoutEfficiencyClassAreHomogeneous()
     {
-        const int size = 32; // sizeof(SYSTEM_CPU_SET_INFORMATION)
+        // before Windows 10 the efficiency class is always 0
+        var buffer = CreateProcessorCore(efficiencyClass: 0, group: 0, mask: 0b11)
+            .Concat(CreateProcessorCore(efficiencyClass: 0, group: 0, mask: 0b1100))
+            .ToArray();
+
+        Assert.Null(PerformanceCoresDetector.BuildMask(PerformanceCoresDetector.ParseWindowsProcessorCores(buffer, buffer.Length)));
+    }
+
+    [Fact]
+    public void TruncatedWindowsBufferIsIgnored()
+    {
+        var buffer = CreateProcessorCore(efficiencyClass: 1, group: 0, mask: 0b1);
+
+        Assert.Empty(PerformanceCoresDetector.ParseWindowsProcessorCores(buffer, buffer.Length - 1));
+    }
+
+    [Fact]
+    public void PerformanceCoresAffinityIsAppliedToTheJobWhenDetected()
+    {
+        var job = Job.Dry.WithPerformanceCoresAffinity();
+
+        if (PerformanceCoresDetector.TryGetPerformanceCoresAffinity(out var affinity))
+            Assert.Equal(affinity, job.Environment.Affinity);
+        else // the CPU has homogeneous cores or the OS is not supported
+            Assert.False(job.HasValue(EnvironmentMode.AffinityCharacteristic));
+    }
+
+    /// <summary>
+    /// Creates a SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX entry of type RelationProcessorCore with a single GROUP_AFFINITY.
+    /// </summary>
+    private static byte[] CreateProcessorCore(byte efficiencyClass, ushort group, ulong mask)
+    {
+        // Relationship (4) + Size (4) + PROCESSOR_RELATIONSHIP { Flags (1), EfficiencyClass (1), Reserved (20), GroupCount (2), GROUP_AFFINITY[] }
+        // GROUP_AFFINITY { KAFFINITY Mask (pointer sized), WORD Group, WORD Reserved[3] }
+        const int groupMaskOffset = 32;
+        int size = groupMaskOffset + IntPtr.Size + 4 * sizeof(ushort);
         var entry = new byte[size];
-        BitConverter.GetBytes(size).CopyTo(entry, 0);
-        BitConverter.GetBytes(0).CopyTo(entry, 4); // CpuSetInformation
-        BitConverter.GetBytes(256 + logicalProcessorIndex).CopyTo(entry, 8); // Id
-        BitConverter.GetBytes(group).CopyTo(entry, 12);
-        entry[14] = logicalProcessorIndex;
-        entry[18] = efficiencyClass;
+        BitConverter.GetBytes(0).CopyTo(entry, 0); // RelationProcessorCore
+        BitConverter.GetBytes(size).CopyTo(entry, 4);
+        entry[9] = efficiencyClass;
+        BitConverter.GetBytes((ushort) 1).CopyTo(entry, 30); // GroupCount
+        if (IntPtr.Size == 8)
+            BitConverter.GetBytes(mask).CopyTo(entry, groupMaskOffset);
+        else
+            BitConverter.GetBytes((uint) mask).CopyTo(entry, groupMaskOffset);
+        BitConverter.GetBytes(group).CopyTo(entry, groupMaskOffset + IntPtr.Size);
         return entry;
     }
 }

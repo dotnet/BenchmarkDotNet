@@ -1,5 +1,10 @@
+using BenchmarkDotNet.ConsoleArguments;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.System.SystemInformation;
 
 namespace BenchmarkDotNet.Detectors.Cpu;
 
@@ -21,7 +26,7 @@ internal static class PerformanceCoresDetector
     {
         try
         {
-            if (OsDetector.IsWindows())
+            if (OsDetector.IsWindows7OrLater())
                 return BuildMask(GetWindowsCoreRanks());
             if (OsDetector.IsLinux())
                 return GetLinuxPerformanceCoresMask();
@@ -32,6 +37,17 @@ internal static class PerformanceCoresDetector
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Returns the affinity of the performance cores that can be applied to the current process,
+    /// or <c>false</c> when it can't be detected, when all the cores are of the same type,
+    /// or when the mask does not fit into the current (32 bit) process.
+    /// </summary>
+    internal static bool TryGetPerformanceCoresAffinity(out IntPtr affinity)
+    {
+        affinity = default;
+        return TryGetPerformanceCoresMask() is ulong mask && ConfigParser.TryConvertAffinity(mask, IntPtr.Size, out affinity);
     }
 
     /// <summary>
@@ -121,62 +137,71 @@ internal static class PerformanceCoresDetector
     }
 
     /// <summary>
-    /// Returns the logical processors of processor group 0 together with their efficiency class
+    /// Returns the logical processors of processor group 0 together with the efficiency class of their core
     /// (a higher efficiency class means a more performant core).
     /// </summary>
-    private static IEnumerable<(int Processor, int Rank)> GetWindowsCoreRanks()
+    [SupportedOSPlatform("windows6.1")]
+    private static unsafe IEnumerable<(int Processor, int Rank)> GetWindowsCoreRanks()
     {
-        GetSystemCpuSetInformation(IntPtr.Zero, 0, out uint requiredLength, IntPtr.Zero, 0);
-        if (requiredLength == 0)
+        uint bufferLength = 0;
+        PInvoke.GetLogicalProcessorInformationEx(LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorCore, null, ref bufferLength);
+        var error = (WIN32_ERROR) Marshal.GetLastWin32Error();
+        if (bufferLength == 0 || error != WIN32_ERROR.ERROR_INSUFFICIENT_BUFFER)
             return [];
 
-        var buffer = new byte[requiredLength];
-        var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-        try
+        var buffer = new byte[bufferLength];
+        fixed (byte* bufferPtr = buffer)
         {
-            if (!GetSystemCpuSetInformation(handle.AddrOfPinnedObject(), requiredLength, out requiredLength, IntPtr.Zero, 0))
+            if (!PInvoke.GetLogicalProcessorInformationEx(LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorCore, (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) bufferPtr, &bufferLength))
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
-        finally
-        {
-            handle.Free();
-        }
 
-        return ParseWindowsCpuSets(buffer, (int) requiredLength);
+        return ParseWindowsProcessorCores(buffer, (int) bufferLength);
     }
 
     /// <summary>
-    /// Parses the buffer returned by GetSystemCpuSetInformation (an array of variable sized SYSTEM_CPU_SET_INFORMATION entries).
+    /// Parses the buffer returned by GetLogicalProcessorInformationEx(RelationProcessorCore)
+    /// (an array of variable sized SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX entries).
+    /// The efficiency class is reported per core, so all the logical processors of a core get the same rank.
+    /// Before Windows 10 it's always 0, which is treated as a homogeneous CPU.
     /// </summary>
-    internal static List<(int Processor, int Rank)> ParseWindowsCpuSets(byte[] buffer, int length)
+    internal static unsafe List<(int Processor, int Rank)> ParseWindowsProcessorCores(byte[] buffer, int length)
     {
-        // SYSTEM_CPU_SET_INFORMATION layout:
-        // DWORD Size; CPU_SET_INFORMATION_TYPE Type; struct { DWORD Id; WORD Group; BYTE LogicalProcessorIndex;
-        // BYTE CoreIndex; BYTE LastLevelCacheIndex; BYTE NumaNodeIndex; BYTE EfficiencyClass; ... } CpuSet;
-        const int typeOffset = 4, groupOffset = 12, logicalProcessorIndexOffset = 14, efficiencyClassOffset = 18;
-        const int cpuSetInformation = 0; // CpuSetInformation
-
         var result = new List<(int, int)>();
-        int offset = 0;
-        while (offset + efficiencyClassOffset < length)
+        if (length <= 0 || length > buffer.Length)
+            return result;
+
+        fixed (byte* bufferPtr = buffer)
         {
-            int size = BitConverter.ToInt32(buffer, offset);
-            if (size <= 0 || offset + size > length)
-                break;
-
-            if (BitConverter.ToInt32(buffer, offset + typeOffset) == cpuSetInformation
-                && BitConverter.ToUInt16(buffer, offset + groupOffset) == 0)
+            byte* currentPtr = bufferPtr;
+            byte* endPtr = bufferPtr + length;
+            while (currentPtr < endPtr)
             {
-                result.Add((buffer[offset + logicalProcessorIndexOffset], buffer[offset + efficiencyClassOffset]));
-            }
+                var info = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) currentPtr;
+                uint size = info->Size;
+                if (size == 0 || size > endPtr - currentPtr)
+                    break;
 
-            offset += size;
+                if (info->Relationship == LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorCore)
+                {
+                    ref PROCESSOR_RELATIONSHIP core = ref info->Processor;
+                    for (int i = 0; i < core.GroupCount; i++)
+                    {
+                        GROUP_AFFINITY groupAffinity = core.GroupMask[i];
+                        if (groupAffinity.Group != 0)
+                            continue;
+
+                        ulong mask = groupAffinity.Mask;
+                        for (int processor = 0; processor < MaxMaskProcessorCount; processor++)
+                            if ((mask & (1UL << processor)) != 0)
+                                result.Add((processor, core.EfficiencyClass));
+                    }
+                }
+
+                currentPtr += size;
+            }
         }
 
         return result;
     }
-
-    [DllImport("kernel32", ExactSpelling = true, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetSystemCpuSetInformation(IntPtr information, uint bufferLength, out uint returnedLength, IntPtr process, uint flags);
 }
