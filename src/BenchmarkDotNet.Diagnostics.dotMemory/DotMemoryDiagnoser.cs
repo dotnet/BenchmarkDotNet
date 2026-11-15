@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace BenchmarkDotNet.Diagnostics.dotMemory;
 
-public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null) : SnapshotProfilerBase
+public class DotMemoryDiagnoser(Uri? nugetUrl = null, string? downloadTo = null, bool profileSingleIteration = false) : SnapshotProfilerBase(profileSingleIteration)
 {
     public override string ShortName => "dotMemory";
 

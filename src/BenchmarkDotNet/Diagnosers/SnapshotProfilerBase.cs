@@ -10,8 +10,10 @@ using System.Diagnostics;
 
 namespace BenchmarkDotNet.Diagnosers;
 
-public abstract class SnapshotProfilerBase : IProfiler
+public abstract class SnapshotProfilerBase(bool profileSingleIteration = false) : IProfiler
 {
+    public bool ProfileSingleIteration { get; } = profileSingleIteration;
+
     public abstract string ShortName { get; }
 
     protected abstract void InitTool(Progress progress);
@@ -31,7 +33,9 @@ public abstract class SnapshotProfilerBase : IProfiler
     public IEnumerable<IAnalyser> Analysers => [];
 
     public RunMode GetRunMode(BenchmarkCase benchmarkCase) =>
-        IsSupported(benchmarkCase.GetRuntime()) ? RunMode.ExtraRun : RunMode.None;
+        !IsSupported(benchmarkCase.GetRuntime())
+            ? RunMode.None
+            : ProfileSingleIteration ? RunMode.ExtraIteration : RunMode.ExtraRun;
 
 
     public ValueTask HandleAsync(HostSignal signal, DiagnoserActionParameters parameters, CancellationToken cancellationToken)
@@ -51,11 +55,13 @@ public abstract class SnapshotProfilerBase : IProfiler
             case HostSignal.BeforeAnythingElse:
                 Init(logger);
                 break;
-            case HostSignal.BeforeActualRun:
+            case HostSignal.BeforeActualRun when !ProfileSingleIteration:
+            case HostSignal.BeforeExtraIteration when ProfileSingleIteration:
                 string snapshotFilePath = Start(logger, parameters);
                 snapshotFilePaths.Add(snapshotFilePath);
                 break;
-            case HostSignal.AfterActualRun:
+            case HostSignal.AfterActualRun when !ProfileSingleIteration:
+            case HostSignal.AfterExtraIteration when ProfileSingleIteration:
                 Stop(logger);
                 break;
         }
