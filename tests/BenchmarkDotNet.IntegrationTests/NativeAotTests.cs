@@ -40,9 +40,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR)]
         public void LatestNativeAotVersionIsSupported()
         {
-            if (!GetShouldRunTest())
-                return;
-
             try
             {
                 CanExecute<NativeAotBenchmark>(GetConfig(), allowWarnings: AllowWarnings);
@@ -59,9 +56,6 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR)]
         public void NativeAotSupportsInProcessDiagnosers()
         {
-            if (!GetShouldRunTest())
-                return;
-
             try
             {
                 var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
@@ -89,11 +83,6 @@ namespace BenchmarkDotNet.IntegrationTests
                 BaseMockInProcessDiagnoser.s_completedResults.Clear();
             }
         }
-
-        private static bool GetShouldRunTest()
-            => RuntimeInformation.Is64BitPlatform() // NativeAOT does not support 32bit yet
-                && !ContinuousIntegration.IsGitHubActionsOnWindows() // no native dependencies installed
-                && !OsDetector.IsMacOS(); // currently not supported
     }
 
     public class NativeAotBenchmark
