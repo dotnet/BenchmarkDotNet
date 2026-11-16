@@ -101,7 +101,7 @@ namespace BenchmarkDotNet.Environments
             {
                 string frequency = UnitHelper.Format(ChronometerFrequency.ToMeasurement(FrequencyUnit.Hz));
                 string resolution = UnitHelper.Format(ChronometerResolution.ToMeasurement(), format: "0.000");
-                string timer = HardwareTimerKind.ToString().ToUpper();
+                string timer = HardwareTimerKind.ToString().ToUpperInvariant();
                 yield return $"Frequency: {frequency}, Resolution: {resolution}, Timer: {timer}";
             }
 

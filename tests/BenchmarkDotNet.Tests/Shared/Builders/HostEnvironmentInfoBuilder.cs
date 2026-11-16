@@ -49,6 +49,12 @@ namespace BenchmarkDotNet.Tests.Builders
             return this;
         }
 
+        public HostEnvironmentInfoBuilder WithHardwareTimerKind(HardwareTimerKind kind)
+        {
+            hardwareTimerKind = kind;
+            return this;
+        }
+
         public HostEnvironmentInfoBuilder WithoutDotNetSdkVersion()
         {
             dotNetSdkVersion = "";
