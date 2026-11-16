@@ -6,8 +6,9 @@
     <!-- The WASM benchmarks live in their own project (like the Mono benchmarks) so the WASM toolchain builds/AOT-compiles
          only BenchmarkDotNet + the benchmark, without pulling the xunit test framework into the app (which fails Mono AOT).
          net472 is only there so the (Windows) net472 build of the IntegrationTests project can reference this project;
-         the WASM benchmarks themselves are built for the wasm runtime's TFM (net10.0) by the toolchain. -->
-    <TargetFrameworks>net472;net10.0</TargetFrameworks>
+         the WASM benchmarks themselves are built for the wasm runtime's TFM (net10.0 or net11.0) by the toolchain. -->
+    <TargetFrameworks>net11.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net472</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />

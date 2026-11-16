@@ -33,7 +33,7 @@ namespace BenchmarkDotNet.IntegrationTests
 
             yield return new object[] { Job.Default.GetToolchain() };
 
-            yield return new object[] { CsProjNativeAotToolchain.Net10_0 };
+            yield return new object[] { TestDefaults.CsProjNativeAotToolchain };
         }
 
         [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]

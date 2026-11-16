@@ -61,9 +61,12 @@ namespace BenchmarkDotNet.Tests
         [InlineData("012345678901234567890", 21, "012345678901234567890")] // the default is 20
         [InlineData("0123456789012345678901234567890123456789", 30, "0123456789(...)0123456789 [40]")]
         [InlineData("😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀", 20, "😀😀(...)😀😀 [54]")]
+        // TODO: Remove temporary workaround for https://github.com/microsoft/vstest/issues/16512
+#if NET
         [InlineData("a😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀", 20, "a😀😀(...)😀😀 [55]")]
         [InlineData("😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀b", 20, "😀😀(...)😀😀b [55]")]
         [InlineData("a😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀b", 20, "a😀😀(...)😀😀b [56]")]
+#endif
         public void MaxParameterColumnWidthCanBeCustomized(string initialLongText, int maxParameterColumnWidth, string expectedDisplayText)
         {
             var summaryStyle = SummaryStyle.Default.WithMaxParameterColumnWidth(maxParameterColumnWidth);

@@ -18,6 +18,7 @@ using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -72,7 +73,11 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("We don't want to test NativeAOT twice (.NET Framework and .NET Core)", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR])]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
-            MemoryDiagnoserIsAccurate(CsProjNativeAotToolchain.Net10_0);
+            // TODO: Remove temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/3329
+            if (OsDetector.IsWindows() && RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+                return;
+
+            MemoryDiagnoserIsAccurate(TestDefaults.CsProjNativeAotToolchain);
         }
 
         [FactEnvSpecific("We don't want to test MonoVM twice (.NET Framework and .NET Core), and it's not supported on Windows+Arm",
@@ -103,7 +108,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var arraySizeOverhead = ptrSize * 2; // bounds + max_length
             var intTaskSize = 40; // We can't use CalculateRequiredSpace for AllocateTask since it calculates the size with IntPtr.Size.
 
-            AssertAllocations(CsProjMonoWasmToolchain.Net10_0, typeof(AccurateAllocations), new Dictionary<string, long>
+            AssertAllocations(TestDefaults.CsProjMonoWasmToolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
                 { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },

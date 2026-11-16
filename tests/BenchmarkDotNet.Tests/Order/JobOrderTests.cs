@@ -53,6 +53,7 @@ public class JobOrderTests
         // pass, because OrderBy is stable.
         Job[] jobs =
         [
+            Job.Dry.WithRuntime(CoreRuntime.Core11_0),
             Job.Dry.WithRuntime(CoreRuntime.Core10_0),
             Job.Dry.WithRuntime(CoreRuntime.Core80),
             Job.Dry.WithRuntime(CoreRuntime.Core90),
@@ -71,7 +72,8 @@ public class JobOrderTests
         {
             CoreRuntime.Core80.ToString(),
             CoreRuntime.Core90.ToString(),
-            CoreRuntime.Core10_0.ToString()
+            CoreRuntime.Core10_0.ToString(),
+            CoreRuntime.Core11_0.ToString(),
         };
         Assert.Equal(expected, results);
     }
@@ -82,6 +84,7 @@ public class JobOrderTests
         // Arrange
         Job[] jobs =
         [
+            Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp11_0),
             Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0),
             Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp90),
             Job.Dry.WithToolchain(CsProjCoreToolchain.NetCoreApp80),
@@ -99,6 +102,7 @@ public class JobOrderTests
             CsProjCoreToolchain.NetCoreApp80.ToString(),
             CsProjCoreToolchain.NetCoreApp90.ToString(),
             CsProjCoreToolchain.NetCoreApp10_0.ToString(),
+            CsProjCoreToolchain.NetCoreApp11_0.ToString(),
         };
         Assert.Equal(expected, results);
     }

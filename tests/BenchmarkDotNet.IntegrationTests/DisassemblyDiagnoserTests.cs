@@ -51,12 +51,12 @@ namespace BenchmarkDotNet.IntegrationTests
                 // See: https://github.com/dotnet/BenchmarkDotNet/issues/3086
                 if (RuntimeInformation.GetCurrentPlatform() is Platform.X86 or Platform.X64 && !OsDetector.IsMacOS())
                 {
-                    yield return [Jit.RyuJit, Platform.X64, CsProjCoreToolchain.NetCoreApp10_0]; // .NET Core x64
+                    yield return [Jit.RyuJit, Platform.X64, TestDefaults.CsProjCoreToolchain]; // .NET Core x64
                     // We could add Platform.X86 here, but it would make our CI more complicated.
                 }
                 else if (RuntimeInformation.GetCurrentPlatform() is Platform.Arm64)
                 {
-                    yield return [Jit.RyuJit, Platform.Arm64, CsProjCoreToolchain.NetCoreApp10_0]; // .NET Core arm64
+                    yield return [Jit.RyuJit, Platform.Arm64, TestDefaults.CsProjCoreToolchain]; // .NET Core arm64
                 }
             }
 

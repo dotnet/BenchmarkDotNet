@@ -19,7 +19,7 @@ namespace BenchmarkDotNet.IntegrationTests
             {
                 var config = ManualConfig.CreateEmpty()
                     .AddJob(Job.Dry
-                        .WithToolchain(CsProjR2RToolchain.R2R10_0))
+                        .WithToolchain(TestDefaults.CsProjR2RToolchain))
                     .WithBuildTimeout(TimeSpan.FromSeconds(540));
                 var summary = CanExecute<R2RBenchmark>(config);
 

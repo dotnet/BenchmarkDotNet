@@ -22,5 +22,7 @@ public class JobIdGeneratorTests
         {"Job-XKQDZR", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp90) },
         {"Job-CFYQDH", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp10_0) },
         {"Job-GVKUBM", Job.Default.WithRuntime(CoreRuntime.Core10_0) },
+        {"Job-RXXCDQ", Job.Default.WithToolchain(CsProjCoreToolchain.NetCoreApp11_0) },
+        {"Job-IHFIKV", Job.Default.WithRuntime(CoreRuntime.Core11_0) },
     };
 }
