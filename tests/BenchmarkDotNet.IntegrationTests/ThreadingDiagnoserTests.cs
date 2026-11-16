@@ -14,6 +14,7 @@ using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Tests.XUnit;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -33,7 +34,9 @@ namespace BenchmarkDotNet.IntegrationTests
 
             yield return new object[] { Job.Default.GetToolchain() };
 
-            yield return new object[] { TestDefaults.CsProjNativeAotToolchain };
+            // TODO: Remove temporary workaround for `windows(arm64)`. See: https://github.com/dotnet/BenchmarkDotNet/issues/3329
+            if (!OsDetector.IsWindows() || RuntimeInformation.ProcessArchitecture != Architecture.Arm64)
+                yield return new object[] { TestDefaults.CsProjNativeAotToolchain };
         }
 
         [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
