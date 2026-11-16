@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.IntegrationTests;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Toolchains;
 
@@ -121,10 +122,8 @@ namespace BenchmarkDotNet.Tests
                 Assert.True(runtime is ClrRuntime, $"Actual runtime: {runtime}");
             else
                 Assert.True(runtime is MonoRuntime, $"Actual runtime: {runtime}");
-#elif NET10_0_OR_GREATER
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.Version.Major == 10, $"Actual runtime: {runtime}");
 #else
-            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.Version.Major == 8, $"Actual runtime: {runtime}");
+            Assert.True(runtime is CoreRuntime coreRuntime && coreRuntime.Version.Major == TestDefaults.CoreRuntime.Version.Major, $"Actual runtime: {runtime}");
 #endif
         }
     }
