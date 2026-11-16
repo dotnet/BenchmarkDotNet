@@ -3,6 +3,7 @@ using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Portability;
 using Perfolizer.Horology;
 using Perfolizer.Models;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Linux;
@@ -65,13 +66,13 @@ internal static class LinuxCpuInfoParser
             double nominalCpuBackupFreq = 0.0;
 
             if (nominalFrequencyHasValue &&
-                double.TryParse(nominalFreqValue, out nominalCpuFreq)
+                double.TryParse(nominalFreqValue, NumberStyles.Float, CultureInfo.InvariantCulture, out nominalCpuFreq)
                 && nominalCpuFreq > 0)
             {
                 nominalCpuFreq = nominalFrequency == 0 ? nominalCpuFreq : Math.Min(nominalFrequency, nominalCpuFreq);
             }
             if (nominalFrequencyBackupHasValue &&
-                     double.TryParse(nominalFreqBackupValue, out nominalCpuBackupFreq)
+                     double.TryParse(nominalFreqBackupValue, NumberStyles.Float, CultureInfo.InvariantCulture, out nominalCpuBackupFreq)
                      && nominalCpuBackupFreq > 0)
             {
                 nominalCpuBackupFreq = nominalFrequency == 0 ? nominalCpuBackupFreq : Math.Min(nominalFrequency, nominalCpuBackupFreq);

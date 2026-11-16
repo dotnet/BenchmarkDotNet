@@ -1,3 +1,4 @@
+using System.Globalization;
 using BenchmarkDotNet.Detectors.Cpu.Linux;
 using Perfolizer.Models;
 using static Perfolizer.Horology.Frequency;
@@ -75,6 +76,27 @@ public class LinuxCpuInfoParserTests(ITestOutputHelper output)
             MaxFrequencyHz = 2_500_000_000
         };
         Output.AssertEqual(expected, actual);
+    }
+
+    // /proc/cpuinfo always uses '.' as the decimal separator, whatever the culture.
+    [Theory]
+    [InlineData("de-DE")]
+    [InlineData("tr-TR")]
+    [InlineData("ru-RU")]
+    public void RealOneProcessorFourCoresWithCommaDecimalSeparatorCultureTest(string cultureName)
+    {
+        var initCulture = Thread.CurrentThread.CurrentCulture;
+        try
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo(cultureName);
+            string cpuInfo = TestHelper.ReadTestFile("ProcCpuInfoRealOneProcessorFourCores.txt");
+            var actual = LinuxCpuInfoParser.Parse(cpuInfo, string.Empty);
+            Assert.Equal(2_494_300_000, actual.NominalFrequencyHz);
+        }
+        finally
+        {
+            Thread.CurrentThread.CurrentCulture = initCulture;
+        }
     }
 
     // https://github.com/dotnet/BenchmarkDotNet/issues/2577
