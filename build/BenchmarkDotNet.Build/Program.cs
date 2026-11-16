@@ -1,7 +1,9 @@
+using BenchmarkDotNet.Build.Helpers;
 using BenchmarkDotNet.Build.Meta;
 using BenchmarkDotNet.Build.Options;
 using Cake.Common;
 using Cake.Frosting;
+using System.Linq;
 
 namespace BenchmarkDotNet.Build;
 
@@ -85,7 +87,7 @@ public class InstallWasmToolsWorkload : FrostingTask<BuildContext>, IHelpProvide
 
     public override void Run(BuildContext context)
     {
-        context.BuildRunner.InstallWorkload("wasm-tools"); // It need to specify `wasm-tools-net10` when using newer version of .NET SDK.
+        context.BuildRunner.InstallWorkload("wasm-tools");
     }
 
     public HelpInfo GetHelp()
@@ -159,12 +161,18 @@ public class InTestsFullTask : FrostingTask<BuildContext>, IHelpProvider
 }
 
 [TaskName(Name)]
-[TaskDescription("Run integration tests using .NET 8 (slow)")]
+[TaskDescription("Run integration tests using .NET (slow)")]
 [IsDependentOn(typeof(BuildTask))]
 public class InTestsCoreTask : FrostingTask<BuildContext>, IHelpProvider
 {
     private const string Name = "in-tests-core";
-    public override void Run(BuildContext context) => context.UnitTestRunner.RunInTests("net10.0");
+
+    public override void Run(BuildContext context)
+    {
+        var tfm = Utils.GetTargetFrameworks(context).First();
+        context.UnitTestRunner.RunInTests(tfm);
+    }
+
     public HelpInfo GetHelp() => new();
 }
 

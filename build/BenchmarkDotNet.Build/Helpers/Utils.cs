@@ -67,19 +67,19 @@ public static class Utils
         switch (jobName)
         {
             case "test-windows-core":
-                return ["net10.0"];
+                return ["net11.0"];
 
             case "test-windows-full":
                 return ["net472"];
 
             case "test-linux":
             case "test-macos":
-                return ["net10.0"];
+                return ["net11.0"];
 
             default:
                 return context.IsRunningOnWindows()
-                    ? ["net472", "net10.0"]
-                    : ["net10.0"];
+                    ? ["net11.0", "net472"]
+                    : ["net11.0"];
         }
     }
 }
