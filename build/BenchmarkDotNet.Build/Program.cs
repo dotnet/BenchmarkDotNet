@@ -171,6 +171,7 @@ public class InTestsCoreTask : FrostingTask<BuildContext>, IHelpProvider
     {
         var tfm = Utils.GetTargetFrameworks(context).First();
         context.UnitTestRunner.RunInTests(tfm);
+        context.UnitTestRunner.RunRuntimeAsyncTests(tfm);
     }
 
     public HelpInfo GetHelp() => new();

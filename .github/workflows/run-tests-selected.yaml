@@ -26,6 +26,7 @@ on:
           - tests/BenchmarkDotNet.IntegrationTests
           - tests/BenchmarkDotNet.IntegrationTests.ManualRunning
           - tests/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks
+          - tests/BenchmarkDotNet.IntegrationTests.RuntimeAsync
           - samples/BenchmarkDotNet.Samples
       framework:
         type: choice

@@ -29,6 +29,11 @@ public class UnitTestRunner(BuildContext context)
         .Combine("BenchmarkDotNet.IntegrationTests")
         .CombineWithFilePath("BenchmarkDotNet.IntegrationTests.csproj");
 
+    private FilePath RuntimeAsyncTestsProjectFile { get; } = context.RootDirectory
+        .Combine("tests")
+        .Combine("BenchmarkDotNet.IntegrationTests.RuntimeAsync")
+        .CombineWithFilePath("BenchmarkDotNet.IntegrationTests.RuntimeAsync.csproj");
+
     private DirectoryPath TestOutputDirectory { get; } = context.RootDirectory
         .Combine("TestResults");
 
@@ -85,5 +90,9 @@ public class UnitTestRunner(BuildContext context)
             RunTests(AnalyzerTestsProjectFile, "analyzer", targetFramework);
     }
 
-    public void RunInTests(string tfm) => RunTests(IntegrationTestsProjectFile, "integration", tfm);
+    public void RunInTests(string tfm)
+        => RunTests(IntegrationTestsProjectFile, "integration", tfm);
+
+    public void RunRuntimeAsyncTests(string tfm)
+        => RunTests(RuntimeAsyncTestsProjectFile, "runtimeasync", tfm);
 }

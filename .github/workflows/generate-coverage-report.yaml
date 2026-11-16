@@ -57,6 +57,11 @@ jobs:
         run: |
           dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.IntegrationTests -c Release --no-build --framework net11.0"
 
+      - name: Collect Code Coverage for BenchmarkDotNet.IntegrationTests.RuntimeAsync
+        if: ${{ github.event.inputs.skip_integration_tests == 'false'}}
+        run: |
+          dotnet coverage connect bdn_coverage "dotnet test tests/BenchmarkDotNet.IntegrationTests.RuntimeAsync -c Release --no-build --framework net11.0"
+
       - name: Shutdown dotnet-coverage server.
         run: dotnet coverage shutdown bdn_coverage --timeout 60000
 
