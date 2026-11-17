@@ -101,14 +101,14 @@ namespace BenchmarkDotNet.Validators
         private static bool HasPrivateGenericArguments(Type type) => type.GetGenericArguments().Any(a => !(a.IsPublic || a.IsNestedPublic));
 
         // source: https://stackoverflow.com/a/19562316
-        private static IEnumerable<string> GetCsharpKeywords()
+        internal static IEnumerable<string> GetCsharpKeywords()
         {
             var memberInfos = typeof(SyntaxKind).GetMembers(BindingFlags.Public | BindingFlags.Static);
 
             return from memberInfo in memberInfos
                    where memberInfo.Name.EndsWith("Keyword")
                    orderby memberInfo.Name
-                   select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword", StringComparison.Ordinal)).ToLower();
+                   select memberInfo.Name.Substring(startIndex: 0, length: memberInfo.Name.IndexOf("Keyword", StringComparison.Ordinal)).ToLowerInvariant();
         }
 
         private class BenchmarkMethodEqualityComparer : IEqualityComparer<BenchmarkCase>
