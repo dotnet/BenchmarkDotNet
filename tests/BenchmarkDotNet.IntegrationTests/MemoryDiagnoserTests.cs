@@ -14,11 +14,12 @@ using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Mono;
-using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.Wasm;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -75,6 +76,11 @@ namespace BenchmarkDotNet.IntegrationTests
         {
             // TODO: Remove temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/3329
             if (OsDetector.IsWindows() && RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+                return;
+
+            // TODO: Remove temporary workaround for https://github.com/dotnet/runtime/issues/135603 / https://github.com/dotnet/BenchmarkDotNet/pull/3333#issuecomment-6953337732
+            var cpuName = CpuDetector.Cpu!.ProcessorName!;
+            if (cpuName.Contains("AMD EPYC 9V74") || cpuName.Contains("INTEL XEON PLATINUM 8573C"))
                 return;
 
             MemoryDiagnoserIsAccurate(TestDefaults.CsProjNativeAotToolchain);

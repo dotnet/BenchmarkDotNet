@@ -36,9 +36,13 @@ namespace BenchmarkDotNet.IntegrationTests
 
             // TODO: Remove temporary workaround for `windows(arm64)`. See: https://github.com/dotnet/BenchmarkDotNet/issues/3329
             if (!OsDetector.IsWindows() || RuntimeInformation.ProcessArchitecture != Architecture.Arm64)
-                yield return new object[] { TestDefaults.CsProjNativeAotToolchain };
+            {
+                // TODO: Remove temporary workaround for https://github.com/dotnet/runtime/issues/135603 / https://github.com/dotnet/BenchmarkDotNet/pull/3333#issuecomment-6953337732
+                var cpuName = CpuDetector.Cpu!.ProcessorName!;
+                if (!cpuName.Contains("AMD EPYC 9V74") && !cpuName.Contains("INTEL XEON PLATINUM 8573C"))
+                    yield return new object[] { TestDefaults.CsProjNativeAotToolchain };
+            }
         }
-
         [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void CompletedWorkItemCountIsAccurate(IToolchain toolchain)
