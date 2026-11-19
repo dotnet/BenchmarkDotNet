@@ -121,14 +121,9 @@ namespace BenchmarkDotNet.Extensions
             // disable ReSharper's Dynamic Program Analysis (see https://github.com/dotnet/BenchmarkDotNet/issues/1871 for details)
             start.Environment["JETBRAINS_DPA_AGENT_ENABLE"] = "0";
 
-            var runStrategy = benchmarkCase.Job.ResolveValueAsNullable(RunMode.RunStrategyCharacteristic);
-            if (runStrategy != RunStrategy.ColdStart)
+            if (benchmarkCase.Job.ResolveValueAsNullable(RunMode.RunStrategyCharacteristic) != RunStrategy.ColdStart)
             {
                 SetClrEnvironmentVariables(start, JitInfo.EnvCallCountingDelayMs, "0");
-                if (runStrategy != RunStrategy.Monitoring)
-                {
-                    SetClrEnvironmentVariables(start, JitInfo.EnvOSR, "0");
-                }
             }
 
             if (!benchmarkCase.Job.HasValue(EnvironmentMode.EnvironmentVariablesCharacteristic))
