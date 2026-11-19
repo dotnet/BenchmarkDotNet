@@ -27,13 +27,15 @@ namespace BenchmarkDotNet.IntegrationTests
         private const string WasmAotWindowsArmSkipReason = "WASM AOT does not build on Windows arm64";
 
         [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
-        [InlineDataEnvSpecific([RuntimeMoniker.MonoWasm10_0, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
-        [InlineData(RuntimeMoniker.MonoWasm10_0, "node")]
-        [InlineDataEnvSpecific([RuntimeMoniker.MonoWasmAot10_0, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
-        [InlineDataEnvSpecific([RuntimeMoniker.MonoWasmAot10_0, "node"], WasmAotWindowsArmSkipReason, [EnvRequirement.NonWindowsArm])]
-        // CoreWasm is not tested yet because it is still experimental .
-        //[InlineDataEnvSpecific([RuntimeMoniker.CoreWasm11_0, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
-        //[InlineData(RuntimeMoniker.CoreWasm11_0, "node")]
+        // MonoWasm
+        [InlineDataEnvSpecific([TestDefaults.MonoWasm, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+        [InlineData(TestDefaults.MonoWasm, "node")]
+        // MonoWasmAot
+        [InlineDataEnvSpecific([TestDefaults.MonoWasmAot, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+        [InlineDataEnvSpecific([TestDefaults.MonoWasmAot, "node"], WasmAotWindowsArmSkipReason, [EnvRequirement.NonWindowsArm])]
+        // CoreWasm
+        [InlineDataEnvSpecific([TestDefaults.CoreWasm, "v8"], V8SkipReason, [EnvRequirement.NonWindowsArm, EnvRequirement.NonLinuxArm])]
+        [InlineData(TestDefaults.CoreWasm, "node")]
         public void WasmIsSupported(string runtimeMoniker, string javaScriptEngine)
         {
             CanExecute<WasmBenchmark>(GetConfig(runtimeMoniker, javaScriptEngine));
@@ -47,7 +49,7 @@ namespace BenchmarkDotNet.IntegrationTests
             try
             {
                 var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
-                var config = GetConfig(RuntimeMoniker.MonoWasm10_0, javaScriptEngine).AddDiagnoser(diagnoser);
+                var config = GetConfig(TestDefaults.MonoWasm, javaScriptEngine).AddDiagnoser(diagnoser);
 
                 CanExecute<WasmBenchmark>(config);
 
@@ -66,7 +68,7 @@ namespace BenchmarkDotNet.IntegrationTests
         public void WasmSupportsCustomMainJs(string javaScriptEngine, string customMainJs, WasmIpcType ipcType)
         {
             var mainJsTemplate = new FileInfo(Path.Combine("wwwroot", customMainJs));
-            var summary = CanExecute<WasmBenchmark>(GetConfig(RuntimeMoniker.MonoWasm10_0, javaScriptEngine, mainJsTemplate: mainJsTemplate, ipcType: ipcType));
+            var summary = CanExecute<WasmBenchmark>(GetConfig(TestDefaults.MonoWasm, javaScriptEngine, mainJsTemplate: mainJsTemplate, ipcType: ipcType));
 
             var standardOutput = summary.Reports.Single().ExecuteResults.Single().StandardOutput;
             Assert.Contains($"hello from {customMainJs}", standardOutput);

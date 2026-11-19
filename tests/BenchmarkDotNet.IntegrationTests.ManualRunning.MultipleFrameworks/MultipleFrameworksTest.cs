@@ -17,7 +17,7 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
         [InlineData(RuntimeMoniker.Net462)]
         [InlineData(RuntimeMoniker.Net48)]
         [InlineData(RuntimeMoniker.Net80)]
-        [InlineData(RuntimeMoniker.Net10_0)]
+        [InlineData(RuntimeMoniker.Net11_0)]
         public void EachFrameworkIsRebuilt(string runtime)
         {
             var config = ManualConfig.CreateEmpty().AddJob(Job.Dry.WithRuntime(Runtime.Parse(runtime)).WithEnvironmentVariable(TfmEnvVarName, runtime));
@@ -33,8 +33,8 @@ namespace BenchmarkDotNet.IntegrationTests.ManualRunning
                 RuntimeMoniker.Net48;
 #elif NET8_0
                 RuntimeMoniker.Net80;
-#elif NET10_0
-                RuntimeMoniker.Net10_0;
+#elif NET11_0
+                RuntimeMoniker.Net11_0;
 #else
                 "NotRecognized";
 #endif

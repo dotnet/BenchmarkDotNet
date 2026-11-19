@@ -14,6 +14,7 @@ using BenchmarkDotNet.Toolchains.NativeAot;
 using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Tests.XUnit;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -33,9 +34,15 @@ namespace BenchmarkDotNet.IntegrationTests
 
             yield return new object[] { Job.Default.GetToolchain() };
 
-            yield return new object[] { CsProjNativeAotToolchain.Net10_0 };
+            // TODO: Remove temporary workaround for `windows(arm64)`. See: https://github.com/dotnet/BenchmarkDotNet/issues/3329
+            if (!OsDetector.IsWindows() || RuntimeInformation.ProcessArchitecture != Architecture.Arm64)
+            {
+                // TODO: Remove temporary workaround for https://github.com/dotnet/runtime/issues/135603 / https://github.com/dotnet/BenchmarkDotNet/pull/3333#issuecomment-6953337732
+                var cpuName = CpuDetector.Cpu!.ProcessorName!;
+                if (!cpuName.Contains("AMD EPYC 9V74") && !cpuName.Contains("INTEL XEON PLATINUM 8573C"))
+                    yield return new object[] { TestDefaults.CsProjNativeAotToolchain };
+            }
         }
-
         [TheoryEnvSpecific(EnvRequirement.NonGitHubDraftPR)]
         [MemberData(nameof(GetToolchains), DisableDiscoveryEnumeration = true)]
         public void CompletedWorkItemCountIsAccurate(IToolchain toolchain)

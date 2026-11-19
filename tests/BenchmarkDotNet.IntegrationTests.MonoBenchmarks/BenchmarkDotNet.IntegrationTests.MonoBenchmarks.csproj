@@ -5,7 +5,8 @@
     <AssemblyName>$(AssemblyTitle)</AssemblyName>
     <!-- net8.0 is required for Mono tests (Mono desktop nuget packages are no longer published for net9.0+, see #3000).
         Keeping these benchmarks in their own project means the main IntegrationTests project doesn't need a net8.0 tfm. -->
-    <TargetFrameworks>net472;net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">$(TargetFrameworks);net472</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\BenchmarkDotNet\BenchmarkDotNet.csproj" />

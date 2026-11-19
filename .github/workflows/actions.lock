@@ -38,9 +38,11 @@ workflows:
         - 'wyrihaximus/github-action-create-milestone@v1.1.2'
     '.github/workflows/run-tests-selected.yaml':
         - 'actions/checkout@v7.0.1'
+        - 'actions/setup-dotnet@v6.1.0'
         - 'actions/upload-artifact@v7.0.2'
     '.github/workflows/run-tests.yaml':
         - 'actions/checkout@v7.0.1'
+        - 'actions/setup-dotnet@v6.1.0'
         - 'actions/setup-node@v7.1.0'
         - 'actions/upload-artifact@v7.0.2'
         - 'dorny/test-reporter@v3.2.0'

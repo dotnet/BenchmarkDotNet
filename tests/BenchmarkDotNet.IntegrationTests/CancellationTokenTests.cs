@@ -6,6 +6,7 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.IntegrationTests.Xunit;
+using BenchmarkDotNet.IntegrationTests.WasmBenchmarks;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -116,7 +117,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         var config = ManualConfig.CreateEmpty()
             .AddLogger(logger)
             .AddJob(Job.Dry
-                .WithToolchain(CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net10_0, wasmSettings)))
+                .WithToolchain(CsProjMonoWasmToolchain.From(TestDefaults.MonoWasmRuntime, wasmSettings)))
             .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)
             .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
@@ -180,7 +181,7 @@ public class CancellationTokenTests(ITestOutputHelper output) : BenchmarkTestExe
         var config = ManualConfig.CreateEmpty()
             .AddLogger(logger)
             .AddJob(Job.Dry
-                .WithToolchain(CsProjMonoWasmToolchain.From(MonoWasmRuntime.Net10_0, wasmSettings)))
+                .WithToolchain(CsProjMonoWasmToolchain.From(TestDefaults.MonoWasmRuntime, wasmSettings)))
             .AddDiagnoser(diagnoser)
             .WithBuildTimeout(TimeSpan.FromSeconds(480))
             .WithOption(ConfigOptions.LogBuildOutput, true)

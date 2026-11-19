@@ -8,6 +8,11 @@ description: |
 runs:
   using: composite
   steps:
+    # TODO: Remove this step after GitHub Actions images are updated.
+    - name: Install .NET 11 SDK
+      uses: actions/setup-dotnet@v6.1.0
+      with:
+        dotnet-version: '11.0.x'
 
     - name: Print Node.js version
       shell: bash

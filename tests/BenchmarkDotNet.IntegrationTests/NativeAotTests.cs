@@ -5,9 +5,9 @@ using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.IntegrationTests.Diagnosers;
 using BenchmarkDotNet.IntegrationTests.Xunit;
 using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains.NativeAot;
+using System.Runtime.InteropServices;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -40,6 +40,10 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR)]
         public void LatestNativeAotVersionIsSupported()
         {
+            // TODO: Remove temporary workaround for `windows(arm64)`. See: https://github.com/dotnet/BenchmarkDotNet/issues/3329
+            if (OsDetector.IsWindows() && RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+                return;
+
             try
             {
                 CanExecute<NativeAotBenchmark>(GetConfig(), allowWarnings: AllowWarnings);
@@ -56,6 +60,10 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("It's impossible to reliably detect the version of NativeAOT if the process is not a .NET Core or NativeAOT process", EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR)]
         public void NativeAotSupportsInProcessDiagnosers()
         {
+            // TODO: Remove temporary workaround for `windows(arm64)`. See: https://github.com/dotnet/BenchmarkDotNet/issues/3329
+            if (OsDetector.IsWindows() && RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+                return;
+
             try
             {
                 var diagnoser = new MockInProcessDiagnoser1(BenchmarkDotNet.Diagnosers.RunMode.NoOverhead);
@@ -92,7 +100,7 @@ namespace BenchmarkDotNet.IntegrationTests
         [Benchmark]
         public void Check()
         {
-            if (!RuntimeInformation.IsNativeAOT)
+            if (!Portability.RuntimeInformation.IsNativeAOT)
                 throw new Exception("This is NOT NativeAOT");
 #if NET6_0_OR_GREATER
             if (System.Runtime.Intrinsics.X86.Avx2.IsSupported != bool.Parse(Environment.GetEnvironmentVariable(EnvVarKey)!))

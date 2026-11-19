@@ -26,15 +26,17 @@ on:
           - tests/BenchmarkDotNet.IntegrationTests
           - tests/BenchmarkDotNet.IntegrationTests.ManualRunning
           - tests/BenchmarkDotNet.IntegrationTests.ManualRunning.MultipleFrameworks
+          - tests/BenchmarkDotNet.IntegrationTests.RuntimeAsync
           - samples/BenchmarkDotNet.Samples
       framework:
         type: choice
         description: Specify target framework
         required: true
         options:
-          - net10.0
+          - net11.0
           - net472
           # Following target framework is used for `MultipleFrameworks` tests
+          - net10.0
           - net8.0
           - net462
           - net48

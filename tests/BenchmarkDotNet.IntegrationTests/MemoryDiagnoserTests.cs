@@ -14,10 +14,12 @@ using BenchmarkDotNet.Tests.XUnit;
 using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Toolchains.Mono;
-using BenchmarkDotNet.Toolchains.Wasm;
 using BenchmarkDotNet.Toolchains.NativeAot;
+using BenchmarkDotNet.Toolchains.Wasm;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Xml.Linq;
 
 namespace BenchmarkDotNet.IntegrationTests
 {
@@ -72,7 +74,16 @@ namespace BenchmarkDotNet.IntegrationTests
         [FactEnvSpecific("We don't want to test NativeAOT twice (.NET Framework and .NET Core)", [EnvRequirement.DotNetCoreOnly, EnvRequirement.NonGitHubDraftPR])]
         public void MemoryDiagnoserSupportsNativeAOT()
         {
-            MemoryDiagnoserIsAccurate(CsProjNativeAotToolchain.Net10_0);
+            // TODO: Remove temporary workaround for https://github.com/dotnet/BenchmarkDotNet/issues/3329
+            if (OsDetector.IsWindows() && RuntimeInformation.ProcessArchitecture == Architecture.Arm64)
+                return;
+
+            // TODO: Remove temporary workaround for https://github.com/dotnet/runtime/issues/135603 / https://github.com/dotnet/BenchmarkDotNet/pull/3333#issuecomment-6953337732
+            var cpuName = CpuDetector.Cpu!.ProcessorName!;
+            if (cpuName.Contains("AMD EPYC 9V74") || cpuName.Contains("INTEL XEON PLATINUM 8573C"))
+                return;
+
+            MemoryDiagnoserIsAccurate(TestDefaults.CsProjNativeAotToolchain);
         }
 
         [FactEnvSpecific("We don't want to test MonoVM twice (.NET Framework and .NET Core), and it's not supported on Windows+Arm",
@@ -103,7 +114,7 @@ namespace BenchmarkDotNet.IntegrationTests
             var arraySizeOverhead = ptrSize * 2; // bounds + max_length
             var intTaskSize = 40; // We can't use CalculateRequiredSpace for AllocateTask since it calculates the size with IntPtr.Size.
 
-            AssertAllocations(CsProjMonoWasmToolchain.Net10_0, typeof(AccurateAllocations), new Dictionary<string, long>
+            AssertAllocations(TestDefaults.CsProjMonoWasmToolchain, typeof(AccurateAllocations), new Dictionary<string, long>
             {
                 { nameof(AccurateAllocations.EightBytesArray), 8 + objectAllocationOverhead + arraySizeOverhead },
                 { nameof(AccurateAllocations.SixtyFourBytesArray), 64 + objectAllocationOverhead + arraySizeOverhead },

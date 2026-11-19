@@ -53,13 +53,13 @@ $InstallPath = Join-Path $PSScriptRoot ".dotnet"
 $SdkPath = Join-Path $BuildPath "sdk"
 $GlobalJsonPath = Join-Path $SdkPath "global.json"
 if (!(Test-Path $InstallPath)) {
+    # Temporary workaround for https://github.com/dotnet/install-scripts/issues/750
+    $env:DOTNET_INSTALL_SKIP_TAR = "1"
+
     New-Item -Path $InstallPath -ItemType Directory -Force | Out-Null;
     $ScriptPath = Join-Path $InstallPath 'dotnet-install.ps1'
     (New-Object System.Net.WebClient).DownloadFile($DotNetInstallerUri, $ScriptPath);
-    & $ScriptPath -JSonFile $GlobalJsonPath -InstallDir $InstallPath;
-
-    # Install .NET 8 SDK
-    & $ScriptPath -Channel 8.0 -InstallDir $InstallPath -NoPath;
+    & $ScriptPath -JSonFile $GlobalJsonPath -InstallDir $InstallPath -NoPath;
 }
 
 Remove-PathVariable "$InstallPath"
