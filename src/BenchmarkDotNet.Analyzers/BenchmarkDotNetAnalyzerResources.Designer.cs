@@ -1332,5 +1332,14 @@ namespace BenchmarkDotNet.Analyzers {
             }
         }
 
+        /// <summary>
+        ///   Looks up a localized string similar to Benchmark classes must be public because BenchmarkDotNet discovers and runs their benchmarks through reflection..
+        /// </summary>
+        internal static string General_BenchmarkClass_SuppressCA1515_Justification {
+            get {
+                return ResourceManager.GetString("General_BenchmarkClass_SuppressCA1515_Justification", resourceCulture);
+            }
+        }
+
     }
 }
