@@ -1,6 +1,5 @@
-using Microsoft.Diagnostics.Runtime;
-using Microsoft.Diagnostics.Runtime.Interfaces;
-using System.Buffers.Binary;
+using AsmArm64;
+using BenchmarkDotNet.Disassemblers;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
@@ -21,22 +20,17 @@ public abstract class Arm64DisassemblerTestBase
         Output = output;
     }
 
-    protected void PrintInstructions(Gee.External.Capstone.Arm64.Arm64Instruction[] instructions)
+    protected void PrintInstructions(IEnumerable<Arm64Instruction> instructions)
     {
         foreach (var instruction in instructions)
         {
-            Output.WriteLine(instruction.ToString());
+            var instructionText = Arm64InstructionFormatter.Format(instruction);
+            Output.WriteLine(instructionText);
         }
     }
 
     protected void PrintInstructions(uint[] rawInstructions)
-    {
-        foreach (var rawInstruction in rawInstructions)
-        {
-            var instruction = rawInstruction.ToCapstoneArm64Instruction();
-            Output.WriteLine(instruction.ToString());
-        }
-    }
+        => PrintInstructions(rawInstructions.Select(Arm64Instruction.Decode));
 
     /// <summary>
     /// Create MockClrRuntime with MockDataReader that returns following data.

@@ -1,14 +1,25 @@
+using AsmArm64;
 using AwesomeAssertions;
+using AwesomeAssertions.Equivalency;
 using BenchmarkDotNet.Disassemblers;
 using BenchmarkDotNet.Serialization;
-using Gee.External.Capstone;
-using Gee.External.Capstone.Arm64;
+using BenchmarkDotNet.Tests.Disassemblers;
+using BenchmarkDotNet.Tests.Disassemblers.Arm64;
 using Iced.Intel;
+using static AsmArm64.Arm64RegisterSP;
+using static AsmArm64.Arm64RegisterW;
+using static AsmArm64.Arm64RegisterX;
 
 namespace BenchmarkDotNet.Tests;
 
-public class DisassemblerModelSerializationTests
+public class DisassemblerModelSerializationTests(ITestOutputHelper output) : Arm64DisassemblerTestBase(output)
 {
+    // Check Arm64Instruction equivalency by ToString output.
+    private static EquivalencyOptions<Arm64Asm> ConfigureCustomEquivalency(EquivalencyOptions<Arm64Asm> options)
+        => options
+            .Using<Arm64Instruction>(ctx => ctx.Subject.ToString().Should().Be(ctx.Expectation.ToString()))
+            .When(info => info.Path == "Instruction");
+
     [Fact]
     public void ClrMdArgsSerializationTest()
     {
@@ -108,25 +119,24 @@ public class DisassemblerModelSerializationTests
     public void Arm64AsmSerializationTest()
     {
         // Arrange
-        byte[] instructionBytes = [0xE1, 0x0B, 0x40, 0xB9]; // ldr w1, [sp, #8]
-        var disassembleSyntax = DisassembleSyntax.Intel;
+        var rawInstruction = Arm64InstructionFactory.LDR(W1, new Arm64ImmediateMemoryAccessor(SP, 8)); // ldr w1, [sp, #8]
+        byte[] instructionBytes = rawInstruction.ToLittleEndianBytes();
 
-        // Create instruction instance by using disassembler.
-        using var disassembler = CapstoneFactory.CreateArm64Disassembler(Arm64DisassembleMode.Arm);
-        disassembler.EnableInstructionDetails = true;
-        disassembler.DisassembleSyntax = disassembleSyntax;
+        using var clrRuntime = new MockMemory().ToMockClrRuntime();
+        var state = new State(clrRuntime, DummyTargetFrameworkVersion);
+
+        var helper = new Arm64DisassemblerHelper();
 
         // Act
-        var instructions = disassembler.Disassemble(instructionBytes);
+        var instructions = helper.Decode(instructionBytes, 0, state, 0, DummyCurrentMethod, Diagnosers.DisassemblySyntax.Att);
         var instruction = instructions.Single();
 
         var model = new Arm64Asm
         {
-            DisassembleSyntax = disassembleSyntax,
-            Instruction = instruction,
-            InstructionLength = instruction.Bytes.Length,
-            InstructionPointer = (ulong) instruction.Address,
-            ReferencedAddress = (instruction.Address > ushort.MaxValue) ? (ulong) instruction.Address : null,
+            InstructionPointer = instruction.InstructionPointer,
+            RawInstruction = instruction.RawInstruction,
+            DisassembleSyntax = instruction.DisassembleSyntax,
+            ReferencedAddress = (instruction.ReferencedAddress > ushort.MaxValue) ? instruction.ReferencedAddress : null,
             IsReferencedAddressIndirect = true, // Test with dummy value
         };
 
@@ -137,13 +147,12 @@ public class DisassemblerModelSerializationTests
         // Assert
         json.Should().NotBe("{}");
 
-        // Compare properties (Except  for`Instruction.Details.Operands` property that )
+        // Compare properties
         result.Should().NotBeNull();
         result.Instruction.Should().NotBeNull();
         result.Instruction.ToString().Should().Be("ldr w1, [sp, #8]");
 
-        result.Should()
-              .BeEquivalentTo(model, options => options.Excluding(x => x.Instruction!.Details.Operands));
+        result.Should().BeEquivalentTo(model, ConfigureCustomEquivalency);
     }
 
     [Fact]

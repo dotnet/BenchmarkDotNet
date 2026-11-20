@@ -1,14 +1,12 @@
-// TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
-#if NET
 using AsmArm64;
 using AwesomeAssertions;
 using BenchmarkDotNet.Disassemblers;
-using static AsmArm64.Arm64RegisterX;
 using static AsmArm64.Arm64RegisterW;
+using static AsmArm64.Arm64RegisterX;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
-public partial class Arm64DisassemblerTests
+public partial class Arm64DisassemblerTests : Arm64DisassemblerTestBase
 {
     private const int DmbIshldOffset = 4;
 
@@ -245,4 +243,3 @@ public partial class Arm64DisassemblerTests
         result.Should().BeFalse();
     }
 }
-#endif
