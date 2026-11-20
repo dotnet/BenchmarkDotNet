@@ -1,6 +1,7 @@
 using BenchmarkDotNet.Helpers;
 using JetBrains.Annotations;
 using Perfolizer.Mathematics.Common;
+using System.Collections.Frozen;
 using System.Globalization;
 using System.Text;
 
@@ -76,7 +77,7 @@ public enum LegacyConfidenceLevel
 
 public static class ConfidenceLevelExtensions
 {
-    private static readonly Dictionary<LegacyConfidenceLevel, (int value, int digits)> ConfidenceLevelDetails = CreateConfidenceLevelMapping();
+    private static readonly FrozenDictionary<LegacyConfidenceLevel, (int value, int digits)> ConfidenceLevelDetails = FrozenDictionary.Create(CreateConfidenceLevelMapping().ToArray());
 
     /// <summary>
     /// Calculates Z value (z-star) for confidence interval
