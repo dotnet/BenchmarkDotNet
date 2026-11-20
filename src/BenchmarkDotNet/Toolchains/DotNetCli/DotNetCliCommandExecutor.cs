@@ -109,7 +109,7 @@ namespace BenchmarkDotNet.Toolchains.DotNetCli
             process.WaitForExit();
 
             // first line contains something like ".NET Command Line Tools (1.0.0-beta-001603)"
-            return Regex.Split(output, Environment.NewLine, RegexOptions.Compiled)
+            return output.Split([Environment.NewLine], StringSplitOptions.None)
                 .FirstOrDefault(line => line.IsNotBlank()) ?? "";
         }
 
