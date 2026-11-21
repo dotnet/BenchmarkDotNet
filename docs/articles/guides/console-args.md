@@ -270,6 +270,7 @@ dotnet run -c Release -- --filter * --runtimes net6.0 net8.0 --statisticalTest 5
 * `-a, --artifacts`           Valid path to accessible directory
 * `--outliers`                (Default: RemoveUpper) `DontRemove`/`RemoveUpper`/`RemoveLower`/`RemoveAll`
 * `--affinity`                Affinity mask to set for the benchmark process
+* `--performanceCores`        (Default: false) Affinitizes the benchmark process to the performance cores (P-cores) of CPUs with heterogeneous cores. Windows and Linux only. Can't be combined with `--affinity`
 * `--allStats`                (Default: false) Displays all statistics (min, max & more)
 * `--allCategories`           Categories to run. If few are provided, only the benchmarks which belong to all of them are going to be executed
 * `--anyCategories`           Any Categories to run

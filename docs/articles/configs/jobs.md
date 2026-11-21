@@ -73,6 +73,7 @@ Like `--anyCategories` and `--allCategories`, the filter is inclusion only: a jo
   * `RyuJit` (available only for `Runtime.Clr` and `Runtime.Core`)
   * `Llvm` (available only for `Runtime.Mono`)
 * `Affinity`: [Affinity](https://msdn.microsoft.com/library/system.diagnostics.process.processoraffinity.aspx) of a benchmark process
+  * `job.WithPerformanceCoresAffinity()` sets it to the performance cores (P-cores) of CPUs with heterogeneous cores (Windows and Linux only, the job is left unchanged when they can't be detected). The `--performanceCores` console argument does the same.
 * `GcMode`: settings of Garbage Collector
   * `Server`: `true` (Server mode) or `false` (Workstation mode)
   * `Concurrent`:  `true` (Concurrent mode) or `false` (NonConcurrent mode)
