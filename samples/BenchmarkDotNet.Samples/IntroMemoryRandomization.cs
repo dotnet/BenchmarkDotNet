@@ -2,6 +2,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkDotNet.Samples
 {
+    [UseLocalJobOnly]
     public class IntroMemoryRandomization
     {
         [Params(512 * 4)]
