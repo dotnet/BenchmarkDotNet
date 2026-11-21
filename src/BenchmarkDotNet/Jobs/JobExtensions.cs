@@ -2,6 +2,7 @@ using BenchmarkDotNet.Analysers;
 using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains;
@@ -32,11 +33,18 @@ namespace BenchmarkDotNet.Jobs
         /// <summary>
         /// Affinitizes the benchmark process to the performance cores (P-cores) of CPUs with heterogeneous cores
         /// (e.g. Intel hybrid architectures or Arm big.LITTLE). Windows and Linux only.
-        /// The performance cores are detected when this method is called; if they can't be detected
-        /// (the CPU has homogeneous cores or the OS is not supported), the job is returned unchanged.
+        /// The performance cores are detected once per process; if they can't be detected (the CPU has homogeneous cores,
+        /// the OS is not supported or none of them is available to the process), a warning is written to the console
+        /// and the job is returned unchanged.
         /// </summary>
         public static Job WithPerformanceCoresAffinity(this Job job)
-            => PerformanceCoresDetector.TryGetPerformanceCoresAffinity(out var affinity) ? job.WithAffinity(affinity) : job;
+        {
+            if (PerformanceCoresDetector.TryGetPerformanceCoresAffinity(out var affinity))
+                return job.WithAffinity(affinity);
+
+            PerformanceCoresDetector.WarnNotDetectedOnce(ConsoleLogger.Default);
+            return job;
+        }
 
         /// <summary>
         /// Specifies whether the common language runtime runs server garbage collection.

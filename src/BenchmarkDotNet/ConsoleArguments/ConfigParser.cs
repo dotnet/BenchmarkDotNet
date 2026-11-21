@@ -413,38 +413,22 @@ namespace BenchmarkDotNet.ConsoleArguments
                     return false;
                 }
 
+                // Don't write the mask to options.Affinity: TryUpdateArgs re-serializes the options and the result
+                // would combine --affinity with --performanceCores. The mask is applied in GetBaseJob.
                 ulong? performanceCoresMask = PerformanceCoresDetector.TryGetPerformanceCoresMask();
                 if (performanceCoresMask.HasValue)
-                {
                     logger.WriteLineInfo($"// Affinitizing the benchmark process to the performance cores (mask 0x{performanceCoresMask.Value:X}).");
-                    options.Affinity = performanceCoresMask;
-                }
                 else
-                {
-                    logger.WriteLineWarning("--performanceCores was provided, but performance cores could not be detected (the CPU has homogeneous cores or the OS is not supported). No affinity is going to be set.");
-                }
+                    logger.WriteLineWarning("--performanceCores was provided, but performance cores could not be detected (the CPU has homogeneous cores, the OS is not supported or none of them is available to the process). No affinity is going to be set.");
             }
 
-            if (options.Affinity.HasValue && !TryConvertAffinity(options.Affinity.Value, IntPtr.Size, out _))
+            if (options.Affinity.HasValue && !ProcessExtensions.TryConvertAffinity(options.Affinity.Value, IntPtr.Size, out _))
             {
                 logger.WriteLineError($"The provided affinity mask 0x{options.Affinity.Value:X} does not fit into the {IntPtr.Size * 8} bit process that hosts the benchmarks. Use a mask of at most 32 bits or run in a 64 bit process.");
                 return false;
             }
 
             return true;
-        }
-
-        // a 32 bit process only reaches the first 32 processors and new IntPtr(long) throws there instead of truncating
-        internal static bool TryConvertAffinity(ulong mask, int pointerSize, out IntPtr affinity)
-        {
-            if (pointerSize >= 8)
-            {
-                affinity = new IntPtr(unchecked((long) mask));
-                return true;
-            }
-
-            affinity = new IntPtr(unchecked((int) mask));
-            return mask <= uint.MaxValue;
         }
 
         private static IConfig CreateConfig(CommandLineOptions options, IConfig? globalConfig, string[] args)
@@ -533,8 +517,10 @@ namespace BenchmarkDotNet.ConsoleArguments
             if (baseJob != Job.Dry && options.Outliers != OutlierMode.RemoveUpper)
                 baseJob = baseJob.WithOutlierMode(options.Outliers);
 
-            if (options.Affinity.HasValue && TryConvertAffinity(options.Affinity.Value, IntPtr.Size, out var affinity))
+            if (options.Affinity.HasValue && ProcessExtensions.TryConvertAffinity(options.Affinity.Value, IntPtr.Size, out var affinity))
                 baseJob = baseJob.WithAffinity(affinity);
+            else if (options.PerformanceCores && PerformanceCoresDetector.TryGetPerformanceCoresAffinity(out var performanceCoresAffinity))
+                baseJob = baseJob.WithAffinity(performanceCoresAffinity);
 
             if (options.LaunchCount.HasValue)
                 baseJob = baseJob.WithLaunchCount(options.LaunchCount.Value);

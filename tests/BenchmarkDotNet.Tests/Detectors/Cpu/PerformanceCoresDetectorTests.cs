@@ -6,7 +6,7 @@ namespace BenchmarkDotNet.Tests.Detectors.Cpu;
 public class PerformanceCoresDetectorTests
 {
     [Fact]
-    public void MaskContainsOnlyTheProcessorsWithTheHighestRank()
+    public void MaskExcludesTheProcessorsWithTheLowestRank()
     {
         // 4 P-cores with hyper-threading (0-7) and 4 E-cores (8-11), like an Intel hybrid CPU
         var processors = Enumerable.Range(0, 8).Select(cpu => (cpu, 1))
@@ -16,12 +16,23 @@ public class PerformanceCoresDetectorTests
     }
 
     [Fact]
-    public void MaskSupportsMoreThanTwoCoreTypes()
+    public void MaskKeepsAllTheNonEfficiencyCoresOfCpusWithMoreThanTwoCoreTypes()
     {
         // Arm DynamIQ: little (0-3), big (4-6) and prime (7) cores
         (int, int)[] processors = [(0, 160), (1, 160), (2, 160), (3, 160), (4, 768), (5, 768), (6, 768), (7, 1024)];
 
-        Assert.Equal(1UL << 7, PerformanceCoresDetector.BuildMask(processors));
+        Assert.Equal(0b1111_0000UL, PerformanceCoresDetector.BuildMask(processors));
+    }
+
+    [Theory]
+    [InlineData(0xFFUL, null, 8, 0xFFUL)]
+    [InlineData(0xFFUL, 0xF0FUL, 8, 0x0FUL)] // partial overlap with the process affinity (e.g. taskset)
+    [InlineData(0xFFUL, 0xF00UL, 8, null)] // only efficiency cores are available (e.g. docker --cpuset-cpus=8-11)
+    [InlineData(0xFFUL << 28, null, 4, 0xFUL << 28)] // a 32 bit process only reaches the first 32 processors
+    [InlineData(0xFFUL << 32, null, 4, null)]
+    public void MaskIsRestrictedToTheProcessorsAvailableToTheProcess(ulong mask, ulong? processAffinity, int pointerSize, ulong? expected)
+    {
+        Assert.Equal(expected, PerformanceCoresDetector.RestrictToAvailableProcessors(mask, processAffinity, pointerSize));
     }
 
     [Fact]
@@ -54,17 +65,37 @@ public class PerformanceCoresDetectorTests
     [Fact]
     public void WindowsProcessorCoresAreParsed()
     {
-        // P-cores with hyper-threading (0-1, 2-3), an E-core (4) and a core in another processor group
+        // P-cores with hyper-threading (0-1, 2-3) and an E-core (4)
         var buffer = CreateProcessorCore(efficiencyClass: 1, group: 0, mask: 0b11)
             .Concat(CreateProcessorCore(efficiencyClass: 1, group: 0, mask: 0b1100))
             .Concat(CreateProcessorCore(efficiencyClass: 0, group: 0, mask: 0b10000))
-            .Concat(CreateProcessorCore(efficiencyClass: 1, group: 1, mask: 0b1))
             .ToArray();
 
-        var processors = PerformanceCoresDetector.ParseWindowsProcessorCores(buffer, buffer.Length);
+        var processors = PerformanceCoresDetector.ParseWindowsProcessorCores(buffer);
 
         Assert.Equal([(0, 1), (1, 1), (2, 1), (3, 1), (4, 0)], processors);
         Assert.Equal(0b1111UL, PerformanceCoresDetector.BuildMask(processors));
+    }
+
+    [Fact]
+    public void WindowsMachinesWithMoreThanOneProcessorGroupAreNotSupported()
+    {
+        // the benchmark process may be assigned to group 1, where the group 0 mask means arbitrary cores
+        var buffer = CreateProcessorCore(efficiencyClass: 1, group: 0, mask: 0b11)
+            .Concat(CreateProcessorCore(efficiencyClass: 0, group: 0, mask: 0b100))
+            .Concat(CreateProcessorCore(efficiencyClass: 1, group: 1, mask: 0b1))
+            .ToArray();
+
+        Assert.Empty(PerformanceCoresDetector.ParseWindowsProcessorCores(buffer));
+    }
+
+    [Fact]
+    public void WindowsEntryWithGroupCountBeyondItsSizeIsIgnored()
+    {
+        var buffer = CreateProcessorCore(efficiencyClass: 1, group: 0, mask: 0b1);
+        BitConverter.GetBytes((ushort) 2).CopyTo(buffer, 30); // GroupCount
+
+        Assert.Empty(PerformanceCoresDetector.ParseWindowsProcessorCores(buffer));
     }
 
     [Fact]
@@ -75,7 +106,7 @@ public class PerformanceCoresDetectorTests
             .Concat(CreateProcessorCore(efficiencyClass: 0, group: 0, mask: 0b1100))
             .ToArray();
 
-        Assert.Null(PerformanceCoresDetector.BuildMask(PerformanceCoresDetector.ParseWindowsProcessorCores(buffer, buffer.Length)));
+        Assert.Null(PerformanceCoresDetector.BuildMask(PerformanceCoresDetector.ParseWindowsProcessorCores(buffer)));
     }
 
     [Fact]
@@ -83,7 +114,8 @@ public class PerformanceCoresDetectorTests
     {
         var buffer = CreateProcessorCore(efficiencyClass: 1, group: 0, mask: 0b1);
 
-        Assert.Empty(PerformanceCoresDetector.ParseWindowsProcessorCores(buffer, buffer.Length - 1));
+        Assert.Empty(PerformanceCoresDetector.ParseWindowsProcessorCores(buffer.Take(buffer.Length - 1).ToArray()));
+        Assert.Empty(PerformanceCoresDetector.ParseWindowsProcessorCores(buffer.Take(4).ToArray())); // not even a complete header
     }
 
     [Fact]

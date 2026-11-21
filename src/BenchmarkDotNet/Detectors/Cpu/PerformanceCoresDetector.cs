@@ -1,9 +1,8 @@
-using BenchmarkDotNet.ConsoleArguments;
-using System.ComponentModel;
-using System.Runtime.InteropServices;
+using BenchmarkDotNet.Detectors.Cpu.Windows;
+using BenchmarkDotNet.Extensions;
+using BenchmarkDotNet.Loggers;
+using System.Diagnostics;
 using System.Runtime.Versioning;
-using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.System.SystemInformation;
 
 namespace BenchmarkDotNet.Detectors.Cpu;
@@ -18,40 +17,63 @@ internal static class PerformanceCoresDetector
     // An affinity mask can describe at most 64 processors (Windows processor group 0).
     private const int MaxMaskProcessorCount = 64;
 
-    /// <summary>
-    /// Returns the affinity mask of the performance cores,
-    /// or <c>null</c> when it can't be detected or when all the cores are of the same type.
-    /// </summary>
-    internal static ulong? TryGetPerformanceCoresMask()
-    {
-        try
-        {
-            if (OsDetector.IsWindows7OrLater())
-                return BuildMask(GetWindowsCoreRanks());
-            if (OsDetector.IsLinux())
-                return GetLinuxPerformanceCoresMask();
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or Win32Exception or EntryPointNotFoundException or DllNotFoundException)
-        {
-            // the information is not available, the caller treats it as "not detected"
-        }
+    // SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX header, then
+    // PROCESSOR_RELATIONSHIP { BYTE Flags; BYTE EfficiencyClass; BYTE Reserved[20]; WORD GroupCount; GROUP_AFFINITY GroupMask[]; }
+    private const int GroupMaskOffset = LogicalProcessorInformation.HeaderSize + 2 + 20 + sizeof(ushort);
 
-        return null;
-    }
+    // The hardware does not change while the process is running, so it is probed only once.
+    private static readonly Lazy<ulong?> CachedMask = new (DetectPerformanceCoresMask);
+
+    /// <summary>
+    /// Returns the affinity mask of the performance cores that the current process may run on,
+    /// or <c>null</c> when it can't be detected, when all the cores are of the same type,
+    /// or when none of the performance cores is available to the current process.
+    /// </summary>
+    internal static ulong? TryGetPerformanceCoresMask() => CachedMask.Value;
 
     /// <summary>
     /// Returns the affinity of the performance cores that can be applied to the current process,
-    /// or <c>false</c> when it can't be detected, when all the cores are of the same type,
-    /// or when the mask does not fit into the current (32 bit) process.
+    /// or <c>false</c> when <see cref="TryGetPerformanceCoresMask"/> returns <c>null</c>.
     /// </summary>
     internal static bool TryGetPerformanceCoresAffinity(out IntPtr affinity)
     {
         affinity = default;
-        return TryGetPerformanceCoresMask() is ulong mask && ConfigParser.TryConvertAffinity(mask, IntPtr.Size, out affinity);
+        return TryGetPerformanceCoresMask() is ulong mask && ProcessExtensions.TryConvertAffinity(mask, IntPtr.Size, out affinity);
+    }
+
+    private static int notDetectedWarningWritten;
+
+    /// <summary>
+    /// Writes (once per process) that the performance cores affinity was requested but could not be applied.
+    /// </summary>
+    internal static void WarnNotDetectedOnce(ILogger logger)
+    {
+        if (Interlocked.Exchange(ref notDetectedWarningWritten, 1) == 0)
+            logger.WriteLineWarning("// The performance cores affinity was requested, but performance cores could not be detected (the CPU has homogeneous cores, the OS is not supported or none of them is available to the process). No affinity is going to be set.");
+    }
+
+    private static ulong? DetectPerformanceCoresMask()
+    {
+        try
+        {
+            ulong? mask = null;
+            if (OsDetector.IsWindows7OrLater() && !Portability.RuntimeInformation.IsMono)
+                mask = BuildMask(GetWindowsCoreRanks());
+            else if (OsDetector.IsLinux())
+                mask = GetLinuxPerformanceCoresMask();
+
+            return RestrictToAvailableProcessors(mask, GetCurrentProcessAffinity(), IntPtr.Size);
+        }
+        catch
+        {
+            // This is a best-effort probe, the caller treats any failure as "not detected".
+            return null;
+        }
     }
 
     /// <summary>
-    /// Builds an affinity mask out of the processors with the highest rank.
+    /// Builds an affinity mask out of all the processors except the ones with the lowest rank (the efficiency cores),
+    /// so CPUs with more than two core types (e.g. Arm prime + big + little) keep all their non-efficiency cores.
     /// Returns <c>null</c> when there are no processors or when all of them have the same rank (homogeneous CPU).
     /// </summary>
     internal static ulong? BuildMask(IEnumerable<(int Processor, int Rank)> processors)
@@ -60,16 +82,42 @@ internal static class PerformanceCoresDetector
         if (list.Count == 0)
             return null;
 
-        int maxRank = list.Max(p => p.Rank);
-        if (list.All(p => p.Rank == maxRank))
+        int minRank = list.Min(p => p.Rank);
+        if (list.All(p => p.Rank == minRank))
             return null;
 
         ulong mask = 0;
         foreach (var (processor, rank) in list)
-            if (rank == maxRank)
+            if (rank > minRank)
                 mask |= 1UL << processor;
 
         return mask;
+    }
+
+    /// <summary>
+    /// Keeps only the processors the current process can use: the ones of its affinity (cgroup cpuset, taskset, job object...)
+    /// and, in a 32 bit process, the first 32 ones. Returns <c>null</c> when none of them is left.
+    /// </summary>
+    internal static ulong? RestrictToAvailableProcessors(ulong? mask, ulong? processAffinity, int pointerSize)
+    {
+        if (mask is not ulong result)
+            return null;
+
+        if (pointerSize < 8)
+            result &= uint.MaxValue;
+        if (processAffinity.HasValue)
+            result &= processAffinity.Value;
+
+        return result == 0 ? null : result;
+    }
+
+    private static ulong? GetCurrentProcessAffinity()
+    {
+        using var process = Process.GetCurrentProcess();
+        if (process.TryGetAffinity() is not IntPtr affinity)
+            return null;
+
+        return IntPtr.Size >= 8 ? unchecked((ulong) affinity.ToInt64()) : unchecked((uint) affinity.ToInt32());
     }
 
     /// <summary>
@@ -137,71 +185,53 @@ internal static class PerformanceCoresDetector
     }
 
     /// <summary>
-    /// Returns the logical processors of processor group 0 together with the efficiency class of their core
+    /// Returns the logical processors together with the efficiency class of their core
     /// (a higher efficiency class means a more performant core).
     /// </summary>
     [SupportedOSPlatform("windows6.1")]
-    private static unsafe IEnumerable<(int Processor, int Rank)> GetWindowsCoreRanks()
+    private static IEnumerable<(int Processor, int Rank)> GetWindowsCoreRanks()
     {
-        uint bufferLength = 0;
-        PInvoke.GetLogicalProcessorInformationEx(LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorCore, null, ref bufferLength);
-        var error = (WIN32_ERROR) Marshal.GetLastWin32Error();
-        if (bufferLength == 0 || error != WIN32_ERROR.ERROR_INSUFFICIENT_BUFFER)
-            return [];
-
-        var buffer = new byte[bufferLength];
-        fixed (byte* bufferPtr = buffer)
-        {
-            if (!PInvoke.GetLogicalProcessorInformationEx(LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorCore, (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) bufferPtr, &bufferLength))
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-        }
-
-        return ParseWindowsProcessorCores(buffer, (int) bufferLength);
+        var buffer = LogicalProcessorInformation.Read(LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorCore);
+        return buffer == null ? [] : ParseWindowsProcessorCores(buffer);
     }
 
     /// <summary>
-    /// Parses the buffer returned by GetLogicalProcessorInformationEx(RelationProcessorCore)
-    /// (an array of variable sized SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX entries).
+    /// Parses the buffer returned by GetLogicalProcessorInformationEx(RelationProcessorCore).
     /// The efficiency class is reported per core, so all the logical processors of a core get the same rank.
     /// Before Windows 10 it's always 0, which is treated as a homogeneous CPU.
+    /// Machines with more than one processor group are not supported (an empty list is returned):
+    /// the affinity mask applies to the primary group of the benchmark process, which is not necessarily group 0.
     /// </summary>
-    internal static unsafe List<(int Processor, int Rank)> ParseWindowsProcessorCores(byte[] buffer, int length)
+    internal static unsafe List<(int Processor, int Rank)> ParseWindowsProcessorCores(byte[] buffer)
     {
         var result = new List<(int, int)>();
-        if (length <= 0 || length > buffer.Length)
-            return result;
+        bool multipleGroups = false;
 
-        fixed (byte* bufferPtr = buffer)
+        LogicalProcessorInformation.ForEachEntry(buffer, info =>
         {
-            byte* currentPtr = bufferPtr;
-            byte* endPtr = bufferPtr + length;
-            while (currentPtr < endPtr)
+            if (info->Relationship != LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorCore || info->Size < GroupMaskOffset)
+                return;
+
+            ref PROCESSOR_RELATIONSHIP core = ref info->Processor;
+            if (info->Size < GroupMaskOffset + core.GroupCount * sizeof(GROUP_AFFINITY))
+                return; // malformed entry
+
+            var groups = (GROUP_AFFINITY*) ((byte*) info + GroupMaskOffset);
+            for (int i = 0; i < core.GroupCount; i++)
             {
-                var info = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) currentPtr;
-                uint size = info->Size;
-                if (size == 0 || size > endPtr - currentPtr)
-                    break;
-
-                if (info->Relationship == LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorCore)
+                if (groups[i].Group != 0)
                 {
-                    ref PROCESSOR_RELATIONSHIP core = ref info->Processor;
-                    for (int i = 0; i < core.GroupCount; i++)
-                    {
-                        GROUP_AFFINITY groupAffinity = core.GroupMask[i];
-                        if (groupAffinity.Group != 0)
-                            continue;
-
-                        ulong mask = groupAffinity.Mask;
-                        for (int processor = 0; processor < MaxMaskProcessorCount; processor++)
-                            if ((mask & (1UL << processor)) != 0)
-                                result.Add((processor, core.EfficiencyClass));
-                    }
+                    multipleGroups = true;
+                    continue;
                 }
 
-                currentPtr += size;
+                ulong mask = groups[i].Mask;
+                for (int processor = 0; processor < MaxMaskProcessorCount; processor++)
+                    if ((mask & (1UL << processor)) != 0)
+                        result.Add((processor, core.EfficiencyClass));
             }
-        }
+        });
 
-        return result;
+        return multipleGroups ? [] : result;
     }
 }
