@@ -41,6 +41,11 @@ A source returning `IAsyncEnumerable<T>` is awaited while the values are read, s
   `SynchronizationContext` needs the asynchronous entry points - see
   @BenchmarkDotNet.Samples.IntroParamsSource, where the same applies to `[ParamsSource]`.
 
+BenchmarkDotNet reads the argument source during discovery, before
+  [`[GlobalSetup]`](xref:BenchmarkDotNet.Attributes.GlobalSetupAttribute) runs.
+To prepare a self-contained argument, initialize it in the argument type's constructor,
+  as `SomeClass` does in the example below.
+
 ### Source code
 
 [!code-csharp[IntroArgumentsSource.cs](../../../samples/BenchmarkDotNet.Samples/IntroArgumentsSource.cs)]
