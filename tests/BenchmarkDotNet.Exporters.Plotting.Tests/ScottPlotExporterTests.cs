@@ -85,6 +85,54 @@ namespace BenchmarkDotNet.Exporters.Plotting.Tests
             output.WriteLine(logger.GetLog());
         }
 
+        [Theory]
+        [MemberData(nameof(GetGroupBenchmarkTypes))]
+        public async Task JitterPlots(Type benchmarkType)
+        {
+            var logger = new AccumulationLogger();
+            logger.WriteLine("=== " + benchmarkType.Name + " ===");
+
+            var exporter = new ScottPlotExporter()
+            {
+                IncludeBarPlot = false,
+                IncludeBoxPlot = false,
+                IncludeJitterPlot = true,
+            };
+            var summary = MockFactory.CreateSummaryWithBiasedDistribution(benchmarkType, 1, 4, 10, 9);
+            await exporter.ExportAsync(summary, logger, CancellationToken.None);
+            var filePaths = Directory.GetFiles(summary.ResultsDirectoryPath, "*.png").ToList();
+            Assert.NotEmpty(filePaths);
+            Assert.All(filePaths, f => Assert.True(File.Exists(f)));
+
+            foreach (string filePath in filePaths)
+                logger.WriteLine($"* {filePath}");
+            output.WriteLine(logger.GetLog());
+        }
+
+        [Theory]
+        [MemberData(nameof(GetGroupBenchmarkTypes))]
+        public async Task JitterPlotsWithOneMeasurement(Type benchmarkType)
+        {
+            var logger = new AccumulationLogger();
+            logger.WriteLine("=== " + benchmarkType.Name + " ===");
+
+            var exporter = new ScottPlotExporter()
+            {
+                IncludeBarPlot = false,
+                IncludeBoxPlot = false,
+                IncludeJitterPlot = true,
+            };
+            var summary = MockFactory.CreateSummaryWithBiasedDistribution(benchmarkType, 1, 4, 10, 1);
+            await exporter.ExportAsync(summary, logger, CancellationToken.None);
+            var filePaths = Directory.GetFiles(summary.ResultsDirectoryPath, "*.png").ToList();
+            Assert.NotEmpty(filePaths);
+            Assert.All(filePaths, f => Assert.True(File.Exists(f)));
+
+            foreach (string filePath in filePaths)
+                logger.WriteLine($"* {filePath}");
+            output.WriteLine(logger.GetLog());
+        }
+
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static class BaselinesBenchmarks
         {

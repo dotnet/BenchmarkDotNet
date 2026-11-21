@@ -34,6 +34,7 @@ namespace BenchmarkDotNet.Exporters.Plotting
             this.Height = height;
             this.IncludeBarPlot = true;
             this.IncludeBoxPlot = true;
+            this.IncludeJitterPlot = false;
             this.RotateLabels = true;
         }
 
@@ -74,6 +75,12 @@ namespace BenchmarkDotNet.Exporters.Plotting
         /// measurement values should be exported.
         /// </summary>
         public bool IncludeBoxPlot { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a jitter scatter plot for time-per-op
+        /// measurement values should be exported.
+        /// </summary>
+        public bool IncludeJitterPlot { get; set; }
 
         /// <summary>
         /// Exports plots to .png files.
@@ -119,6 +126,19 @@ namespace BenchmarkDotNet.Exporters.Plotting
                     var filePath = CreateBoxPlot(
                         $"{title} - {benchmarkName}",
                         Path.Combine(summary.ResultsDirectoryPath, $"{title}-{benchmarkName}-boxplot.png"),
+                        $"Time ({timeUnit})",
+                        "Target",
+                        timeStats,
+                        annotations);
+                    logger.WriteLineInfo($"  {filePath.GetBaseName(Directory.GetCurrentDirectory())}");
+                }
+
+                if (this.IncludeJitterPlot)
+                {
+                    // <BenchmarkName>-jitterplot.png
+                    var filePath = CreateJitterPlot(
+                        $"{title} - {benchmarkName}",
+                        Path.Combine(summary.ResultsDirectoryPath, $"{title}-{benchmarkName}-jitterplot.png"),
                         $"Time ({timeUnit})",
                         "Target",
                         timeStats,
@@ -328,6 +348,86 @@ namespace BenchmarkDotNet.Exporters.Plotting
             }
 
             // Tell the plot to autoscale with a small padding below the boxes.
+            plt.Axes.Margins(bottom: 0.05, right: .2);
+
+            plt.PlottableList.AddRange(annotations);
+
+            plt.SavePng(fileName, this.Width, this.Height);
+            return Path.GetFullPath(fileName);
+        }
+
+        /// <summary>
+        /// Creates a jitter scatter plot: one point per measurement, with the horizontal
+        /// position jittered around its target so overlapping values stay visible.
+        /// </summary>
+        private string CreateJitterPlot(string title, string fileName, string yLabel, string xLabel, IEnumerable<ChartStats> data, IReadOnlyList<Annotation> annotations)
+        {
+            Plot plt = new Plot();
+            plt.Title(title, this.TitleFontSize);
+            plt.YLabel(yLabel, this.FontSize);
+            plt.XLabel(xLabel, this.FontSize);
+
+            var palette = new ScottPlot.Palettes.Category10();
+
+            var legendPalette = data.Select(d => d.JobId)
+                .Distinct()
+                .Select((jobId, index) => (jobId, index))
+                .ToDictionary(t => t.jobId, t => palette.GetColor(t.index));
+
+            plt.Legend.IsVisible = true;
+            plt.Legend.Alignment = Alignment.UpperRight;
+            plt.Legend.FontSize = this.FontSize;
+
+            var ticks = data
+                .Select((d, index) => new Tick(index, d.Target))
+                .ToArray();
+
+            plt.Axes.Left.TickLabelStyle.FontSize = this.FontSize;
+            plt.Axes.Bottom.TickGenerator = new ScottPlot.TickGenerators.NumericManual(ticks);
+            plt.Axes.Bottom.MajorTickStyle.Length = 0;
+            plt.Axes.Bottom.TickLabelStyle.FontSize = this.FontSize;
+
+            if (this.RotateLabels)
+            {
+                plt.Axes.Bottom.TickLabelStyle.Rotation = 45;
+                plt.Axes.Bottom.TickLabelStyle.Alignment = Alignment.MiddleLeft;
+
+                // determine the width of the largest tick label
+                float largestLabelWidth = 0;
+                using Paint paint = Paint.NewDisposablePaint();
+                foreach (Tick tick in ticks)
+                {
+                    PixelSize size = plt.Axes.Bottom.TickLabelStyle.Measure(tick.Label, paint).Size;
+                    largestLabelWidth = Math.Max(largestLabelWidth, size.Width);
+                }
+
+                // ensure axis panels do not get smaller than the largest label
+                plt.Axes.Bottom.MinimumSize = largestLabelWidth * 2;
+                plt.Axes.Right.MinimumSize = largestLabelWidth;
+            }
+
+            // A fixed seed keeps the jitter reproducible across repeated exports.
+            var random = new Random(0);
+
+            int globalIndex = 0;
+            foreach (var targetGroup in data.GroupBy(s => s.Target))
+            {
+                foreach (var job in targetGroup)
+                {
+                    double position = ticks[globalIndex].Position;
+                    double[] xs = job.Values.Select(_ => position + (random.NextDouble() - 0.5) * 0.6).ToArray();
+                    double[] ys = job.Values.ToArray();
+
+                    var scatter = plt.Add.ScatterPoints(xs, ys);
+                    scatter.Color = legendPalette[job.JobId];
+                    scatter.MarkerSize = 5;
+                    scatter.LegendText = job.JobId;
+
+                    globalIndex++;
+                }
+            }
+
+            // Tell the plot to autoscale with a small padding around the points.
             plt.Axes.Margins(bottom: 0.05, right: .2);
 
             plt.PlottableList.AddRange(annotations);
