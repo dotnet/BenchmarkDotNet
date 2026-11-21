@@ -114,7 +114,7 @@ public abstract class SuppressorTestFixture<TSuppressor>
             _rule = rule;
         }
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [_rule];
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(_rule);
 
         public override void Initialize(AnalysisContext context)
         {

@@ -19,7 +19,7 @@ public sealed class BenchmarkClassSuppressor : DiagnosticSuppressor
         SuppressedDiagnosticId,
         AnalyzerHelper.GetResourceString(nameof(BenchmarkDotNetAnalyzerResources.General_BenchmarkClass_SuppressCA1515_Justification)));
 
-    public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions { get; } = [Rule];
+    public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions { get; } = ImmutableArray.Create(Rule);
 
     public override void ReportSuppressions(SuppressionAnalysisContext context)
     {
