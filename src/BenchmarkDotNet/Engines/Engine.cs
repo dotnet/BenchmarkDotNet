@@ -6,6 +6,7 @@ using BenchmarkDotNet.Portability;
 using BenchmarkDotNet.Reports;
 using JetBrains.Annotations;
 using Perfolizer.Horology;
+using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
 
 namespace BenchmarkDotNet.Engines
@@ -321,18 +322,18 @@ namespace BenchmarkDotNet.Engines
             public const string Acknowledgment = "Acknowledgment";
             public const string Cancel = "CANCEL";
 
-            private static readonly Dictionary<HostSignal, string> SignalsToMessages = new()
-            {
-                [HostSignal.BeforeAnythingElse] = "// BeforeAnythingElse",
-                [HostSignal.BeforeActualRun] = "// BeforeActualRun",
-                [HostSignal.AfterActualRun] = "// AfterActualRun",
-                [HostSignal.AfterAll] = "// AfterAll",
-                [HostSignal.BeforeExtraIteration] = "// BeforeExtraIteration",
-                [HostSignal.AfterExtraIteration] = "// AfterExtraIteration"
-            };
+            private static readonly FrozenDictionary<HostSignal, string> SignalsToMessages = FrozenDictionary.Create<HostSignal, string>(
+            [
+                new(HostSignal.BeforeAnythingElse, "// BeforeAnythingElse"),
+                new(HostSignal.BeforeActualRun, "// BeforeActualRun"),
+                new(HostSignal.AfterActualRun, "// AfterActualRun"),
+                new(HostSignal.AfterAll, "// AfterAll"),
+                new(HostSignal.BeforeExtraIteration, "// BeforeExtraIteration"),
+                new(HostSignal.AfterExtraIteration, "// AfterExtraIteration")
+            ]);
 
-            private static readonly Dictionary<string, HostSignal> MessagesToSignals
-                = SignalsToMessages.ToDictionary(p => p.Value, p => p.Key);
+            private static readonly FrozenDictionary<string, HostSignal> MessagesToSignals
+                = FrozenDictionary.Create(StringComparer.Ordinal, SignalsToMessages.ToDictionary(p => p.Value, p => p.Key).ToArray());
 
             public static string ToMessage(HostSignal signal) => SignalsToMessages[signal];
 

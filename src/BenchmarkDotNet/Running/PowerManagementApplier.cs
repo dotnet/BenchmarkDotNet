@@ -2,6 +2,7 @@ using BenchmarkDotNet.Detectors;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Helpers;
 using BenchmarkDotNet.Loggers;
+using System.Collections.Frozen;
 
 namespace BenchmarkDotNet.Running
 {
@@ -9,14 +10,14 @@ namespace BenchmarkDotNet.Running
     {
         private static readonly Guid UserPowerPlan = new Guid("67b4a053-3646-4532-affd-0535c9ea82a7");
 
-        private static readonly Dictionary<PowerPlan, Guid> PowerPlansDict = new Dictionary<PowerPlan, Guid>()
-        {
-            { PowerPlan.UserPowerPlan, UserPowerPlan },
-            { PowerPlan.HighPerformance, new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c") },
-            { PowerPlan.PowerSaver, new Guid("a1841308-3541-4fab-bc81-f71556f20b4a") },
-            { PowerPlan.Balanced, new Guid("381b4222-f694-41f0-9685-ff5bb260df2e") },
-            { PowerPlan.UltimatePerformance, new Guid("e9a42b02-d5df-448d-aa00-03f14749eb61") },
-        };
+        private static readonly FrozenDictionary<PowerPlan, Guid> PowerPlansDict = FrozenDictionary.Create<PowerPlan, Guid>(
+        [
+            new(PowerPlan.UserPowerPlan, UserPowerPlan),
+            new(PowerPlan.HighPerformance, new Guid("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c")),
+            new(PowerPlan.PowerSaver, new Guid("a1841308-3541-4fab-bc81-f71556f20b4a")),
+            new(PowerPlan.Balanced, new Guid("381b4222-f694-41f0-9685-ff5bb260df2e")),
+            new(PowerPlan.UltimatePerformance, new Guid("e9a42b02-d5df-448d-aa00-03f14749eb61"))
+        ]);
 
         private readonly ILogger logger;
         private Guid? userCurrentPowerPlan;

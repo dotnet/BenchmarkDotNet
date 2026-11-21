@@ -3,28 +3,28 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using BenchmarkDotNet.Validators;
 using Microsoft.Diagnostics.Tracing.Session;
+using System.Collections.Frozen;
 
 namespace BenchmarkDotNet.Diagnostics.Windows
 {
     public static class HardwareCounters
     {
-        private static readonly Dictionary<HardwareCounter, string> EtwTranslations
-            = new Dictionary<HardwareCounter, string>
-            {
-                { HardwareCounter.Timer, "Timer" },
-                { HardwareCounter.TotalIssues, "TotalIssues" },
-                { HardwareCounter.BranchInstructions, "BranchInstructions" },
-                { HardwareCounter.CacheMisses, "CacheMisses" },
-                { HardwareCounter.BranchMispredictions, "BranchMispredictions" },
-                { HardwareCounter.TotalCycles, "TotalCycles" },
-                { HardwareCounter.UnhaltedCoreCycles, "UnhaltedCoreCycles" },
-                { HardwareCounter.InstructionRetired, "InstructionRetired" },
-                { HardwareCounter.UnhaltedReferenceCycles, "UnhaltedReferenceCycles" },
-                { HardwareCounter.LlcReference, "LLCReference" },
-                { HardwareCounter.LlcMisses, "LLCMisses" },
-                { HardwareCounter.BranchInstructionRetired, "BranchInstructionRetired" },
-                { HardwareCounter.BranchMispredictsRetired, "BranchMispredictsRetired" }
-            };
+        private static readonly FrozenDictionary<HardwareCounter, string> EtwTranslations = FrozenDictionary.Create<HardwareCounter, string>(
+        [
+            new(HardwareCounter.Timer, "Timer"),
+            new(HardwareCounter.TotalIssues, "TotalIssues"),
+            new(HardwareCounter.BranchInstructions, "BranchInstructions"),
+            new(HardwareCounter.CacheMisses, "CacheMisses"),
+            new(HardwareCounter.BranchMispredictions, "BranchMispredictions"),
+            new(HardwareCounter.TotalCycles, "TotalCycles"),
+            new(HardwareCounter.UnhaltedCoreCycles, "UnhaltedCoreCycles"),
+            new(HardwareCounter.InstructionRetired, "InstructionRetired"),
+            new(HardwareCounter.UnhaltedReferenceCycles, "UnhaltedReferenceCycles"),
+            new(HardwareCounter.LlcReference, "LLCReference"),
+            new(HardwareCounter.LlcMisses, "LLCMisses"),
+            new(HardwareCounter.BranchInstructionRetired, "BranchInstructionRetired"),
+            new(HardwareCounter.BranchMispredictsRetired, "BranchMispredictsRetired")
+        ]);
 
         public static IEnumerable<ValidationError> Validate(ValidationParameters validationParameters, bool mandatory)
         {
@@ -47,7 +47,7 @@ namespace BenchmarkDotNet.Diagnostics.Windows
 
             foreach (var hardwareCounter in validationParameters.Config.GetHardwareCounters())
             {
-                if (!EtwTranslations.TryGetValue(hardwareCounter, out string counterName))
+                if (!EtwTranslations.TryGetValue(hardwareCounter, out var counterName))
                 {
                     yield return new ValidationError(true,
                         $"Counter {hardwareCounter} not recognized. " +

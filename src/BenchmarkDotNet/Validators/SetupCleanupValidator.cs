@@ -72,14 +72,8 @@ namespace BenchmarkDotNet.Validators
                     {
                         foreach (string target in attribute.Targets)
                         {
-                            if (!targetCount.ContainsKey(target))
-                            {
-                                targetCount[target] = 1;
-                            }
-                            else
-                            {
-                                targetCount[target] += 1;
-                            }
+                            targetCount.TryGetValue(target, out int count);
+                            targetCount[target] = count + 1;
                         }
                     }
                 }

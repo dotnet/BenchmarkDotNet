@@ -64,10 +64,13 @@ namespace BenchmarkDotNet.Diagnostics.Windows.Tracing
         private void HandleIterationEvent(int processId, double timeStampRelative, IterationMode iterationMode, long totalOperations)
         {
             // if given process emits Benchmarking events it's the process that we care about
-            if (!processIdToData.ContainsKey(processId))
-                processIdToData.Add(processId, new ProcessMetrics());
+            if (!processIdToData.TryGetValue(processId, out var data))
+            {
+                data = new ProcessMetrics();
+                processIdToData.Add(processId, data);
+            }
 
-            processIdToData[processId].HandleIterationEvent(timeStampRelative, iterationMode, totalOperations);
+            data.HandleIterationEvent(timeStampRelative, iterationMode, totalOperations);
         }
 
         private void OnPmcIntervalChange(SampledProfileIntervalTraceData data)

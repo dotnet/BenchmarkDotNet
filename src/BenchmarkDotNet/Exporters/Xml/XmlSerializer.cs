@@ -115,7 +115,7 @@ namespace BenchmarkDotNet.Exporters.Xml
             {
                 if (itemName == null)
                 {
-                    itemName = collectionItemNameMap.ContainsKey(property.Name) ? collectionItemNameMap[property.Name] : DefaultItemName;
+                    itemName = collectionItemNameMap.TryGetValue(property.Name, out string? mappedItemName) ? mappedItemName : DefaultItemName;
                 }
 
                 if (IsSimple(item.GetType().GetTypeInfo()))
