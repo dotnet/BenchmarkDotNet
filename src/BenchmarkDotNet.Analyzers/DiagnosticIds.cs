@@ -56,4 +56,5 @@ public static class DiagnosticIds
     public const string Attributes_SetupCleanup_MustNotReturnAsyncEnumerable = "BDN1700";
     public const string General_AwaitableAsyncEnumerable_AmbiguousReturnType = "BDN1701";
     public const string General_Job_RuntimeAndToolchainBothSet = "BDN1800";
+    public const string General_BenchmarkClass_SuppressCA1515 = "BDN1900";
 }

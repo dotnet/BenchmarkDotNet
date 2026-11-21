@@ -577,4 +577,7 @@ Either add the [ArgumentsSource] or [Arguments] attribute(s) or remove the param
   <data name="Attributes_ArgumentsSourceAttribute_ShouldYieldParameterType_Description" xml:space="preserve">
     <value>object remains supported, and is the way to defer the decision to the value&apos;s runtime type. Naming the parameter&apos;s own type instead makes a wrong value a compile error in the source rather than a cast that fails while the benchmark runs.</value>
   </data>
+  <data name="General_BenchmarkClass_SuppressCA1515_Justification" xml:space="preserve">
+    <value>Benchmark classes must be public because BenchmarkDotNet discovers and runs their benchmarks through reflection.</value>
+  </data>
 </root>
