@@ -1,15 +1,18 @@
 # Running Tests
 
-To run all tests just run the following command in the repo root:
+Use the .NET 11 SDK to run tests.
+To run the solution's tests, you also need the .NET 8 runtime for the multi-framework tests and the .NET 10 runtime for the sample projects. On Windows, you also need .NET Framework 4.8 or later.
+Run this command in the repo root.
 
 ```cmd
 dotnet test -c Release BenchmarkDotNet.slnx
 ```
 
-Most of the tests projects target `net472` and `net8.0`. If the change that you want to test is not specific to any particular runtime, you can run the tests for one of them.
+The main unit and integration test projects target `net11.0` and also target `net472` on Windows.
+Run the main unit test project on .NET 11 with this command.
 
 ```cmd
-dotnet test -c Release -f net8.0 BenchmarkDotNet.slnx
+dotnet test -c Release -f net11.0 tests/BenchmarkDotNet.Tests
 ```
 
 You should be able to run all of tests from your IDE as well.
@@ -44,7 +47,7 @@ Following parameters need to specified to invoke workflow with `gh workflow run`
 | `--ref`           | Specify target branch name
 
 > [!NOTE]
-> `gh run workflow` command requires `Write` permission on target repository.
+> The `gh workflow run` command requires write permission on the target repository.
 > Contributors who don't have write permission to `dotnet/BenchmarkDotNet` need to run workflow on a **forked** repository.
 
 ### Parameters of `run-tests-selected.yaml` workflow
@@ -53,9 +56,9 @@ Following parameters need to specified to invoke workflow with `gh workflow run`
 
 | name                          | default                                  | description
 |-------------------------------|------------------------------------------|---------------------
-| `runs_on`                     | `ubuntu-latest`                          | GitHub Actions runner image name (`windows-latest` `windows-11-arm` `ubuntu-latest` `macos-latest` `macos-26-intel`)
+| `runs_on`                     | `ubuntu-latest`                          | GitHub Actions runner image name (`windows-latest` `windows-11-arm` `ubuntu-latest` `ubuntu-24.04-arm` `macos-latest` `macos-26-intel`)
 | `project`                     | `tests/BenchmarkDotNet.IntegrationTests` | Specify path of project directory
-| `framework`                   | `net8.0`                                 | Target Framework (e.g. `net8.0`, `net472`)
+| `framework`                   | No explicit default                      | Required target framework supported by the selected project (e.g. `net11.0`, `net472`)
 | `filter`                      | `BenchmarkDotNet`                        | Test filter text (It's used for `dotnet test --filter`) Use default value when running all tests
 | `iteration_count`             | `1`                                      | Count of test loop (It's expected to be used for flaky tests)
 | `skip_setup_additional_tools` | `false`                                  | Skip setup additional tools for Wasm/NativeAOT tests  
@@ -64,6 +67,8 @@ Following parameters need to specified to invoke workflow with `gh workflow run`
 
 #### Run `CompletedWorkItemCountIsAccurate` test
 
+This example uses the upstream repository. To run it on your fork, replace `dotnet/BenchmarkDotNet` with your fork's `owner/repo` and set `--ref` to the branch you want to test.
+
 ```pwsh
-gh workflow run run-tests-selected.yaml --repo dotnet/BenchmarkDotNet --ref master -f runs_on=windows-latest -f filter=CompletedWorkItemCountIsAccurate
+gh workflow run run-tests-selected.yaml --repo dotnet/BenchmarkDotNet --ref master -f runs_on=windows-latest -f framework=net11.0 -f filter=CompletedWorkItemCountIsAccurate
 ```
