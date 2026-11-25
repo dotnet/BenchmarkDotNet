@@ -39,22 +39,53 @@
   
   <Choose>
     <When Condition="'$(IsFullPack)' == 'true'">
+      <PropertyGroup>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_BenchmarkDotNetPackWeaver</TargetsForTfmSpecificContentInPackage>
+      </PropertyGroup>
       <ItemGroup>
-        <!-- Include the BenchmarkDotNet.Weaver dlls in tasks without making it an explicit dependency. -->
-        <Content Include="$(MSBuildThisFileDirectory)..\BenchmarkDotNet.Weaver\bin\Release\$(TargetFramework)\**\*.dll" Pack="true" PackagePath="tasks/$(TargetFramework)" />
-        <!-- MIT attribution for the third-party assemblies bundled above. They ship as binaries with no package dependency pointing back to their origin, so their notices have to travel in this package. -->
+        <!-- MIT attribution for the third-party assemblies that _BenchmarkDotNetPackWeaver bundles. They ship as binaries with no package dependency pointing back to their origin, so their notices have to travel in this package. -->
         <None Include="$(MSBuildThisFileDirectory)..\BenchmarkDotNet.Weaver\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="/" />
         <Content Include="$(MSBuildThisFileDirectory)buildTransitive\**\*.targets" Pack="true" PackagePath="buildTransitive" />
-        <!-- Bundle the shared weaving logic that BenchmarkDotNet.Annotations.targets imports (kept in sync with the Weaver package). -->
+        <!-- Bundle the weaving logic that BenchmarkDotNet.Annotations.targets imports, which it shares with BenchmarkDotNet.Weaver.Source.targets. -->
         <Content Include="$(MSBuildThisFileDirectory)..\BenchmarkDotNet.Weaver\buildTransitive\netstandard2.0\BenchmarkDotNet.Weaver.Common.targets" Pack="true" PackagePath="buildTransitive/netstandard2.0" />
       </ItemGroup>
     </When>
     <Otherwise>
-      <!-- PackageReference for transitive weaver dependency for ProjectReferences to this. -->
+      <!-- The Weaver package carries no weaver of its own: it exists so that NuGet flows its targets to every project
+           that references this one, directly or transitively, and those targets weave with the Weaver built from source. -->
       <ItemGroup>
-        <PackageReference Include="BenchmarkDotNet.Weaver" Version="$(Version)$(WeaverVersionSuffix)" />
+        <PackageReference Include="BenchmarkDotNet.Weaver" Version="$(WeaverPackageVersion)" />
       </ItemGroup>
     </Otherwise>
   </Choose>
+  <!-- Builds the Weaver before anything that references this project, both for weaving from source and for the full
+       pack, which bundles its output. NuGet leaves references without an output assembly out of the restore graph, so
+       this does not collide with the package of the same name. -->
+  <ItemGroup>
+    <ProjectReference Include="..\BenchmarkDotNet.Weaver\BenchmarkDotNet.Weaver.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <!-- _BenchmarkDotNetBuildWeaverInVisualStudio only runs if Visual Studio's fast up-to-date check does not skip this
+         project, so changes to the Weaver's source count as a change here. -->
+    <UpToDateCheckInput Include="..\BenchmarkDotNet.Weaver\**\*.cs;..\BenchmarkDotNet.Weaver\BenchmarkDotNet.Weaver.csproj" Exclude="..\BenchmarkDotNet.Weaver\bin\**;..\BenchmarkDotNet.Weaver\obj\**" />
+  </ItemGroup>
+
+  <!-- Visual Studio does not build project references, so a Weaver that is not in the solution would never be built. If
+       the solution contains it, it is already built by now and this incremental build does nothing. -->
+  <Target Name="_BenchmarkDotNetBuildWeaverInVisualStudio"
+      BeforeTargets="ResolveProjectReferences"
+      Condition="'$(BuildingInsideVisualStudio)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <MSBuild Projects="..\BenchmarkDotNet.Weaver\BenchmarkDotNet.Weaver.csproj" Targets="Build" RemoveProperties="TargetFramework;RuntimeIdentifier" />
+  </Target>
+
+  <!-- Bundles the BenchmarkDotNet.Weaver dlls in tasks without making it an explicit dependency. They are gathered when
+       packing rather than by a static glob, which would be expanded before the reference above has built them. -->
+  <Target Name="_BenchmarkDotNetPackWeaver">
+    <PropertyGroup>
+      <_BenchmarkDotNetWeaverOutput>$(MSBuildThisFileDirectory)..\BenchmarkDotNet.Weaver\bin\$(TargetFramework)\</_BenchmarkDotNetWeaverOutput>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(_BenchmarkDotNetWeaverOutput)BenchmarkDotNet.Weaver.dll')" Text="The BenchmarkDotNet weaver has not been built at '$(_BenchmarkDotNetWeaverOutput)', so it cannot be bundled into this package." />
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(_BenchmarkDotNetWeaverOutput)**\*.dll" PackagePath="tasks/$(TargetFramework)/%(RecursiveDir)" />
+    </ItemGroup>
+  </Target>
   <Import Project="..\..\build\common.targets" />
 </Project>

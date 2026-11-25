@@ -1,14 +1,20 @@
 <!--
-If any changes are made to this project, increment the WeaverVersionSuffix in the common.props file,
-then run `build.cmd pack-weaver`.
+Projects that reference the BenchmarkDotNet projects weave with this project's build output, so changes to it apply on the
+next build. The package it packs carries only buildTransitive\netstandard2.0\BenchmarkDotNet.Weaver.targets: if that file
+changes, increment the WeaverPackageVersion in the common.props file, then run `build.cmd pack-weaver`.
 -->
 
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <VersionSuffix>$(VersionSuffix)$(WeaverVersionSuffix)</VersionSuffix>
-    <OutputPath>$(MSBuildThisFileDirectory)bin\$(Configuration)</OutputPath>
+    <!-- Only the package is versioned independently: the assembly, which the full pack also bundles into
+         BenchmarkDotNet.Annotations, keeps the BenchmarkDotNet version. -->
+    <PackageVersion>$(WeaverPackageVersion)</PackageVersion>
+    <!-- Not per configuration: weaving finds the task here whatever configuration built it, which is not always the
+         configuration of the project being woven (a solution that does not contain this project builds it in its default
+         configuration). -->
+    <OutputPath>$(MSBuildThisFileDirectory)bin\</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoWarn>$(NoWarn);NU5100;NU5127;NU5128</NoWarn>
@@ -26,9 +32,8 @@ then run `build.cmd pack-weaver`.
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Include .targets file and all DLLs in the output directory in the NuGet package -->
-    <Content Include="$(MSBuildThisFileDirectory)buildTransitive\**\*.targets" Pack="true" PackagePath="buildTransitive" />
-    <Content Include="$(OutputPath)**\*.dll" Pack="true" PackagePath="tasks/$(TargetFramework)" />
+    <!-- The package only locates the source tree; the rest of the targets and the task are used from there. -->
+    <Content Include="$(MSBuildThisFileDirectory)buildTransitive\netstandard2.0\BenchmarkDotNet.Weaver.targets" Pack="true" PackagePath="buildTransitive/netstandard2.0" />
     <None Remove="packages\**" />
   </ItemGroup>
 

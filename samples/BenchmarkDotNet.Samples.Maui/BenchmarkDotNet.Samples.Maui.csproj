@@ -61,7 +61,6 @@
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-    <PackageReference Include="BenchmarkDotNet.Weaver" Version="$(VersionPrefix)-$(VersionSuffix)$(WeaverVersionSuffix)" />
   </ItemGroup>
 
   <ItemGroup>

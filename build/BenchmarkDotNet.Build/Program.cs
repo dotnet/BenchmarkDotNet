@@ -40,7 +40,6 @@ public class PackWeaverTask : FrostingTask<BuildContext>, IHelpProvider
 
 [TaskName(Name)]
 [TaskDescription("Restore NuGet packages")]
-[IsDependentOn(typeof(PackWeaverTask))]
 public class RestoreTask : FrostingTask<BuildContext>, IHelpProvider
 {
     private const string Name = "restore";
@@ -328,7 +327,6 @@ public class VersionIncrementTask : FrostingTask<BuildContext>, IHelpProvider
     public override void Run(BuildContext context)
     {
         context.ReleaseRunner.VersionIncrement();
-        context.BuildRunner.PackWeaver(develop: true);
     }
 
     public HelpInfo GetHelp() => new()
@@ -351,7 +349,6 @@ public class VersionMinorIncrementTask : FrostingTask<BuildContext>, IHelpProvid
     public override void Run(BuildContext context)
     {
         context.ReleaseRunner.VersionMinorIncrement();
-        context.BuildRunner.PackWeaver(develop: true);
     }
 
     public HelpInfo GetHelp() => new()

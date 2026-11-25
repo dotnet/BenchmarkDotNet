@@ -1,5 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Entry point of the BenchmarkDotNet.Weaver package.
+
+  The package is only for builds that reference the BenchmarkDotNet projects from source; the published packages bundle
+  the weaver into BenchmarkDotNet.Annotations instead. It is a package so that NuGet flows this file to every project that
+  references BenchmarkDotNet.Annotations, directly or transitively, which a ProjectReference cannot do.
+
+  This file only finds the BenchmarkDotNet source tree and imports the weaving targets from it, so changes to the Weaver
+  apply on the next build. Changing this file means incrementing WeaverPackageVersion and re-packing, so keep it to that.
+-->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- The weaving logic is shared with BenchmarkDotNet.Annotations.targets. See the common file for details. -->
-  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Weaver.Common.targets" />
+
+  <!--
+    1. Find the BenchmarkDotNet.Annotations project.
+
+    The import below is resolved while the project is evaluated, and the restore assets file is the only record of a
+    transitive project reference available that early. Its "libraries" section has an entry like
+
+      "BenchmarkDotNet.Annotations/0.16.0-develop": { "type": "project", "path": "../../src/BenchmarkDotNet.Annotations/BenchmarkDotNet.Annotations.csproj", ... }
+
+    whose path is relative to the project being built. The pattern matches only that path.
+  -->
+  <PropertyGroup>
+    <_BdnWeaverAssetsFile>$(ProjectAssetsFile)</_BdnWeaverAssetsFile>
+    <_BdnWeaverAssetsFile Condition="'$(_BdnWeaverAssetsFile)' == ''">$(MSBuildProjectExtensionsPath)project.assets.json</_BdnWeaverAssetsFile>
+    <_BdnWeaverPathPattern>(?&lt;="BenchmarkDotNet\.Annotations/[^"]*"\s*:\s*\{\s*"type"\s*:\s*"project"\s*,\s*"path"\s*:\s*")[^"]+</_BdnWeaverPathPattern>
+
+    <_BdnWeaverAnnotationsProject Condition="Exists('$(_BdnWeaverAssetsFile)')">$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText($(_BdnWeaverAssetsFile))), $(_BdnWeaverPathPattern)).Value)</_BdnWeaverAnnotationsProject>
+    <!-- BenchmarkDotNet.Annotations itself has no reference to itself. -->
+    <_BdnWeaverAnnotationsProject Condition="'$(MSBuildProjectName)' == 'BenchmarkDotNet.Annotations'">$(MSBuildProjectFile)</_BdnWeaverAnnotationsProject>
+  </PropertyGroup>
+
+  <!-- 2. Import the weaving targets from the src folder that contains it. -->
+  <PropertyGroup Condition="'$(_BdnWeaverAnnotationsProject)' != ''">
+    <_BdnWeaverSrcDirectory>$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $([System.IO.Path]::GetDirectoryName($(_BdnWeaverAnnotationsProject))), '..'))</_BdnWeaverSrcDirectory>
+    <_BdnWeaverSourceTargets>$(_BdnWeaverSrcDirectory)BenchmarkDotNet.Weaver\buildTransitive\netstandard2.0\BenchmarkDotNet.Weaver.Source.targets</_BdnWeaverSourceTargets>
+  </PropertyGroup>
+
+  <Import Project="$(_BdnWeaverSourceTargets)" Condition="Exists('$(_BdnWeaverSourceTargets)')" />
+
+  <!-- 3. Fail rather than build benchmarks that were silently left unwoven. -->
+  <Target Name="_BdnWeaverCheckSourceFound"
+      BeforeTargets="CoreCompile"
+      Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' != 'false' and '$(SkipCompilerExecution)' != 'true' and !Exists('$(_BdnWeaverSourceTargets)')">
+    <Error Condition="'$(_BdnWeaverAnnotationsProject)' == ''" Text="BenchmarkDotNet.Weaver found no project reference to BenchmarkDotNet.Annotations in '$(_BdnWeaverAssetsFile)'. This package weaves with the BenchmarkDotNet source tree, so it is only for projects that reference the BenchmarkDotNet projects from source." />
+    <Error Condition="'$(_BdnWeaverAnnotationsProject)' != ''" Text="BenchmarkDotNet.Weaver could not find '$(_BdnWeaverSourceTargets)' in the referenced BenchmarkDotNet source tree." />
+  </Target>
 </Project>
