@@ -1,17 +1,13 @@
-// TODO: Remove #if directive when migrated to xunit.v3 or migrated to AsmArm64 based implementation.
-#if NET
 using AsmArm64;
 using AwesomeAssertions;
 using AwesomeAssertions.Equivalency;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Disassemblers;
-using Gee.External.Capstone;
 using static AsmArm64.Arm64RegisterX;
-using Arm64Instruction = Gee.External.Capstone.Arm64.Arm64Instruction;
 
 namespace BenchmarkDotNet.Tests.Disassemblers.Arm64;
 
-public partial class Arm64DisassemblerTests
+public partial class Arm64DisassemblerTests : Arm64DisassemblerTestBase
 {
     // Check Arm64Instruction equivalency by ToString output.
     private static EquivalencyOptions<Arm64Asm> ConfigureCustomEquivalency(EquivalencyOptions<Arm64Asm> options)
@@ -33,7 +29,7 @@ public partial class Arm64DisassemblerTests
 
         byte[] bytes = rawInstructions.ToLittleEndianBytes();
 
-        const ulong MdSlotAddress = 0x56781234 + 8 + 0x20000;
+        const ulong MdSlotAddress = 0x5678_1234 + 8 + 0x20000;
 
         using var clrRuntime = new MockMemory()
             .AddInstructions(0x5678_1234,
@@ -43,8 +39,8 @@ public partial class Arm64DisassemblerTests
                 Arm64InstructionFactory.LDR(X12, 0x20000), // ldr x12, #0x20000
                 Arm64InstructionFactory.BR(X10),           // br x10
             ])
-            .AddPointer(MdSlotAddress, ExpectedResultAddress) // Called by TryResolvePrecode
-            .AddJitHelperFunctionName(ExpectedResultAddress, "")
+            .AddPointer(MdSlotAddress, ExpectedResultAddress)    // Called by TryResolvePrecode
+            .AddJitHelperFunctionName(ExpectedResultAddress, "") // Called by TryTranslateAddressToName
             .AddMethodByInstructionPointer(ExpectedResultAddress, DummyTargetMethod)
             .ToMockClrRuntime();
         var state = new State(clrRuntime, DummyTargetFrameworkVersion);
@@ -63,9 +59,8 @@ public partial class Arm64DisassemblerTests
         results[0].Should().BeEquivalentTo(new Arm64Asm
         {
             InstructionPointer = baseAddress,
-            Instruction = rawInstructions[0].ToCapstoneArm64Instruction(baseAddress, 0),
-            InstructionLength = 4,
-            DisassembleSyntax = DisassembleSyntax.Masm,
+            RawInstruction = rawInstructions[0],
+            DisassembleSyntax = DisassembleSyntax.Gas,
             ReferencedAddress = null,
             IsReferencedAddressIndirect = false,
         }, ConfigureCustomEquivalency);
@@ -74,9 +69,8 @@ public partial class Arm64DisassemblerTests
         results[1].Should().BeEquivalentTo(new Arm64Asm
         {
             InstructionPointer = baseAddress + 4,
-            Instruction = rawInstructions[1].ToCapstoneArm64Instruction(baseAddress, 1),
-            InstructionLength = 4,
-            DisassembleSyntax = DisassembleSyntax.Masm,
+            RawInstruction = rawInstructions[1],
+            DisassembleSyntax = DisassembleSyntax.Gas,
             ReferencedAddress = null,
             IsReferencedAddressIndirect = false,
         }, ConfigureCustomEquivalency);
@@ -85,9 +79,8 @@ public partial class Arm64DisassemblerTests
         results[2].Should().BeEquivalentTo(new Arm64Asm
         {
             InstructionPointer = baseAddress + 8,
-            Instruction = rawInstructions[2].ToCapstoneArm64Instruction(baseAddress, 2),
-            InstructionLength = 4,
-            DisassembleSyntax = DisassembleSyntax.Masm,
+            RawInstruction = rawInstructions[2],
+            DisassembleSyntax = DisassembleSyntax.Gas,
             ReferencedAddress = ExpectedResultAddress,
             IsReferencedAddressIndirect = true,
         }, ConfigureCustomEquivalency);
@@ -100,4 +93,3 @@ public partial class Arm64DisassemblerTests
         });
     }
 }
-#endif
