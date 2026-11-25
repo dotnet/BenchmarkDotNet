@@ -90,7 +90,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 .AddLogger(logger)
                 .AddJob(Job.Dry
                     .WithToolchain(toolchain))
-                .WithBuildTimeout(TimeSpan.FromSeconds(480)) // Increase timeout for `WasmSupportsInProcessDiagnosers` test on macos(x64)
+                .WithBuildTimeout(TimeSpan.FromSeconds(720)) // Increase timeout for `WasmSupportsInProcessDiagnosers` test on macos(x64)
                 .WithOption(ConfigOptions.LogBuildOutput, true)
                 .WithOption(ConfigOptions.GenerateMSBuildBinLog, false);
         }

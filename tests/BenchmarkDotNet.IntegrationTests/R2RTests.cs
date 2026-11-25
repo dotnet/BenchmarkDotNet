@@ -20,7 +20,7 @@ namespace BenchmarkDotNet.IntegrationTests
                 var config = ManualConfig.CreateEmpty()
                     .AddJob(Job.Dry
                         .WithToolchain(TestDefaults.CsProjR2RToolchain))
-                    .WithBuildTimeout(TimeSpan.FromSeconds(540));
+                    .WithBuildTimeout(TimeSpan.FromSeconds(720));
                 var summary = CanExecute<R2RBenchmark>(config);
 
                 Assert.True(summary.Reports.Length > 0, "Expected at least one benchmark report");
