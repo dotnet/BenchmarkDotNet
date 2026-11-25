@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Testing;
 
 namespace BenchmarkDotNet.Analyzers.Tests.Fixtures;
 
-public abstract class CodeFixTestFixture<TAnalyzer, TCodeFix>
+public abstract class CodeFixTestFixture<TAnalyzer, TCodeFix> : TestFixtureBase
     where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFix : CodeFixProvider, new()
 {
@@ -17,30 +17,9 @@ public abstract class CodeFixTestFixture<TAnalyzer, TCodeFix>
     {
         _codeFixTest = new InternalCodeFixTest
         {
-#if NET10_0_OR_GREATER
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net100,
-#elif NET8_0_OR_GREATER
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net80,
-#elif NET6_0_OR_GREATER
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
-#else
-            ReferenceAssemblies = ReferenceAssemblies.NetStandard.NetStandard20,
-#endif
-            TestState =
-            {
-                AdditionalReferences =
-                {
-                    "BenchmarkDotNet.dll",
-                    "BenchmarkDotNet.Annotations.dll",
-#if !NET6_0_OR_GREATER
-                    "System.Memory.dll",
-                    // Polyfills `IAsyncEnumerable<T>` etc. on netstandard2.0 — a retyped source may be an async
-                    // one, and the fix is only offered where that type resolves.
-                    "Microsoft.Bcl.AsyncInterfaces.dll"
-#endif
-                }
-            }
+            ReferenceAssemblies = GetReferenceAssemblies(),
         };
+        AddAdditionalReferences(_codeFixTest.TestState);
 
         var analyzer = new TAnalyzer();
         if (diagnosticDescriptor == null)

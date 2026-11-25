@@ -7,7 +7,7 @@ using Xunit;
 
 namespace BenchmarkDotNet.Analyzers.Tests.Fixtures;
 
-public abstract class AnalyzerTestFixture<TAnalyzer>
+public abstract class AnalyzerTestFixture<TAnalyzer> : TestFixtureBase
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
     private readonly CSharpAnalyzerTest<TAnalyzer, DefaultVerifier> _analyzerTest;
@@ -17,30 +17,9 @@ public abstract class AnalyzerTestFixture<TAnalyzer>
     {
         _analyzerTest = new InternalAnalyzerTest
         {
-#if NET10_0_OR_GREATER
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net100,
-#elif NET8_0_OR_GREATER
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net80,
-#elif NET6_0_OR_GREATER
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net60,
-#else
-            ReferenceAssemblies = ReferenceAssemblies.NetStandard.NetStandard20,
-#endif
-            TestState =
-            {
-                AdditionalReferences =
-                {
-                    "BenchmarkDotNet.dll",
-                    "BenchmarkDotNet.Annotations.dll",
-#if !NET6_0_OR_GREATER
-                    "System.Memory.dll",
-                    // Polyfills `IAsyncEnumerable<T>` etc. on netstandard2.0 — the analyzer's
-                    // setup/cleanup rule needs the type symbol to resolve on the net472 test path.
-                    "Microsoft.Bcl.AsyncInterfaces.dll"
-#endif
-                }
-            }
+            ReferenceAssemblies = GetReferenceAssemblies(),
         };
+        AddAdditionalReferences(_analyzerTest.TestState);
 
         if (assertUniqueSupportedDiagnostics)
         {
