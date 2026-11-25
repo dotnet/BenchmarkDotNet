@@ -80,7 +80,11 @@ namespace BenchmarkDotNet.IntegrationTests
 
             // TODO: Remove temporary workaround for https://github.com/dotnet/runtime/issues/135603 / https://github.com/dotnet/BenchmarkDotNet/pull/3333#issuecomment-6953337732
             var cpuName = CpuDetector.Cpu!.ProcessorName!;
-            if (cpuName.Contains("AMD EPYC 9V74") || cpuName.Contains("INTEL XEON PLATINUM 8573C"))
+            Console.WriteLine($"CPU: {cpuName}");
+
+            if (cpuName.Contains("AMD EPYC 9V74")
+             || cpuName.Contains("Platinum 8370C")
+             || cpuName.Contains("PLATINUM 8573C"))
                 return;
 
             MemoryDiagnoserIsAccurate(TestDefaults.CsProjNativeAotToolchain);
