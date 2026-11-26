@@ -86,7 +86,7 @@
   </ItemGroup>
   <!-- The transitive weaver reference is stripped during full pack, so we need to reference it directly. -->
   <ItemGroup Condition="'$(IsFullPack)' == 'true'">
-    <PackageReference Include="BenchmarkDotNet.Weaver" Version="$(Version)$(WeaverVersionSuffix)" PrivateAssets="all" />
+    <PackageReference Include="BenchmarkDotNet.Weaver" Version="$(WeaverPackageVersion)" PrivateAssets="all" />
   </ItemGroup>
 
   <Import Project="..\..\build\common.targets" />

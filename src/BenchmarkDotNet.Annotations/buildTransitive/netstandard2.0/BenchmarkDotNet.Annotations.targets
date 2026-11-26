@@ -6,7 +6,11 @@
     </Reference>
   </ItemGroup>
 
-  <!-- The weaving logic is shared with BenchmarkDotNet.Weaver.targets. See the common file for details. -->
+  <!-- The weaving logic is shared with BenchmarkDotNet.Weaver.Source.targets. See the common file for details. -->
+  <PropertyGroup>
+    <BenchmarkDotNetWeaverTaskAssembly>$(MSBuildThisFileDirectory)..\..\tasks\netstandard2.0\BenchmarkDotNet.Weaver.dll</BenchmarkDotNetWeaverTaskAssembly>
+  </PropertyGroup>
+  <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssemblyTask" AssemblyFile="$(BenchmarkDotNetWeaverTaskAssembly)" />
   <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Weaver.Common.targets" />
 
   <Target Name="_BenchmarkDotNetGatherAnalyzers">

@@ -1,8 +1,3 @@
-// *****
-// If any changes are made to this file, increment the WeaverVersionSuffix in the common.props file,
-// then run `build.cmd pack-weaver`.
-// *****
-
 using AsmResolver.DotNet;
 using AsmResolver.PE.DotNet.Metadata.Tables;
 using AsmResolver.PE.DotNet.StrongName;

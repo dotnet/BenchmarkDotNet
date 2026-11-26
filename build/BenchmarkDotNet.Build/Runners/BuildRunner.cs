@@ -8,8 +8,8 @@ using Cake.Common.Tools.DotNet.Restore;
 using Cake.Common.Tools.DotNet.Workload.Install;
 using Cake.Core;
 using Cake.Core.IO;
-using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 
 namespace BenchmarkDotNet.Build.Runners;
@@ -33,59 +33,60 @@ public class BuildRunner
         }
     }
 
-    /// <param name="develop">
-    /// Pack with the local-development version suffix even on CI, for the package committed to the repository.
-    /// </param>
-    public void PackWeaver(bool develop = false)
+    private const string WeaverLocatorPath = "buildTransitive/netstandard2.0/BenchmarkDotNet.Weaver.targets";
+
+    private DirectoryPath WeaverDirectory => context.RootDirectory.Combine("src").Combine("BenchmarkDotNet.Weaver");
+
+    private DirectoryPath WeaverPackageDirectory => WeaverDirectory.Combine("packages");
+
+    public void PackWeaver()
     {
-        var weaverPath = context.AllPackableSrcProjects.Single(p => p.GetFilename() == "BenchmarkDotNet.Weaver.csproj");
-        var outputPackageDir = weaverPath.GetDirectory().Combine("packages");
-
-        if (!isFullPack)
-        {
-            // Delete old package.
-            foreach (var file in Directory.EnumerateFiles(outputPackageDir.FullPath))
-            {
-                File.Delete(file);
-            }
-        }
-
-        // common.props picks the 'ci' suffix from BDN_CI_BUILD; clearing it here leaves the other packages' versions alone.
-        var environment = new Dictionary<string, string>();
-        if (develop)
-            environment["BDN_CI_BUILD"] = "";
-
-        var restoreSettings = new DotNetRestoreSettings
-        {
-            MSBuildSettings = context.MsBuildSettingsRestore,
-            EnvironmentVariables = environment
-        };
-        context.DotNetRestore(weaverPath.GetDirectory().FullPath, restoreSettings);
-
-        context.Information("BuildSystemProvider: " + context.BuildSystem().Provider);
-        var buildSettings = new DotNetBuildSettings
-        {
-            NoRestore = true,
-            DiagnosticOutput = true,
-            MSBuildSettings = context.MsBuildSettingsBuild,
-            Configuration = context.BuildConfiguration,
-            Verbosity = context.BuildVerbosity,
-            EnvironmentVariables = environment
-        };
-        context.DotNetBuild(weaverPath.FullPath, buildSettings);
+        foreach (var file in Directory.EnumerateFiles(WeaverPackageDirectory.FullPath))
+            File.Delete(file);
 
         var packSettings = new DotNetPackSettings
         {
-            OutputDirectory = outputPackageDir,
+            OutputDirectory = WeaverPackageDirectory,
             MSBuildSettings = context.MsBuildSettingsPack,
-            Configuration = context.BuildConfiguration,
-            EnvironmentVariables = environment
+            Configuration = context.BuildConfiguration
         };
-        context.DotNetPack(weaverPath.FullPath, packSettings);
+        context.DotNetPack(WeaverDirectory.CombineWithFilePath("BenchmarkDotNet.Weaver.csproj").FullPath, packSettings);
+    }
+
+    /// <summary>
+    /// Checks that the committed BenchmarkDotNet.Weaver package carries the current locator targets, which every build that
+    /// references the BenchmarkDotNet projects restores. Restore itself reports a package whose version does not match
+    /// WeaverPackageVersion.
+    /// </summary>
+    public void VerifyWeaverPackage()
+    {
+        const string fix = "increment WeaverPackageVersion in build/common.props, then run `build.cmd pack-weaver`";
+        // pack-weaver leaves exactly one package. Its file name carries NuGet's normalized version, so it is found rather
+        // than derived from WeaverPackageVersion.
+        var packages = Directory.GetFiles(WeaverPackageDirectory.FullPath, "BenchmarkDotNet.Weaver.*.nupkg");
+        if (packages.Length != 1)
+            throw new CakeException($"'{WeaverPackageDirectory.FullPath}' should contain exactly one BenchmarkDotNet.Weaver package, but has {packages.Length}: run `build.cmd pack-weaver`.");
+        var packagePath = packages[0];
+
+        string packed;
+        using (var package = ZipFile.OpenRead(packagePath))
+        {
+            var entry = package.GetEntry(WeaverLocatorPath)
+                ?? throw new CakeException($"'{packagePath}' has no '{WeaverLocatorPath}': {fix}.");
+            using var reader = new StreamReader(entry.Open());
+            packed = reader.ReadToEnd();
+        }
+        var source = File.ReadAllText(WeaverDirectory.CombineWithFilePath(WeaverLocatorPath).FullPath);
+
+        // Git may check the source out with either line ending.
+        if (packed.Replace("\r\n", "\n") != source.Replace("\r\n", "\n"))
+            throw new CakeException($"src/BenchmarkDotNet.Weaver/{WeaverLocatorPath} differs from the copy in '{packagePath}': {fix}.");
     }
 
     public void Restore()
     {
+        VerifyWeaverPackage();
+
         var restoreSettings = new DotNetRestoreSettings
         {
             MSBuildSettings = context.MsBuildSettingsRestore,

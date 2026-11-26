@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Weaves with the Weaver built from source. BenchmarkDotNet.Weaver.targets, the Weaver package's entry point, imports this
+  file from the BenchmarkDotNet source tree that the building project references.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BenchmarkDotNetWeaverTaskAssembly>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\bin\netstandard2.0\BenchmarkDotNet.Weaver.dll'))</BenchmarkDotNetWeaverTaskAssembly>
+  </PropertyGroup>
+
+  <!--
+    TaskHostFactory runs the task in a process of its own that exits once the task finishes. Loaded in-process instead, the
+    assembly would stay locked by the long-lived MSBuild nodes and Visual Studio, so rebuilding the Weaver would either fail
+    or leave the stale copy running.
+  -->
+  <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssemblyTask" AssemblyFile="$(BenchmarkDotNetWeaverTaskAssembly)" TaskFactory="TaskHostFactory" />
+
+  <!--
+    A rebuilt Weaver recompiles the project. Weaving the previously woven assembly again could only add to what the old
+    Weaver did, never undo it. The fast up-to-date check in Visual Studio skips a project without running any targets, so
+    it is told about the dependency too. BenchmarkDotNet.Annotations is told about the Weaver's source instead: in Visual
+    Studio it builds the Weaver itself, and an input that changes during a project's own build makes the next check fail
+    as well.
+  -->
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Include="$(BenchmarkDotNetWeaverTaskAssembly)" />
+    <UpToDateCheckInput Include="$(BenchmarkDotNetWeaverTaskAssembly)" Condition="'$(MSBuildProjectName)' != 'BenchmarkDotNet.Annotations'" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)BenchmarkDotNet.Weaver.Common.targets" />
+
+  <Target Name="_BenchmarkDotNetCheckWeaverBuilt"
+      BeforeTargets="BenchmarkDotNetWeaveAssemblies"
+      Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' == 'true' and '$(SkipCompilerExecution)' != 'true' and !Exists('$(BenchmarkDotNetWeaverTaskAssembly)')">
+    <Error Text="The BenchmarkDotNet weaver has not been built: '$(BenchmarkDotNetWeaverTaskAssembly)' does not exist. Build the referenced BenchmarkDotNet projects." />
+  </Target>
+</Project>

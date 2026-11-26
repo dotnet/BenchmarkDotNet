@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Shared weaving logic imported by both BenchmarkDotNet.Weaver.targets (Weaver package, used by in-repo ProjectReferences)
-  and BenchmarkDotNet.Annotations.targets (bundled into the Annotations package for NuGet consumers).
+  Shared weaving logic imported by both BenchmarkDotNet.Weaver.Source.targets (weaving with the Weaver built from source,
+  for projects that reference the BenchmarkDotNet projects) and BenchmarkDotNet.Annotations.targets (bundled into the
+  Annotations package for NuGet consumers).
 
-  Both importing files live next to this one (buildTransitive/netstandard2.0), so $(MSBuildThisFileDirectory)
-  resolves the task assembly identically regardless of which package this ends up in.
+  The importing file declares the WeaveAssemblyTask UsingTask and sets BenchmarkDotNetWeaverTaskAssembly to the assembly
+  that task is loaded from.
 -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <UsingTask TaskName="BenchmarkDotNet.Weaver.WeaveAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\tasks\netstandard2.0\BenchmarkDotNet.Weaver.dll" />
-
   <PropertyGroup>
     <BenchmarkDotNetShouldWeaveAssemblies Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' == ''">true</BenchmarkDotNetShouldWeaveAssemblies>
     <BenchmarkDotNetWeaveAssembliesAfterTargets Condition="'$(BenchmarkDotNetWeaveAssembliesAfterTargets)' == ''">CoreCompile</BenchmarkDotNetWeaveAssembliesAfterTargets>
@@ -26,7 +25,7 @@
       AfterTargets="$(BenchmarkDotNetWeaveAssembliesAfterTargets)"
       BeforeTargets="$(BenchmarkDotNetWeaveAssembliesBeforeTargets)"
       Condition="'$(BenchmarkDotNetShouldWeaveAssemblies)' == 'true' and '$(SkipCompilerExecution)' != 'true'"
-      Inputs="$(BenchmarkDotNetWeaveAssemblyPath)"
+      Inputs="$(BenchmarkDotNetWeaveAssemblyPath);$(BenchmarkDotNetWeaverTaskAssembly)"
       Outputs="$(BenchmarkDotNetWeaveAssembliesStampFile)">
 
     <!--

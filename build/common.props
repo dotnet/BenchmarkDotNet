@@ -39,7 +39,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(VersionPrefix)' == '' ">
-    <!-- When this is changed, optionally reset WeaverVersionSuffix, then run `build.cmd pack-weaver`. -->
     <VersionPrefix>0.16.0</VersionPrefix>
   </PropertyGroup>
 
@@ -56,8 +55,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Increment this when the BenchmarkDotNet.Weaver package needs to be re-packed. -->
-    <WeaverVersionSuffix>-11</WeaverVersionSuffix>
+    <!-- The version of the BenchmarkDotNet.Weaver package, independent of the BenchmarkDotNet version. Increment it
+         whenever src/BenchmarkDotNet.Weaver/buildTransitive/netstandard2.0/BenchmarkDotNet.Weaver.targets changes,
+         then run `build.cmd pack-weaver`: NuGet caches a package by version, so re-packing the same one is not seen. -->
+    <WeaverPackageVersion>0.1.0-dev</WeaverPackageVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(MSBuildProjectExtension)' != '.fsproj'">
