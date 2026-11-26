@@ -34,16 +34,21 @@ internal class DefaultCpuDetector : ICpuDetector
     [SupportedOSPlatform("windows6.1")]
     internal static class ProcessorInfo
     {
-        public static CpuInfo GetCpuInfo()
+        public static CpuInfo? GetCpuInfo()
         {
             var processorModelNames = new HashSet<string>();
             double maxFrequency = 0;
             double nominalFrequency = 0;
 
-            // Gets CPU information from registry.
-            GetProcessorInfoFromRegistry(processorModelNames, ref maxFrequency, ref nominalFrequency);
+            // Gets CPU name and frequency information from SMBIOS or Registry.
+            if (!TryGetProcessorInfoFromSmbios(processorModelNames, ref maxFrequency, ref nominalFrequency)
+             && !TryGetProcessorInfoFromRegistry(processorModelNames, ref maxFrequency, ref nominalFrequency))
+            {
+                return null;
+            }
 
             // Gets other CPU information by using Win32 API.
+            // (Because SMBIOS information is set on OS boot timing and SMBIOS don't have P-Core/E-Core information)
             var data = GetLogicalProcessorInformation() ?? new CpuData();
 
             string? processorName = processorModelNames.Count > 0
@@ -67,12 +72,34 @@ internal class DefaultCpuDetector : ICpuDetector
             };
         }
 
-        private static void GetProcessorInfoFromRegistry(HashSet<string> names, ref double maxFrequency, ref double nominalFrequency)
+        private static bool TryGetProcessorInfoFromSmbios(HashSet<string> names, ref double maxFrequency, ref double nominalFrequency)
+        {
+            var processors = Smbios.SmbiosDataAccessor.GetProcessorInfo();
+            foreach (var processor in processors)
+            {
+                // A populated socket can still have its CPU disabled by the user or the BIOS,
+                // and only enabled CPUs contribute to the reported CPU information.
+                if (!processor.IsEnabled)
+                    continue;
+
+                var processorName = processor.ProcessorVersion;
+                if (processorName.IsNotBlank())
+                    names.Add(processorName.Trim()); // It need to trim value, because it may contains trailing whitespaces.
+
+                maxFrequency = Math.Max(maxFrequency, processor.MaxSpeedMHz);
+                nominalFrequency = Math.Max(nominalFrequency, processor.CurrentSpeedMHz);
+            }
+
+            // On some virtualized environment(e.g.`macos(x64`). these information is not available.
+            return names.Count > 0 && maxFrequency > 0 && nominalFrequency > 0;
+        }
+
+        private static bool TryGetProcessorInfoFromRegistry(HashSet<string> names, ref double maxFrequency, ref double nominalFrequency)
         {
             using var key = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
 
             if (key == null)
-                return;
+                return false;
 
             // HKLM\HARDWARE\DESCRIPTION\System\CentralProcessor\0..{N}
             foreach (string subKeyName in key.GetSubKeyNames())
@@ -95,6 +122,7 @@ internal class DefaultCpuDetector : ICpuDetector
                         : Math.Min(nominalFrequency, mhz);
                 }
             }
+            return true;
         }
 
         private static unsafe CpuData? GetLogicalProcessorInformation()

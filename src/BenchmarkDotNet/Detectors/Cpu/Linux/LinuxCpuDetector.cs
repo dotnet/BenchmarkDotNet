@@ -5,13 +5,13 @@ namespace BenchmarkDotNet.Detectors.Cpu.Linux;
 
 /// <summary>
 /// CPU information from output of the `cat /proc/cpuinfo` and `lscpu` command.
-/// Linux only.
+/// When the process is elevated, the CPU name and frequencies are overwritten that are taken from SMBIOS information.
 /// </summary>
-internal class LinuxCpuDetector : ICpuDetector
+internal class LinuxCpuDetector : CpuDetectorBase
 {
-    public bool IsApplicable() => OsDetector.IsLinux();
+    public override bool IsApplicable() => OsDetector.IsLinux();
 
-    public CpuInfo? Detect()
+    public override CpuInfo? Detect()
     {
         if (!IsApplicable()) return null;
 
@@ -26,9 +26,12 @@ internal class LinuxCpuDetector : ICpuDetector
         string? cpuInfo = ProcessHelper.RunAndReadOutput("cat", "/proc/cpuinfo") ?? string.Empty;
         string? lscpu = ProcessHelper.RunAndReadOutput("/bin/bash", "-c \"lscpu\"", environmentVariables: languageInvariantEnvironment) ?? string.Empty;
 
-        if (cpuInfo == string.Empty && lscpu == string.Empty)
-            return null;
+        var result = LinuxCpuInfoParser.Parse(cpuInfo, lscpu);
 
-        return LinuxCpuInfoParser.Parse(cpuInfo, lscpu);
+        // Try to overwrite ProcessorName/Frequencies information by using SMBIOS data
+        if (TryGetSmbiosCpuInfo(out var smbiosCpuInfo))
+            ApplySmbiosNameAndFrequency(result, smbiosCpuInfo);
+
+        return result;
     }
 }

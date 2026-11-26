@@ -3,7 +3,7 @@ using BenchmarkDotNet.Helpers;
 using Perfolizer.Models;
 using System.Diagnostics.CodeAnalysis;
 
-namespace BenchmarkDotNet.Detectors.Cpu.macOS;
+namespace BenchmarkDotNet.Detectors.Cpu.MacOS;
 
 internal static class SysctlCpuInfoParser
 {
