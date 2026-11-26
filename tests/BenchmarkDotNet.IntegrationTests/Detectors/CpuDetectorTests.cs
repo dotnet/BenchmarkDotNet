@@ -19,12 +19,13 @@ public class CpuDetectorTests(ITestOutputHelper Output)
         cpuInfo.Should().NotBeNull();
         cpuInfo.ToFullBrandName().Should().NotBe("Unknown processor");
 
-        Output.WriteLine(cpuInfo.ToFullBrandName());
-        if (cpuInfo.MaxFrequencyHz == null || cpuInfo.NominalFrequencyHz == null)
-            return;
-
+        Output.WriteLine($"FullBrandName: {cpuInfo.ToFullBrandName()}");
+        Output.WriteLine($"ProcessorName: {cpuInfo.ProcessorName}");
         Output.WriteLine($"MaxFrequencyHz: {cpuInfo.MaxFrequencyHz}");
         Output.WriteLine($"NominalFrequencyHz: {cpuInfo.NominalFrequencyHz}");
+
+        if (cpuInfo.MaxFrequencyHz == null || cpuInfo.NominalFrequencyHz == null)
+            return;
 
         // On Linux, There is issue wrong CPU frequency is returned on some CPU.
         // https://github.com/dotnet/BenchmarkDotNet/pull/3131#issuecomment-4455965694
