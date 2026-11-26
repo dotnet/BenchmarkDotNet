@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Detectors;
+using BenchmarkDotNet.Detectors.Smbios;
 using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Helpers;
-using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
@@ -98,7 +98,7 @@ namespace BenchmarkDotNet.Environments
             var memStatus = new MEMORYSTATUSEX { dwLength = (uint) Marshal.SizeOf<MEMORYSTATUSEX>() };
             if (PInvoke.GlobalMemoryStatusEx(ref memStatus))
             {
-                var (speed, type) = GetWindowsMemoryDetails();
+                var (speed, type) = GetSmbiosMemoryDeviceDetails();
                 return new PhysicalMemoryInfo((long) memStatus.ullTotalPhys, (long) memStatus.ullAvailPhys, speed, type);
             }
 
@@ -171,20 +171,10 @@ namespace BenchmarkDotNet.Environments
         private static (long? SpeedMts, string? MemoryType) GetLinuxMemoryDetails()
         {
             // The raw SMBIOS table is readable only by root on most distros.
-            try
-            {
-                const string dmiTablePath = "/sys/firmware/dmi/tables/DMI";
-                if (File.Exists(dmiTablePath))
-                {
-                    var details = ParseSmbiosMemoryDevices(File.ReadAllBytes(dmiTablePath));
-                    if (details.SpeedMts.HasValue || details.MemoryType != null)
-                        return details;
-                }
-            }
-            catch
-            {
-                // Fall back to EDAC
-            }
+            // SmbiosDataAccessor returns no data when the files cannot be read.
+            var details = GetSmbiosMemoryDeviceDetails();
+            if (details.SpeedMts.HasValue || details.MemoryType != null)
+                return details;
 
             // EDAC is world-readable but usually only present on ECC systems, and it does not expose the speed.
             try
@@ -227,129 +217,62 @@ namespace BenchmarkDotNet.Environments
             return edacType.StartsWith("Low-Power", StringComparison.Ordinal) ? "LP" + match.Value : match.Value;
         }
 
-        [SupportedOSPlatform("windows6.0.6000")]
-        private static unsafe (long? SpeedMts, string? MemoryType) GetWindowsMemoryDetails()
+        private static (long? SpeedMts, string? MemoryType) GetSmbiosMemoryDeviceDetails()
+        {
+            if (!SmbiosDataAccessor.TryGetSmbiosData(out _, out var table))
+                return (null, null);
+
+            return ParseSmbiosMemoryDevices(table);
+        }
+
+        /// <summary>
+        /// Reads the memory type and speed from the SMBIOS Memory Device (Type 17) structures.
+        /// Returns <c>(null, null)</c> when SMBIOS is not available.
+        /// </summary>
+        internal static (long? SpeedMts, string? MemoryType) ParseSmbiosMemoryDevices(ReadOnlySpan<byte> table)
         {
             try
             {
-                const uint rsMb = 0x52534D42; // 'RSMB'
-                var provider = (FIRMWARE_TABLE_PROVIDER) rsMb;
-                uint bufferSize = PInvoke.GetSystemFirmwareTable(provider, 0, null, 0);
-                if (bufferSize == 0)
-                    return (null, null);
+                long? speed = null;
+                string? memoryType = null;
 
-                byte[] buffer = new byte[bufferSize];
-                fixed (byte* pBuffer = buffer)
+                var devices = SmbiosDataParser.ParseMemoryDevicesInfo(table);
+
+                foreach (SmbiosMemoryDeviceInfo device in devices)
                 {
-                    if (PInvoke.GetSystemFirmwareTable(provider, 0, pBuffer, bufferSize) == 0)
-                        return (null, null);
+                    // 0x00 (Reserved) and 0x02 (Unknown) should not be shown as display name.
+                    if (memoryType == null && device.MemoryTypeId is not (0x00 or 0x02))
+                        memoryType = device.MemoryTypeName;
+
+                    // When multiple memory modules exists, Use the speed of the slowest one.
+                    long? deviceSpeed = GetMemoryDeviceSpeed(device);
+                    if (deviceSpeed.HasValue && (speed == null || deviceSpeed.Value < speed.Value))
+                        speed = deviceSpeed;
                 }
 
-                // RawSMBIOSData header: 4 version bytes, then the DWORD length of the structure table that follows.
-                const int headerSize = 8;
-                if (buffer.Length < headerSize)
-                    return (null, null);
-                int tableLength = (int) Math.Min(BinaryPrimitives.ReadUInt32LittleEndian(buffer.AsSpan(4)), (uint) (buffer.Length - headerSize));
-                return ParseSmbiosMemoryDevices(buffer.AsSpan(headerSize, tableLength));
+                return (speed, memoryType);
             }
             catch
             {
+                // SMBIOS is optional information; ignore failures and let the caller fall back.
                 return (null, null);
             }
         }
 
-        /// <summary>
-        /// Reads the memory type and speed from the Memory Device (type 17) structures of an SMBIOS structure table (DMTF DSP0134).
-        /// </summary>
-        internal static (long? SpeedMts, string? MemoryType) ParseSmbiosMemoryDevices(ReadOnlySpan<byte> table)
+        // Configured Memory Speed is what the module actually runs at.
+        // Speed is the module's maximum rated speed, used only when the configured speed is not reported.
+        private static long? GetMemoryDeviceSpeed(SmbiosMemoryDeviceInfo device)
         {
-            const byte memoryDeviceType = 17;
-            const byte endOfTableType = 127;
+            uint configuredSpeed = device.ResolvedConfiguredSpeedMTs;
+            if (configuredSpeed != 0)
+                return configuredSpeed;
 
-            long? speed = null;
-            string? memoryType = null;
-            int offset = 0;
+            uint ratedSpeed = device.ResolvedSpeedMTs;
+            if (ratedSpeed != 0)
+                return ratedSpeed;
 
-            while (offset + 4 <= table.Length)
-            {
-                byte structureType = table[offset];
-                byte length = table[offset + 1];
-
-                if (structureType == endOfTableType || length < 4 || offset + length > table.Length)
-                    break;
-
-                if (structureType == memoryDeviceType)
-                {
-                    var device = table.Slice(offset, length);
-                    if (IsInstalledMemoryDevice(device))
-                    {
-                        if (memoryType == null && device.Length > 0x12)
-                            memoryType = MapSmbiosMemoryType(device[0x12]);
-
-                        // Mixed modules all run at the speed of the slowest one.
-                        long? deviceSpeed = GetMemoryDeviceSpeed(device);
-                        if (deviceSpeed.HasValue && (speed == null || deviceSpeed.Value < speed.Value))
-                            speed = deviceSpeed;
-                    }
-                }
-
-                // Skip the formatted area, then the string-set, which ends with a double null.
-                offset += length;
-                while (offset + 1 < table.Length && (table[offset] != 0 || table[offset + 1] != 0))
-                    offset++;
-                offset += 2;
-            }
-
-            return (speed, memoryType);
+            return null;
         }
-
-        // Size (WORD at 0x0C) is 0 for an empty slot.
-        private static bool IsInstalledMemoryDevice(ReadOnlySpan<byte> device)
-            => device.Length < 0x0E || BinaryPrimitives.ReadUInt16LittleEndian(device.Slice(0x0C)) != 0;
-
-        // Configured Memory Speed (0x20, SMBIOS 2.7+) is what the module actually runs at.
-        // Speed (0x15) is the module's maximum rated speed, used only when the configured speed is not reported.
-        private static long? GetMemoryDeviceSpeed(ReadOnlySpan<byte> device)
-            => ReadSmbiosSpeed(device, wordOffset: 0x20, extendedOffset: 0x58)
-                ?? ReadSmbiosSpeed(device, wordOffset: 0x15, extendedOffset: 0x54);
-
-        private static long? ReadSmbiosSpeed(ReadOnlySpan<byte> device, int wordOffset, int extendedOffset)
-        {
-            if (device.Length < wordOffset + 2)
-                return null;
-
-            ushort speed = BinaryPrimitives.ReadUInt16LittleEndian(device.Slice(wordOffset));
-            if (speed == 0)
-                return null; // unknown
-            if (speed != 0xFFFF)
-                return speed;
-
-            // 0xFFFF means the speed is in the DWORD Extended field (SMBIOS 3.3+), whose bit 31 is reserved.
-            if (device.Length < extendedOffset + 4)
-                return null;
-            uint extendedSpeed = BinaryPrimitives.ReadUInt32LittleEndian(device.Slice(extendedOffset)) & 0x7FFFFFFF;
-            return extendedSpeed == 0 ? null : extendedSpeed;
-        }
-
-        private static string? MapSmbiosMemoryType(byte type) => type switch
-        {
-            0x12 => "DDR",
-            0x13 => "DDR2",
-            0x18 => "DDR3",
-            0x1A => "DDR4",
-            0x1B => "LPDDR",
-            0x1C => "LPDDR2",
-            0x1D => "LPDDR3",
-            0x1E => "LPDDR4",
-            0x20 => "HBM",
-            0x21 => "HBM2",
-            0x22 => "DDR5",
-            0x23 => "LPDDR5",
-            0x24 => "HBM3",
-            0x25 => "MRDIMM",
-            0x26 => "LPDDR6",
-            _ => null
-        };
 
         private static PhysicalMemoryInfo? GetMacMemory()
         {
