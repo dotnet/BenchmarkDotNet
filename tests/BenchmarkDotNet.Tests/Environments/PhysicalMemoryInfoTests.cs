@@ -1,7 +1,6 @@
 using AwesomeAssertions;
 using BenchmarkDotNet.Environments;
 using System.Buffers.Binary;
-using Xunit;
 
 namespace BenchmarkDotNet.Tests.Environments
 {
@@ -30,100 +29,161 @@ namespace BenchmarkDotNet.Tests.Environments
         public void ToFormattedString(long? available, long? speed, string? type, string expected)
         {
             var info = new PhysicalMemoryInfo(SixteenGb, available, speed, type);
-            Assert.Equal(expected, info.ToFormattedString());
+            info.ToFormattedString().Should().Be(expected);
         }
 
         [Fact]
         public void TwoArgumentConstructorLeavesDetailsUnset()
         {
             var info = new PhysicalMemoryInfo(SixteenGb, EightGb);
-            Assert.Null(info.FrequencyMts);
-            Assert.Null(info.MemoryType);
+            info.FrequencyMts.Should().BeNull();
+            info.MemoryType.Should().BeNull();
         }
 
         [Fact]
         public void SmbiosPrefersConfiguredSpeedOverRatedSpeed()
         {
+            // Arrange
             // A DDR4-3600 module running at 2133 (XMP off).
             byte[] table = Table(MemoryDevice(Smbios28Length, Ddr4, speed: 3600, configuredSpeed: 2133));
 
-            Assert.Equal((2133L, "DDR4"), SystemMemory.ParseSmbiosMemoryDevices(table));
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(table);
+
+            // Assert
+            result.Should().Be((2133L, "DDR4"));
         }
 
         [Fact]
         public void SmbiosFallsBackToRatedSpeedBeforeVersion27()
         {
+            // Arrange
             byte[] table = Table(MemoryDevice(Smbios23Length, Ddr4, speed: 2400));
 
-            Assert.Equal((2400L, "DDR4"), SystemMemory.ParseSmbiosMemoryDevices(table));
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(table);
+
+            // Assert
+            result.Should().Be((2400L, "DDR4"));
         }
 
         [Fact]
         public void SmbiosFallsBackToRatedSpeedWhenConfiguredSpeedIsUnknown()
         {
+            // Arrange
             byte[] table = Table(MemoryDevice(Smbios28Length, Ddr4, speed: 2400, configuredSpeed: 0));
 
-            Assert.Equal((2400L, "DDR4"), SystemMemory.ParseSmbiosMemoryDevices(table));
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(table);
+
+            // Assert
+            result.Should().Be((2400L, "DDR4"));
         }
 
         [Fact]
         public void SmbiosReadsExtendedSpeedWhenWordIsSaturated()
         {
+            // Arrange
             byte[] table = Table(MemoryDevice(Smbios33Length, Ddr5, speed: 0xFFFF, configuredSpeed: 0xFFFF, extendedSpeed: 88000, extendedConfiguredSpeed: 70000));
 
-            Assert.Equal((70000L, "DDR5"), SystemMemory.ParseSmbiosMemoryDevices(table));
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(table);
+
+            // Assert
+            result.Should().Be((70000L, "DDR5"));
         }
 
         [Fact]
         public void SmbiosIgnoresSaturatedSpeedWithoutExtendedField()
         {
+            // Arrange
             byte[] table = Table(MemoryDevice(Smbios28Length, Ddr5, speed: 0xFFFF, configuredSpeed: 0xFFFF));
 
-            Assert.Equal(((long?) null, "DDR5"), SystemMemory.ParseSmbiosMemoryDevices(table));
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(table);
+
+            // Assert
+            result.Should().Be((null, "DDR5"));
+        }
+
+        [Theory]
+        [InlineData((byte) 0x00)] // Reserved
+        [InlineData((byte) 0x02)] // Unknown
+        public void SmbiosOmitsReservedOrUnknownMemoryTypes(byte memoryType)
+        {
+            // Arrange
+            byte[] table = Table(MemoryDevice(Smbios28Length, memoryType, speed: 4800, configuredSpeed: 4800));
+
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(table);
+
+            // Assert
+            result.Should().Be((4800L, null));
         }
 
         [Fact]
         public void SmbiosSkipsEmptySlotsAndOtherStructures()
         {
+            // Arrange
             byte[] table = Table(
                 OtherStructure(type: 16, "Board"),
                 MemoryDevice(Smbios28Length, UnknownType, speed: 0, configuredSpeed: 0, size: 0, strings: ["DIMM_A1"]),
                 MemoryDevice(Smbios28Length, Ddr5, speed: 4800, configuredSpeed: 4800, strings: ["DIMM_A2", "Vendor"]));
 
-            Assert.Equal((4800L, "DDR5"), SystemMemory.ParseSmbiosMemoryDevices(table));
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(table);
+
+            // Assert
+            result.Should().Be((4800L, "DDR5"));
         }
 
         [Fact]
         public void SmbiosReportsSlowestModule()
         {
+            // Arrange
             byte[] table = Table(
                 MemoryDevice(Smbios28Length, Ddr5, speed: 6000, configuredSpeed: 5600),
                 MemoryDevice(Smbios28Length, Ddr5, speed: 4800, configuredSpeed: 4800));
 
-            Assert.Equal((4800L, "DDR5"), SystemMemory.ParseSmbiosMemoryDevices(table));
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(table);
+
+            // Assert
+            result.Should().Be((4800L, "DDR5"));
         }
 
         [Fact]
         public void SmbiosStopsAtEndOfTable()
         {
+            // Arrange
             byte[] table = Table(
                 OtherStructure(type: 127),
                 MemoryDevice(Smbios28Length, Ddr5, speed: 4800, configuredSpeed: 4800));
 
-            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseSmbiosMemoryDevices(table));
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(table);
+
+            // Assert
+            result.Should().Be((null, null));
         }
 
         [Fact]
         public void SmbiosToleratesTruncatedTable()
         {
+            // Arrange
             byte[] full = Table(MemoryDevice(Smbios28Length, Ddr5, speed: 4800, configuredSpeed: 4800));
 
-            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseSmbiosMemoryDevices(full.AsSpan(0, 10)));
+            // Act
+            var result = SystemMemory.ParseSmbiosMemoryDevices(full.AsSpan(0, 10).ToArray());
+
+            // Assert
+            result.Should().Be((null, null));
         }
 
         [Fact]
         public void MacIntelReadsPerSlotItems()
         {
+            // Arrange
             const string json = """
                 {
                   "SPMemoryDataType" : [
@@ -140,12 +200,17 @@ namespace BenchmarkDotNet.Tests.Environments
                 }
                 """;
 
-            Assert.Equal((2667L, "DDR4"), SystemMemory.ParseMacMemoryJson(json));
+            // Act
+            var result = SystemMemory.ParseMacMemoryJson(json);
+
+            // Assert
+            result.Should().Be((2667L, "DDR4"));
         }
 
         [Fact]
         public void MacAppleSiliconReadsTypeWithoutSpeed()
         {
+            // Arrange
             const string json = """
                 {
                   "SPMemoryDataType" : [
@@ -154,7 +219,11 @@ namespace BenchmarkDotNet.Tests.Environments
                 }
                 """;
 
-            Assert.Equal(((long?) null, "LPDDR5"), SystemMemory.ParseMacMemoryJson(json));
+            // Act
+            var result = SystemMemory.ParseMacMemoryJson(json);
+
+            // Assert
+            result.Should().Be((null, "LPDDR5"));
         }
 
         [Fact]
@@ -164,15 +233,15 @@ namespace BenchmarkDotNet.Tests.Environments
             const string arm64 = """{ "SPMemoryDataType" : [ { "dimm_manufacturer" : "Unknown", "dimm_type" : "Unknown", "SPMemoryDataType" : "7 GB" } ] }""";
             const string x64 = """{ "SPMemoryDataType" : [ { "_items" : [ { "_name" : "DIMM0", "dimm_size" : "14 GB", "dimm_speed" : "1600 MHz", "dimm_type" : "RAM" } ] } ] }""";
 
-            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseMacMemoryJson(arm64));
-            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseMacMemoryJson(x64));
+            SystemMemory.ParseMacMemoryJson(arm64).Should().Be((null, null));
+            SystemMemory.ParseMacMemoryJson(x64).Should().Be((null, null));
         }
 
         [Fact]
         public void MacWithoutMemoryDataReturnsNothing()
         {
-            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseMacMemoryJson("""{ "SPMemoryDataType" : [] }"""));
-            Assert.Equal(((long?) null, (string?) null), SystemMemory.ParseMacMemoryJson("{}"));
+            SystemMemory.ParseMacMemoryJson("""{ "SPMemoryDataType" : [] }""").Should().Be((null, null));
+            SystemMemory.ParseMacMemoryJson("{}").Should().Be((null, null));
         }
 
         [Theory]
@@ -184,7 +253,11 @@ namespace BenchmarkDotNet.Tests.Environments
         [InlineData("Unknown", null)]
         public void EdacMemoryTypeIsNormalized(string edacType, string? expected)
         {
-            Assert.Equal(expected, SystemMemory.NormalizeEdacMemoryType(edacType));
+            // Act
+            var result = SystemMemory.NormalizeEdacMemoryType(edacType);
+
+            // Assert
+            result.Should().Be(expected);
         }
 
         [Fact]
@@ -312,6 +385,7 @@ namespace BenchmarkDotNet.Tests.Environments
         [Fact]
         public void MacAvailableMemoryIncludesReusablePages()
         {
+            // Arrange
             const string vmStat = """
                 Mach Virtual Memory Statistics: (page size of 16384 bytes)
                 Pages free:                               100.
@@ -322,12 +396,17 @@ namespace BenchmarkDotNet.Tests.Environments
                 Pages wired down:                       500.
                 """;
 
-            Assert.Equal(7_372_800, SystemMemory.ParseMacAvailableMemory(vmStat));
+            // Act
+            var result = SystemMemory.ParseMacAvailableMemory(vmStat);
+
+            // Assert
+            result.Should().Be(7_372_800);
         }
 
         [Fact]
         public void MacAvailableMemoryReturnsZeroWhenAllAvailablePagesAreZero()
         {
+            // Arrange
             const string vmStat = """
                 Mach Virtual Memory Statistics: (page size of 4096 bytes)
                 Pages free:                                 0.
@@ -335,36 +414,51 @@ namespace BenchmarkDotNet.Tests.Environments
                 Pages speculative:                           0.
                 """;
 
-            Assert.Equal(0, SystemMemory.ParseMacAvailableMemory(vmStat));
+            // Act
+            var result = SystemMemory.ParseMacAvailableMemory(vmStat);
+
+            // Assert
+            result.Should().Be(0);
         }
 
         [Fact]
         public void MacAvailableMemoryReturnsNullWhenFreePagesAreMissing()
         {
+            // Arrange
             const string vmStat = """
                 Mach Virtual Memory Statistics: (page size of 4096 bytes)
                 Pages inactive:                          300.
                 Pages speculative:                        50.
                 """;
 
-            Assert.Null(SystemMemory.ParseMacAvailableMemory(vmStat));
+            // Act
+            var result = SystemMemory.ParseMacAvailableMemory(vmStat);
+
+            // Assert
+            result.Should().BeNull();
         }
 
         [Fact]
         public void MacAvailableMemoryTreatsMissingReusablePagesAsZero()
         {
+            // Arrange
             const string vmStat = """
                 Mach Virtual Memory Statistics: (page size of 16384 bytes)
                 Pages free:                               100.
                 Pages inactive:                          300.
                 """;
 
-            Assert.Equal(400 * 16384, SystemMemory.ParseMacAvailableMemory(vmStat));
+            // Act
+            var result = SystemMemory.ParseMacAvailableMemory(vmStat);
+
+            // Assert
+            result.Should().Be(400 * 16384);
         }
 
         [Fact]
         public void MacAvailableMemoryDefaultsTo4KPagesWhenPageSizeIsMissing()
         {
+            // Arrange
             const string vmStat = """
                 Mach Virtual Memory Statistics:
                 Pages free:                               100.
@@ -372,7 +466,11 @@ namespace BenchmarkDotNet.Tests.Environments
                 Pages speculative:                        50.
                 """;
 
-            Assert.Equal(450 * 4096, SystemMemory.ParseMacAvailableMemory(vmStat));
+            // Act
+            var result = SystemMemory.ParseMacAvailableMemory(vmStat);
+
+            // Assert
+            result.Should().Be(450 * 4096);
         }
     }
 }
