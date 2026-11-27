@@ -43,6 +43,19 @@ namespace BenchmarkDotNet.Extensions
                 : new IntPtr(processorAffinity.ToInt32() & cpuMask);
         }
 
+        // a 32 bit process only reaches the first 32 processors and new IntPtr(long) throws there instead of truncating
+        internal static bool TryConvertAffinity(ulong mask, int pointerSize, out IntPtr affinity)
+        {
+            if (pointerSize >= 8)
+            {
+                affinity = new IntPtr(unchecked((long) mask));
+                return true;
+            }
+
+            affinity = new IntPtr(unchecked((int) mask));
+            return mask <= uint.MaxValue;
+        }
+
         public static bool TrySetPriority(
             this Process process,
             ProcessPriorityClass priority,

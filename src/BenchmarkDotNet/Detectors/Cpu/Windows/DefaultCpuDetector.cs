@@ -2,10 +2,7 @@ using BenchmarkDotNet.Extensions;
 using Microsoft.Win32;
 using Perfolizer.Horology;
 using Perfolizer.Models;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using Windows.Win32;
-using Windows.Win32.Foundation;
 using Windows.Win32.System.SystemInformation;
 
 namespace BenchmarkDotNet.Detectors.Cpu.Windows;
@@ -97,53 +94,24 @@ internal class DefaultCpuDetector : ICpuDetector
             }
         }
 
-        private static unsafe CpuData? GetLogicalProcessorInformation()
+        private static CpuData? GetLogicalProcessorInformation()
         {
-            // Get required buffer length.
-            uint bufferLength = 0;
-            PInvoke.GetLogicalProcessorInformationEx(LOGICAL_PROCESSOR_RELATIONSHIP.RelationAll, null, ref bufferLength);
-
-            var error = (WIN32_ERROR) Marshal.GetLastWin32Error();
-            if (bufferLength == 0 || error != WIN32_ERROR.ERROR_INSUFFICIENT_BUFFER)
-                return null;
-
-            var buffer = new byte[bufferLength];
-            fixed (byte* bufferPtr = buffer)
-            {
-                var isSuccess = PInvoke.GetLogicalProcessorInformationEx(
-                    LOGICAL_PROCESSOR_RELATIONSHIP.RelationAll,
-                    (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) bufferPtr,
-                    &bufferLength
-                );
-
-                if (!isSuccess)
-                    return null;
-
-                return ParseData(bufferPtr, bufferLength);
-            }
+            var buffer = LogicalProcessorInformation.Read(LOGICAL_PROCESSOR_RELATIONSHIP.RelationAll);
+            return buffer == null ? null : ParseData(buffer);
         }
 
-        private static unsafe CpuData ParseData(byte* bufferPtr, uint actualLength)
+        private static unsafe CpuData ParseData(byte[] buffer)
         {
-            byte* currentPtr = bufferPtr;
-            byte* endPtr = currentPtr + actualLength;
+            // GROUP_RELATIONSHIP { WORD MaximumGroupCount; WORD ActiveGroupCount; BYTE Reserved[20]; PROCESSOR_GROUP_INFO GroupInfo[]; }
+            const int groupInfoOffset = LogicalProcessorInformation.HeaderSize + 2 * sizeof(ushort) + 20;
 
             int processorPackageCount = 0;
             int physicalProcessorCoreCount = 0;
             int activeProcessorCount = 0;
 
-            while (currentPtr < endPtr)
+            LogicalProcessorInformation.ForEachEntry(buffer, info =>
             {
-                var info = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*) currentPtr;
-                uint size = info->Size;
-                uint remaining = (uint) (endPtr - currentPtr);
-
-                // Additional boundary for unexpected data. 
-                if (size == 0 || size > remaining)
-                    break;
-
-                var relationship = info->Relationship;
-                switch (relationship)
+                switch (info->Relationship)
                 {
                     case LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorPackage:
                         ++processorPackageCount;
@@ -155,6 +123,9 @@ internal class DefaultCpuDetector : ICpuDetector
 
                     case LOGICAL_PROCESSOR_RELATIONSHIP.RelationGroup:
                         ref GROUP_RELATIONSHIP group = ref info->Group;
+                        if (info->Size < groupInfoOffset + group.ActiveGroupCount * sizeof(PROCESSOR_GROUP_INFO))
+                            break; // malformed entry
+
                         for (int i = 0; i < group.ActiveGroupCount; i++)
                         {
                             activeProcessorCount += group.GroupInfo[i].ActiveProcessorCount;
@@ -165,10 +136,7 @@ internal class DefaultCpuDetector : ICpuDetector
                     default:
                         break;
                 }
-
-                // Move pointer to next struct.
-                currentPtr += size;
-            }
+            });
 
             return new CpuData
             {

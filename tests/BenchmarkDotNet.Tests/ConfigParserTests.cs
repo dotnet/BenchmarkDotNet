@@ -1,9 +1,11 @@
 using AwesomeAssertions;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.ConsoleArguments;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Extensions;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Helpers;
@@ -686,6 +688,37 @@ namespace BenchmarkDotNet.Tests
             Assert.Equal(new IntPtr((long) affinity), config.GetJobs().Single().Environment.Affinity);
         }
 
+        [Fact]
+        public void PerformanceCoresCanNotBeCombinedWithAffinity()
+        {
+            var config = ConfigParser.Parse(["--performanceCores", "--affinity", "1"], new OutputLogger(Output)).config;
+
+            Assert.Null(config);
+        }
+
+        [Fact]
+        public void PerformanceCoresSetTheDetectedAffinity()
+        {
+            var config = ConfigParser.Parse(["--performanceCores"], new OutputLogger(Output)).config;
+
+            Assert.NotNull(config);
+            if (PerformanceCoresDetector.TryGetPerformanceCoresAffinity(out var affinity))
+                Assert.Equal(affinity, config.GetJobs().Single().Environment.Affinity);
+            else // the CPU has homogeneous cores or the OS is not supported
+                Assert.DoesNotContain(config.GetJobs(), job => job.HasValue(EnvironmentMode.AffinityCharacteristic));
+        }
+
+        [Fact]
+        public void PerformanceCoresSurviveArgsUpdate()
+        {
+            // RunAll/RunAllJoined update the args, the detected mask must not be written back as --affinity
+            Assert.True(ConfigParser.TryUpdateArgs(["--performanceCores"], out var updatedArgs, options => options.Filters = ["*"]));
+
+            Assert.NotNull(updatedArgs);
+            Assert.DoesNotContain(updatedArgs, arg => arg.Equals("--affinity", StringComparison.OrdinalIgnoreCase));
+            Assert.NotNull(ConfigParser.Parse(updatedArgs, new OutputLogger(Output)).config);
+        }
+
         [FactEnvSpecific("A mask with a bit above 32 does not fit in IntPtr on a 32 bit runtime", EnvRequirement.Platform64BitOnly)]
         public void UserCanSpecifyAffinityBeyondThirtyTwoProcessors()
         {
@@ -714,7 +747,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(uint.MaxValue)]
         public void AffinityThatFitsThirtyTwoBitsIsAcceptedByAThirtyTwoBitProcess(ulong affinity)
         {
-            Assert.True(ConfigParser.TryConvertAffinity(affinity, pointerSize: 4, out var converted));
+            Assert.True(ProcessExtensions.TryConvertAffinity(affinity, pointerSize: 4, out var converted));
             Assert.Equal(new IntPtr(unchecked((int) affinity)), converted);
         }
 
@@ -724,7 +757,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(1UL << 63)]
         public void AffinityWiderThanThirtyTwoBitsIsRejectedByAThirtyTwoBitProcess(ulong affinity)
         {
-            Assert.False(ConfigParser.TryConvertAffinity(affinity, pointerSize: 4, out _));
+            Assert.False(ProcessExtensions.TryConvertAffinity(affinity, pointerSize: 4, out _));
         }
 
         [Theory]
@@ -733,7 +766,7 @@ namespace BenchmarkDotNet.Tests
         [InlineData(1UL << 63)]
         public void AffinityOfAnyWidthIsAcceptedByASixtyFourBitProcess(ulong affinity)
         {
-            Assert.True(ConfigParser.TryConvertAffinity(affinity, pointerSize: 8, out var converted));
+            Assert.True(ProcessExtensions.TryConvertAffinity(affinity, pointerSize: 8, out var converted));
             Assert.Equal(new IntPtr(unchecked((long) affinity)), converted);
         }
 
