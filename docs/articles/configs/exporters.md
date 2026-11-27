@@ -94,6 +94,17 @@ type MyPerformanceTests() =
         someTestData |> myFunctionUnderTest
 ```
 
+To plot with your own R script, derive from `RPlotExporter` and override `GetScriptAsync`.
+The script it returns is written as `BuildPlots.R` and gets the full path of the measurements CSV file as its only argument:
+
+```cs
+public class MyRPlotExporter : RPlotExporter
+{
+    protected override ValueTask<string> GetScriptAsync(Summary summary, CancellationToken cancellationToken)
+        => new(File.ReadAllText("MyPlots.R"));
+}
+```
+
 ## CSV
 
 The CSV file format is often used to graph the output or to analyze the results programmatically. The CSV exporter may be configured to produce sanitized output, where cell values are numerals and their units are predefined.
