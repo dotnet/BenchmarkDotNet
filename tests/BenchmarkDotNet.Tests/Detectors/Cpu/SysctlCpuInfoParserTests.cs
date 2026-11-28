@@ -1,4 +1,4 @@
-using BenchmarkDotNet.Detectors.Cpu.macOS;
+using BenchmarkDotNet.Detectors.Cpu.MacOS;
 using Perfolizer.Models;
 
 namespace BenchmarkDotNet.Tests.Detectors.Cpu;

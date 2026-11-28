@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Detectors.Cpu;
 using BenchmarkDotNet.Detectors.Cpu.Linux;
-using BenchmarkDotNet.Detectors.Cpu.macOS;
+using BenchmarkDotNet.Detectors.Cpu.MacOS;
 using BenchmarkDotNet.Detectors.Cpu.Windows;
 using BenchmarkDotNet.Extensions;
 using Perfolizer.Models;

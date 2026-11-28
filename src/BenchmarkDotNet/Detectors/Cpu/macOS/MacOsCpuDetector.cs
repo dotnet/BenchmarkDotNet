@@ -1,17 +1,17 @@
 using BenchmarkDotNet.Helpers;
 using Perfolizer.Models;
 
-namespace BenchmarkDotNet.Detectors.Cpu.macOS;
+namespace BenchmarkDotNet.Detectors.Cpu.MacOS;
 
 /// <summary>
 /// CPU information from output of the `sysctl -a` command.
-/// MacOSX only.
+/// When SMBIOS data is available (x64), the CPU name and frequencies are overwritten with the SMBIOS values.
 /// </summary>
-internal class MacOsCpuDetector : ICpuDetector
+internal class MacOsCpuDetector : CpuDetectorBase
 {
-    public bool IsApplicable() => OsDetector.IsMacOS();
+    public override bool IsApplicable() => OsDetector.IsMacOS();
 
-    public CpuInfo? Detect()
+    public override CpuInfo? Detect()
     {
         if (!IsApplicable()) return null;
 
@@ -20,6 +20,12 @@ internal class MacOsCpuDetector : ICpuDetector
         if (sysctlOutput is null)
             return null;
 
-        return SysctlCpuInfoParser.Parse(sysctlOutput);
+        var result = SysctlCpuInfoParser.Parse(sysctlOutput);
+
+        // Try to overwrite ProcessorName/Frequencies information by using SMBIOS data
+        if (TryGetSmbiosCpuInfo(out var smbiosCpuInfo))
+            ApplySmbiosNameAndFrequency(result, smbiosCpuInfo);
+
+        return result;
     }
 }
